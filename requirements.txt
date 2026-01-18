@@ -1,2 +1,6 @@
 google-generativeai
 python-wordpress-xmlrpc
+feedparser
+requests
+pillow
+pytz
