@@ -1,21 +1,21 @@
 name: AI Content Bot
 on:
-  workflow_dispatch: # ይህ በእጅ ለማስጀመር ቁልፉን ያመጣልሃል
+  workflow_dispatch:
 jobs:
-  run-bot:
+  build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - name: Set up Python
+      - name: Setup Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.10'
-      - name: Install dependencies
+      - name: Install Tools
         run: pip install -r requirements.txt
-      - name: Run Script
+      - name: Run Bot
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           WORDPRESS_URL: ${{ secrets.WORDPRESS_URL }}
           WORDPRESS_USER: ${{ secrets.WORDPRESS_USER }}
           WORDPRESS_PASSWORD: ${{ secrets.WORDPRESS_PASSWORD }}
-        run: python free_money_maker.py
+        run: python free_money_maker.py --auto
