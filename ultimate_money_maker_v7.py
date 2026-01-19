@@ -424,50 +424,52 @@ class GeminiContentGenerator:
             print("   Make sure your API key is valid and has access to Gemini Pro")
     
     def _test_model_availability(self):
-        """Test which Gemini models are available"""
-        self.available_models = []
-        
-        # List of models to test (Updated for 2026 Gemini 3)
-        test_models = [
-            'gemini-3-flash',           # ፈጣን እና ቀላል ተግባራት
-            'gemini-3-pro',            # ለማዕቀፍ ስራዎች እና ውስብስብ ተግባራት
-            'gemini-3-ultra',          # ለሙያዊ እና ምርምር ደረጃ ስራዎች
-            'gemini-3-flash-lite',     # ለሞባይል እና የመስመር ላይ አገልግሎቶች
-            'gemini-2.5-pro',          # አማራጭ ለተወሰኑ ልዩ ልዩ ተግባራት
-        ]
-        
-        print("🔍 Testing available Gemini models...")
-        
-        for model_name in test_models:
-            try:
-                # Quick test to see if model is accessible
-                test_model = genai.GenerativeModel(model_name)
-                response = test_model.generate_content(
-                    "Test",
-                    generation_config={'max_output_tokens': 1}
-                )
-                self.available_models.append(model_name)
-                print(f"   ✅ {model_name}: Available")
+    """Test which Gemini models are available"""
+    self.available_models = []
+    
+    # 2024-2025 የሚሰሩ ሞዴሎች ዝርዝር (በነጻ የተገለጹ)
+    test_models = [
+        'gemini-1.5-flash-latest',      # በነጻ የሚገኝ ፈጣን ሞዴል
+        'gemini-1.5-pro-latest',        # በነጻ ለብዙ ስራዎች
+        'gemini-1.0-pro-latest',        # አማራጭ ሞዴል
+        'models/gemini-1.5-flash',      # አማራጭ ፎርማት
+        'models/gemini-1.5-pro'         # አማራጭ ፎርማት
+    ]
+    
+    print("🔍 Testing available Gemini models...")
+    
+    for model_name in test_models:
+        try:
+            # Quick test to see if model is accessible
+            test_model = genai.GenerativeModel(model_name)
+            response = test_model.generate_content(
+                "Test",
+                generation_config={'max_output_tokens': 1}
+            )
+            self.available_models.append(model_name)
+            print(f"   ✅ {model_name}: Available")
+            
+            # Early exit if we find a working model
+            if len(self.available_models) >= 2:
+                break
                 
-                # Early exit if we find a working model
-                if len(self.available_models) >= 2:
-                    break
-                    
-            except Exception as e:
-                error_msg = str(e).lower()
-                if '404' in error_msg or 'not found' in error_msg:
-                    print(f"   ❌ {model_name}: Not found (404)")
-                elif 'permission' in error_msg or 'access' in error_msg:
-                    print(f"   ⚠️  {model_name}: No access")
-                else:
-                    print(f"   ⚠️  {model_name}: Error - {str(e)[:50]}")
-                continue
-        
-        if not self.available_models:
-            print("❌ No Gemini models available for use")
-            self.available = False
-        else:
-            print(f"✅ Found {len(self.available_models)} working model(s)")
+        except Exception as e:
+            error_msg = str(e).lower()
+            if '404' in error_msg or 'not found' in error_msg:
+                print(f"   ❌ {model_name}: Not found (404)")
+            elif 'quota' in error_msg or 'exceeded' in error_msg:
+                print(f"   ⚠️  {model_name}: Quota exceeded")
+            elif 'permission' in error_msg or 'access' in error_msg:
+                print(f"   ⚠️  {model_name}: No access")
+            else:
+                print(f"   ⚠️  {model_name}: Error - {str(e)[:50]}")
+            continue
+    
+    if not self.available_models:
+        print("❌ No Gemini models available for use")
+        self.available = False
+    else:
+        print(f"✅ Found {len(self.available_models)} working model(s)")
     
     def generate_article(self, topic: str, word_count: int = 1200) -> Dict:
         """Generate article using Gemini AI with model switching"""
