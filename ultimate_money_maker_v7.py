@@ -412,7 +412,8 @@ class GeminiContentGenerator:
         
         try:
             genai.configure(api_key=api_key)
-            self.model = genai.GenerativeModel('gemini-pro')
+            self.model = genai.GenerativeModel('gemini-1.5-flash')
+
             self.available = True
             print("✅ Gemini AI configured successfully")
         except Exception as e:
