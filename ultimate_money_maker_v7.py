@@ -423,7 +423,7 @@ class GeminiContentGenerator:
             print(f"⚠️  Gemini AI configuration failed: {e}")
             print("   Make sure your API key is valid and has access to Gemini Pro")
     
-        def _test_model_availability(self):
+            def _test_model_availability(self):
         """Test which Gemini models are available"""
         self.available_models = []
         
@@ -435,6 +435,7 @@ class GeminiContentGenerator:
             'gemini-1.5-flash',            # አማራጭ (Fallback)
             'gemini-1.5-pro'               # አማራጭ (Fallback)
         ]
+        
         
         print("🔍 Testing available Gemini models...")
         
