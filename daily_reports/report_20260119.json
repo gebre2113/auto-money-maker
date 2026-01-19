@@ -1,25 +1,26 @@
 {
-  "execution_date": "2026-01-19T12:48:55.121175",
-  "github_run_number": "16",
+  "execution_date": "2026-01-19T13:18:29.292555",
+  "github_run_number": "17",
   "article": {
-    "title": "Passive Income Strategies for Content Creators",
-    "word_count": 980,
-    "seo_score": 0.58,
-    "seo_grade": "D (Needs Improvement)",
+    "title": "How to Monetize Your Website with Affiliate Marketing",
+    "word_count": 1052,
+    "seo_score": 0.61,
+    "seo_grade": "C (Fair)",
     "categories": [
-      "Monetization"
+      "WordPress",
+      "Monetization",
+      "Marketing"
     ],
-    "focus_keyword": "Passive Income Strategies",
+    "focus_keyword": "How to Monetize",
     "generation_source": "fallback_template",
     "quality": "template_generated"
   },
   "seo_analysis": {
-    "overall_score": 0.58,
-    "grade": "D (Needs Improvement)",
-    "title_score": 0.9,
+    "overall_score": 0.61,
+    "grade": "C (Fair)",
+    "title_score": 1.0,
     "content_score": 0.7,
     "recommendations": [
-      "Increase content length to at least 1000 words (current: 980)",
       "Add images with alt text for better SEO"
     ]
   },
@@ -28,13 +29,13 @@
     "success": false,
     "wordpress_id": null,
     "link": null,
-    "error": "Low SEO score"
+    "error": "Failed after 3 attempts"
   },
   "system_stats": {
-    "total_articles": 5,
+    "total_articles": 6,
     "memory_stats": {
       "total_topics": 0,
-      "avg_word_count": 987.4,
+      "avg_word_count": 998.17,
       "avg_seo_score": 0.6,
       "database_size_mb": 0.02
     },
