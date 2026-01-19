@@ -1,25 +1,27 @@
 {
-  "execution_date": "2026-01-19T15:35:24.626471",
-  "github_run_number": "27",
+  "execution_date": "2026-01-19T16:34:15.131847",
+  "github_run_number": "33",
   "article": {
-    "title": "Essential WordPress Plugins for Every Website",
-    "word_count": 246,
-    "seo_score": 0.51,
+    "title": "How to Monetize Your Website with Affiliate Marketing",
+    "word_count": 258,
+    "seo_score": 0.53,
     "seo_grade": "D (Needs Improvement)",
     "categories": [
-      "WordPress"
+      "WordPress",
+      "Monetization",
+      "Marketing"
     ],
-    "focus_keyword": "Essential WordPress Plugins",
+    "focus_keyword": "How to Monetize",
     "generation_source": "template_system",
     "quality": "unknown"
   },
   "seo_analysis": {
-    "overall_score": 0.51,
+    "overall_score": 0.53,
     "grade": "D (Needs Improvement)",
-    "title_score": 0.9,
+    "title_score": 1.0,
     "content_score": 0.5,
     "recommendations": [
-      "Increase content length to at least 1000 words (current: 246)"
+      "Increase content length to at least 1000 words (current: 258)"
     ]
   },
   "publishing": {
@@ -33,8 +35,8 @@
     "total_articles": 8,
     "memory_stats": {
       "total_topics": 0,
-      "avg_word_count": 900.25,
-      "avg_seo_score": 0.59,
+      "avg_word_count": 801.0,
+      "avg_seo_score": 0.58,
       "database_size_mb": 0.02
     },
     "wordpress_connected": true,
