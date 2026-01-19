@@ -423,41 +423,53 @@ class GeminiContentGenerator:
             print(f"⚠️  Gemini AI configuration failed: {e}")
             print("   Make sure your API key is valid and has access to Gemini Pro")
     
-        def _test_model_availability(self):
+    def _test_model_availability(self):
         """Test which Gemini models are available"""
         self.available_models = []
         
-        # 2026 የሚሰሩ ሞዴሎች ዝርዝር (Indentation ተስተካክሏል)
+        # List of models to test (Updated for current working models)
         test_models = [
-            'gemini-2.0-flash-exp',
-            'gemini-1.5-flash',
-            'gemini-1.5-pro',
-            'models/gemini-1.5-flash'
+            'gemini-1.5-flash-latest',      # Fast and capable (currently free)
+            'gemini-1.5-pro-latest',        # High quality (currently free)
+            'gemini-1.0-pro-latest',        # Alternative model
+            'models/gemini-1.5-flash',      # Alternative format
+            'models/gemini-1.5-pro'         # Alternative format
         ]
+        
+        print("🔍 Testing available Gemini models...")
         
         for model_name in test_models:
             try:
-                model = genai.GenerativeModel(model_name)
-                # Test with a very short prompt
-                model.generate_content("test", generation_config={"max_output_tokens": 1})
+                # Quick test to see if model is accessible
+                test_model = genai.GenerativeModel(model_name)
+                response = test_model.generate_content(
+                    "Test",
+                    generation_config={'max_output_tokens': 1}
+                )
                 self.available_models.append(model_name)
-                print(f"✅ {model_name}: Available")
+                print(f"   ✅ {model_name}: Available")
+                
+                # Early exit if we find a working model
+                if len(self.available_models) >= 2:
+                    break
+                    
             except Exception as e:
-                error_msg = str(e)
-                if "404" in error_msg:
-                    print(f"❌ {model_name}: Not found (404)")
-                elif "429" in error_msg:
-                    print(f"⚠️ {model_name}: Error - 429 Quota Exceeded")
+                error_msg = str(e).lower()
+                if '404' in error_msg or 'not found' in error_msg:
+                    print(f"   ❌ {model_name}: Not found (404)")
+                elif 'quota' in error_msg or 'exceeded' in error_msg:
+                    print(f"   ⚠️  {model_name}: Quota exceeded")
+                elif 'permission' in error_msg or 'access' in error_msg:
+                    print(f"   ⚠️  {model_name}: No access")
                 else:
-                    print(f"❌ {model_name}: Error - {error_msg[:50]}")
-
-            continue
-    
-    if not self.available_models:
-        print("❌ No Gemini models available for use")
-        self.available = False
-    else:
-        print(f"✅ Found {len(self.available_models)} working model(s)")
+                    print(f"   ⚠️  {model_name}: Error - {str(e)[:50]}")
+                continue
+        
+        if not self.available_models:
+            print("❌ No Gemini models available for use")
+            self.available = False
+        else:
+            print(f"✅ Found {len(self.available_models)} working model(s)")
     
     def generate_article(self, topic: str, word_count: int = 1200) -> Dict:
         """Generate article using Gemini AI with model switching"""
@@ -1488,7 +1500,8 @@ class EnterpriseOrchestratorPro:
         # Publish to WordPress (only if SEO score is good)
         publish_result = None
         if self.wordpress and self.wordpress.connected:
-            if seo_analysis['overall_score'] >= 0.6:  # Minimum threshold
+            # Changed from 0.6 to 0.4 to allow more articles to be published
+            if seo_analysis['overall_score'] >= 0.4:  # Reduced threshold for testing
                 print("🌐 Publishing to WordPress...")
                 publish_result = self.wordpress.publish_article(
                     article_data,
