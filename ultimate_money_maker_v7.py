@@ -446,7 +446,7 @@ Article Structure:
 
 Make the article genuinely useful and avoid generic content."""
 
-        # Retry logic with exponential backoff
+                # Retry logic with exponential backoff
         for attempt in range(3):
             try:
                 response = self.model.generate_content(
@@ -455,9 +455,10 @@ Make the article genuinely useful and avoid generic content."""
                         'temperature': 0.7,
                         'top_p': 0.9,
                         'top_k': 40,
-                        'max_output_tokens': word_count * 1.5,
+                        'max_output_tokens': int(word_count * 1.5),
                     }
                 )
+
                 
                 content = response.text.strip()
                 
