@@ -254,7 +254,6 @@ class WordPressPublisher:
             'status': status,
             'slug': self._generate_slug(article_data.get('title', '')),
             'categories': self._get_or_create_categories(article_data.get('categories', [])),
-            'author': 1  # Default to first author
         }
         
         # Add excerpt if available
@@ -427,13 +426,13 @@ class GeminiContentGenerator:
         """Test which Gemini models are available"""
         self.available_models = []
         
-        # List of models to test (Updated for current working models)
+        # ለ2026 የሚሰሩ ሞዴሎች - አስፈላጊ ለውጦች
         test_models = [
-            'gemini-1.5-flash-latest',      # Fast and capable (currently free)
-            'gemini-1.5-pro-latest',        # High quality (currently free)
-            'gemini-1.0-pro-latest',        # Alternative model
-            'models/gemini-1.5-flash',      # Alternative format
-            'models/gemini-1.5-pro'         # Alternative format
+            'gemini-1.5-flash',          # ዋና ሞዴል - ሁልጊዜ የሚሰራ
+            'gemini-1.5-pro',           # ሁለተኛ አማራጭ
+            'gemini-1.0-pro',           # ሶስተኛ አማራጭ
+            'gemini-1.5-flash-001',     # አዲስ ስሪት
+            'gemini-pro'                # አሮጌ ስሪት
         ]
         
         print("🔍 Testing available Gemini models...")
@@ -444,7 +443,13 @@ class GeminiContentGenerator:
                 test_model = genai.GenerativeModel(model_name)
                 response = test_model.generate_content(
                     "Test",
-                    generation_config={'max_output_tokens': 1}
+                    generation_config={'max_output_tokens': 1},
+                    safety_settings=[
+                        {"category": "HARM_CATEGORY_HARASSMENT", "threshold": "BLOCK_NONE"},
+                        {"category": "HARM_CATEGORY_HATE_SPEECH", "threshold": "BLOCK_NONE"},
+                        {"category": "HARM_CATEGORY_SEXUALLY_EXPLICIT", "threshold": "BLOCK_NONE"},
+                        {"category": "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold": "BLOCK_NONE"}
+                    ]
                 )
                 self.available_models.append(model_name)
                 print(f"   ✅ {model_name}: Available")
@@ -503,7 +508,13 @@ class GeminiContentGenerator:
                         'top_p': 0.9,
                         'top_k': 40,
                         'max_output_tokens': int(word_count * 1.5),
-                    }
+                    },
+                    safety_settings=[
+                        {"category": "HARM_CATEGORY_HARASSMENT", "threshold": "BLOCK_NONE"},
+                        {"category": "HARM_CATEGORY_HATE_SPEECH", "threshold": "BLOCK_NONE"},
+                        {"category": "HARM_CATEGORY_SEXUALLY_EXPLICIT", "threshold": "BLOCK_NONE"},
+                        {"category": "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold": "BLOCK_NONE"}
+                    ]
                 )
                 
                 content = response.text.strip()
