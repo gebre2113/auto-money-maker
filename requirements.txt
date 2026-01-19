@@ -1,6 +1,6 @@
-google-generativeai
+requests>=2.31.0
+google-generativeai>=0.3.0
 python-wordpress-xmlrpc
 feedparser
-requests
 pillow
 pytz
