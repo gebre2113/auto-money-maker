@@ -1,26 +1,25 @@
 {
-  "execution_date": "2026-01-19T13:24:17.752122",
-  "github_run_number": "18",
+  "execution_date": "2026-01-19T15:35:24.626471",
+  "github_run_number": "27",
   "article": {
-    "title": "AI Content Creation: Best Practices and Tools",
-    "word_count": 967,
-    "seo_score": 0.58,
+    "title": "Essential WordPress Plugins for Every Website",
+    "word_count": 246,
+    "seo_score": 0.51,
     "seo_grade": "D (Needs Improvement)",
     "categories": [
-      "Artificial Intelligence"
+      "WordPress"
     ],
-    "focus_keyword": "AI Content Creation:",
-    "generation_source": "fallback_template",
-    "quality": "template_generated"
+    "focus_keyword": "Essential WordPress Plugins",
+    "generation_source": "template_system",
+    "quality": "unknown"
   },
   "seo_analysis": {
-    "overall_score": 0.58,
+    "overall_score": 0.51,
     "grade": "D (Needs Improvement)",
     "title_score": 0.9,
-    "content_score": 0.7,
+    "content_score": 0.5,
     "recommendations": [
-      "Increase content length to at least 1000 words (current: 967)",
-      "Add images with alt text for better SEO"
+      "Increase content length to at least 1000 words (current: 246)"
     ]
   },
   "publishing": {
@@ -31,15 +30,15 @@
     "error": "Low SEO score"
   },
   "system_stats": {
-    "total_articles": 7,
+    "total_articles": 8,
     "memory_stats": {
       "total_topics": 0,
-      "avg_word_count": 993.71,
-      "avg_seo_score": 0.6,
+      "avg_word_count": 900.25,
+      "avg_seo_score": 0.59,
       "database_size_mb": 0.02
     },
     "wordpress_connected": true,
-    "gemini_available": true,
+    "gemini_available": false,
     "telegram_available": true
   }
 }
