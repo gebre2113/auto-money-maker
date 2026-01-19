@@ -1,21 +1,57 @@
-name: AI Content Bot
+name: Ultimate Money Maker v7.0 - Daily Auto-Pilot
+
 on:
+  schedule:
+    - cron: '0 6 * * *'  # Every day at 6:00 AM UTC (9:00 AM Ethiopia)
   workflow_dispatch:
+
 jobs:
-  build:
+  run-auto-pilot:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    
     steps:
-      - uses: actions/checkout@v3
-      - name: Setup Python
+      - name: 🛎️ Checkout Repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      
+      - name: 🐍 Setup Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.10'
-      - name: Install Tools
+      
+      - name: 📦 Install Dependencies
         run: pip install -r requirements.txt
-      - name: Run Bot
+      
+      - name: 📁 Create Directories
+        run: mkdir -p memory daily_reports
+      
+      - name: 🚀 Execute Ultimate Money Maker
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-          WORDPRESS_URL: ${{ secrets.WORDPRESS_URL }}
-          WORDPRESS_USER: ${{ secrets.WORDPRESS_USER }}
-          WORDPRESS_PASSWORD: ${{ secrets.WORDPRESS_PASSWORD }}
-        run: python free_money_maker.py --auto
+          WP_URL: ${{ secrets.WP_URL }}
+          WP_USERNAME: ${{ secrets.WP_USERNAME }}
+          WP_PASSWORD: ${{ secrets.WP_PASSWORD }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          GITHUB_RUN_NUMBER: ${{ github.run_number }}
+        run: python ultimate_money_maker_v7.py
+      
+      - name: 💾 Auto-Commit Generated Data
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "GitHub Actions"
+          git add memory/ daily_reports/ github_run_status.json
+          git commit -m "🤖 Auto-update: Daily run $(date +'%Y-%m-%d')" || echo "No changes"
+          git push || echo "Push failed or not needed"
+      
+      - name: 📤 Upload Artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: enterprise-reports-${{ github.run_number }}
+          path: |
+            daily_reports/
+            github_run_status.json
+          retention-days: 30
