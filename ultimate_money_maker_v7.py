@@ -424,17 +424,17 @@ class GeminiContentGenerator:
             print("   Make sure your API key is valid and has access to Gemini Pro")
     
     def _test_model_availability(self):
-        """Test which Gemini models are available"""
-        self.available_models = []
-        
-        # List of models to test (in order of preference)
-        test_models = [
-            'gemini-1.5-flash-latest',      # Fast and capable
-            'gemini-1.5-pro-latest',        # Highest quality
-            'gemini-pro',                    # Legacy
-            'models/gemini-1.5-flash',      # Alternative format
-            'models/gemini-1.5-pro'         # Alternative format
-        ]
+    """Test which Gemini models are available"""
+    self.available_models = []
+    
+    # List of models to test (Updated for 2026 Gemini 3)
+    test_models = [
+        'gemini-3-flash',           # ፈጣን እና ቀላል ተግባራት
+        'gemini-3-pro',            # ለማዕቀፍ ስራዎች እና ውስብስብ ተግባራት
+        'gemini-3-ultra',          # ለሙያዊ እና ምርምር ደረጃ ስራዎች
+        'gemini-3-flash-lite',     # ለሞባይል እና የመስመር ላይ አገልግሎቶች
+        'gemini-2.5-pro',          # አማራጭ ለተወሰኑ ልዩ ልዩ ተግባራት
+    ]
         
         print("🔍 Testing available Gemini models...")
         
