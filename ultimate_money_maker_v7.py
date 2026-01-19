@@ -685,7 +685,7 @@ class GeminiContentGenerator:
         return f"""Write a comprehensive, SEO-optimized article about: "{topic}"
 
 CRITICAL REQUIREMENTS:
-1. Word Count: Target {word_count} words (±10%)
+1. Word Count: Target {word_count} words (plus or minus 10 percent)
 2. Language: Professional English, engaging tone
 3. Structure: Must include H1, H2, and H3 headings
 4. SEO: Naturally include the focus keyword and related terms
