@@ -849,8 +849,7 @@ The article should be publication-ready and provide real value to readers intere
         """Create guide-style template"""
         main_keyword = topic.split(':')[0] if ':' in topic else topic.split()[0]
         
-        return f"""
-<h1>{topic}</h1>
+        return f"""<h1>{topic}</h1>
 
 <p>Welcome to our comprehensive guide on {topic}. Whether you're just getting started or looking to improve your skills, this guide will walk you through everything you need to know in {year}.</p>
 
