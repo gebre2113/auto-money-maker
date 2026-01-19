@@ -1,15 +1,15 @@
 {
-  "execution_date": "2026-01-19T19:36:08.024465",
-  "github_run_number": "46",
+  "execution_date": "2026-01-19T19:38:18.513983",
+  "github_run_number": "48",
   "article": {
-    "title": "Digital Marketing Strategies That Actually Work",
-    "word_count": 246,
+    "title": "AI Content Creation: Best Practices and Tools",
+    "word_count": 253,
     "seo_score": 0.51,
     "seo_grade": "D (Needs Improvement)",
     "categories": [
-      "Marketing"
+      "Artificial Intelligence"
     ],
-    "focus_keyword": "Digital Marketing Strategies",
+    "focus_keyword": "AI Content Creation:",
     "generation_source": "template_system",
     "quality": "unknown"
   },
@@ -19,7 +19,7 @@
     "title_score": 0.9,
     "content_score": 0.5,
     "recommendations": [
-      "Increase content length to at least 1000 words (current: 246)"
+      "Increase content length to at least 1000 words (current: 253)"
     ]
   },
   "publishing": {
