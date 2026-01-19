@@ -424,7 +424,7 @@ class GeminiContentGenerator:
             print("   Make sure your API key is valid and has access to Gemini Pro")
     
     def _test_model_availability(self):
-    """Test which Gemini models are available"""
+                """Test which Gemini models are available"""
     self.available_models = []
     
     # 2024-2025 የሚሰሩ ሞዴሎች ዝርዝር (በነጻ የተገለጹ)
