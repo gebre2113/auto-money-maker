@@ -1,0 +1,45 @@
+{
+  "execution_date": "2026-01-19T10:34:32.614469",
+  "github_run_number": "9",
+  "article": {
+    "title": "How to Start a Successful Blog in 2024",
+    "word_count": 965,
+    "seo_score": 0.58,
+    "seo_grade": "D (Needs Improvement)",
+    "categories": [
+      "WordPress"
+    ],
+    "focus_keyword": "How to Start",
+    "generation_source": "fallback_template",
+    "quality": "template_generated"
+  },
+  "seo_analysis": {
+    "overall_score": 0.58,
+    "grade": "D (Needs Improvement)",
+    "title_score": 0.9,
+    "content_score": 0.7,
+    "recommendations": [
+      "Increase content length to at least 1000 words (current: 965)",
+      "Add images with alt text for better SEO"
+    ]
+  },
+  "publishing": {
+    "attempted": true,
+    "success": false,
+    "wordpress_id": null,
+    "link": null,
+    "error": "WordPress not connected"
+  },
+  "system_stats": {
+    "total_articles": 1,
+    "memory_stats": {
+      "total_topics": 0,
+      "avg_word_count": 965.0,
+      "avg_seo_score": 0.58,
+      "database_size_mb": 0.02
+    },
+    "wordpress_connected": false,
+    "gemini_available": true,
+    "telegram_available": false
+  }
+}
