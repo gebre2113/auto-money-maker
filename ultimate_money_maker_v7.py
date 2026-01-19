@@ -423,19 +423,18 @@ class GeminiContentGenerator:
             print(f"⚠️  Gemini AI configuration failed: {e}")
             print("   Make sure your API key is valid and has access to Gemini Pro")
     
-            def _test_model_availability(self):
+    def _test_model_availability(self):
         """Test which Gemini models are available"""
         self.available_models = []
         
-        # List of models to test (Updated for 2026 Gemini 3)
+        # List of models to test (in order of preference)
         test_models = [
-            'gemini-3-flash-preview',       # ፈጣን እና እጅግ ዘመናዊ
-            'gemini-3-pro-preview',        # ለጥልቅ እና ጥራት ላለው ጽሑፍ
-            'gemini-2.0-flash-exp',        # ተጨማሪ አማራጭ
-            'gemini-1.5-flash',            # አማራጭ (Fallback)
-            'gemini-1.5-pro'               # አማራጭ (Fallback)
+            'gemini-1.5-flash-latest',      # Fast and capable
+            'gemini-1.5-pro-latest',        # Highest quality
+            'gemini-pro',                    # Legacy
+            'models/gemini-1.5-flash',      # Alternative format
+            'models/gemini-1.5-pro'         # Alternative format
         ]
-        
         
         print("🔍 Testing available Gemini models...")
         
