@@ -845,7 +845,7 @@ The article should be publication-ready and provide real value to readers intere
             'note': 'Gemini AI models unavailable, using enhanced template system'
         }
     
-    def _create_guide_template(self, topic: str, year: int) -> str:
+     def _create_guide_template(self, topic: str, year: int) -> str:
         """Create guide-style template"""
         main_keyword = topic.split(':')[0] if ':' in topic else topic.split()[0]
         
@@ -921,6 +921,10 @@ Once working correctly, scale your solution and establish maintenance routines.<
 
 <p><strong>Next Steps:</strong> Start implementing one section at a time, track your progress, and don't hesitate to revisit sections as needed. Remember, consistent effort over time yields the best results.</p>
 """
+
+    def _create_list_template(self, topic: str, year: int) -> str:
+        """Create list-style template"""
+        return f"""
     
     def _create_list_template(self, topic: str, year: int) -> str:
         """Create list-style template"""
