@@ -34,14 +34,15 @@ except ImportError:
     REQUESTS_AVAILABLE = False
     print("⚠️  requests library not installed. Install with: pip install requests")
 
+from google import genai
+
+# ... ኮዱ ውስጥ የ Gemini ክፍል ጋር ሲትደርስ ...
 try:
-    from google import genai
-    from google.genai import types
+    client = genai.Client(api_key=os.getenv('GEMINI_API_KEY'))
     GEMINI_AVAILABLE = True
-except ImportError:
+except Exception as e:
+    print(f"⚠️ Gemini Configuration Error: {e}")
     GEMINI_AVAILABLE = False
-    # ይህ መልዕክት በ Log ላይ እንዲታይ ይረዳሃል
-    print("❌ ERROR: google-genai library missing in environment!")
 
 
 # =================== TELEGRAM NOTIFICATION BOT ===================
@@ -428,26 +429,23 @@ class GeminiContentGenerator:
         except Exception as e:
             print(f"⚠️  Gemini AI configuration failed: {e}")
             print("   Make sure your API key is valid and has access to Gemini Pro")
-        def _test_model_availability(self):
-            """Test which Gemini models are available - 2026 Updated"""
-        self.available_models = []
-        # አሁን በነጻ የሚሰሩ ምርጥ ሞዴሎች
-        test_models = [
-            'gemini-2.0-flash-exp', 
-            'gemini-1.5-flash',
-            'gemini-1.5-flash-8b'
-        ]
+    def _test_model_availability(self):
+            self.available_models = []
+            test_models = ['gemini-2.0-flash-exp', 'gemini-1.5-flash']
         
         for model_name in test_models:
             try:
-                model = genai.GenerativeModel(model_name)
-                # ፈጣን ሙከራ
-                response = model.generate_content("Hi", generation_config={"max_output_tokens": 10})
+                # አዲሱ የ Client አጠቃቀም
+                response = client.models.generate_content(
+                    model=model_name, 
+                    contents="Hi"
+                )
                 if response:
                     self.available_models.append(model_name)
                     print(f"✅ {model_name}: Available")
+                    break
             except Exception as e:
-                print(f"❌ {model_name}: Failed - {str(e)[:50]}")
+                print(f"❌ {model_name} failed: {str(e)[:50]}")
                 continue
         
         if not self.available_models:
