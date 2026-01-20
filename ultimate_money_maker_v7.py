@@ -425,48 +425,26 @@ class GeminiContentGenerator:
         except Exception as e:
             print(f"⚠️  Gemini AI configuration failed: {e}")
             print("   Make sure your API key is valid and has access to Gemini Pro")
-    
-    def _test_model_availability(self):
-        """Test which Gemini models are available"""
+        def _test_model_availability(self):
+            """Test which Gemini models are available - 2026 Updated"""
         self.available_models = []
-        
-        # የበለጠ ትክክለኛ የሞዴል ስሞች ለ 2024/2025
+        # አሁን በነጻ የሚሰሩ ምርጥ ሞዴሎች
         test_models = [
-            'gemini-1.5-flash',    # በነጻ የሚገኝ ዋና ሞዴል
-            'gemini-1.5-pro',      # ለውስብስብ ስራዎች
-            'gemini-pro',          # አሮጌ ነገር ግን ሊሰራ ይችላል
-            'models/gemini-1.5-flash',
-            'models/gemini-1.5-pro'
+            'gemini-2.0-flash-exp', 
+            'gemini-1.5-flash',
+            'gemini-1.5-flash-8b'
         ]
-        
-        print("🔍 Testing available Gemini models...")
         
         for model_name in test_models:
             try:
-                # Quick test to see if model is accessible
                 model = genai.GenerativeModel(model_name)
-                # Simple test with minimal parameters
-                response = model.generate_content(
-                    "Hello",
-                    generation_config={'max_output_tokens': 5}
-                )
-                self.available_models.append(model_name)
-                print(f"   ✅ {model_name}: Available")
-                
-                # If we find at least one working model, that's enough
-                if self.available_models:
-                    break
-                    
+                # ፈጣን ሙከራ
+                response = model.generate_content("Hi", generation_config={"max_output_tokens": 10})
+                if response:
+                    self.available_models.append(model_name)
+                    print(f"✅ {model_name}: Available")
             except Exception as e:
-                error_msg = str(e).lower()
-                if '404' in error_msg or 'not found' in error_msg:
-                    print(f"   ❌ {model_name}: Not found (404)")
-                elif 'quota' in error_msg or 'exceeded' in error_msg:
-                    print(f"   ⚠️  {model_name}: Quota exceeded")
-                elif 'permission' in error_msg or 'access' in error_msg:
-                    print(f"   ⚠️  {model_name}: No access")
-                else:
-                    print(f"   ⚠️  {model_name}: Error - {str(e)[:50]}")
+                print(f"❌ {model_name}: Failed - {str(e)[:50]}")
                 continue
         
         if not self.available_models:
