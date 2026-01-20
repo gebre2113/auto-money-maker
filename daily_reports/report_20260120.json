@@ -1,25 +1,25 @@
 {
-  "execution_date": "2026-01-20T03:04:03.397572",
-  "github_run_number": "50",
+  "execution_date": "2026-01-20T03:24:43.059171",
+  "github_run_number": "51",
   "article": {
-    "title": "Digital Marketing Strategies That Actually Work",
-    "word_count": 246,
-    "seo_score": 0.51,
+    "title": "Building an Automated Content Pipeline with Python",
+    "word_count": 252,
+    "seo_score": 0.53,
     "seo_grade": "D (Needs Improvement)",
     "categories": [
-      "Marketing"
+      "Programming"
     ],
-    "focus_keyword": "Digital Marketing Strategies",
+    "focus_keyword": "Building an Automated",
     "generation_source": "template_system",
     "quality": "unknown"
   },
   "seo_analysis": {
-    "overall_score": 0.51,
+    "overall_score": 0.53,
     "grade": "D (Needs Improvement)",
-    "title_score": 0.9,
+    "title_score": 1.0,
     "content_score": 0.5,
     "recommendations": [
-      "Increase content length to at least 1000 words (current: 246)"
+      "Increase content length to at least 1000 words (current: 252)"
     ]
   },
   "publishing": {
@@ -27,17 +27,17 @@
     "success": false,
     "wordpress_id": null,
     "link": null,
-    "error": "WordPress not connected"
+    "error": "Failed after 3 attempts"
   },
   "system_stats": {
     "total_articles": 10,
     "memory_stats": {
       "total_topics": 0,
-      "avg_word_count": 473.6,
-      "avg_seo_score": 0.54,
+      "avg_word_count": 400.0,
+      "avg_seo_score": 0.53,
       "database_size_mb": 0.02
     },
-    "wordpress_connected": false,
+    "wordpress_connected": true,
     "gemini_available": false,
     "telegram_available": true
   }
