@@ -40,7 +40,9 @@ try:
     GEMINI_AVAILABLE = True
 except ImportError:
     GEMINI_AVAILABLE = False
-    print("⚠️  New google-genai library not found. Install with: pip install google-genai")
+    # ይህ መልዕክት በ Log ላይ እንዲታይ ይረዳሃል
+    print("❌ ERROR: google-genai library missing in environment!")
+
 
 # =================== TELEGRAM NOTIFICATION BOT ===================
 
