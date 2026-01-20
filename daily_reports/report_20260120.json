@@ -1,25 +1,25 @@
 {
-  "execution_date": "2026-01-20T03:57:37.097148",
-  "github_run_number": "55",
+  "execution_date": "2026-01-20T08:09:44.394927",
+  "github_run_number": "59",
   "article": {
-    "title": "Building an Automated Content Pipeline with Python",
-    "word_count": 252,
-    "seo_score": 0.53,
+    "title": "Essential WordPress Plugins for Every Website",
+    "word_count": 246,
+    "seo_score": 0.51,
     "seo_grade": "D (Needs Improvement)",
     "categories": [
-      "Programming"
+      "WordPress"
     ],
-    "focus_keyword": "Building an Automated",
+    "focus_keyword": "Essential WordPress Plugins",
     "generation_source": "template_system",
     "quality": "unknown"
   },
   "seo_analysis": {
-    "overall_score": 0.53,
+    "overall_score": 0.51,
     "grade": "D (Needs Improvement)",
-    "title_score": 1.0,
+    "title_score": 0.9,
     "content_score": 0.5,
     "recommendations": [
-      "Increase content length to at least 1000 words (current: 252)"
+      "Increase content length to at least 1000 words (current: 246)"
     ]
   },
   "publishing": {
@@ -27,7 +27,7 @@
     "success": false,
     "wordpress_id": null,
     "link": null,
-    "error": "Failed after 3 attempts"
+    "error": "WordPress not connected"
   },
   "system_stats": {
     "total_articles": 10,
@@ -37,7 +37,7 @@
       "avg_seo_score": 0.53,
       "database_size_mb": 0.02
     },
-    "wordpress_connected": true,
+    "wordpress_connected": false,
     "gemini_available": false,
     "telegram_available": true
   }
