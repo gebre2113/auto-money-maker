@@ -1,0 +1,44 @@
+{
+  "execution_date": "2026-01-20T03:04:03.397572",
+  "github_run_number": "50",
+  "article": {
+    "title": "Digital Marketing Strategies That Actually Work",
+    "word_count": 246,
+    "seo_score": 0.51,
+    "seo_grade": "D (Needs Improvement)",
+    "categories": [
+      "Marketing"
+    ],
+    "focus_keyword": "Digital Marketing Strategies",
+    "generation_source": "template_system",
+    "quality": "unknown"
+  },
+  "seo_analysis": {
+    "overall_score": 0.51,
+    "grade": "D (Needs Improvement)",
+    "title_score": 0.9,
+    "content_score": 0.5,
+    "recommendations": [
+      "Increase content length to at least 1000 words (current: 246)"
+    ]
+  },
+  "publishing": {
+    "attempted": true,
+    "success": false,
+    "wordpress_id": null,
+    "link": null,
+    "error": "WordPress not connected"
+  },
+  "system_stats": {
+    "total_articles": 10,
+    "memory_stats": {
+      "total_topics": 0,
+      "avg_word_count": 473.6,
+      "avg_seo_score": 0.54,
+      "database_size_mb": 0.02
+    },
+    "wordpress_connected": false,
+    "gemini_available": false,
+    "telegram_available": true
+  }
+}
