@@ -1,5 +1,4 @@
-#!/usr/bin/env python3
-"""
+
 🏆 ULTIMATE MONEY MAKER v7.0 - ENTERPRISE AUTO-PILOT
 ✅ Complete Auto-Pilot System with Telegram Notifications
 ✅ WordPress API with Application Password
@@ -34,16 +33,12 @@ except ImportError:
     REQUESTS_AVAILABLE = False
     print("⚠️  requests library not installed. Install with: pip install requests")
 
-from google import genai
-
-# ... ኮዱ ውስጥ የ Gemini ክፍል ጋር ሲትደርስ ...
 try:
-    client = genai.Client(api_key=os.getenv('GEMINI_API_KEY'))
+    import google.generativeai as genai
     GEMINI_AVAILABLE = True
-except Exception as e:
-    print(f"⚠️ Gemini Configuration Error: {e}")
+except ImportError:
     GEMINI_AVAILABLE = False
-
+    print("⚠️  google-generativeai not installed. Install with: pip install google-generativeai")
 
 # =================== TELEGRAM NOTIFICATION BOT ===================
 
@@ -221,20 +216,25 @@ class WordPressPublisher:
             return False
         
         try:
+            # Try to get current user to verify authentication
             response = requests.get(
-                f"{self.api_url}/posts",
+                f"{self.wp_url}/wp-json/wp/v2/users/me",
                 auth=self.auth,
-                params={'per_page': 1},
                 timeout=10
             )
             
             if response.status_code == 200:
-                print("✅ WordPress connected successfully with Application Password")
+                user_data = response.json()
+                print(f"✅ WordPress connected successfully as user: {user_data.get('name')}")
+                print(f"   User capabilities: {user_data.get('capabilities', {})}")
                 return True
             else:
                 print(f"⚠️  WordPress connection failed: {response.status_code}")
-                print("   Tip: Make sure you're using Application Password, not regular password")
-                print("   Generate at: WordPress Admin → Users → Profile → Application Passwords")
+                if response.text:
+                    print(f"   Response: {response.text[:200]}")
+                print("   Tip 1: Make sure you're using Application Password, not regular password")
+                print("   Tip 2: Generate at: WordPress Admin → Users → Profile → Application Passwords")
+                print("   Tip 3: The user must have 'edit_posts' capability")
                 return False
                 
         except Exception as e:
@@ -251,7 +251,7 @@ class WordPressPublisher:
                 'article_data': article_data
             }
         
-        # Prepare WordPress post data with authentication headers
+        # Prepare WordPress post data with basic fields only
         post_data = {
             'title': article_data.get('title', ''),
             'content': article_data.get('content', ''),
@@ -262,11 +262,6 @@ class WordPressPublisher:
         # Add excerpt if available
         if 'excerpt' in article_data:
             post_data['excerpt'] = article_data['excerpt']
-        
-        # Add categories if we can get them
-        categories = self._get_or_create_categories(article_data.get('categories', []))
-        if categories:
-            post_data['categories'] = categories
         
         # Retry logic
         for attempt in range(self.max_retries):
@@ -290,7 +285,10 @@ class WordPressPublisher:
                 else:
                     print(f"⚠️  WordPress API error (attempt {attempt + 1}): {response.status_code}")
                     if response.text:
-                        print(f"   Response: {response.text[:200]}")
+                        error_data = response.json() if response.headers.get('content-type', '').startswith('application/json') else {}
+                        print(f"   Error: {error_data.get('message', response.text[:200])}")
+                        if 'code' in error_data:
+                            print(f"   Code: {error_data['code']}")
                     
                     # Wait before retry with exponential backoff
                     wait_time = self.retry_delay * (2 ** attempt)
@@ -324,60 +322,6 @@ class WordPressPublisher:
         
         # Trim to 100 characters
         return slug[:100]
-    
-    def _get_or_create_categories(self, categories: List[str]) -> List[int]:
-        """Get or create WordPress categories"""
-        category_ids = []
-        
-        for category_name in categories[:3]:  # Limit to 3 categories
-            if not category_name:
-                continue
-                
-            category_id = self._find_category(category_name)
-            if not category_id:
-                category_id = self._create_category(category_name)
-            
-            if category_id:
-                category_ids.append(category_id)
-        
-        return category_ids
-    
-    def _find_category(self, category_name: str) -> Optional[int]:
-        """Find existing category"""
-        try:
-            response = requests.get(
-                f"{self.api_url}/categories",
-                params={'search': category_name, 'per_page': 10},
-                auth=self.auth,
-                timeout=10
-            )
-            
-            if response.status_code == 200:
-                categories = response.json()
-                for category in categories:
-                    if category['name'].lower() == category_name.lower():
-                        return category['id']
-        except:
-            pass
-        
-        return None
-    
-    def _create_category(self, category_name: str) -> Optional[int]:
-        """Create new category"""
-        try:
-            response = requests.post(
-                f"{self.api_url}/categories",
-                json={'name': category_name, 'slug': category_name.lower().replace(' ', '-')},
-                auth=self.auth,
-                timeout=10
-            )
-            
-            if response.status_code == 201:
-                return response.json().get('id')
-        except Exception as e:
-            print(f"⚠️  Failed to create category '{category_name}': {e}")
-        
-        return None
     
     def get_stats(self) -> Dict:
         """Get WordPress publishing statistics"""
@@ -429,37 +373,60 @@ class GeminiContentGenerator:
         except Exception as e:
             print(f"⚠️  Gemini AI configuration failed: {e}")
             print("   Make sure your API key is valid and has access to Gemini Pro")
+    
     def _test_model_availability(self):
-            self.available_models = []
-            test_models = ['gemini-2.0-flash-exp', 'gemini-1.5-flash']
+        """Test which Gemini models are available - UPDATED FOR CURRENT GEMINI API"""
+        self.available_models = []
+        
+        # Current working Gemini models (as of 2024)
+        test_models = [
+            'gemini-1.5-flash-latest',      # Most reliable free model
+            'gemini-1.5-pro-latest',        # Pro model for complex tasks
+            'gemini-1.0-pro-latest',        # Legacy model
+            'gemini-pro'                    # Basic model
+        ]
+        
+        print("🔍 Testing available Gemini models...")
         
         for model_name in test_models:
             try:
-                # አዲሱ የ Client አጠቃቀም
-                response = client.models.generate_content(
-                    model=model_name, 
-                    contents="Hi"
+                print(f"   Testing model: {model_name}")
+                # Try to list models first to see what's available
+                model = genai.GenerativeModel(model_name)
+                
+                # Simple test generation
+                response = model.generate_content(
+                    "Hello, are you working?",
+                    generation_config={'max_output_tokens': 5}
                 )
-                if response:
+                
+                if response.text:
                     self.available_models.append(model_name)
-                    print(f"✅ {model_name}: Available")
-                    break
+                    print(f"   ✅ {model_name}: Available")
+                else:
+                    print(f"   ❌ {model_name}: No response")
+                    
             except Exception as e:
-                print(f"❌ {model_name} failed: {str(e)[:50]}")
+                error_msg = str(e).lower()
+                if '404' in error_msg or 'not found' in error_msg:
+                    print(f"   ❌ {model_name}: Not found (404)")
+                elif 'quota' in error_msg or 'exceeded' in error_msg:
+                    print(f"   ⚠️  {model_name}: Quota exceeded")
+                elif 'permission' in error_msg or 'access' in error_msg:
+                    print(f"   ⚠️  {model_name}: No access")
+                elif 'invalid' in error_msg or 'model' in error_msg:
+                    print(f"   ❌ {model_name}: Invalid model name")
+                else:
+                    print(f"   ⚠️  {model_name}: Error - {str(e)[:50]}")
                 continue
         
         if not self.available_models:
             print("❌ No Gemini models available for use")
-            print("   Trying one more time with different approach...")
-            # Last attempt with most common model
-            try:
-                model = genai.GenerativeModel('gemini-pro')
-                response = model.generate_content("Test")
-                self.available_models.append('gemini-pro')
-                print("   ✅ gemini-pro: Available (fallback)")
-            except:
-                print("   ❌ Even fallback failed")
-                self.available = False
+            print("   Possible solutions:")
+            print("   1. Check your API key at https://makersuite.google.com/app/apikey")
+            print("   2. Make sure you have access to Gemini API")
+            print("   3. Try different model names")
+            self.available = False
         else:
             print(f"✅ Found {len(self.available_models)} working model(s)")
             self.available = True
@@ -535,16 +502,39 @@ class GeminiContentGenerator:
     def _create_prompt(self, topic: str, word_count: int) -> str:
         """Create enhanced prompt for better article generation"""
         
-        return f"""Create a comprehensive article about: "{topic}"
+        return f"""Create a comprehensive, SEO-optimized article about: "{topic}"
 
-Requirements:
-- Word count: Approximately {word_count} words
-- Language: Professional English
-- Format: Use HTML tags for structure
-- Include: H1, H2 headings, paragraphs
-- Focus: Provide valuable, practical information
+REQUIREMENTS:
+1. Word Count: Approximately {word_count} words
+2. Language: Professional English, engaging tone
+3. Structure: Must include H1, H2, and H3 headings with proper HTML tags
+4. Format: Use HTML tags for all formatting (<h1>, <h2>, <h3>, <p>, <ul>, <li>, etc.)
+5. SEO: Naturally include the focus keyword and related terms
+6. Quality: Well-researched, practical, valuable information
 
-Write the article in HTML format with proper structure. Make it engaging and informative."""
+ARTICLE STRUCTURE:
+<h1>Main Title</h1>
+<p>Introduction paragraph that hooks the reader.</p>
+
+<h2>First Major Section</h2>
+<p>Detailed content about this section.</p>
+
+<h3>Subsection if needed</h3>
+<p>More detailed information.</p>
+
+<h2>Second Major Section</h2>
+<p>Continue with valuable content.</p>
+
+<h2>Conclusion</h2>
+<p>Summarize key points and provide actionable advice.</p>
+
+IMPORTANT:
+- Do not use markdown, only HTML tags
+- Make it genuinely useful for readers
+- Include practical tips and examples
+- Write in a natural, engaging style
+
+The article should be publication-ready and provide real value to readers interested in {topic}."""
     
     def _validate_content(self, content: str) -> bool:
         """Validate generated content meets minimum requirements"""
@@ -1415,27 +1405,23 @@ class EnterpriseOrchestratorPro:
         
         print(f"📈 SEO Score: {seo_analysis['overall_score']} ({seo_analysis['grade']})")
         
-        # Publish to WordPress (only if SEO score is good)
+        # Publish to WordPress (only if connected)
         publish_result = None
         if self.wordpress and self.wordpress.connected:
-            # Changed from 0.6 to 0.0 to allow ALL articles to be published (for testing)
-            if seo_analysis['overall_score'] >= 0.0:  # Allow all for now
-                print("🌐 Publishing to WordPress...")
-                publish_result = self.wordpress.publish_article(
-                    article_data,
-                    status='draft'  # Start as draft, change to 'publish' for auto-publish
-                )
-                
-                if publish_result.get('success'):
-                    article_data['published'] = True
-                    article_data['wordpress_id'] = publish_result.get('post_id')
-                    article_data['wordpress_link'] = publish_result.get('link')
-                    print(f"✅ Published to WordPress (ID: {publish_result.get('post_id')})")
-                else:
-                    print(f"⚠️  WordPress publish failed: {publish_result.get('error')}")
+            # Always try to publish regardless of SEO score for now
+            print("🌐 Publishing to WordPress...")
+            publish_result = self.wordpress.publish_article(
+                article_data,
+                status='draft'  # Start as draft
+            )
+            
+            if publish_result.get('success'):
+                article_data['published'] = True
+                article_data['wordpress_id'] = publish_result.get('post_id')
+                article_data['wordpress_link'] = publish_result.get('link')
+                print(f"✅ Published to WordPress (ID: {publish_result.get('post_id')})")
             else:
-                print(f"⚠️  SEO score too low for publishing: {seo_analysis['overall_score']}")
-                publish_result = {'success': False, 'error': 'Low SEO score'}
+                print(f"⚠️  WordPress publish failed: {publish_result.get('error')}")
         else:
             print("⚠️  WordPress not connected, skipping publish")
             publish_result = {'success': False, 'error': 'WordPress not connected'}
@@ -1591,6 +1577,192 @@ class EnterpriseOrchestratorPro:
                 'word_count': article_data['word_count'],
                 'seo_score': article_data['seo_score'],
                 'seo_grade': article_data['seo_grade'],
+                'categories': article_data['categories'],
+                'focus_keyword': article_data['focus_keyword'],
+                'generation_source': article_data.get('generation_source', 'unknown'),
+                'quality': article_data.get('quality', 'unknown')
+            },
+            'seo_analysis': {
+                'overall_score': seo_analysis['overall_score'],
+                'grade': seo_analysis['grade'],
+                'title_score': seo_analysis['title_analysis']['score'],
+                'content_score': seo_analysis['content_analysis']['score'],
+                'recommendations': seo_analysis['recommendations']
+            },
+            'publishing': {
+                'attempted': publish_result is not None,
+                'success': publish_result.get('success', False) if publish_result else False,
+                'wordpress_id': publish_result.get('post_id') if publish_result else None,
+                'link': publish_result.get('link') if publish_result else None,
+                'error': publish_result.get('error') if publish_result else None
+            },
+            'system_stats': {
+                'total_articles': self.memory._count_articles(),
+                'memory_stats': self.memory._get_system_stats(),
+                'wordpress_connected': self.wordpress.connected if self.wordpress else False,
+                'gemini_available': self.gemini.available if self.gemini else False,
+                'telegram_available': self.telegram.available if self.telegram else False
+            }
+        }
+        
+        # Save report
+        os.makedirs("daily_reports", exist_ok=True)
+        date_str = datetime.now().strftime('%Y%m%d')
+        report_file = f"daily_reports/report_{date_str}.json"
+        
+        with open(report_file, 'w') as f:
+            json.dump(report, f, indent=2)
+        
+        print(f"📊 Daily report saved: {report_file}")
+        
+        return report_file
+
+# =================== MAIN EXECUTION ===================
+
+def main():
+    """Main execution function"""
+    
+    print("=" * 80)
+    print("🏆 ULTIMATE MONEY MAKER v7.0 - ENTERPRISE AUTO-PILOT")
+    print("=" * 80)
+    print("\n🚀 Starting system with all integrations...\n")
+    
+    # Load configuration from environment variables (GitHub Secrets)
+    config = {
+        'GEMINI_API_KEY': os.getenv('GEMINI_API_KEY', ''),
+        'WP_URL': os.getenv('WP_URL', ''),
+        'WP_USERNAME': os.getenv('WP_USERNAME', ''),
+        'WP_PASSWORD': os.getenv('WP_PASSWORD', ''),
+        'TELEGRAM_BOT_TOKEN': os.getenv('TELEGRAM_BOT_TOKEN', ''),
+        'TELEGRAM_CHAT_ID': os.getenv('TELEGRAM_CHAT_ID', '')
+    }
+    
+    # Print configuration status
+    print("📋 Configuration Status:")
+    config_status = [
+        ('GEMINI_API_KEY', config['GEMINI_API_KEY'], 'AI Content Generation'),
+        ('WP_URL', config['WP_URL'], 'WordPress Publishing'),
+        ('WP_USERNAME', config['WP_USERNAME'], 'WordPress Username'),
+        ('WP_PASSWORD', config['WP_PASSWORD'], 'WordPress App Password'),
+        ('TELEGRAM_BOT_TOKEN', config['TELEGRAM_BOT_TOKEN'], 'Telegram Bot'),
+        ('TELEGRAM_CHAT_ID', config['TELEGRAM_CHAT_ID'], 'Telegram Chat')
+    ]
+    
+    for key, value, description in config_status:
+        status = "✅" if value else "⚠️ "
+        masked = "****" + value[-4:] if len(value) > 4 else "Not Set"
+        print(f"   {status} {description}: {masked}")
+    
+    # Check if we have minimum configuration
+    has_minimum_config = bool(config['WP_URL'] and config['WP_USERNAME'] and config['WP_PASSWORD'])
+    
+    if not has_minimum_config:
+        print("\n⚠️  WARNING: Minimum configuration not met!")
+        print("   Required: WP_URL, WP_USERNAME, WP_PASSWORD")
+        print("   System will run in limited mode")
+    
+    # Initialize orchestrator
+    try:
+        orchestrator = EnterpriseOrchestratorPro(config)
+    except Exception as e:
+        print(f"\n❌ System initialization failed: {e}")
+        
+        # Try to send error notification
+        if config['TELEGRAM_BOT_TOKEN'] and config['TELEGRAM_CHAT_ID']:
+            try:
+                notifier = TelegramNotifier(config['TELEGRAM_BOT_TOKEN'], config['TELEGRAM_CHAT_ID'])
+                notifier.send_error_notification(str(e), "System Initialization")
+            except:
+                pass
+        
+        sys.exit(1)
+    
+    # Execute daily run
+    try:
+        result = orchestrator.execute_daily_run()
+        
+        if result.get('success'):
+            article = result['article']
+            publish_result = result['publish_result']
+            
+            print("\n✅ Daily Execution Complete!")
+            print(f"   Article: {article['title']}")
+            print(f"   SEO Score: {article['seo_score']} ({article['seo_grade']})")
+            print(f"   WordPress: {'Published' if publish_result.get('success') else 'Draft/Not Published'}")
+            
+            if publish_result.get('link'):
+                print(f"   Link: {publish_result['link']}")
+        else:
+            print("\n⚠️  Daily execution completed with issues")
+        
+        # Send completion notification
+        if orchestrator.telegram and orchestrator.telegram.available:
+            articles_generated = 1 if result.get('success') else 0
+            orchestrator.telegram.send_system_complete_notification(
+                success=result.get('success', False),
+                articles_generated=articles_generated
+            )
+        
+        # Create final status file
+        status = {
+            'run_completed': datetime.now().isoformat(),
+            'success': result.get('success', False),
+            'article_generated': result.get('success', False),
+            'wordpress_published': result.get('publish_result', {}).get('success', False) if result.get('publish_result') else False,
+            'seo_score': result.get('article', {}).get('seo_score', 0),
+            'telegram_notified': orchestrator.telegram.available if orchestrator.telegram else False,
+            'github_run_number': os.getenv('GITHUB_RUN_NUMBER', 'N/A'),
+            'files_generated': [
+                result.get('report_file', ''),
+                'memory/content_memory.db',
+                'daily_reports/'
+            ]
+        }
+        
+        with open('github_run_status.json', 'w') as f:
+            json.dump(status, f, indent=2)
+        
+        print(f"\n📁 Status saved: github_run_status.json")
+        
+        return result.get('success', False)
+        
+    except Exception as e:
+        print(f"\n❌ Daily execution failed: {e}")
+        
+        # Send error notification
+        if orchestrator.telegram and orchestrator.telegram.available:
+            orchestrator.telegram.send_error_notification(str(e), "Daily Execution")
+        
+        # Create error status file
+        error_status = {
+            'run_completed': datetime.now().isoformat(),
+            'success': False,
+            'error': str(e),
+            'github_run_number': os.getenv('GITHUB_RUN_NUMBER', 'N/A')
+        }
+        
+        with open('github_run_status.json', 'w') as f:
+            json.dump(error_status, f, indent=2)
+        
+        return False
+
+if __name__ == "__main__":
+    # Create necessary directories
+    os.makedirs("memory", exist_ok=True)
+    os.makedirs("daily_reports", exist_ok=True)
+    
+    # Run main function
+    success = main()
+    
+    print("\n" + "=" * 80)
+    if success:
+        print("✅ ENTERPRISE AUTO-PILOT EXECUTION SUCCESSFUL")
+    else:
+        print("⚠️  EXECUTION COMPLETED WITH ISSUES")
+    print("=" * 80)
+    
+    # Exit with appropriate code
+    sys.exit(0 if success else 1)'],
                 'categories': article_data['categories'],
                 'focus_keyword': article_data['focus_keyword'],
                 'generation_source': article_data.get('generation_source', 'unknown'),
