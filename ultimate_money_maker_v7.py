@@ -35,11 +35,12 @@ except ImportError:
     print("⚠️  requests library not installed. Install with: pip install requests")
 
 try:
-    import google.generativeai as genai
+    from google import genai
+    from google.genai import types
     GEMINI_AVAILABLE = True
 except ImportError:
     GEMINI_AVAILABLE = False
-    print("⚠️  google-generativeai not installed. Install with: pip install google-generativeai")
+    print("⚠️  New google-genai library not found. Install with: pip install google-genai")
 
 # =================== TELEGRAM NOTIFICATION BOT ===================
 
