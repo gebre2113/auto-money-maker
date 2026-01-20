@@ -1,17 +1,15 @@
 {
-  "execution_date": "2026-01-20T03:40:30.951616",
-  "github_run_number": "52",
+  "execution_date": "2026-01-20T03:57:37.097148",
+  "github_run_number": "55",
   "article": {
-    "title": "How to Monetize Your Website with Affiliate Marketing",
-    "word_count": 258,
+    "title": "Building an Automated Content Pipeline with Python",
+    "word_count": 252,
     "seo_score": 0.53,
     "seo_grade": "D (Needs Improvement)",
     "categories": [
-      "WordPress",
-      "Monetization",
-      "Marketing"
+      "Programming"
     ],
-    "focus_keyword": "How to Monetize",
+    "focus_keyword": "Building an Automated",
     "generation_source": "template_system",
     "quality": "unknown"
   },
@@ -21,7 +19,7 @@
     "title_score": 1.0,
     "content_score": 0.5,
     "recommendations": [
-      "Increase content length to at least 1000 words (current: 258)"
+      "Increase content length to at least 1000 words (current: 252)"
     ]
   },
   "publishing": {
