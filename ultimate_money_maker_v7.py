@@ -1360,6 +1360,16 @@ class WordPressPublisher:
         # Authentication for WordPress REST API
         self.auth = (self.wp_username, self.app_password)
         
+        # Create session with headers to mimic browser
+        self.session = requests.Session()
+        self.session.headers.update({
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+            'Accept': 'application/json',
+            'Accept-Language': 'en-US,en;q=0.9',
+            'Accept-Encoding': 'gzip, deflate, br',
+            'Connection': 'keep-alive',
+        })
+        
         # Retry configuration
         self.max_retries = 3
         self.retry_delay = 2
@@ -1376,8 +1386,18 @@ class WordPressPublisher:
             return False
         
         try:
-            # Try to get current user to verify authentication
-            response = requests.get(
+            # First, try to access the site without auth to check for Pantheon lock
+            test_url = self.wp_url
+            try:
+                response = self.session.get(test_url, timeout=5)
+                if response.status_code == 401:
+                    print("⚠️  Site appears to be behind Pantheon's Basic Auth protection")
+                    print("   This might prevent API access. Check Pantheon dashboard.")
+            except:
+                pass
+            
+            # Now try to get current user to verify authentication
+            response = self.session.get(
                 f"{self.wp_url}/wp-json/wp/v2/users/me",
                 auth=self.auth,
                 timeout=10
@@ -1390,13 +1410,28 @@ class WordPressPublisher:
                 return True
             else:
                 print(f"⚠️  WordPress connection failed: {response.status_code}")
+                if response.status_code == 401:
+                    print("   ERROR 401: Unauthorized")
+                    print("   Possible causes:")
+                    print("   1. Pantheon site is locked (check dashboard)")
+                    print("   2. Application Password is incorrect")
+                    print("   3. User doesn't have 'edit_posts' permission")
+                    print("   4. Site URL is incorrect")
+                
                 if response.text:
-                    print(f"   Response: {response.text[:200]}")
-                print("   Tip 1: Make sure you're using Application Password, not regular password")
-                print("   Tip 2: Generate at: WordPress Admin → Users → Profile → Application Passwords")
-                print("   Tip 3: The user must have 'edit_posts' capability")
+                    error_text = response.text[:200]
+                    print(f"   Response: {error_text}")
+                
                 return False
                 
+        except requests.exceptions.ConnectTimeout:
+            print("❌ Connection timeout - check your URL and network")
+            return False
+        except requests.exceptions.ConnectionError:
+            print("❌ Connection error - cannot reach the WordPress site")
+            print(f"   URL: {self.wp_url}")
+            print("   Check if the site is accessible")
+            return False
         except Exception as e:
             print(f"❌ WordPress connection error: {e}")
             return False
@@ -1426,7 +1461,7 @@ class WordPressPublisher:
         # Retry logic
         for attempt in range(self.max_retries):
             try:
-                response = requests.post(
+                response = self.session.post(
                     f"{self.api_url}/posts",
                     json=post_data,
                     auth=self.auth,
@@ -1443,12 +1478,27 @@ class WordPressPublisher:
                         'attempts': attempt + 1
                     }
                 else:
-                    print(f"⚠️  WordPress API error (attempt {attempt + 1}): {response.status_code}")
+                    error_msg = f"WordPress API error (attempt {attempt + 1}): {response.status_code}"
+                    
+                    # Provide more specific error messages
+                    if response.status_code == 401:
+                        error_msg += " - Unauthorized. Check Application Password."
+                    elif response.status_code == 404:
+                        error_msg += f" - Endpoint not found. Check URL: {self.api_url}/posts"
+                    elif response.status_code == 403:
+                        error_msg += " - Forbidden. User may not have permission."
+                    
+                    print(f"⚠️  {error_msg}")
+                    
                     if response.text:
-                        error_data = response.json() if response.headers.get('content-type', '').startswith('application/json') else {}
-                        print(f"   Error: {error_data.get('message', response.text[:200])}")
-                        if 'code' in error_data:
-                            print(f"   Code: {error_data['code']}")
+                        try:
+                            error_data = response.json()
+                            if 'message' in error_data:
+                                print(f"   Error: {error_data['message']}")
+                            if 'code' in error_data:
+                                print(f"   Code: {error_data['code']}")
+                        except:
+                            print(f"   Response: {response.text[:200]}")
                     
                     # Wait before retry with exponential backoff
                     wait_time = self.retry_delay * (2 ** attempt)
@@ -1486,7 +1536,7 @@ class WordPressPublisher:
     def get_stats(self) -> Dict:
         """Get WordPress publishing statistics"""
         try:
-            response = requests.get(
+            response = self.session.get(
                 f"{self.api_url}/posts",
                 params={'per_page': 1, 'context': 'edit'},
                 auth=self.auth,
