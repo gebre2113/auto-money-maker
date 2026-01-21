@@ -1,27 +1,27 @@
 {
-  "execution_date": "2026-01-21T11:45:42.151786",
-  "github_run_number": "76",
+  "execution_date": "2026-01-21T11:53:07.875588",
+  "github_run_number": "78",
   "article": {
-    "title": "Building a Personal Brand Online: Strategies and Tips",
-    "word_count": 731,
+    "title": "Building Customer Loyalty Through Digital Engagement",
+    "word_count": 688,
     "seo_score": 0.65,
     "seo_grade": "C (Fair)",
     "categories": [
-      "Brand Building"
+      "Digital Strategy"
     ],
-    "focus_keyword": "Building a Personal",
+    "focus_keyword": "Building Customer Loyalty",
     "generation_source": "groq_official",
     "quality": "ai_generated",
     "ai_model": "llama-3.3-70b-versatile",
-    "slug": "building-a-personal-brand-online:-strategies-and-tips"
+    "slug": "building-customer-loyalty-through-digital-engagement"
   },
   "seo_analysis": {
     "overall_score": 0.65,
     "grade": "C (Fair)",
     "title_score": 1.0,
-    "content_score": 0.8,
+    "content_score": 0.7,
     "recommendations": [
-      "Increase content length to at least 1000 words (current: 731)",
+      "Increase content length to at least 1000 words (current: 688)",
       "Add images with alt text for better SEO"
     ]
   },
