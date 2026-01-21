@@ -382,76 +382,8 @@ class EnhancedAIGenerator:
             }
         
         return {'success': False, 'error': 'Free AI failed'}
-    
-    def _generate_with_template(self, topic: str, word_count: int) -> Dict:
-        """Generate using enhanced template system"""
-        content = self._create_enhanced_template(topic, word_count)
-        
-        return {
-            'success': True,
-            'content': content,
-            'word_count': len(content.split()),
-            'source': 'enhanced_template',
-            'quality': 'template_generated'
-        }
-    
-    def _generate_enhanced_fallback(self, topic: str, word_count: int) -> Dict:
-        """Enhanced fallback with multiple template types"""
-        templates = [
-            self._create_comprehensive_guide,
-            self._create_list_article,
-            self._create_how_to_guide,
-            self._create_news_style_article,
-            self._create_review_style_article
-        ]
-        
-        # Select random template
-        template_func = random.choice(templates)
-        content = template_func(topic, word_count)
-        
-        # Ensure word count
-        while len(content.split()) < word_count * 0.8:
-            content += self._add_extra_section(topic)
-        
-        return {
-            'success': False,
-            'content': content,
-            'word_count': len(content.split()),
-            'source': 'enhanced_fallback',
-            'quality': 'template_fallback',
-            'note': 'All AI methods failed, using enhanced template'
-        }
-    
-    def _create_ai_prompt(self, topic: str, word_count: int) -> str:
-        """Create prompt for AI generation"""
-        return f"""Write a comprehensive, SEO-optimized article about: "{topic}"
-
-ARTICLE REQUIREMENTS:
-1. Word Count: Approximately {word_count} words
-2. Format: Use HTML tags (<h1>, <h2>, <h3>, <p>, <ul>, <li>, <strong>)
-3. Structure: Include introduction, main sections with subheadings, and conclusion
-4. SEO: Naturally include focus keywords and related terms
-5. Tone: Professional, engaging, and informative
-6. Quality: Provide practical, actionable information
-7. Formatting: Use proper HTML structure without markdown
-
-EXAMPLE STRUCTURE:
-<h1>Main Title About {topic}</h1>
-<p>Engaging introduction paragraph...</p>
-
-<h2>First Major Section</h2>
-<p>Detailed content...</p>
-
-<h3>Subsection</h3>
-<p>More specific information...</p>
-
-<h2>Conclusion</h2>
-<p>Summary and final thoughts...</p>
-
-Write a valuable article that helps readers understand and implement information about {topic}. Return only the HTML content, no explanations."""
-    
-    def _validate_content(self, content: str) -> bool:
-        """Validate generated content"""
+        def _validate_content(self, content: str) -> bool:
+            """Validate generated content"""
         if not content or len(content.strip()) < 200:
             return False
         
@@ -463,38 +395,43 @@ Write a valuable article that helps readers understand and implement information
     
     def _clean_content(self, content: str) -> str:
         """Clean and format content"""
-        # Remove markdown
+        # Remove markdown code blocks
         content = re.sub(r'```[a-z]*\n', '', content)
         content = content.replace('```', '')
-        content = content.replace('`', '')
         
-        # Ensure HTML structure
-        lines = [line.strip() for line in content.split('\n') if line.strip()]
-        return '\n'.join(lines)
-    
-    def _create_enhanced_template(self, topic: str, word_count: int) -> str:
-        """Create enhanced template"""
-        current_year = datetime.now().year
-        
-        # Choose template based on topic
-        topic_lower = topic.lower()
-        
-        if any(word in topic_lower for word in ['how to', 'tutorial', 'step by step', 'guide']):
-            return self._create_comprehensive_guide(topic, current_year)
-        elif any(word in topic_lower for word in ['top', 'best', 'list', 'ways']):
-            return self._create_list_article(topic, current_year)
-        elif any(word in topic_lower for word in ['news', 'update', 'trend', '2024']):
-            return self._create_news_style_article(topic, current_year)
-        elif any(word in topic_lower for word in ['review', 'comparison', 'vs']):
-            return self._create_review_style_article(topic, current_year)
-        else:
-            return self._create_comprehensive_guide(topic, current_year)
-    
-    def _create_comprehensive_guide(self, topic: str, year: int) -> str:
-        """Create comprehensive guide template"""
-        return f"""
-<h1>{topic}</h1>
+        # Remove any leading/trailing whitespace
+        return content.strip()
 
+    def _create_enhanced_template(self, topic: str, word_count: int) -> str:
+        """Create enhanced template based on topic"""
+        year = datetime.now().year
+        topic_l = topic.lower()
+        
+        if any(x in topic_l for x in ['how to', 'guide', 'tutorial']):
+            return self._create_how_to_guide(topic, year)
+        elif any(x in topic_l for x in ['best', 'top', 'list']):
+            return self._create_list_article(topic, year)
+        else:
+            return self._create_comprehensive_guide(topic, year)
+
+    def _create_comprehensive_guide(self, topic, year):
+        return f"<h1>Ultimate Guide to {topic} ({year})</h1><p>Welcome to our deep dive into {topic}. In this guide, we explore the core concepts and strategies you need to succeed.</p><h2>Understanding the Basics</h2><p>To master {topic}, you must first understand the fundamental principles that drive success in this field.</p><h2>Advanced Strategies</h2><p>Once you have the basics down, it is time to look at advanced implementation techniques.</p><h2>Conclusion</h2><p>Final thoughts on how to move forward with {topic}.</p>"
+
+    def _create_list_article(self, topic, year):
+        return f"<h1>Top 10 Insights on {topic} for {year}</h1><p>Looking for the best ways to handle {topic}? Here are our top recommendations.</p><h2>1. Quality First</h2><p>Always prioritize quality when dealing with {topic}.</p><h2>2. Consistency</h2><p>Regular updates are key to maintaining your edge.</p><h2>Conclusion</h2><p>Start applying these {topic} tips today.</p>"
+
+    def _create_how_to_guide(self, topic, year):
+        return f"<h1>How to Master {topic} in {year}</h1><p>Step-by-step instructions on achieving your goals with {topic}.</p><h2>Step 1: Preparation</h2><p>Gather all necessary tools for {topic}.</p><h2>Step 2: Execution</h2><p>Follow these steps to complete your {topic} project.</p><h2>Conclusion</h2><p>Success with {topic} is now within your reach.</p>"
+
+    def _create_news_style_article(self, topic, year):
+        return f"<h1>Latest Updates on {topic} ({year})</h1><p>Recent developments in {topic} are changing the landscape for creators.</p>"
+
+    def _create_review_style_article(self, topic, year):
+        return f"<h1>Honest Review: {topic} Pros and Cons</h1><p>We take a detailed look at whether {topic} is worth your time and investment.</p>"
+
+    def _add_extra_section(self, topic):
+        return f"<h2>More on {topic}</h2><p>In addition to what we've covered, it is important to remember that {topic} is constantly evolving. Stay tuned for more updates!</p>"
+        
 <p>Welcome to our complete guide on {topic}. Whether you're just starting out or looking to enhance your existing knowledge, this guide provides everything you need to succeed in {year}.</p>
 
 <h2>Why {topic.split(':')[0] if ':' in topic else topic} Matters Today</h2>
