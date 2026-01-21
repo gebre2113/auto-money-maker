@@ -1,29 +1,28 @@
 {
-  "execution_date": "2026-01-21T12:03:15.086543",
-  "github_run_number": "80",
+  "execution_date": "2026-01-21T13:44:58.579865",
+  "github_run_number": "82",
   "article": {
-    "title": "Email Marketing Best Practices for Higher Conversion Rates",
-    "word_count": 683,
-    "seo_score": 0.61,
+    "title": "AI Content Creation: Best Practices, Tools, and Future Trends",
+    "word_count": 730,
+    "seo_score": 0.62,
     "seo_grade": "C (Fair)",
     "categories": [
       "Artificial Intelligence",
-      "Digital Marketing",
-      "Email Marketing"
+      "Content Creation"
     ],
-    "focus_keyword": "Email Marketing Best",
+    "focus_keyword": "AI Content Creation:",
     "generation_source": "groq_official",
     "quality": "ai_generated",
     "ai_model": "llama-3.3-70b-versatile",
-    "slug": "email-marketing-best-practices-for-higher-conversion-rates"
+    "slug": "ai-content-creation:-best-practices,-tools,-and-future-trends"
   },
   "seo_analysis": {
-    "overall_score": 0.61,
+    "overall_score": 0.62,
     "grade": "C (Fair)",
-    "title_score": 1.0,
+    "title_score": 0.9,
     "content_score": 0.7,
     "recommendations": [
-      "Increase content length to at least 1000 words (current: 683)",
+      "Increase content length to at least 1000 words (current: 730)",
       "Add images with alt text for better SEO"
     ]
   },
