@@ -16,7 +16,7 @@ jobs:
         run: pip install -r requirements.txt
       - name: Run Bot
         env:
-          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GROQ_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           WORDPRESS_URL: ${{ secrets.WORDPRESS_URL }}
           WORDPRESS_USER: ${{ secrets.WORDPRESS_USER }}
           WORDPRESS_PASSWORD: ${{ secrets.WORDPRESS_PASSWORD }}
