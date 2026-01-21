@@ -1,10 +1,10 @@
 {
-  "execution_date": "2026-01-21T16:37:40.410178",
-  "github_run_number": "85",
+  "execution_date": "2026-01-21T18:44:07.084865",
+  "github_run_number": "86",
   "article": {
     "title": "The Future of AI in Content Creation and Marketing",
-    "word_count": 726,
-    "seo_score": 0.61,
+    "word_count": 687,
+    "seo_score": 0.65,
     "seo_grade": "C (Fair)",
     "categories": [
       "Artificial Intelligence",
@@ -18,32 +18,32 @@
     "slug": "the-future-of-ai-in-content-creation-and-marketing"
   },
   "seo_analysis": {
-    "overall_score": 0.61,
+    "overall_score": 0.65,
     "grade": "C (Fair)",
     "title_score": 1.0,
     "content_score": 0.7,
     "recommendations": [
-      "Increase content length to at least 1000 words (current: 726)",
+      "Increase content length to at least 1000 words (current: 687)",
       "Add images with alt text for better SEO"
     ]
   },
   "publishing": {
     "attempted": true,
-    "success": false,
-    "wordpress_id": null,
-    "link": null,
-    "error": "WordPress not connected"
+    "success": true,
+    "wordpress_id": 6,
+    "link": "https://dev-new-world-news.pantheonsite.io/?p=6",
+    "error": null
   },
   "system_stats": {
     "total_articles": 1,
     "memory_stats": {
       "total_topics": 0,
-      "avg_word_count": 726.0,
-      "avg_seo_score": 0.61,
+      "avg_word_count": 687.0,
+      "avg_seo_score": 0.65,
       "unique_sources": 1,
       "database_size_mb": 0.02
     },
-    "wordpress_connected": false,
+    "wordpress_connected": true,
     "telegram_available": true,
     "ai_methods_available": 3
   }
