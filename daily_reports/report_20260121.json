@@ -1,27 +1,28 @@
 {
-  "execution_date": "2026-01-21T11:27:33.932801",
-  "github_run_number": "74",
+  "execution_date": "2026-01-21T11:31:35.958824",
+  "github_run_number": "75",
   "article": {
-    "title": "Building Customer Loyalty Through Digital Engagement",
-    "word_count": 667,
+    "title": "Digital Marketing Strategies That Actually Work in 2024",
+    "word_count": 979,
     "seo_score": 0.69,
     "seo_grade": "C (Fair)",
     "categories": [
+      "Digital Marketing",
       "Digital Strategy"
     ],
-    "focus_keyword": "Building Customer Loyalty",
+    "focus_keyword": "Digital Marketing Strategies",
     "generation_source": "groq_official",
     "quality": "ai_generated",
     "ai_model": "llama-3.3-70b-versatile",
-    "slug": "building-customer-loyalty-through-digital-engagement"
+    "slug": "digital-marketing-strategies-that-actually-work-in-2024"
   },
   "seo_analysis": {
     "overall_score": 0.69,
     "grade": "C (Fair)",
     "title_score": 1.0,
-    "content_score": 0.7,
+    "content_score": 0.8,
     "recommendations": [
-      "Increase content length to at least 1000 words (current: 667)",
+      "Increase content length to at least 1000 words (current: 979)",
       "Add images with alt text for better SEO"
     ]
   },
