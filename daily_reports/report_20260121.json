@@ -1,28 +1,27 @@
 {
-  "execution_date": "2026-01-21T11:31:35.958824",
-  "github_run_number": "75",
+  "execution_date": "2026-01-21T11:45:42.151786",
+  "github_run_number": "76",
   "article": {
-    "title": "Digital Marketing Strategies That Actually Work in 2024",
-    "word_count": 979,
-    "seo_score": 0.69,
+    "title": "Building a Personal Brand Online: Strategies and Tips",
+    "word_count": 731,
+    "seo_score": 0.65,
     "seo_grade": "C (Fair)",
     "categories": [
-      "Digital Marketing",
-      "Digital Strategy"
+      "Brand Building"
     ],
-    "focus_keyword": "Digital Marketing Strategies",
+    "focus_keyword": "Building a Personal",
     "generation_source": "groq_official",
     "quality": "ai_generated",
     "ai_model": "llama-3.3-70b-versatile",
-    "slug": "digital-marketing-strategies-that-actually-work-in-2024"
+    "slug": "building-a-personal-brand-online:-strategies-and-tips"
   },
   "seo_analysis": {
-    "overall_score": 0.69,
+    "overall_score": 0.65,
     "grade": "C (Fair)",
     "title_score": 1.0,
     "content_score": 0.8,
     "recommendations": [
-      "Increase content length to at least 1000 words (current: 979)",
+      "Increase content length to at least 1000 words (current: 731)",
       "Add images with alt text for better SEO"
     ]
   },
