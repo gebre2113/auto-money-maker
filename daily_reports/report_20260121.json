@@ -1,28 +1,28 @@
 {
-  "execution_date": "2026-01-21T13:44:58.579865",
-  "github_run_number": "82",
+  "execution_date": "2026-01-21T15:18:29.790912",
+  "github_run_number": "83",
   "article": {
-    "title": "AI Content Creation: Best Practices, Tools, and Future Trends",
-    "word_count": 730,
-    "seo_score": 0.62,
+    "title": "Content Strategy for Growing Your Online Audience and Engagement",
+    "word_count": 894,
+    "seo_score": 0.67,
     "seo_grade": "C (Fair)",
     "categories": [
-      "Artificial Intelligence",
+      "Audience Building",
       "Content Creation"
     ],
-    "focus_keyword": "AI Content Creation:",
+    "focus_keyword": "Content Strategy for",
     "generation_source": "groq_official",
     "quality": "ai_generated",
     "ai_model": "llama-3.3-70b-versatile",
-    "slug": "ai-content-creation:-best-practices,-tools,-and-future-trends"
+    "slug": "content-strategy-for-growing-your-online-audience-and-engagement"
   },
   "seo_analysis": {
-    "overall_score": 0.62,
+    "overall_score": 0.67,
     "grade": "C (Fair)",
     "title_score": 0.9,
-    "content_score": 0.7,
+    "content_score": 0.8,
     "recommendations": [
-      "Increase content length to at least 1000 words (current: 730)",
+      "Increase content length to at least 1000 words (current: 894)",
       "Add images with alt text for better SEO"
     ]
   },
@@ -34,12 +34,12 @@
     "error": "WordPress not connected"
   },
   "system_stats": {
-    "total_articles": 10,
+    "total_articles": 1,
     "memory_stats": {
       "total_topics": 0,
-      "avg_word_count": 288.6,
-      "avg_seo_score": 0.53,
-      "unique_sources": 2,
+      "avg_word_count": 894.0,
+      "avg_seo_score": 0.67,
+      "unique_sources": 1,
       "database_size_mb": 0.02
     },
     "wordpress_connected": false,
