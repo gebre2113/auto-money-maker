@@ -1,13 +1,15 @@
 {
-  "run_completed": "2026-01-20T08:09:45.079172",
+  "run_completed": "2026-01-21T11:27:34.635458",
   "success": true,
   "article_generated": true,
   "wordpress_published": false,
-  "seo_score": 0.51,
+  "seo_score": 0.69,
+  "ai_source": "groq_official",
+  "ai_model": "llama-3.3-70b-versatile",
   "telegram_notified": true,
-  "github_run_number": "59",
+  "github_run_number": "74",
   "files_generated": [
-    "daily_reports/report_20260120.json",
+    "daily_reports/report_20260121.json",
     "memory/content_memory.db",
     "daily_reports/"
   ]
