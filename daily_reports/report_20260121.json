@@ -1,28 +1,29 @@
 {
-  "execution_date": "2026-01-21T15:18:29.790912",
-  "github_run_number": "83",
+  "execution_date": "2026-01-21T16:02:14.953800",
+  "github_run_number": "84",
   "article": {
-    "title": "Content Strategy for Growing Your Online Audience and Engagement",
-    "word_count": 894,
-    "seo_score": 0.67,
+    "title": "Email Marketing Best Practices for Higher Conversion Rates",
+    "word_count": 893,
+    "seo_score": 0.69,
     "seo_grade": "C (Fair)",
     "categories": [
-      "Audience Building",
-      "Content Creation"
+      "Artificial Intelligence",
+      "Digital Marketing",
+      "Email Marketing"
     ],
-    "focus_keyword": "Content Strategy for",
+    "focus_keyword": "Email Marketing Best",
     "generation_source": "groq_official",
     "quality": "ai_generated",
     "ai_model": "llama-3.3-70b-versatile",
-    "slug": "content-strategy-for-growing-your-online-audience-and-engagement"
+    "slug": "email-marketing-best-practices-for-higher-conversion-rates"
   },
   "seo_analysis": {
-    "overall_score": 0.67,
+    "overall_score": 0.69,
     "grade": "C (Fair)",
-    "title_score": 0.9,
+    "title_score": 1.0,
     "content_score": 0.8,
     "recommendations": [
-      "Increase content length to at least 1000 words (current: 894)",
+      "Increase content length to at least 1000 words (current: 893)",
       "Add images with alt text for better SEO"
     ]
   },
@@ -34,11 +35,11 @@
     "error": "WordPress not connected"
   },
   "system_stats": {
-    "total_articles": 1,
+    "total_articles": 2,
     "memory_stats": {
       "total_topics": 0,
-      "avg_word_count": 894.0,
-      "avg_seo_score": 0.67,
+      "avg_word_count": 893.5,
+      "avg_seo_score": 0.68,
       "unique_sources": 1,
       "database_size_mb": 0.02
     },
