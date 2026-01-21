@@ -1,42 +1,35 @@
-name: AI Content Bot
+name: Ultimate Money Maker v7.0 - Daily Auto-Pilot
+
 on:
-  name: AI Content Bot
-on:
-  workflow_dispatch:
+  schedule:
+    - cron: '0 6 * * *'
+  workflow_dispatch: 
+
 jobs:
-  build:
+  run-auto-pilot:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    
     steps:
-      - uses: actions/checkout@v3
-      - name: Setup Python
-        uses: actions/setup-python@v4
+      - name: 🛎️ Checkout Repository
+        uses: actions/checkout@v4
+      
+      - name: 🐍 Setup Python
+        uses: actions/setup-python@v5
         with:
-          python-version: '3.10'
-      - name: Install Tools
-        run: pip install -r requirements.txt
-      - name: Run Bot
+          python-version: '3.11'
+
+      - name: 📦 Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install groq requests
+
+      - name: 🚀 Execute Script
         env:
-          GROQ_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-          WORDPRESS_URL: ${{ secrets.WORDPRESS_URL }}
-          WORDPRESS_USER: ${{ secrets.WORDPRESS_USER }}
-          WORDPRESS_PASSWORD: ${{ secrets.WORDPRESS_PASSWORD }}
-        run: python free_money_maker.py --auto
-: # በእጅ ለመጀመር
-jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - name: Setup Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.10'
-      - run: pip install -r requirements.txt
-      - name: Run Bot
-        env:
-          GROQ_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-          WORDPRESS_URL: ${{ secrets.WORDPRESS_URL }}
-          WORDPRESS_USER: ${{ secrets.WORDPRESS_USER }}
-          WORDPRESS_PASSWORD: ${{ secrets.WORDPRESS_PASSWORD }}
-        run: python free_money_maker.py
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          WP_URL: ${{ secrets.WP_URL }}
+          WP_USERNAME: ${{ secrets.WP_USERNAME }}
+          WP_PASSWORD: ${{ secrets.WP_PASSWORD }}
+        run: python ultimate_money_maker_v7.py
         
