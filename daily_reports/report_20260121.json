@@ -1,28 +1,29 @@
 {
-  "execution_date": "2026-01-21T11:55:01.420432",
-  "github_run_number": "79",
+  "execution_date": "2026-01-21T12:03:15.086543",
+  "github_run_number": "80",
   "article": {
-    "title": "Data Analytics for Digital Marketers: Making Informed Decisions",
-    "word_count": 748,
-    "seo_score": 0.62,
+    "title": "Email Marketing Best Practices for Higher Conversion Rates",
+    "word_count": 683,
+    "seo_score": 0.61,
     "seo_grade": "C (Fair)",
     "categories": [
-      "Digital Strategy",
-      "Data Analytics"
+      "Artificial Intelligence",
+      "Digital Marketing",
+      "Email Marketing"
     ],
-    "focus_keyword": "Data Analytics for",
+    "focus_keyword": "Email Marketing Best",
     "generation_source": "groq_official",
     "quality": "ai_generated",
     "ai_model": "llama-3.3-70b-versatile",
-    "slug": "data-analytics-for-digital-marketers:-making-informed-decisions"
+    "slug": "email-marketing-best-practices-for-higher-conversion-rates"
   },
   "seo_analysis": {
-    "overall_score": 0.62,
+    "overall_score": 0.61,
     "grade": "C (Fair)",
-    "title_score": 0.9,
+    "title_score": 1.0,
     "content_score": 0.7,
     "recommendations": [
-      "Increase content length to at least 1000 words (current: 748)",
+      "Increase content length to at least 1000 words (current: 683)",
       "Add images with alt text for better SEO"
     ]
   },
