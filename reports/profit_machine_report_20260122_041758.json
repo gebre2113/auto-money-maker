@@ -1,0 +1,68 @@
+{
+  "execution_time": "2026-01-22T04:17:58.349421",
+  "base_article": {
+    "title": "Cryptocurrency Investing: Safe Strategies for Beginners",
+    "word_count": 1274,
+    "image_count": 4,
+    "has_video": false
+  },
+  "multilingual_versions": {
+    "count": 4,
+    "languages": [
+      "en",
+      "de",
+      "fr",
+      "es"
+    ],
+    "details": {
+      "en": {
+        "word_count": 1274,
+        "has_audio": false
+      },
+      "de": {
+        "word_count": 857,
+        "has_audio": true
+      },
+      "fr": {
+        "word_count": 997,
+        "has_audio": true
+      },
+      "es": {
+        "word_count": 1433,
+        "has_audio": true
+      }
+    }
+  },
+  "publishing_results": [
+    {
+      "language": "en",
+      "success": true,
+      "link": "https://dev-new-world-news.pantheonsite.io/?p=8",
+      "error": null
+    },
+    {
+      "language": "de",
+      "success": true,
+      "link": "https://dev-new-world-news.pantheonsite.io/?p=9",
+      "error": null
+    },
+    {
+      "language": "fr",
+      "success": true,
+      "link": "https://dev-new-world-news.pantheonsite.io/?p=10",
+      "error": null
+    },
+    {
+      "language": "es",
+      "success": true,
+      "link": "https://dev-new-world-news.pantheonsite.io/?p=11",
+      "error": null
+    }
+  ],
+  "system_info": {
+    "tts_available": true,
+    "groq_available": true,
+    "wordpress_connected": true,
+    "telegram_connected": true
+  }
+}
