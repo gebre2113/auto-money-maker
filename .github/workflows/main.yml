@@ -2,9 +2,8 @@ name: Enterprise Profit Machine Run
 
 on:
   schedule:
-    # በየቀኑ በጠዋቱ 12 ሰዓት (UTC) በራሱ እንዲነሳ ያደርገዋል
     - cron: '0 0 * * *'
-  workflow_dispatch: # አስፈላጊ ሆኖ ሲገኝ በፈለግከው ጊዜ በእጅህ "Run" ለማድረግ
+  workflow_dispatch: 
 
 jobs:
   build:
@@ -22,16 +21,14 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          # ሁሉንም አስፈላጊ ጥቅሎች (Libraries) እዚህ ጋር ይጭናል
           pip install groq openai stability-sdk beautifulsoup4 requests aiohttp
 
       - name: Run Profit Machine
         env:
-          # እነዚህን በ GitHub Secrets ውስጥ መመዝገብህን አረጋግጥ
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
           PERPLEXITY_API_KEY: ${{ secrets.PERPLEXITY_API_KEY }}
           DALLE_API_KEY: ${{ secrets.DALLE_API_KEY }}
           STABILITY_API_KEY: ${{ secrets.STABILITY_API_KEY }}
         run: |
-          # ፋይልህን በምትፈልገው ፍላግ (flag) ያስነሳል
-          python3 Profit_machine_enterprise.py --execute --country US
+          # እዚህ ጋር የፋይሉን ስም በትንሽ ፊደል አስተካክለነዋል
+          python3 profit_machine_enterprise.py --execute --country US
