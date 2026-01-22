@@ -1,54 +1,97 @@
-name: Ultimate Money Maker v7.0 - Daily Auto-Pilot
+name: Ultimate Money Maker v9.0 - Profit Machine
 
 on:
   schedule:
-    - cron: '0 6 * * *'  # በየቀኑ ጠዋት 3:00 (UTC) ወይም 9:00 (ኢትዮጵያ)
-  workflow_dispatch: 
+    - cron: '0 6 * * *'  # Runs daily at 6 AM UTC
+  workflow_dispatch:  # Allows manual triggering
 
 jobs:
-  run-auto-pilot:
+  run-profit-machine:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+      pages: write
+      id-token: write
     
     steps:
       - name: 🛎️ Checkout Repository
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
       
       - name: 🐍 Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
+          cache: 'pip'
 
       - name: 📦 Install Dependencies
         run: |
           python -m pip install --upgrade pip
-          # እዚህ ጋር groq ተጨምሯል፣ google-genai ተወግዷል
-          pip install groq requests python-wordpress-xmlrpc
-          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+          pip install groq requests gtts pygame deep-translator
+          # Optional: Install for Google Trends if needed
+          # pip install pytrends
 
-      - name: 📁 Create Directories
-        run: mkdir -p memory daily_reports
-      
-      - name: 🚀 Execute Ultimate Money Maker
+      - name: 🚀 Execute Profit Machine v9.0
         env:
-          # እዚህ ጋር GEMINI_API_KEY ወደ GROQ_API_KEY ተቀይሯል
+          # Core AI Configuration
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          
+          # WordPress Configuration
           WP_URL: ${{ secrets.WP_URL }}
           WP_USERNAME: ${{ secrets.WP_USERNAME }}
           WP_PASSWORD: ${{ secrets.WP_PASSWORD }}
+          
+          # Telegram Notifications (Optional)
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-          GITHUB_RUN_NUMBER: ${{ github.run_number }}
-        run: python ultimate_money_maker_v7.py
-      
-      - name: 💾 Auto-Commit Generated Data
-        run: |
-          git config --local user.email "github-actions[bot]@users.noreply.github.com"
-          git config --local user.name "GitHub Actions"
-          git add memory/ daily_reports/ github_run_status.json || echo "Nothing to add"
-          git commit -m "🤖 Auto-update: Daily run $(date +'%Y-%m-%d')" || echo "No changes"
-          git push origin main || echo "Push failed or not needed"
           
+          # YouTube API (Optional - for better video search)
+          YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
+          
+          # Image APIs (Optional - for better images)
+          UNSPLASH_API_KEY: ${{ secrets.UNSPLASH_API_KEY }}
+          PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
+        run: |
+          echo "Starting Profit Machine v9.0..."
+          python profit_machine_v9.py
+          
+          # Check if execution was successful
+          if [ -f "profit_machine_status.json" ]; then
+            echo "✅ Profit Machine executed successfully!"
+          else
+            echo "⚠️  Profit Machine may have encountered issues"
+          fi
+
+      - name: 📊 Upload Generated Reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: profit-reports
+          path: |
+            reports/
+            audio_output/
+            profit_machine_status.json
+          retention-days: 30
+
+      - name: 📁 Commit Generated Content
+        if: always()
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          
+          # Check if there are any generated files to commit
+          if [ -n "$(git status --porcelain)" ]; then
+            git add reports/ audio_output/ profit_machine_status.json
+            git commit -m "🤖 Auto-generated: Profit Machine v9.0 run $(date +'%Y-%m-%d %H:%M')"
+            git push
+          else
+            echo "No new generated files to commit"
+          fi
+
+      - name: 🚀 Deploy to GitHub Pages (Optional)
+        if: success()
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./reports
+          destination_dir: ./reports
+          keep_files: false
