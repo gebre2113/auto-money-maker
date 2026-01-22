@@ -1,26 +1,37 @@
-# enterprise_profit_machine.yml
 name: Enterprise Profit Machine Run
 
 on:
   schedule:
-    - cron: '0 */4 * * *' # በየ 4 ሰዓቱ አንድ ጊዜ ይነሳል
-  workflow_dispatch:
+    # በየቀኑ በጠዋቱ 12 ሰዓት (UTC) በራሱ እንዲነሳ ያደርገዋል
+    - cron: '0 0 * * *'
+  workflow_dispatch: # አስፈላጊ ሆኖ ሲገኝ በፈለግከው ጊዜ በእጅህ "Run" ለማድረግ
 
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v2
+      - name: Checkout code
+        uses: actions/checkout@v3
+
       - name: Set up Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: '3.9'
+
       - name: Install dependencies
         run: |
-          pip install cryptography tweepy facebook-sdk groq openai
+          python -m pip install --upgrade pip
+          # ሁሉንም አስፈላጊ ጥቅሎች (Libraries) እዚህ ጋር ይጭናል
+          pip install groq openai stability-sdk beautifulsoup4 requests aiohttp
+
       - name: Run Profit Machine
         env:
+          # እነዚህን በ GitHub Secrets ውስጥ መመዝገብህን አረጋግጥ
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          ENCRYPTION_KEY: ${{ secrets.ENCRYPTION_KEY }}
-        run: python3 profit_machine_enterprise.py --execute --country US
+          PERPLEXITY_API_KEY: ${{ secrets.PERPLEXITY_API_KEY }}
+          DALLE_API_KEY: ${{ secrets.DALLE_API_KEY }}
+          STABILITY_API_KEY: ${{ secrets.STABILITY_API_KEY }}
+        run: |
+          # ፋይልህን በምትፈልገው ፍላግ (flag) ያስነሳል
+          python3 Profit_machine_enterprise.py --execute --country US
