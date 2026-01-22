@@ -4,3 +4,7 @@ python-wordpress-xmlrpc
 feedparser
 pillow
 pytz
+gTTS
+pygame
+groq
+requests
