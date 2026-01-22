@@ -12,14 +12,12 @@ import uuid
 import random
 from datetime import datetime
 from typing import Dict, List
-import aiohttp
 
 class ProfitMachineSimple:
     """Simplified Profit Machine for CI/CD"""
     
     def __init__(self):
         self.config = self.load_config()
-        self.session = None
         
     def load_config(self):
         """Load configuration"""
@@ -204,20 +202,77 @@ class ProfitMachineSimple:
         """Create HTML export"""
         meta = article['metadata']
         
-        return f"""<!DOCTYPE html>
+        # Process content for HTML
+        content = article['content']
+        # Escape HTML special characters
+        content = content.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;')
+        # Convert newlines to <br> and headers
+        lines = content.split('\n')
+        html_lines = []
+        for line in lines:
+            if line.startswith('# '):
+                html_lines.append(f'<h1>{line[2:]}</h1>')
+            elif line.startswith('## '):
+                html_lines.append(f'<h2>{line[3:]}</h2>')
+            elif line.startswith('### '):
+                html_lines.append(f'<h3>{line[4:]}</h3>')
+            elif line.strip():
+                html_lines.append(f'<p>{line}</p>')
+            else:
+                html_lines.append('<br>')
+        
+        processed_content = '\n'.join(html_lines)
+        
+        # Now create the HTML template without backslashes in f-string
+        html_template = f'''<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{meta['topic']} - Market Analysis</title>
     <style>
-        body {{ font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif; line-height: 1.6; max-width: 800px; margin: 0 auto; padding: 20px; color: #333; }}
-        h1 {{ color: #2c3e50; border-bottom: 3px solid #3498db; padding-bottom: 10px; }}
-        h2 {{ color: #34495e; margin-top: 30px; }}
-        .metadata {{ background: #f8f9fa; padding: 20px; border-radius: 10px; margin: 20px 0; }}
-        .metrics {{ display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin: 20px 0; }}
-        .metric-card {{ background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }}
-        footer {{ margin-top: 50px; padding-top: 20px; border-top: 1px solid #ddd; color: #7f8c8d; font-size: 0.9em; }}
+        body {{ 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, sans-serif; 
+            line-height: 1.6; 
+            max-width: 800px; 
+            margin: 0 auto; 
+            padding: 20px; 
+            color: #333; 
+        }}
+        h1 {{ 
+            color: #2c3e50; 
+            border-bottom: 3px solid #3498db; 
+            padding-bottom: 10px; 
+        }}
+        h2 {{ 
+            color: #34495e; 
+            margin-top: 30px; 
+        }}
+        .metadata {{ 
+            background: #f8f9fa; 
+            padding: 20px; 
+            border-radius: 10px; 
+            margin: 20px 0; 
+        }}
+        .metrics {{ 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); 
+            gap: 15px; 
+            margin: 20px 0; 
+        }}
+        .metric-card {{ 
+            background: white; 
+            padding: 15px; 
+            border-radius: 8px; 
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1); 
+        }}
+        footer {{ 
+            margin-top: 50px; 
+            padding-top: 20px; 
+            border-top: 1px solid #ddd; 
+            color: #7f8c8d; 
+            font-size: 0.9em; 
+        }}
     </style>
 </head>
 <body>
@@ -245,7 +300,7 @@ class ProfitMachineSimple:
     </div>
     
     <div class="content">
-        {article['content'].replace('\n', '<br>').replace('# ', '<h2>').replace('## ', '<h3>')}
+        {processed_content}
     </div>
     
     <footer>
@@ -253,11 +308,34 @@ class ProfitMachineSimple:
         <p>Article ID: {meta['id']}</p>
     </footer>
 </body>
-</html>"""
+</html>'''
+        
+        return html_template
     
     def _create_markdown_summary(self, article: Dict) -> str:
         """Create markdown summary"""
         meta = article['metadata']
+        
+        # Create keyword density string
+        keyword_density_lines = []
+        for k, v in article['seo_analysis']['keyword_density'].items():
+            keyword_density_lines.append(f'  - {k}: {v}%')
+        keyword_density_str = '\n'.join(keyword_density_lines)
+        
+        # Create trends string
+        trends_lines = []
+        for trend in article['market_data']['trends']:
+            trends_lines.append(f'  - {trend}')
+        trends_str = '\n'.join(trends_lines)
+        
+        # Create social media string
+        social_lines = []
+        for platform, posts in article['social_posts'].items():
+            social_lines.append(f'### {platform.capitalize()}')
+            for post in posts:
+                social_lines.append(f'- {post}')
+            social_lines.append('')
+        social_str = '\n'.join(social_lines)
         
         return f"""# Article Summary
 
@@ -277,18 +355,17 @@ class ProfitMachineSimple:
 ## 🔍 SEO Analysis
 - **Unique Words:** {article['seo_analysis']['unique_words']}
 - **Keyword Density:**
-{chr(10).join(f'  - {k}: {v}%' for k, v in article['seo_analysis']['keyword_density'].items())}
+{keyword_density_str}
 
 ## 📈 Market Data
 - **Competition Level:** {article['market_data']['competition_level']}
 - **Market Size:** {article['market_data']['market_size']}
 - **Growth Rate:** {article['market_data']['growth_rate']}
 - **Top Trends:**
-{chr(10).join(f'  - {trend}' for trend in article['market_data']['trends'])}
+{trends_str}
 
 ## 📱 Social Media Posts
-{chr(10).join(f'### {platform.capitalize()}{chr(10)}{chr(10).join(f"- {post}" for post in posts)}' for platform, posts in article['social_posts'].items())}
-
+{social_str}
 ---
 *Generated by Profit Machine v11.0*
 """
