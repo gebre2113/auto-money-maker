@@ -4,7 +4,8 @@ python-wordpress-xmlrpc
 feedparser
 pillow
 pytz
-gTTS
-pygame
-groq
-requests
+groq==0.3.0
+gtts==2.4.0
+pygame==2.5.1
+deep-translator==1.11.4
+pytrends==4.9.2
