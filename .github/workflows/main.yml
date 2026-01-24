@@ -5,7 +5,6 @@ on:
     - cron: '0 6 * * *' # በየቀኑ በራሱ እንዲነሳ (አማራጭ)
   push:
     branches: [ main ] # ኮድ ስትልክ (Push) እንዲ
-
 on:
   schedule:
     # Runs multiple times per day for maximum profit
