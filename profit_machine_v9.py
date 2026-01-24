@@ -194,9 +194,9 @@ class RealAIGenerator:
             "mixtral-8x7b-32768",
             "gemma2-9b-it"
         ]
-        
-    def generate_article(self, topic: str, category: str = 'technology', 
-                        word_count: int = 1800) -> Dict:
+        # በ generate_article method ውስጥ ይህንን አስተካክል
+def generate_article(self, topic: str, category: str = 'technology', 
+                    word_count: int = 2500) -> Dict:  # 1800 ከ2500 ቀይር
         """Generate REAL article using Groq AI"""
         
         logger.info(f"🤖 Generating article about: {topic}")
