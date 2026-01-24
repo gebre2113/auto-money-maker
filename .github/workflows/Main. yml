@@ -1,0 +1,45 @@
+name: Run AI Bot (Stable Minimal)
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 */6 * * *"   # 6 ሰዓት እያንዳንዱ
+
+concurrency:
+  group: ai-bot
+  cancel-in-progress: true
+
+jobs:
+  run-bot:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    env:
+      SIMULATION_MODE: "true"
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install minimal dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install requests python-dotenv
+
+      - name: Run bot (simulation)
+        run: |
+          echo "🤖 BOT STARTED"
+          echo "Simulation mode: $SIMULATION_MODE"
+          python bot.py
+
+      - name: Upload logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: bot-logs
+          path: .
