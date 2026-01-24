@@ -1,4 +1,10 @@
 name: Profit Master Supreme v11.0 - Ultimate AI Monetization
+on:
+  workflow_dispatch: # ይህ ትዕዛዝ በእጅህ እንድታስጀምረው (Manual run) ይፈቅዳል
+  schedule:
+    - cron: '0 6 * * *' # በየቀኑ በራሱ እንዲነሳ (አማራጭ)
+  push:
+    branches: [ main ] # ኮድ ስትልክ (Push) እንዲ
 
 on:
   schedule:
