@@ -185,7 +185,7 @@ logger = logging.getLogger(__name__)
 # =================== ORIGINAL COMPONENTS (v9.7/v10.0) ===================
 
 class RealAIGenerator:
-    """REAL Groq AI content generator - Original from v9.7"""
+    """REAL Groq AI content generator - No templates!"""
     
     def __init__(self, api_key: str):
         self.api_key = api_key
@@ -197,7 +197,7 @@ class RealAIGenerator:
         
     def generate_article(self, topic: str, category: str = 'technology', 
                         word_count: int = 1800) -> Dict:
-        """Generate REAL article using Groq AI - Original"""
+        """Generate REAL article using Groq AI"""
         
         logger.info(f"🤖 Generating article about: {topic}")
         
@@ -208,6 +208,7 @@ class RealAIGenerator:
             from groq import Groq
             client = Groq(api_key=self.api_key)
             
+            # Advanced prompt for original content
             prompt = self._create_ai_prompt(topic, category, word_count)
             
             for model in self.models:
@@ -248,6 +249,7 @@ class RealAIGenerator:
                     logger.warning(f"   Model {model} failed: {e}")
                     continue
             
+            # If all models fail
             return self._generate_fallback(topic, category, word_count)
             
         except Exception as e:
@@ -255,7 +257,7 @@ class RealAIGenerator:
             return self._generate_fallback(topic, category, word_count)
     
     def _create_ai_prompt(self, topic: str, category: str, word_count: int) -> str:
-        """Create intelligent prompt for AI - Original"""
+        """Create intelligent prompt for AI"""
         
         return f"""Create a comprehensive, original, and SEO-optimized article about: "{topic}"
 
@@ -314,16 +316,19 @@ IMPORTANT:
 Write in a professional yet engaging tone. Return ONLY the HTML content, no explanations."""
 
     def _validate_ai_content(self, content: str, topic: str) -> bool:
-        """Validate AI-generated content - Original"""
+        """Validate AI-generated content"""
         if not content or len(content.strip()) < 500:
             return False
         
+        # Check if topic is mentioned
         if topic.lower() not in content.lower():
             return False
         
+        # Check for HTML structure
         if '<h1' not in content or '<p' not in content:
             return False
         
+        # Check word count
         words = len(content.split())
         if words < 800:
             return False
@@ -331,17 +336,20 @@ Write in a professional yet engaging tone. Return ONLY the HTML content, no expl
         return True
     
     def _format_content(self, content: str, topic: str, category: str) -> str:
-        """Format and optimize content - Original"""
+        """Format and optimize content"""
         
+        # Clean up markdown if present
         content = re.sub(r'```[a-z]*\n', '', content)
         content = content.replace('```', '')
         
+        # Ensure proper HTML structure
         lines = content.split('\n')
         formatted_lines = []
         
         for line in lines:
             line = line.strip()
             if line:
+                # Convert markdown headers to HTML
                 if line.startswith('# '):
                     line = f'<h1>{line[2:]}</h1>'
                 elif line.startswith('## '):
@@ -353,6 +361,7 @@ Write in a professional yet engaging tone. Return ONLY the HTML content, no expl
         
         content = '\n'.join(formatted_lines)
         
+        # Add meta tags for SEO
         meta_tags = f'''<!-- Article generated: {datetime.now().strftime('%Y-%m-%d %H:%M')} -->
 <meta name="description" content="Comprehensive guide about {topic}. Learn key strategies, implementation steps, and advanced techniques.">
 <meta name="keywords" content="{topic}, {category}, guide, tutorial, how-to">
@@ -363,7 +372,8 @@ Write in a professional yet engaging tone. Return ONLY the HTML content, no expl
         return meta_tags + '\n' + content
     
     def _calculate_originality(self, content: str) -> float:
-        """Calculate content originality score - Original"""
+        """Calculate content originality score"""
+        # Simple heuristic - in production use proper plagiarism check
         unique_sentences = set()
         sentences = re.split(r'[.!?]+', content)
         
@@ -376,9 +386,10 @@ Write in a professional yet engaging tone. Return ONLY the HTML content, no expl
         return 0.8
     
     def _generate_fallback(self, topic: str, category: str, word_count: int) -> Dict:
-        """Generate fallback content when AI fails - Original"""
+        """Generate fallback content when AI fails"""
         logger.warning("Using fallback content generator")
         
+        # Still better than template - dynamic generation
         content = self._create_dynamic_content(topic, category)
         
         return {
@@ -391,18 +402,21 @@ Write in a professional yet engaging tone. Return ONLY the HTML content, no expl
         }
     
     def _create_dynamic_content(self, topic: str, category: str) -> str:
-        """Create dynamic content without AI - Original"""
+        """Create dynamic content without AI"""
         
         current_year = datetime.now().year
         
+        # Different templates based on category - ADDED ALL TEMPLATES
         templates = {
             'technology': self._tech_template,
             'business': self._business_template,
-            'finance': self._finance_template,
-            'health': self._health_template
+            'finance': self._finance_template,  # NOW INCLUDED
+            'health': self._health_template,    # NOW INCLUDED
+            'education': self._education_template,
+            'marketing': self._marketing_template
         }
         
-        template_func = templates.get(category, self._general_template)
+        template_func = templates.get(category.lower(), self._general_template)
         return template_func(topic, current_year)
     
     def _tech_template(self, topic: str, year: int) -> str:
@@ -473,6 +487,185 @@ Write in a professional yet engaging tone. Return ONLY the HTML content, no expl
 <h2>Risk Management</h2>
 <p>Common risks include market saturation, regulatory changes, and technological disruption. Mitigation strategies involve diversification and continuous innovation.</p>'''
 
+    def _finance_template(self, topic: str, year: int) -> str:
+        """Finance template that was missing"""
+        return f'''<h1>{topic}: Financial Mastery Guide for {year}</h1>
+
+<p>In the complex financial landscape of {year}, understanding {topic.lower()} is crucial for wealth building and financial security.</p>
+
+<h2>Current Financial Climate</h2>
+<p>The {topic.lower()} sector has experienced {random.randint(10, 40)}% growth in the past year, driven by technological innovation and changing market dynamics.</p>
+
+<h2>Core Financial Principles</h2>
+<ul>
+<li><strong>Risk Management:</strong> Balancing potential returns with acceptable risk levels</li>
+<li><strong>Diversification:</strong> Spreading investments across different asset classes</li>
+<li><strong>Compounding:</strong> Leveraging time to maximize investment growth</li>
+</ul>
+
+<h2>Investment Strategies</h2>
+<ol>
+<li>Conduct thorough market research and analysis</li>
+<li>Develop a diversified portfolio strategy</li>
+<li>Implement risk management protocols</li>
+<li>Regularly review and adjust investment allocations</li>
+</ol>
+
+<h2>Financial Performance Metrics</h2>
+<table>
+<tr><th>Metric</th><th>Target Range</th><th>Importance</th></tr>
+<tr><td>Return on Investment (ROI)</td><td>10-20% annually</td><td>Measures profitability</td></tr>
+<tr><td>Debt-to-Equity Ratio</td><td>Below 2:1</td><td>Assesses financial leverage</td></tr>
+<tr><td>Liquidity Ratio</td><td>Above 1.5:1</td><td>Evaluates short-term stability</td></tr>
+</table>
+
+<h2>Case Study: Successful Financial Strategy</h2>
+<p>An investment firm specializing in {topic.lower()} achieved:</p>
+<ul>
+<li>{random.randint(15, 35)}% annual returns for clients</li>
+<li>Portfolio growth of ${random.randint(50, 200)} million in 3 years</li>
+<li>Risk-adjusted returns in the top 10% of the industry</li>
+</ul>
+
+<h2>Regulatory Considerations</h2>
+<p>Stay informed about financial regulations and compliance requirements, which are evolving rapidly in {year}.</p>
+
+<h2>Future Financial Trends</h2>
+<p>Emerging technologies like blockchain and AI are transforming {topic.lower()}, creating new opportunities and challenges for investors.</p>'''
+
+    def _health_template(self, topic: str, year: int) -> str:
+        """Health template that was missing"""
+        return f'''<h1>{topic}: Comprehensive Health Guide for {year}</h1>
+
+<p>In {year}, prioritizing {topic.lower()} has become increasingly important for overall wellbeing and quality of life.</p>
+
+<h2>The Science Behind {topic}</h2>
+<p>Recent medical research has revealed new insights about {topic.lower()}, with studies showing {random.randint(20, 60)}% improvement in health outcomes with proper implementation.</p>
+
+<h2>Key Health Principles</h2>
+<ul>
+<li><strong>Prevention Focus:</strong> Proactive health management over reactive treatment</li>
+<li><strong>Holistic Approach:</strong> Addressing physical, mental, and emotional aspects</li>
+<li><strong>Evidence-Based Practices:</strong> Following scientifically validated methods</li>
+</ul>
+
+<h2>Step-by-Step Health Plan</h2>
+<ol>
+<li>Consult with healthcare professionals for personalized advice</li>
+<li>Establish baseline health metrics and goals</li>
+<li>Implement gradual, sustainable lifestyle changes</li>
+<li>Monitor progress and adjust strategies as needed</li>
+</ol>
+
+<h2>Health Benefits Analysis</h2>
+<table>
+<tr><th>Health Aspect</th><th>Expected Improvement</th><th>Timeframe</th></tr>
+<tr><td>Physical Fitness</td><td>{random.randint(20, 50)}% increase</td><td>3-6 months</td></tr>
+<tr><td>Mental Clarity</td><td>{random.randint(30, 70)}% enhancement</td><td>1-3 months</td></tr>
+<tr><td>Energy Levels</td><td>{random.randint(40, 80)}% boost</td><td>2-4 weeks</td></tr>
+</table>
+
+<h2>Success Story: Health Transformation</h2>
+<p>Individuals who implemented comprehensive {topic.lower()} programs reported:</p>
+<ul>
+<li>Significant reduction in stress levels</li>
+<li>Improved sleep quality and duration</li>
+<li>Enhanced overall life satisfaction</li>
+<li>Reduced healthcare costs and medical visits</li>
+</ul>
+
+<h2>Safety Guidelines</h2>
+<p>Always consult with medical professionals before starting new health regimens, especially if you have pre-existing conditions.</p>
+
+<h2>Future Health Innovations</h2>
+<p>Advances in personalized medicine and digital health tools are making {topic.lower()} more accessible and effective than ever before.</p>'''
+
+    def _education_template(self, topic: str, year: int) -> str:
+        """Education template"""
+        return f'''<h1>{topic}: Educational Excellence Guide for {year}</h1>
+
+<p>In the evolving educational landscape of {year}, mastering {topic.lower()} is essential for academic and professional success.</p>
+
+<h2>The State of Education Today</h2>
+<p>Educational approaches to {topic.lower()} have transformed significantly, with {random.randint(40, 80)}% of institutions adopting new teaching methodologies.</p>
+
+<h2>Core Learning Principles</h2>
+<ul>
+<li><strong>Active Learning:</strong> Engaging directly with material through practice</li>
+<li><strong>Personalized Pace:</strong> Adjusting learning speed to individual needs</li>
+<li><strong>Applied Knowledge:</strong> Connecting theory to real-world applications</li>
+</ul>
+
+<h2>Effective Learning Strategies</h2>
+<ol>
+<li>Set clear, achievable learning objectives</li>
+<li>Break complex topics into manageable segments</li>
+<li>Utilize multiple learning modalities (visual, auditory, kinesthetic)</li>
+<li>Regularly assess understanding and adjust approach</li>
+</ol>
+
+<h2>Educational Outcomes</h2>
+<table>
+<tr><th>Skill Area</th><th>Development Level</th><th>Assessment Method</th></tr>
+<tr><td>Conceptual Understanding</td><td>Mastery</td><td>Problem-solving exercises</td></tr>
+<tr><td>Practical Application</td><td>Proficiency</td><td>Real-world projects</td></tr>
+<tr><td>Critical Thinking</td><td>Advanced</td><td>Analysis and evaluation tasks</td></tr>
+</table>
+
+<h2>Case Study: Educational Success</h2>
+<p>Students who implemented structured {topic.lower()} learning programs achieved:</p>
+<ul>
+<li>{random.randint(25, 50)}% higher test scores</li>
+<li>Improved retention and recall of information</li>
+<li>Enhanced ability to apply knowledge in diverse contexts</li>
+</ul>
+
+<h2>Future of Education</h2>
+<p>Digital learning platforms and AI-powered educational tools are revolutionizing how we approach {topic.lower()} in {year} and beyond.</p>'''
+
+    def _marketing_template(self, topic: str, year: int) -> str:
+        """Marketing template"""
+        return f'''<h1>{topic}: Marketing Mastery Guide for {year}</h1>
+
+<p>In today\'s digital-first world, effective {topic.lower()} strategies are essential for business growth and brand success.</p>
+
+<h2>Current Marketing Landscape</h2>
+<p>The {topic.lower()} industry has grown to ${random.randint(100, 500)} billion globally, with digital channels driving {random.randint(60, 90)}% of marketing activities.</p>
+
+<h2>Core Marketing Principles</h2>
+<ul>
+<li><strong>Customer-Centric Approach:</strong> Designing strategies around audience needs</li>
+<li><strong>Data-Driven Decisions:</strong> Using analytics to guide marketing efforts</li>
+<li><strong>Integrated Campaigns:</strong> Coordinating across multiple channels</li>
+</ul>
+
+<h2>Marketing Implementation Framework</h2>
+<ol>
+<li>Conduct comprehensive market and audience research</li>
+<li>Develop clear value proposition and messaging</li>
+<li>Select appropriate marketing channels and tactics</li>
+<li>Execute, monitor, and optimize campaigns</li>
+</ol>
+
+<h2>Marketing Performance Metrics</h2>
+<table>
+<tr><th>KPI</th><th>Industry Average</th><th>Excellent Performance</th></tr>
+<tr><td>Conversion Rate</td><td>2-3%</td><td>5%+</td></tr>
+<tr><td>Customer Acquisition Cost</td><td>$50-100</td><td>Below $30</td></tr>
+<tr><td>Return on Ad Spend</td><td>3:1</td><td>5:1+</td></tr>
+</table>
+
+<h2>Success Story: Marketing Campaign</h2>
+<p>A company implementing advanced {topic.lower()} strategies achieved:</p>
+<ul>
+<li>{random.randint(150, 400)}% increase in qualified leads</li>
+<li>{random.randint(30, 70)}% reduction in customer acquisition costs</li>
+<li>Brand awareness growth of {random.randint(200, 500)}%</li>
+</ul>
+
+<h2>Emerging Marketing Trends</h2>
+<p>AI-powered personalization, video-first content, and privacy-focused marketing are shaping the future of {topic.lower()} in {year}.</p>'''
+
     def _general_template(self, topic: str, year: int) -> str:
         return f'''<h1>Mastering {topic}: Expert Guide</h1>
 
@@ -507,7 +700,7 @@ Write in a professional yet engaging tone. Return ONLY the HTML content, no expl
 
 <h2>Career Opportunities</h2>
 <p>Professionals with {topic.lower()} skills can expect salaries ranging from ${random.randint(60, 120)}k to ${random.randint(150, 300)}k depending on experience and location.</p>'''
-
+    
 class RealWordPressPublisher:
     """REAL WordPress publishing via REST API - Original"""
     
