@@ -1,18 +1,21 @@
 {
   "content_generated": 3,
-  "revenue_projected": 523.74,
-  "details": [
+  "revenue_projected": 524.2900000000001,
+  "articles": [
     {
-      "topic": "Crypto Trading 2026",
-      "quality": 93
+      "topic": "Crypto Trading Bot Strategies 2026",
+      "quality": 91,
+      "filename": "art_2418_0.html"
     },
     {
-      "topic": "Crypto Trading 2026",
-      "quality": 92
+      "topic": "AI Content Monetization Blueprint",
+      "quality": 95,
+      "filename": "art_2418_1.html"
     },
     {
-      "topic": "Affiliate Marketing Secrets",
-      "quality": 88
+      "topic": "AI Content Monetization Blueprint",
+      "quality": 92,
+      "filename": "art_2418_2.html"
     }
   ]
 }
