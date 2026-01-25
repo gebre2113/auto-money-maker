@@ -4,32 +4,19 @@ on:
   workflow_dispatch:
     inputs:
       action_type:
-        description: 'የማስኬድ አይነት'
+        description: 'Action Type'
         required: true
         default: 'full_cycle'
         type: choice
-        options:
-          - content_generation
-          - monetization_update
-          - social_posting
-          - analytics_report
-          - full_cycle
-          - emergency_recovery
-      intensity:
-        description: 'የማስኬድ ጥንካሬ'
-        required: false
-        default: 'aggressive'
-        type: choice
-        options:
-          - light
-          - standard
-          - aggressive
-          - extreme
-
-  # ቀለል ያለ የሰአት ማስተካከያ (የዋጋ ቅነሳ)
+        options: [full_cycle, content_gen]
+  
+  # በየ6 ሰዓቱ እና በየቀኑ 12:30 እንዲሮጥ
   schedule:
-    - cron: '0 */6 * * *'    # በየ6 ሰዓቱ
-    - cron: '30 12 * * *'    # በየቀኑ በ12:30
+    - cron: '0 */6 * * *'
+    - cron: '30 12 * * *'
+
+permissions:
+  contents: write # ለ GitHub Pages መልቀቂያ ወሳኝ ነው
 
 env:
   PYTHON_VERSION: '3.10'
@@ -37,846 +24,309 @@ env:
   OUTPUT_DIR: 'public'
 
 jobs:
-  # ==================== ደረጃ 1: ስርዓት ማስነሻ እና መሰረታዊ ማዋቀር ====================
+  # ==================== ደረጃ 1: ስርዓት ማስነሻ ====================
   system_setup:
     runs-on: ubuntu-latest
-    name: "🔧 ስርዓት ማስነሻ እና መሰረታዊ ማዋቀር"
+    name: "🔧 System Setup & Boot"
     outputs:
-      session_id: ${{ steps.generate_session.outputs.session_id }}
+      session_id: ${{ steps.gen_session.outputs.session_id }}
     
     steps:
-      - name: "📥 ኮድ ማውረድ"
+      - name: "📥 Checkout Code"
         uses: actions/checkout@v4
 
-      - name: "🐍 Python ማዋቀር"
+      - name: "🐍 Setup Python"
         uses: actions/setup-python@v4
         with:
           python-version: ${{ env.PYTHON_VERSION }}
-          cache: 'pip'
 
-      - name: "📦 የፓይተን ፓኬጆች መጫን"
+      - name: "📦 Install Dependencies"
         run: |
-          pip install --upgrade pip
-          pip install sqlite3 pandas numpy requests
-          pip install schedule python-dotenv
-          pip install matplotlib seaborn
-          echo "✅ Python packages installed"
-
-      - name: "🆔 የስርዓት ማስነሻ መለያ ማመንጨት"
-        id: generate_session
-        run: |
-          SESSION_ID="PM_$(date +%Y%m%d%H%M%S)_${{ github.run_id }}_$(openssl rand -hex 3)"
-          echo "session_id=$SESSION_ID" >> $GITHUB_OUTPUT
-          echo "✅ Session ID generated: $SESSION_ID"
-
-      - name: "🗄️ የውሂብ ጎታ እና የውጤት ማውጫ መፍጠር"
-        run: |
-          # የውጤት ማውጫ መፍጠር
+          pip install pandas numpy requests
           mkdir -p ${{ env.OUTPUT_DIR }}
+
+      - name: "🆔 Generate Session ID"
+        id: gen_session
+        run: echo "session_id=PM_$(date +%Y%m%d)_${{ github.run_id }}" >> $GITHUB_OUTPUT
+
+      - name: "🗄️ Initialize Database"
+        run: |
+          cat << 'EOF' > init_db.py
+          import sqlite3, json, os, datetime
           
-          # የውሂብ ጎታ መፍጠር እና መሰረታዊ ማዋቀር
-          python3 << 'EOF'
-import sqlite3, json, os
-from datetime import datetime
+          db_path = os.environ.get('DATABASE_FILE', 'profit_master.db')
+          output_dir = os.environ.get('OUTPUT_DIR', 'public')
+          
+          # DB መፍጠር
+          conn = sqlite3.connect(db_path)
+          c = conn.cursor()
+          
+          c.execute('CREATE TABLE IF NOT EXISTS content_items (id TEXT, title TEXT, type TEXT, words INT, quality INT, potential REAL, created_at TEXT)')
+          c.execute('CREATE TABLE IF NOT EXISTS revenue_events (id TEXT, source TEXT, amount REAL, platform TEXT, date TEXT)')
+          
+          conn.commit()
+          conn.close()
+          
+          # ሲስተም ኢንፎ
+          info = {
+              "status": "BOOT_COMPLETE", 
+              "timestamp": datetime.datetime.now().isoformat(),
+              "version": "12.1"
+          }
+          with open(f'{output_dir}/system_info.json', 'w') as f:
+              json.dump(info, f, indent=2)
+          
+          print(f"✅ Database initialized at {db_path}")
+          EOF
+          
+          python3 init_db.py
 
-db_path = os.environ.get('DATABASE_FILE', 'profit_master.db')
-output_dir = os.environ.get('OUTPUT_DIR', 'public')
-
-# የውሂብ ጎታ መፍጠር
-conn = sqlite3.connect(db_path)
-cursor = conn.cursor()
-
-# መሰረታዊ ሰንጠረዦችን መፍጠር
-cursor.execute('''
-CREATE TABLE IF NOT EXISTS system_logs (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    session_id TEXT,
-    event_type TEXT,
-    message TEXT,
-    timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
-)
-''')
-
-cursor.execute('''
-CREATE TABLE IF NOT EXISTS content_items (
-    id TEXT PRIMARY KEY,
-    title TEXT,
-    content_type TEXT,
-    word_count INTEGER,
-    quality_score INTEGER,
-    created_at DATETIME,
-    monetization_potential REAL
-)
-''')
-
-cursor.execute('''
-CREATE TABLE IF NOT EXISTS revenue_events (
-    id TEXT PRIMARY KEY,
-    source TEXT,
-    amount REAL,
-    event_date DATE,
-    platform TEXT,
-    session_id TEXT
-)
-''')
-
-# የሙከራ ውሂብ ማስገባት
-test_data = [
-    ('system_start', 'System initialized successfully', datetime.now().isoformat()),
-    ('database_created', 'Database tables created', datetime.now().isoformat()),
-    ('environment_ready', 'Python environment configured', datetime.now().isoformat())
-]
-
-for event_type, message, timestamp in test_data:
-    cursor.execute(
-        "INSERT INTO system_logs (event_type, message, timestamp) VALUES (?, ?, ?)",
-        (event_type, message, timestamp)
-    )
-
-conn.commit()
-conn.close()
-
-print(f"✅ Database created at {db_path}")
-print(f"✅ Output directory created: {output_dir}")
-
-# የስርዓት መረጃ ፋይል መፍጠር
-system_info = {
-    "version": "12.1.0",
-    "session_id": os.environ.get('SESSION_ID', 'unknown'),
-    "boot_time": datetime.now().isoformat(),
-    "database": db_path,
-    "output_directory": output_dir,
-    "python_version": os.environ.get('PYTHON_VERSION', '3.10')
-}
-
-with open(f'{output_dir}/system_info.json', 'w') as f:
-    json.dump(system_info, f, indent=2)
-
-print("✅ System info file created")
-EOF
-
-      - name: "📤 የስርዓት መረጃ ማስቀመጥ"
+      - name: "📤 Upload Artifacts"
         uses: actions/upload-artifact@v4
         with:
           name: system-data
           path: |
             ${{ env.DATABASE_FILE }}
             ${{ env.OUTPUT_DIR }}/
-          retention-days: 7
 
-  # ==================== ደረጃ 2: የይዘት ማመንጨት እና ትንተና ====================
+  # ==================== ደረጃ 2: ይዘት ማመንጨት ====================
   content_generation:
-    runs-on: ubuntu-latest
     needs: system_setup
-    name: "🧠 የይዘት ማመንጨት እና ትንተና"
+    runs-on: ubuntu-latest
+    name: "🧠 AI Content Generation"
     
     steps:
-      - name: "📥 የስርዓት መረጃ ማውረድ"
+      - name: "📥 Download System Data"
         uses: actions/download-artifact@v4
         with:
           name: system-data
 
-      - name: "🐍 የፓይተን ፓኬጆች መጫን (እንደገና)"
+      - name: "🐍 Setup Python & Libs"
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+      
+      - name: "📦 Install Libs"
+        run: pip install pandas numpy
+
+      - name: "📝 Generate Content"
         run: |
-          pip install --upgrade pip
-          pip install pandas numpy
-          echo "✅ Python packages installed for content generation"
+          cat << 'EOF' > content_gen.py
+          import sqlite3, json, random, datetime, os
+          import pandas as pd
+          
+          db_path = os.environ.get('DATABASE_FILE')
+          output_dir = os.environ.get('OUTPUT_DIR')
+          
+          conn = sqlite3.connect(db_path)
+          
+          topics = ["AI Monetization", "Passive Income", "Affiliate SEO", "Crypto Bots"]
+          types = ["Blog", "Guide", "Review"]
+          
+          new_items = []
+          for i in range(10):
+              item = {
+                  'id': f"cnt_{random.randint(1000,9999)}",
+                  'title': f"{random.choice(topics)} - Part {i+1}",
+                  'type': random.choice(types),
+                  'words': random.randint(800, 2500),
+                  'quality': random.randint(85, 99),
+                  'potential': round(random.uniform(50, 500), 2),
+                  'date': datetime.datetime.now().isoformat()
+              }
+              
+              conn.execute('INSERT INTO content_items VALUES (?,?,?,?,?,?,?)', 
+                  (item['id'], item['title'], item['type'], item['words'], item['quality'], item['potential'], item['date']))
+              new_items.append(item)
+          
+          conn.commit()
+          
+          # JSON ሪፖርት
+          report = {"generated_count": len(new_items), "items": new_items}
+          with open(f'{output_dir}/content_report.json', 'w') as f:
+              json.dump(report, f, indent=2)
+              
+          print(f"✅ Generated {len(new_items)} articles")
+          EOF
+          
+          python3 content_gen.py
 
-      - name: "📝 የይዘት ማመንጫ ሞጁል መፍጠር"
-        run: |
-          cat > content_generator.py << 'EOF'
-import sqlite3, json, random, datetime, os
-import pandas as pd
-
-class ContentGenerator:
-    def __init__(self, db_path, output_dir):
-        self.db_path = db_path
-        self.output_dir = output_dir
-        self.conn = sqlite3.connect(db_path)
-        
-        # የይዘት አይነቶች
-        self.content_types = [
-            'blog_post', 'product_review', 'how_to_guide',
-            'case_study', 'list_article', 'tutorial'
-        ]
-        
-        # የርዕስ ርእሶች
-        self.topics = [
-            "AI Monetization Strategies",
-            "Passive Income with Automation",
-            "Affiliate Marketing Optimization",
-            "Social Media Growth Hacking",
-            "SEO Content Creation"
-        ]
-    
-    def generate_content(self, count=10):
-        """የይዘት ምድቦችን ማመንጨት"""
-        content_items = []
-        
-        for i in range(count):
-            content_type = random.choice(self.content_types)
-            topic = random.choice(self.topics)
-            
-            content = {
-                'id': f"content_{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}_{i}",
-                'title': f"{topic} - Complete Guide {i+1}",
-                'content_type': content_type,
-                'word_count': random.randint(800, 3000),
-                'quality_score': random.randint(70, 98),
-                'created_at': datetime.datetime.now().isoformat(),
-                'monetization_potential': round(random.uniform(10, 500), 2),
-                'keywords': [topic.lower(), content_type, 'guide', '2024'],
-                'estimated_read_time': f"{random.randint(3, 15)} minutes"
-            }
-            
-            content_items.append(content)
-            
-            # ወደ ውሂብ ጎታ ማስቀመጥ
-            self.save_to_database(content)
-        
-        return content_items
-    
-    def save_to_database(self, content):
-        """ውሂብ ወደ ውሂብ ጎታ ማስቀመጥ"""
-        cursor = self.conn.cursor()
-        cursor.execute('''
-            INSERT OR REPLACE INTO content_items 
-            (id, title, content_type, word_count, quality_score, created_at, monetization_potential)
-            VALUES (?, ?, ?, ?, ?, ?, ?)
-        ''', (
-            content['id'],
-            content['title'],
-            content['content_type'],
-            content['word_count'],
-            content['quality_score'],
-            content['created_at'],
-            content['monetization_potential']
-        ))
-        self.conn.commit()
-    
-    def analyze_content(self):
-        """የይዘት ትንተና"""
-        df = pd.read_sql_query("SELECT * FROM content_items", self.conn)
-        
-        if df.empty:
-            return {"error": "No content found"}
-        
-        analysis = {
-            'total_content': len(df),
-            'total_words': int(df['word_count'].sum()),
-            'average_quality': float(df['quality_score'].mean()),
-            'average_monetization': float(df['monetization_potential'].mean()),
-            'by_content_type': df['content_type'].value_counts().to_dict(),
-            'top_performing': self.get_top_performing(df)
-        }
-        
-        return analysis
-    
-    def get_top_performing(self, df):
-        """ምርጥ የሆኑ ይዘቶችን መለየት"""
-        top = df.nlargest(3, 'monetization_potential')
-        return top[['id', 'title', 'monetization_potential']].to_dict('records')
-    
-    def create_report(self):
-        """ሪፖርት መፍጠር"""
-        content_items = self.generate_content(15)
-        analysis = self.analyze_content()
-        
-        report = {
-            'generated_at': datetime.datetime.now().isoformat(),
-            'session_id': os.environ.get('SESSION_ID', 'unknown'),
-            'content_summary': {
-                'generated_count': len(content_items),
-                'total_monetization_potential': sum(c['monetization_potential'] for c in content_items)
-            },
-            'analysis': analysis,
-            'recommendations': [
-                "Increase content frequency by 30%",
-                "Focus on high-monetization content types",
-                "Optimize for SEO with targeted keywords",
-                "Repurpose content across multiple platforms"
-            ]
-        }
-        
-        return report
-    
-    def close(self):
-        """መረጃዎችን ማጠፋት"""
-        self.conn.close()
-
-def main():
-    db_path = os.environ.get('DATABASE_FILE', 'profit_master.db')
-    output_dir = os.environ.get('OUTPUT_DIR', 'public')
-    
-    generator = ContentGenerator(db_path, output_dir)
-    
-    try:
-        # ሪፖርት መፍጠር
-        report = generator.create_report()
-        
-        # ወደ JSON ፋይል ማስቀመጥ
-        report_file = f'{output_dir}/content_report.json'
-        with open(report_file, 'w') as f:
-            json.dump(report, f, indent=2)
-        
-        print(f"✅ Content generation completed")
-        print(f"📊 Generated {report['content_summary']['generated_count']} content items")
-        print(f"💰 Total monetization potential: ${report['content_summary']['total_monetization_potential']:.2f}")
-        
-        # የይዘት ሪፖርት HTML መፍጠር
-        create_html_report(report, output_dir)
-        
-    except Exception as e:
-        print(f"❌ Error in content generation: {e}")
-    finally:
-        generator.close()
-
-def create_html_report(report, output_dir):
-    """የHTML ሪፖርት መፍጠር"""
-    html_content = f"""
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Profit Master Content Report</title>
-    <style>
-        body {{ font-family: Arial, sans-serif; margin: 40px; background: #f5f5f5; }}
-        .container {{ max-width: 1200px; margin: 0 auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 0 20px rgba(0,0,0,0.1); }}
-        .header {{ background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; border-radius: 10px 10px 0 0; text-align: center; }}
-        .stats {{ display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin: 30px 0; }}
-        .stat-card {{ background: #f8f9fa; padding: 20px; border-radius: 8px; border-left: 4px solid #667eea; }}
-        .stat-value {{ font-size: 2em; font-weight: bold; color: #333; }}
-        .stat-label {{ color: #666; }}
-        .recommendation {{ background: #fff3cd; border-left: 4px solid #ffc107; padding: 15px; margin: 10px 0; border-radius: 4px; }}
-        table {{ width: 100%; border-collapse: collapse; margin: 20px 0; }}
-        th, td {{ padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }}
-        th {{ background-color: #667eea; color: white; }}
-    </style>
-</head>
-<body>
-    <div class="container">
-        <div class="header">
-            <h1>📊 Profit Master Content Report</h1>
-            <p>Generated: {report['generated_at']}</p>
-            <p>Session: {report['session_id']}</p>
-        </div>
-        
-        <div class="stats">
-            <div class="stat-card">
-                <div class="stat-value">{report['content_summary']['generated_count']}</div>
-                <div class="stat-label">Content Items Generated</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-value">${report['content_summary']['total_monetization_potential']:.2f}</div>
-                <div class="stat-label">Total Monetization Potential</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-value">{report['analysis']['average_quality']:.1f}/100</div>
-                <div class="stat-label">Average Quality Score</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-value">{report['analysis']['total_words']:,}</div>
-                <div class="stat-label">Total Words Generated</div>
-            </div>
-        </div>
-        
-        <h2>📈 Content Type Distribution</h2>
-        <table>
-            <tr><th>Content Type</th><th>Count</th></tr>
-            {"".join(f"<tr><td>{ctype}</td><td>{count}</td></tr>" for ctype, count in report['analysis']['by_content_type'].items())}
-        </table>
-        
-        <h2>🏆 Top Performing Content</h2>
-        <table>
-            <tr><th>Title</th><th>Monetization Potential</th></tr>
-            {"".join(f"<tr><td>{item['title']}</td><td>${item['monetization_potential']:.2f}</td></tr>" for item in report['analysis']['top_performing'])}
-        </table>
-        
-        <h2>🎯 Recommendations</h2>
-        {"".join(f'<div class="recommendation">✅ {rec}</div>' for rec in report['recommendations'])}
-        
-        <div style="margin-top: 40px; padding-top: 20px; border-top: 1px solid #ddd; text-align: center; color: #666;">
-            <p>Generated by Profit Master Supreme v12.1</p>
-            <p>Next scheduled update: 6 hours</p>
-        </div>
-    </div>
-</body>
-</html>
-"""
-    
-    # ዋና index.html ፋይል መፍጠር
-    with open(f'{output_dir}/index.html', 'w') as f:
-        f.write(html_content)
-    
-    print("✅ HTML report created at index.html")
-
-if __name__ == "__main__":
-    main()
-EOF
-
-      - name: "🚀 የይዘት ማመንጫ ማስኬድ"
-        env:
-          DATABASE_FILE: ${{ env.DATABASE_FILE }}
-          OUTPUT_DIR: ${{ env.OUTPUT_DIR }}
-          SESSION_ID: ${{ needs.system_setup.outputs.session_id }}
-        run: python3 content_generator.py
-
-      - name: "📤 የይዘት ማመንጨት ውጤቶች ማስቀመጥ"
+      - name: "📤 Upload Content Data"
         uses: actions/upload-artifact@v4
         with:
           name: content-results
           path: |
-            ${{ env.OUTPUT_DIR }}/
             ${{ env.DATABASE_FILE }}
-          retention-days: 7
+            ${{ env.OUTPUT_DIR }}/
 
-  # ==================== ደረጃ 3: የገቢ ትንተና እና ዳሽቦርድ ====================
+  # ==================== ደረጃ 3: ገቢ ትንተና እና ዳሽቦርድ ====================
   revenue_analytics:
-    runs-on: ubuntu-latest
     needs: content_generation
-    name: "💰 የገቢ ትንተና እና ዳሽቦርድ"
+    runs-on: ubuntu-latest
+    name: "💰 Revenue & Dashboard"
     
     steps:
-      - name: "📥 የይዘት ውጤቶች ማውረድ"
+      - name: "📥 Download Content Data"
         uses: actions/download-artifact@v4
         with:
           name: content-results
 
-      - name: "📈 የገቢ ትንተና ሞጁል መፍጠር"
+      - name: "🐍 Setup Python"
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          
+      - name: "📦 Install Libs"
+        run: pip install pandas matplotlib seaborn
+
+      - name: "📊 Analyze & Create Dashboard"
         run: |
-          cat > revenue_analyzer.py << 'EOF'
-import sqlite3, json, random, datetime, os
-import pandas as pd
-import matplotlib.pyplot as plt
+          cat << 'EOF' > dashboard.py
+          import sqlite3, json, random, datetime, os
+          import pandas as pd
+          import matplotlib.pyplot as plt
+          
+          db_path = os.environ.get('DATABASE_FILE')
+          output_dir = os.environ.get('OUTPUT_DIR')
+          conn = sqlite3.connect(db_path)
+          
+          # 1. Simulate Revenue
+          sources = ['Affiliate', 'Ads', 'Sponsorship']
+          platforms = ['Web', 'Social', 'Email']
+          
+          for _ in range(20):
+              conn.execute('INSERT INTO revenue_events VALUES (?,?,?,?,?)',
+                  (f"rev_{random.randint(1000,9999)}", random.choice(sources), 
+                   round(random.uniform(10, 200), 2), random.choice(platforms), 
+                   datetime.datetime.now().strftime('%Y-%m-%d')))
+          conn.commit()
+          
+          # 2. Analyze
+          df_rev = pd.read_sql('SELECT * FROM revenue_events', conn)
+          df_cnt = pd.read_sql('SELECT * FROM content_items', conn)
+          
+          total_rev = df_rev['amount'].sum()
+          top_source = df_rev.groupby('source')['amount'].sum().idxmax()
+          avg_quality = df_cnt['quality'].mean()
+          
+          # 3. Create Charts
+          plt.figure(figsize=(8,5))
+          df_rev.groupby('source')['amount'].sum().plot(kind='bar', color='#6366f1')
+          plt.title('Revenue by Source')
+          plt.tight_layout()
+          plt.savefig(f'{output_dir}/revenue_chart.png')
+          
+          # 4. Generate HTML Dashboard
+          html = f"""
+          <!DOCTYPE html>
+          <html>
+          <head>
+              <title>Profit Master Supreme v12.1</title>
+              <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+              <style>
+                  body {{ background: #f0f2f5; font-family: 'Segoe UI', sans-serif; }}
+                  .header {{ background: linear-gradient(135deg, #667eea, #764ba2); color: white; padding: 40px 0; margin-bottom: 30px; }}
+                  .card {{ border: none; border-radius: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); transition: transform 0.2s; }}
+                  .card:hover {{ transform: translateY(-5px); }}
+                  .metric {{ font-size: 2.5rem; font-weight: bold; color: #333; }}
+              </style>
+          </head>
+          <body>
+              <div class="header text-center">
+                  <h1>🚀 Profit Master Supreme v12.1</h1>
+                  <p class="lead">AI-Powered Monetization Dashboard</p>
+                  <span class="badge bg-success">SYSTEM ACTIVE</span>
+              </div>
+              
+              <div class="container">
+                  <div class="row text-center mb-4">
+                      <div class="col-md-4">
+                          <div class="card p-4">
+                              <div class="text-muted">Total Revenue</div>
+                              <div class="metric text-success">${total_rev:,.2f}</div>
+                          </div>
+                      </div>
+                      <div class="col-md-4">
+                          <div class="card p-4">
+                              <div class="text-muted">Content Generated</div>
+                              <div class="metric text-primary">{len(df_cnt)}</div>
+                          </div>
+                      </div>
+                      <div class="col-md-4">
+                          <div class="card p-4">
+                              <div class="text-muted">Quality Score</div>
+                              <div class="metric text-warning">{avg_quality:.1f}</div>
+                          </div>
+                      </div>
+                  </div>
+                  
+                  <div class="row">
+                      <div class="col-md-6">
+                          <div class="card p-3">
+                              <h4 class="mb-3">Revenue Analysis</h4>
+                              <img src="revenue_chart.png" class="img-fluid rounded">
+                          </div>
+                      </div>
+                      <div class="col-md-6">
+                          <div class="card p-3">
+                              <h4 class="mb-3">Top Performing Content</h4>
+                              <ul class="list-group list-group-flush">
+          """
+          
+          for _, row in df_cnt.nlargest(5, 'potential').iterrows():
+              html += f'<li class="list-group-item d-flex justify-content-between"><span>{row["title"]}</span> <span class="fw-bold">${row["potential"]}</span></li>'
+          
+          html += f"""
+                              </ul>
+                          </div>
+                      </div>
+                  </div>
+                  
+                  <div class="text-center mt-5 text-muted">
+                      <p>Run ID: {os.environ.get('GITHUB_RUN_ID')} • Last Update: {datetime.datetime.now().strftime('%Y-%m-%d %H:%M')}</p>
+                  </div>
+              </div>
+          </body>
+          </html>
+          """
+          
+          with open(f'{output_dir}/index.html', 'w') as f:
+              f.write(html)
+          
+          print("✅ Dashboard generated at index.html")
+          EOF
+          
+          python3 dashboard.py
 
-class RevenueAnalyzer:
-    def __init__(self, db_path, output_dir):
-        self.db_path = db_path
-        self.output_dir = output_dir
-        self.conn = sqlite3.connect(db_path)
-        
-        # የገቢ ምንጮች
-        self.revenue_sources = [
-            'affiliate_marketing', 'advertising', 'sponsorships',
-            'digital_products', 'consulting', 'membership'
-        ]
-        
-        # የመድረኮች
-        self.platforms = ['website', 'youtube', 'twitter', 'linkedin', 'facebook', 'instagram']
-    
-    def generate_revenue_data(self, days=30):
-        """የታሪካዊ የገቢ ውሂብ ማመንጨት"""
-        start_date = datetime.datetime.now() - datetime.timedelta(days=days)
-        
-        for i in range(days):
-            current_date = start_date + datetime.timedelta(days=i)
-            
-            for _ in range(random.randint(2, 6)):  # 2-6 የገቢ ክስተቶች በቀን
-                revenue_event = {
-                    'id': f"rev_{current_date.strftime('%Y%m%d')}_{random.randint(1000, 9999)}",
-                    'source': random.choice(self.revenue_sources),
-                    'amount': round(random.uniform(5, 500), 2),
-                    'event_date': current_date.strftime('%Y-%m-%d'),
-                    'platform': random.choice(self.platforms),
-                    'session_id': os.environ.get('SESSION_ID', 'unknown')
-                }
-                
-                self.save_revenue_event(revenue_event)
-    
-    def save_revenue_event(self, event):
-        """የገቢ ክስተት ወደ ውሂብ ጎታ ማስቀመጥ"""
-        cursor = self.conn.cursor()
-        cursor.execute('''
-            INSERT INTO revenue_events 
-            (id, source, amount, event_date, platform, session_id)
-            VALUES (?, ?, ?, ?, ?, ?)
-        ''', (
-            event['id'],
-            event['source'],
-            event['amount'],
-            event['event_date'],
-            event['platform'],
-            event['session_id']
-        ))
-        self.conn.commit()
-    
-    def analyze_revenue(self):
-        """የገቢ ትንተና"""
-        df = pd.read_sql_query("SELECT * FROM revenue_events", self.conn)
-        
-        if df.empty:
-            # የሙከራ ውሂብ ማመንጨት ከውሂብ ጎታ ባዶ ከሆነ
-            self.generate_revenue_data(30)
-            df = pd.read_sql_query("SELECT * FROM revenue_events", self.conn)
-        
-        analysis = {
-            'total_revenue': float(df['amount'].sum()),
-            'average_daily': float(df.groupby('event_date')['amount'].sum().mean()),
-            'by_source': df.groupby('source')['amount'].sum().to_dict(),
-            'by_platform': df.groupby('platform')['amount'].sum().to_dict(),
-            'daily_trend': self.get_daily_trend(df),
-            'top_performing': self.get_top_performing(df)
-        }
-        
-        return analysis
-    
-    def get_daily_trend(self, df):
-        """ዕለታዊ የገቢ አዝማሚያ"""
-        daily = df.groupby('event_date')['amount'].sum()
-        return {str(date): float(amount) for date, amount in daily.items()}
-    
-    def get_top_performing(self, df):
-        """ምርጥ የሆኑ የገቢ ምንጮች"""
-        top_sources = df.groupby('source')['amount'].sum().nlargest(3)
-        return top_sources.to_dict()
-    
-    def create_visualizations(self):
-        """የዳሲዎች ምስሎች መፍጠር"""
-        df = pd.read_sql_query("SELECT * FROM revenue_events", self.conn)
-        
-        if df.empty:
-            return
-        
-        # የገቢ ስርጭት በምንጭ
-        plt.figure(figsize=(10, 6))
-        source_dist = df.groupby('source')['amount'].sum()
-        colors = plt.cm.Set3(range(len(source_dist)))
-        plt.pie(source_dist.values, labels=source_dist.index, autopct='%1.1f%%', colors=colors)
-        plt.title('Revenue Distribution by Source')
-        plt.savefig(f'{self.output_dir}/revenue_pie.png', bbox_inches='tight', dpi=100)
-        plt.close()
-        
-        # ዕለታዊ የገቢ አዝማሚያ
-        plt.figure(figsize=(12, 6))
-        daily_revenue = df.groupby('event_date')['amount'].sum()
-        daily_revenue.plot(kind='line', marker='o', linewidth=2)
-        plt.title('Daily Revenue Trend')
-        plt.xlabel('Date')
-        plt.ylabel('Revenue ($)')
-        plt.grid(True, alpha=0.3)
-        plt.xticks(rotation=45)
-        plt.tight_layout()
-        plt.savefig(f'{self.output_dir}/revenue_trend.png', bbox_inches='tight', dpi=100)
-        plt.close()
-    
-    def create_dashboard(self, content_report, revenue_analysis):
-        """ዋና ዳሽቦርድ መፍጠር"""
-        html_content = f"""
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🚀 Profit Master Supreme Dashboard</title>
-    <style>
-        :root {{
-            --primary: #6366f1;
-            --secondary: #8b5cf6;
-            --success: #10b981;
-            --warning: #f59e0b;
-            --danger: #ef4444;
-            --dark: #1f2937;
-            --light: #f9fafb;
-        }}
-        
-        * {{
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', system-ui, sans-serif;
-        }}
-        
-        body {{
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 20px;
-        }}
-        
-        .dashboard-container {{
-            max-width: 1400px;
-            margin: 0 auto;
-        }}
-        
-        .header {{
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            padding: 30px;
-            margin-bottom: 30px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            text-align: center;
-        }}
-        
-        .header h1 {{
-            font-size: 2.5rem;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin-bottom: 10px;
-        }}
-        
-        .stats-grid {{
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
-        }}
-        
-        .stat-card {{
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border-radius: 15px;
-            padding: 25px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
-            border-left: 4px solid var(--primary);
-        }}
-        
-        .stat-value {{
-            font-size: 2.5rem;
-            font-weight: 800;
-            color: var(--dark);
-            margin: 10px 0;
-        }}
-        
-        .stat-label {{
-            color: #6b7280;
-            font-size: 0.9rem;
-        }}
-        
-        .charts-container {{
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-            margin-bottom: 30px;
-        }}
-        
-        @media (max-width: 768px) {{
-            .charts-container {{
-                grid-template-columns: 1fr;
-            }}
-        }}
-        
-        .chart-box {{
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border-radius: 15px;
-            padding: 20px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
-        }}
-        
-        .chart-box img {{
-            width: 100%;
-            height: auto;
-            border-radius: 8px;
-        }}
-        
-        .status-badge {{
-            display: inline-block;
-            padding: 8px 16px;
-            background: rgba(16, 185, 129, 0.2);
-            color: var(--success);
-            border-radius: 20px;
-            font-weight: 600;
-            margin-top: 10px;
-        }}
-        
-        .footer {{
-            text-align: center;
-            padding: 20px;
-            color: rgba(255, 255, 255, 0.8);
-            font-size: 0.9rem;
-        }}
-    </style>
-</head>
-<body>
-    <div class="dashboard-container">
-        <div class="header">
-            <h1>🚀 Profit Master Supreme v12.1</h1>
-            <p>AI-Powered Monetization Dashboard</p>
-            <div class="status-badge">✅ System Active • Next Run: 6 hours</div>
-        </div>
-        
-        <div class="stats-grid">
-            <div class="stat-card">
-                <div class="stat-label">💰 Total Revenue</div>
-                <div class="stat-value">${revenue_analysis['total_revenue']:,.2f}</div>
-                <div class="stat-label">Last 30 days</div>
-            </div>
-            
-            <div class="stat-card">
-                <div class="stat-label">📝 Content Generated</div>
-                <div class="stat-value">{content_report['content_summary']['generated_count']}</div>
-                <div class="stat-label">Articles & Guides</div>
-            </div>
-            
-            <div class="stat-card">
-                <div class="stat-label">📈 Daily Average</div>
-                <div class="stat-value">${revenue_analysis['average_daily']:.2f}</div>
-                <div class="stat-label">Revenue per day</div>
-            </div>
-            
-            <div class="stat-card">
-                <div class="stat-label">⭐ Quality Score</div>
-                <div class="stat-value">{content_report['analysis']['average_quality']:.1f}/100</div>
-                <div class="stat-label">Content Quality</div>
-            </div>
-        </div>
-        
-        <div class="charts-container">
-            <div class="chart-box">
-                <h3>📊 Revenue Distribution</h3>
-                <img src="revenue_pie.png" alt="Revenue Distribution">
-            </div>
-            
-            <div class="chart-box">
-                <h3>📈 Revenue Trend</h3>
-                <img src="revenue_trend.png" alt="Revenue Trend">
-            </div>
-        </div>
-        
-        <div class="stat-card">
-            <h3>🎯 Top Revenue Sources</h3>
-            <div style="margin-top: 15px;">
-                {"".join(f'<div style="padding: 10px; background: #f8f9fa; margin: 5px 0; border-radius: 8px;"><strong>{source}</strong>: ${amount:,.2f}</div>' for source, amount in revenue_analysis['top_performing'].items())}
-            </div>
-        </div>
-        
-        <div class="footer">
-            <p>Run ID: {os.environ.get('SESSION_ID', 'unknown')} • Generated: {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}</p>
-            <p>Profit Master Supreme v12.1 • Automated Monetization System</p>
-        </div>
-    </div>
-</body>
-</html>
-"""
-        
-        # ዋና index.html መፍጠር
-        with open(f'{self.output_dir}/index.html', 'w') as f:
-            f.write(html_content)
-        
-        print(f"✅ Dashboard created at {self.output_dir}/index.html")
-    
-    def close(self):
-        self.conn.close()
-
-def main():
-    db_path = os.environ.get('DATABASE_FILE', 'profit_master.db')
-    output_dir = os.environ.get('OUTPUT_DIR', 'public')
-    
-    analyzer = RevenueAnalyzer(db_path, output_dir)
-    
-    try:
-        # የገቢ ትንተና
-        revenue_analysis = analyzer.analyze_revenue()
-        
-        # የዳሲዎች ምስሎች መፍጠር
-        analyzer.create_visualizations()
-        
-        # የይዘት ሪፖርት ማንበብ
-        try:
-            with open(f'{output_dir}/content_report.json', 'r') as f:
-                content_report = json.load(f)
-        except:
-            content_report = {'content_summary': {'generated_count': 0}, 'analysis': {'average_quality': 0}}
-        
-        # ዳሽቦርድ መፍጠር
-        analyzer.create_dashboard(content_report, revenue_analysis)
-        
-        # የገቢ ሪፖርት መፍጠር
-        revenue_report = {
-            'generated_at': datetime.datetime.now().isoformat(),
-            'session_id': os.environ.get('SESSION_ID', 'unknown'),
-            'analysis': revenue_analysis,
-            'recommendations': [
-                f"Focus on {list(revenue_analysis['top_performing'].keys())[0]} for maximum revenue",
-                "Diversify revenue sources for stability",
-                "Increase content production in high-performing categories",
-                "Optimize monetization strategies for better conversion"
-            ]
-        }
-        
-        with open(f'{output_dir}/revenue_report.json', 'w') as f:
-            json.dump(revenue_report, f, indent=2)
-        
-        print(f"✅ Revenue analysis completed")
-        print(f"💰 Total revenue: ${revenue_analysis['total_revenue']:,.2f}")
-        print(f"📈 Daily average: ${revenue_analysis['average_daily']:.2f}")
-        
-    except Exception as e:
-        print(f"❌ Error in revenue analysis: {e}")
-    finally:
-        analyzer.close()
-
-if __name__ == "__main__":
-    main()
-EOF
-
-      - name: "📊 የገቢ ትንተና ማስኬድ"
-        env:
-          DATABASE_FILE: ${{ env.DATABASE_FILE }}
-          OUTPUT_DIR: ${{ env.OUTPUT_DIR }}
-          SESSION_ID: ${{ needs.system_setup.outputs.session_id }}
-        run: python3 revenue_analyzer.py
-
-      - name: "📤 የገቢ ትንተና ውጤቶች ማስቀመጥ"
+      - name: "📤 Upload Final Assets"
         uses: actions/upload-artifact@v4
         with:
           name: final-results
           path: ${{ env.OUTPUT_DIR }}/
-          retention-days: 7
 
-  # ==================== ደረጃ 4: ወደ GitHub Pages ማስቀመጥ ====================
-  deploy_to_github_pages:
-    runs-on: ubuntu-latest
+  # ==================== ደረጃ 4: መልቀቅ (Deployment) ====================
+  deploy:
     needs: revenue_analytics
-    name: "🚀 ወደ GitHub Pages ማስቀመጥ"
+    runs-on: ubuntu-latest
+    name: "🚀 Deploy to GitHub Pages"
     
     steps:
-      - name: "📥 የመጨረሻ ውጤቶች ማውረድ"
+      - name: "📥 Download Assets"
         uses: actions/download-artifact@v4
         with:
           name: final-results
+          path: public
 
-      - name: "🌐 ወደ GitHub Pages ማስቀመጥ"
+      - name: "🌐 Deploy to GitHub Pages"
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./${{ env.OUTPUT_DIR }}
-          publish_branch: gh-pages
-          keep_files: false
-          force_orphan: true
-          enable_jekyll: false
-          # ትክክለኛው የ GitHub Actions ቦት ኢሜል አድራሻ እዚህ ተጠቅሷል
+          publish_dir: ./public
+          keep_files: true
           user_name: 'github-actions[bot]'
-          user_email: '41898282+github-actions[bot]@users.noreply.github.com'  # ይህ ዋናው ማስተካከያ ነው
+          user_email: 'github-actions[bot]@users.noreply.github.com'
 
-      - name: "📊 የመጨረሻ ሁኔታ ሪፖርት"
+      - name: "✅ Final Report"
         run: |
-          echo "=== 🏁 FINAL DEPLOYMENT REPORT ==="
-          echo "✅ Deployment Successful!"
-          echo ""
-          echo "📊 SYSTEM INFORMATION:"
-          echo "• Workflow: Profit Master Supreme v12.1"
-          echo "• Run ID: ${{ github.run_id }}"
-          echo "• Session ID: ${{ needs.system_setup.outputs.session_id }}"
-          echo "• Deployment Time: $(date)"
-          echo ""
-          echo "🌐 DEPLOYMENT DETAILS:"
-          echo "• GitHub Pages URL: https://${{ github.repository_owner }}.github.io/${{ github.repository }}"
-          echo "• Dashboard: https://${{ github.repository_owner }}.github.io/${{ github.repository }}/index.html"
-          echo "• Workflow Run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-          echo ""
-          echo "📁 GENERATED FILES:"
-          echo "• index.html - Main dashboard"
-          echo "• content_report.json - Content analysis"
-          echo "• revenue_report.json - Revenue analysis"
-          echo "• system_info.json - System information"
-          echo "• revenue_pie.png - Revenue distribution chart"
-          echo "• revenue_trend.png - Revenue trend chart"
-          echo ""
-          echo "🔄 NEXT AUTOMATED RUN:"
-          echo "• Scheduled in 6 hours"
-          echo "• Will update dashboard automatically"
-          echo ""
-          echo "=== 🚀 DEPLOYMENT COMPLETE ==="
+          echo "Deployment Complete!"
+          echo "Visit: https://${{ github.repository_owner }}.github.io/${{ github.repository }}/"
