@@ -1,0 +1,386 @@
+name: Profit Master Supreme v11.0
+
+on:
+  # በሁለት መንገድ ሊሠራ ይችላል:
+  # 1. በእጅ (በGitHub ውስጥ በመጫን)
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: 'ምርጫ ያድርጉ'
+        required: true
+        default: 'auto'
+        type: choice
+        options:
+        - auto
+        - cli
+        - report
+        - setup
+      topic:
+        description: 'የሚፈለገው ርዕስ (ለauto mode ባዶ ይተው)'
+        required: false
+        default: ''
+        type: string
+      category:
+        description: 'ምድብ'
+        required: false
+        default: 'technology'
+        type: choice
+        options:
+        - technology
+        - business
+        - finance
+        - health
+        - education
+        - marketing
+  
+  # 2. በራስ-ሰር በየቀኑ በ08:00 UTC
+  schedule:
+    - cron: '0 8 * * *'
+
+env:
+  PYTHON_VERSION: '3.11'
+  MIN_WORD_COUNT: '2500'
+  ARTICLES_PER_DAY: '3'
+
+jobs:
+  profit-master:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: 📥 ሪፖዝቶሪ አምጣ
+      uses: actions/checkout@v3
+    
+    - name: 🐍 Python አቋቁም
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+    
+    - name: 📦 የፓይቶን ጥገኛዎች ጫን
+      run: |
+        python -m pip install --upgrade pip
+        pip install groq requests tweepy facebook-sdk Pillow schedule
+        pip install pytrends pandas plotly streamlit streamlit-option-menu
+    
+    - name: 📁 የሚያስፈልጉ ዳይሬክቶሪዎችን ፍጠር
+      run: |
+        mkdir -p data images backups exports reports
+        echo "📁 ዳይሬክቶሪዎች ተፈጥረዋል"
+    
+    - name: 🔧 የአሰራር መለኪያዎችን አስገባ
+      run: |
+        echo "GROQ_API_KEY=${{ secrets.GROQ_API_KEY }}" >> $GITHUB_ENV
+        echo "WP_URL=${{ secrets.WP_URL }}" >> $GITHUB_ENV
+        echo "WP_USERNAME=${{ secrets.WP_USERNAME }}" >> $GITHUB_ENV
+        echo "WP_PASSWORD=${{ secrets.WP_PASSWORD }}" >> $GITHUB_ENV
+        echo "TWITTER_API_KEY=${{ secrets.TWITTER_API_KEY }}" >> $GITHUB_ENV
+        echo "TWITTER_API_SECRET=${{ secrets.TWITTER_API_SECRET }}" >> $GITHUB_ENV
+        echo "TWITTER_ACCESS_TOKEN=${{ secrets.TWITTER_ACCESS_TOKEN }}" >> $GITHUB_ENV
+        echo "TWITTER_ACCESS_SECRET=${{ secrets.TWITTER_ACCESS_SECRET }}" >> $GITHUB_ENV
+        echo "FACEBOOK_ACCESS_TOKEN=${{ secrets.FACEBOOK_ACCESS_TOKEN }}" >> $GITHUB_ENV
+        echo "FACEBOOK_PAGE_ID=${{ secrets.FACEBOOK_PAGE_ID }}" >> $GITHUB_ENV
+        echo "TELEGRAM_BOT_TOKEN=${{ secrets.TELEGRAM_BOT_TOKEN }}" >> $GITHUB_ENV
+        echo "TELEGRAM_CHAT_ID=${{ secrets.TELEGRAM_CHAT_ID }}" >> $GITHUB_ENV
+        echo "STABILITY_API_KEY=${{ secrets.STABILITY_API_KEY }}" >> $GITHUB_ENV
+        echo "UNSPLASH_ACCESS_KEY=${{ secrets.UNSPLASH_ACCESS_KEY }}" >> $GITHUB_ENV
+        echo "ELEVENLABS_API_KEY=${{ secrets.ELEVENLABS_API_KEY }}" >> $GITHUB_ENV
+        echo "GOOGLE_TTS_API_KEY=${{ secrets.GOOGLE_TTS_API_KEY }}" >> $GITHUB_ENV
+        
+        # የግብዣ ማሻሻያዎች
+        echo "ENABLE_GROQ_AI=true" >> $GITHUB_ENV
+        echo "ENABLE_WORDPRESS=true" >> $GITHUB_ENV
+        echo "ENABLE_SOCIAL_MEDIA=true" >> $GITHUB_ENV
+        echo "ENABLE_AI_IMAGES=true" >> $GITHUB_ENV
+        echo "ENABLE_AFFILIATE_MONETIZATION=true" >> $GITHUB_ENV
+        echo "ENABLE_AUTO_SCHEDULING=true" >> $GITHUB_ENV
+        echo "ENABLE_TRENDING_TOPICS=true" >> $GITHUB_ENV
+    
+    - name: 🚀 Profit Master Supreme አሂድ
+      id: run_profit_master
+      run: |
+        echo "🏁 Profit Master Supreme v11.0 ሊሠራ ጀምሯል..."
+        echo "📅 ቀን: $(date)"
+        echo "🔧 ሞድ: ${{ github.event.inputs.mode || 'auto' }}"
+        echo "📝 ርዕስ: ${{ github.event.inputs.topic || 'Auto-generated from trends' }}"
+        echo "🏷️ ምድብ: ${{ github.event.inputs.category || 'technology' }}"
+        
+        # ስክሪፕት ስም እንደ አካባቢዎ ይለውጡ
+        SCRIPT_NAME="profit_master_supreme.py"
+        
+        if [ -f "$SCRIPT_NAME" ]; then
+          echo "✅ $SCRIPT_NAME ተገኝቷል"
+        elif [ -f "profit_machine_v9.py" ]; then
+          SCRIPT_NAME="profit_machine_v9.py"
+          echo "✅ $SCRIPT_NAME (v9.7) ተገኝቷል"
+        elif [ -f "profit_master.py" ]; then
+          SCRIPT_NAME="profit_master.py"
+          echo "✅ $SCRIPT_NAME ተገኝቷል"
+        else
+          echo "❌ ምንም የProfit Master ስክሪፕት አልተገኘም"
+          exit 1
+        fi
+        
+        # የሚሠራበትን ሞድ ይወስኑ
+        MODE="${{ github.event.inputs.mode || 'auto' }}"
+        
+        if [ "$MODE" = "auto" ]; then
+          echo "🤖 በራስ-ሰር ሞድ በመሠራት ላይ..."
+          python $SCRIPT_NAME --auto
+          EXIT_CODE=$?
+        elif [ "$MODE" = "cli" ]; then
+          echo "💻 በትዕዛዝ መስመር ሞድ በመሠራት ላይ..."
+          TOPIC="${{ github.event.inputs.topic }}"
+          CATEGORY="${{ github.event.inputs.category || 'technology' }}"
+          
+          if [ -z "$TOPIC" ]; then
+            echo "❌ ለCLI ሞድ ርዕስ ያስፈልጋል"
+            exit 1
+          fi
+          
+          # ኮዱን በቀጥታ ለማስፈፀም ምትክ ኮድ
+          python3 << 'EOF'
+import os
+import sys
+import json
+from datetime import datetime
+
+# ኮንፊግ ይፍጠሩ
+config = {
+    'GROQ_API_KEY': os.getenv('GROQ_API_KEY', ''),
+    'WP_URL': os.getenv('WP_URL', ''),
+    'WP_USERNAME': os.getenv('WP_USERNAME', ''),
+    'WP_PASSWORD': os.getenv('WP_PASSWORD', ''),
+    'TWITTER_API_KEY': os.getenv('TWITTER_API_KEY', ''),
+    'TWITTER_API_SECRET': os.getenv('TWITTER_API_SECRET', ''),
+    'TWITTER_ACCESS_TOKEN': os.getenv('TWITTER_ACCESS_TOKEN', ''),
+    'TWITTER_ACCESS_SECRET': os.getenv('TWITTER_ACCESS_SECRET', ''),
+    'FACEBOOK_ACCESS_TOKEN': os.getenv('FACEBOOK_ACCESS_TOKEN', ''),
+    'FACEBOOK_PAGE_ID': os.getenv('FACEBOOK_PAGE_ID', ''),
+    'ENABLE_GROQ_AI': True,
+    'ENABLE_WORDPRESS': bool(os.getenv('WP_URL')),
+    'ENABLE_SOCIAL_MEDIA': bool(os.getenv('TWITTER_API_KEY')),
+    'MIN_WORD_COUNT': 2500,
+    'ARTICLES_PER_DAY': 3
+}
+
+topic = "$TOPIC"
+category = "$CATEGORY"
+
+print(f"🎯 ርዕስ: {topic}")
+print(f"🏷️ ምድብ: {category}")
+print(f"🔑 GROQ API: {'✅ አለ' if config['GROQ_API_KEY'] else '❌ የለም'}")
+print(f"🌐 WordPress: {'✅ አለ' if config['ENABLE_WORDPRESS'] else '❌ የለም'}")
+print(f"📱 Social Media: {'✅ አለ' if config['ENABLE_SOCIAL_MEDIA'] else '❌ የለም'}")
+
+# አሁን ያለዎትን ኮድ ይጠቀሙ
+try:
+    # ይህንን ይለውጡ በእርስዎ እውነተኛ ኮድ
+    exec(open("$SCRIPT_NAME").read())
+except Exception as e:
+    print(f"❌ ስህተት: {e}")
+EOF
+          EXIT_CODE=$?
+        elif [ "$MODE" = "report" ]; then
+          echo "📊 ሪፖርት በመፍጠር ላይ..."
+          python $SCRIPT_NAME --report
+          EXIT_CODE=$?
+        elif [ "$MODE" = "setup" ]; then
+          echo "🔧 ማሰናዳት መመሪያዎችን በማሳየት ላይ..."
+          python $SCRIPT_NAME --setup
+          EXIT_CODE=$?
+        else
+          echo "❌ የተሳሳተ ሞድ: $MODE"
+          exit 1
+        fi
+        
+        # ውጤቱን አስፍረው
+        echo "exit_code=$EXIT_CODE" >> $GITHUB_OUTPUT
+        
+        if [ $EXIT_CODE -eq 0 ]; then
+          echo "✅ Profit Master በተሳካ ሁኔታ ተፈጽሟል!"
+        else
+          echo "❌ Profit Master በስህተት ገደበ!"
+        fi
+    
+    - name: 📂 ውጤቶችን አስቀምጥ
+      if: always()
+      run: |
+        echo "📁 የተፈጠሩ ፋይሎችን እየተመለከተ ነው..."
+        ls -la data/ 2>/dev/null || echo "📁 የውሂብ ዳይሬክቶሪ አልተፈጠረም"
+        ls -la images/ 2>/dev/null || echo "📁 የምስል ዳይሬክቶሪ አልተፈጠረም"
+        ls -la reports/ 2>/dev/null || echo "📁 የሪፖርት ዳይሬክቶሪ አልተፈጠረም"
+        
+        # የውሂብ ጎታ ውሂብ ለማየት
+        if [ -f "data/profit_master.db" ]; then
+          echo "🗄️ የውሂብ ጎታ መጠን: $(du -h data/profit_master.db | cut -f1)"
+          echo "📊 የውሂብ ጎታ ይዘት:"
+          python3 << 'EOF'
+import sqlite3
+import os
+
+db_path = "data/profit_master.db"
+if os.path.exists(db_path):
+    conn = sqlite3.connect(db_path)
+    cursor = conn.cursor()
+    
+    # የአርቲክሎች ብዛት
+    cursor.execute("SELECT COUNT(*) FROM articles")
+    article_count = cursor.fetchone()[0]
+    print(f"📝 አጠቃላይ አርቲክሎች: {article_count}")
+    
+    # የአርቲክሎች ብዛት (Pro)
+    cursor.execute("SELECT COUNT(*) FROM articles_pro")
+    article_pro_count = cursor.fetchone()[0]
+    print(f"📝 Pro አርቲክሎች: {article_pro_count}")
+    
+    # የተገመተ ገቢ
+    cursor.execute("SELECT SUM(estimated_revenue) FROM articles_pro")
+    total_revenue = cursor.fetchone()[0] or 0
+    print(f"💰 አጠቃላይ የተገመተ ገቢ: ${total_revenue:.2f}")
+    
+    conn.close()
+else:
+    print("❌ የውሂብ ጎታ አልተገኘም")
+EOF
+        fi
+    
+    - name: 📧 ውጤቱን ላክ
+      if: always()
+      uses: actions/github-script@v6
+      with:
+        script: |
+          const mode = context.payload.inputs?.mode || 'auto';
+          const topic = context.payload.inputs?.topic || 'Auto-generated';
+          const category = context.payload.inputs?.category || 'technology';
+          const exitCode = ${{ steps.run_profit_master.outputs.exit_code }};
+          
+          const success = exitCode === 0;
+          const status = success ? '✅ ተሳክቷል' : '❌ አልተሳካም';
+          
+          // የአሰራር ሪፖርት ፍጠር
+          const report = `
+          # Profit Master Supreme v11.0 - የአሰራር ሪፖርት
+          
+          ## 📊 ውጤት
+          - **ሁኔታ:** ${status}
+          - **ሞድ:** ${mode}
+          - **ርዕስ:** ${topic}
+          - **ምድብ:** ${category}
+          - **ጊዜ:** ${new Date().toLocaleString()}
+          - **የውጤት ኮድ:** ${exitCode}
+          
+          ## 🔗 ማገናኛዎች
+          - [የአሰራር ምዝገባ](https://github.com/${context.repo.owner}/${context.repo.name}/actions/runs/${context.runId})
+          - [ሪፖዝቶሪ](https://github.com/${context.repo.owner}/${context.repo.name})
+          
+          ## 📈 ለሚቀጥለው እርምጃ
+          ${success ? '✅ ቀጣዩን አሰራር ያቀናብሩ!' : '⚠️ አሰራሩን ይመልከቱ እና ስህተቶችን ያርሙ!'}
+          `;
+          
+          // በ GitHub አሰራር ውስጥ አስተያየት አስቀምጥ
+          github.rest.issues.createComment({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            issue_number: context.issue?.number || context.payload.workflow_run?.pull_requests?.[0]?.number || 0,
+            body: report
+          }).catch(() => {
+            // አስተያየት ካልተሳካ ችላ በል
+            console.log('አስተያየት ማስቀመጥ አልተቻለም');
+          });
+          
+          // ለሪፖዝቶሪ ደራሲዎች ማሳወቂያ ላክ (ከፈለጉ)
+          if (!success) {
+            github.rest.actions.createWorkflowDispatch({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              workflow_id: 'profit_master.yml',
+              ref: context.ref,
+              inputs: {
+                mode: 'report',
+                topic: 'System Check',
+                category: 'technology'
+              }
+            });
+          }
+
+  backup:
+    runs-on: ubuntu-latest
+    needs: profit-master
+    if: always()
+    
+    steps:
+    - name: 📥 ሪፖዝቶሪ አምጣ
+      uses: actions/checkout@v3
+    
+    - name: 📦 የውሂብ ጎታ ያረጋግጡ
+      run: |
+        if [ -f "data/profit_master.db" ]; then
+          echo "🗄️ የውሂብ ጎታ አለ"
+          echo "📏 መጠን: $(du -h data/profit_master.db | cut -f1)"
+          
+          # የውሂብ ጎታን ያረጋግጡ
+          python3 << 'EOF'
+import sqlite3
+import os
+import json
+
+db_path = "data/profit_master.db"
+if os.path.exists(db_path):
+    try:
+        conn = sqlite3.connect(db_path)
+        cursor = conn.cursor()
+        
+        # ሰንጠረዦችን ያረጋግጡ
+        cursor.execute("SELECT name FROM sqlite_master WHERE type='table'")
+        tables = cursor.fetchall()
+        
+        print(f"📋 የሰንጠረዦች ብዛት: {len(tables)}")
+        for table in tables:
+            cursor.execute(f"SELECT COUNT(*) FROM {table[0]}")
+            count = cursor.fetchone()[0]
+            print(f"  - {table[0]}: {count} ረድፎች")
+        
+        conn.close()
+        print("✅ የውሂብ ጎታ ደህና ነው")
+    except Exception as e:
+        print(f"❌ የውሂብ ጎታ ስህተት: {e}")
+else:
+    print("⚠️ የውሂብ ጎታ አልተገኘም")
+EOF
+        else
+          echo "⚠️ የውሂብ ጎታ አልተገኘም"
+        fi
+    
+    - name: 💾 የውሂብ ጎታ ተቆጣጣሪ ፍጠር
+      run: |
+        TIMESTAMP=$(date +%Y%m%d_%H%M%S)
+        BACKUP_DIR="backups"
+        
+        # የውሂብ ጎታን ቅጂ ያድርጉ
+        if [ -f "data/profit_master.db" ]; then
+          mkdir -p $BACKUP_DIR
+          cp data/profit_master.db "$BACKUP_DIR/profit_master_${TIMESTAMP}.db"
+          echo "💾 የውሂብ ጎታ ተቆጣጣሪ ተፈጥሯል: $BACKUP_DIR/profit_master_${TIMESTAMP}.db"
+          
+          # የተፈጠሩትን ተቆጣጣሪዎች ይቁጠሩ
+          BACKUP_COUNT=$(ls -1 $BACKUP_DIR/*.db 2>/dev/null | wc -l)
+          echo "📊 አጠቃላይ ተቆጣጣሪዎች: $BACKUP_COUNT"
+          
+          # 10 በላይ ከሆኑ ጥንዶቹን ያጥፉ
+          if [ $BACKUP_COUNT -gt 10 ]; then
+            echo "🧹 ጥንድ ተቆጣጣሪዎችን እየጠፋ ነው..."
+            ls -1t $BACKUP_DIR/*.db | tail -n +11 | xargs rm -f
+            echo "✅ ጥንድ ተቆጣጣሪዎች ጠፍተዋል"
+          fi
+        else
+          echo "⚠️ የውሂብ ጎታ ለተቆጣጣሪ አልተገኘም"
+        fi
+    
+    - name: 📤 ተቆጣጣሪዎችን ወደ አርቲፋክት ላክ
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: profit-master-backup-${{ github.run_id }}
+        path: |
+          backups/
+          data/profit_master.db
+        retention-days: 7
