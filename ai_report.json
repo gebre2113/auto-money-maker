@@ -1,16 +1,13 @@
 {
-  "content_generated": 2,
-  "revenue_projected": 349.76493496606287,
   "articles": [
     {
-      "topic": "AI Affiliate Automation",
-      "quality": 99,
-      "filename": "art_5430_0.html"
+      "topic": "Affiliate Marketing Pro",
+      "filename": "art_0448_0.html"
     },
     {
-      "topic": "AI Affiliate Automation",
-      "quality": 95,
-      "filename": "art_5434_1.html"
+      "topic": "Crypto Bots Strategy",
+      "filename": "art_0452_1.html"
     }
-  ]
+  ],
+  "revenue": 223
 }
