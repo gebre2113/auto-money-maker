@@ -34,7 +34,7 @@ jobs:
         WORDPRESS_PASSWORD: ${{ secrets.WORDPRESS_PASSWORD }}
         TEST_MODE: ${{ secrets.TEST_MODE }}
       run: |
-        python fail_safe_maker.py --auto
+        python profit_master.py --auto
         
     - name: Upload generated content
       uses: actions/upload-artifact@v4 # ተዘምኗል
