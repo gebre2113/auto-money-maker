@@ -1,41 +1,151 @@
-name: Profit Master v12 Test
+name: Profit Master Supreme v12.0
 
 on:
   schedule:
-    - cron: '0 */3 * * *'
+    - cron: '*/30 * * * *'    # በየ30 ደቂቃው
+    - cron: '0 */3 * * *'     # በየ3 ሰዓቱ
+    - cron: '0 0 1 * *'       # በወር መጀመሪያ
+  
   workflow_dispatch:
     inputs:
       action_type:
-        description: 'Action'
+        description: 'የማስኬድ አይነት'
+        required: true
         default: 'full_cycle'
         type: choice
         options:
-          - full_cycle
           - content_generation
+          - monetization_update
+          - social_posting
+          - analytics_report
+          - full_cycle
+          - emergency_recovery
+
+env:
+  ECOSYSTEM_VERSION: "12.0.0"
+  AI_MODELS: "groq-llama3-70b,replicate-api,huggingface"
+  TARGET_DAILY_REVENUE: 50
 
 jobs:
   system_boot:
     runs-on: ubuntu-latest
+    timeout-minutes: 360
+    name: "🔋 ስርዓት ማስነሻ"
+    
     steps:
-      - name: "🚀 Boot"
-        run: echo "System booting..."
-
-  setup_environment:
-    needs: system_boot
-    runs-on: ubuntu-latest
-    steps:
-      - name: "📥 Checkout"
+      - name: "🚀 ስርዓት መነሻ"
+        run: |
+          echo "=== Profit Master Supreme v12.0 ==="
+          echo "Session: $(date +%Y%m%d_%H%M%S)"
+          echo "Trigger: ${{ github.event_name }}"
+          
+      - name: "📥 ኮድ ማውረድ"
         uses: actions/checkout@v4
-      - name: "🐍 Setup Python"
+          
+      - name: "🐍 Python ማዋቀር"
         uses: actions/setup-python@v4
         with:
           python-version: '3.10'
-      - name: "📦 Install"
-        run: echo "Simulating pip install..."
+          
+      - name: "📦 ፓኬጆችን መጫን"
+        run: |
+          pip install -r requirements.txt
 
-  run_profit_master:
-    needs: setup_environment
+  content_generation:
+    needs: system_boot
     runs-on: ubuntu-latest
+    name: "🤖 AI ይዘት ማመንጨት"
+    
     steps:
-      - name: "🤖 Run"
-        run: echo "Master script starting..."
+      - name: "📥 ኮድ ማውረድ"
+        uses: actions/checkout@v4
+        
+      - name: "🧠 ይዘት ማመንጨት"
+        env:
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+        run: |
+          python3 scripts/content_generator.py
+
+      - name: "📤 ውጤቶችን ማስቀመጥ"
+        uses: actions/upload-artifact@v4
+        with:
+          name: generated-content
+          path: output/content/
+          retention-days: 30
+
+  monetization_engine:
+    needs: system_boot
+    runs-on: ubuntu-latest
+    name: "💰 ገቢ ማምራት"
+    
+    steps:
+      - name: "📥 ኮድ ማውረድ"
+        uses: actions/checkout@v4
+        
+      - name: "🔗 አፊሊዬት አውታረመረብ"
+        run: |
+          python3 scripts/monetization_engine.py
+
+      - name: "📊 የገቢ ትንበያ"
+        run: |
+          python3 scripts/analytics.py --type revenue
+
+      - name: "📤 የገቢ ውጤቶች ማስቀመጥ"
+        uses: actions/upload-artifact@v4
+        with:
+          name: monetization-results
+          path: output/revenue/
+          retention-days: 30
+
+  social_media:
+    needs: [content_generation, monetization_engine]
+    runs-on: ubuntu-latest
+    name: "📱 ማህበራዊ ሚዲያ አውቶማሽን"
+    
+    steps:
+      - name: "📥 ኮድ ማውረድ"
+        uses: actions/checkout@v4
+        
+      - name: "🌐 ማህበራዊ ሚዲያ ዝግጅት"
+        run: |
+          python3 scripts/social_automation.py
+
+      - name: "📤 የማህበራዊ ሚዲያ ውጤቶች ማስቀመጥ"
+        uses: actions/upload-artifact@v4
+        with:
+          name: social-media-content
+          path: output/social/
+          retention-days: 30
+
+  final_report:
+    needs: [content_generation, monetization_engine, social_media]
+    runs-on: ubuntu-latest
+    name: "📊 የመጨረሻ ሪፖርት"
+    
+    steps:
+      - name: "📥 ሁሉንም ውጤቶች ማውረድ"
+        uses: actions/download-artifact@v4
+        with:
+          pattern: '*'
+          merge-multiple: true
+          
+      - name: "📈 ማጠቃለያ ሪፖርት"
+        run: |
+          python3 scripts/analytics.py --type summary
+
+      - name: "🌐 ዳሽቦርድ መፍጠር"
+        run: |
+          python3 scripts/analytics.py --type dashboard
+
+      - name: "📤 የመጨረሻ ሪፖርት ማስቀመጥ"
+        uses: actions/upload-artifact@v4
+        with:
+          name: final-report
+          path: output/report/
+          retention-days: 365
+          
+      - name: "📢 ማስታወቂያ"
+        if: success()
+        run: |
+          echo "✅ Profit Master v12.0 completed successfully!"
+          echo "📊 Check artifacts for generated content and reports"
