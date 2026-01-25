@@ -1,10 +1,14 @@
 name: Profit Master Supreme v12.0 - Ultimate-AI-Monetization-Ecosystem
 
 on:
-  # እራስ-ሰር ማስኬድ ደቂቃዎች
   schedule:
-    - cron: '*/30 * * * *'  # በየ30 ደቂቃው ማስኬድ (ለተወሳሰቡ አገልግሎቶች)
-    - cron: '0 */3 * * *'    # በየ3 ሰዓቱ ሙሉ ማስኬድ
+    - cron: '*/30 * * * *'
+    - cron: '0 */3 * * *'
+    - cron: '0 0 1 * *'
+  workflow_dispatch:
+    inputs:
+      # ... (የቀረው ይቀጥላል)
+
   
   # የፈጣን ማስኬድ ቁልፎች
   repository_dispatch:
