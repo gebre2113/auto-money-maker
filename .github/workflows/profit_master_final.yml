@@ -1,0 +1,26 @@
+name: Profit Master Final
+
+on:
+  workflow_dispatch:  # ይህ የግድ የማስጀመሪያ ቁልፉን ያመጣል
+  schedule:
+    - cron: '0 * * * *' # በየሰዓቱ እንዲነሳ
+
+jobs:
+  run-script:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          
+      - name: Install
+        run: pip install requests google-genai feedparser
+        
+      - name: Run
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: python profit_master.py --auto
