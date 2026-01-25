@@ -847,8 +847,9 @@ EOF
           keep_files: false
           force_orphan: true
           enable_jekyll: false
+          # ትክክለኛው የ GitHub Actions ቦት ኢሜል አድራሻ እዚህ ተጠቅሷል
           user_name: 'github-actions[bot]'
-          user_email: 'github-actions[bot]@users.noreply.github.com'
+          user_email: '41898282+github-actions[bot]@users.noreply.github.com'  # ይህ ዋናው ማስተካከያ ነው
 
       - name: "📊 የመጨረሻ ሁኔታ ሪፖርት"
         run: |
