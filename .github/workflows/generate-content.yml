@@ -12,11 +12,11 @@ on:
     inputs:
       topic:
         description: 'የተጠቃሚ ርዕስ (ከፈለጉ)'
-        required: false
+        required: true
         default: ''
       category:
         description: 'የይዘት ምድብ'
-        required: false
+        required: true
         default: 'technology'
         type: choice
         options:
