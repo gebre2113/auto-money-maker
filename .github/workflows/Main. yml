@@ -1,45 +1,43 @@
-name: Run AI Bot (Stable Minimal)
+name: Profit Master Supreme v11.0
 
 on:
-  workflow_dispatch:
   schedule:
-    - cron: "0 */6 * * *"   # 6 ሰዓት እያንዳንዱ
+    - cron: '0 6 * * *'    # በቀን 4 ጊዜ
+    - cron: '0 12 * * *'
+    - cron: '0 18 * * *'
+    - cron: '0 0 * * *'
+    - cron: '0 0 * * 0'    # ሳምንታዊ
+  workflow_dispatch:      # ይህ ነው "Run Workflow" የሚለውን ቁልፍ የሚያመጣው!
+    inputs:
+      topic:
+        description: 'ርዕስ'
+        default: ''
+      category:
+        description: 'ምድብ'
+        default: 'technology'
 
-concurrency:
-  group: ai-bot
-  cancel-in-progress: true
+permissions:
+  contents: write
+  pages: write
 
 jobs:
-  run-bot:
+  run-profit-master:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
-
-    env:
-      SIMULATION_MODE: "true"
-
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
+      - uses: actions/checkout@v4
+      
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.11"
-
-      - name: Install minimal dependencies
+          python-version: '3.11'
+          
+      - name: Install Dependencies
         run: |
-          python -m pip install --upgrade pip
-          pip install requests python-dotenv
-
-      - name: Run bot (simulation)
-        run: |
-          echo "🤖 BOT STARTED"
-          echo "Simulation mode: $SIMULATION_MODE"
-          python bot.py
-
-      - name: Upload logs
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: bot-logs
-          path: .
+          pip install groq openai pandas requests schedule streamlit
+          
+      - name: Run Bot
+        env:
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: python profit_master_supreme.py
