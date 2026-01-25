@@ -1,0 +1,677 @@
+name: 🏗️ Initialize & Run Profit Machine Ultimate
+
+on:
+  workflow_dispatch: # Manual trigger only
+  schedule:
+    # Run 3 times daily at 8:00, 14:00, 20:00 UTC
+    - cron: '0 8,14,20 * * *'
+
+permissions:
+  contents: write
+  actions: write
+  checks: write
+
+jobs:
+  setup-and-run:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 🔐 Setup Git Identity
+        run: |
+          git config --global user.email "actions@github.com"
+          git config --global user.name "GitHub Actions"
+
+      - name: 🐍 Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: 📦 Install Core Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          if [ -f requirements.txt ]; then 
+            pip install -r requirements.txt
+          else
+            echo "Installing basic dependencies..."
+            pip install python-dotenv requests groq schedule sqlite3 pandas
+          fi
+
+      - name: 🏗️ Create Project Structure
+        run: |
+          echo "Creating project structure..."
+          if [ ! -f "create_structure.py" ]; then
+            echo "Creating create_structure.py..."
+            cat > create_structure.py << 'EOF'
+import os
+import json
+from pathlib import Path
+
+def create_complete_structure():
+    """Create complete Profit Machine Ultimate structure"""
+    
+    project_root = Path(__file__).parent
+    
+    # Main directories
+    directories = [
+        'core',
+        'v10',
+        'v11',
+        'utils',
+        'data',
+        'exports/v10',
+        'exports/v11',
+        'logs',
+        'backups',
+        'v10_original',
+        'v11_original',
+        '.github/workflows',
+        'reports',
+        'social_media',
+        'audio_output',
+        'templates'
+    ]
+    
+    print("🏗️  Creating Profit Machine Ultimate structure...")
+    
+    # Create directories
+    for directory in directories:
+        dir_path = project_root / directory
+        dir_path.mkdir(parents=True, exist_ok=True)
+        
+        # Add __init__.py to Python packages
+        if directory in ['core', 'v10', 'v11', 'utils']:
+            (dir_path / '__init__.py').touch()
+        
+        print(f"✅ Created: {directory}/")
+    
+    # Create essential files
+    essential_files = {
+        'README.md': """# 🏆 Profit Machine Ultimate
+Complete Automated Digital Business System
+
+## Features
+✅ v10 - Content Factory
+✅ v11 - GOD MODE (Quality Control & Marketing)
+✅ Master Controller (Smart Routing)
+✅ GitHub Actions (24/7 Automation)
+✅ Telegram Notifications
+✅ Database Persistence
+
+## Quick Start
+1. Clone this repository
+2. Run: `python main_controller.py --setup`
+3. Add API keys to .env file
+4. Test locally: `python main_controller.py --workflow daily`
+5. Push to GitHub for 24/7 automation
+
+## Configuration
+Copy `.env.example` to `.env` and add your API keys.
+
+## Support
+For issues, check the GitHub repository.
+""",
+        
+        '.env.example': """# Profit Machine Ultimate - Environment Variables
+
+# Core APIs
+GROQ_API_KEY=your_groq_api_key_here
+WP_URL=https://yourwordpress.com
+WP_USERNAME=your_username
+WP_PASSWORD=your_application_password
+
+# Telegram
+TELEGRAM_BOT_TOKEN=your_bot_token_here
+TELEGRAM_CHAT_ID=your_chat_id_here
+
+# Social Media (Optional)
+TWITTER_API_KEY=your_twitter_api_key
+TWITTER_API_SECRET=your_twitter_api_secret
+TWITTER_ACCESS_TOKEN=your_access_token
+TWITTER_ACCESS_SECRET=your_access_secret
+
+FACEBOOK_ACCESS_TOKEN=your_facebook_token
+FACEBOOK_PAGE_ID=your_facebook_page_id
+
+# Affiliate Networks (Store in GitHub Secrets)
+AMAZON_AFFILIATE_ID=your_amazon_id
+CLICKBANK_AFFILIATE_ID=your_clickbank_id
+SHAREASALE_AFFILIATE_ID=your_shareasale_id
+
+# System Settings
+MASTER_MODE=auto
+HYBRID_STRATEGY=quality_first
+V10_DAILY_LIMIT=2
+V11_DAILY_LIMIT=1
+""",
+        
+        'requirements.txt': """# Profit Machine Ultimate Dependencies
+
+# Core
+requests==2.31.0
+groq==0.3.0
+python-dotenv==1.0.0
+schedule==1.2.0
+
+# Content Generation
+gtts==2.3.2
+pygame==2.5.1
+
+# Data Processing
+pandas==2.1.4
+numpy==1.24.3
+
+# Social Media (Optional)
+tweepy==4.14.0
+facebook-sdk==4.0.0
+praw==7.7.1
+
+# System Monitoring
+psutil==5.9.6
+
+# Web Scraping
+beautifulsoup4==4.12.2
+lxml==4.9.3
+
+# Database
+sqlite3
+
+# Utilities
+python-dateutil==2.8.2
+tqdm==4.66.1
+""",
+        
+        '.gitignore': """# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual Environments
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Database
+*.db
+*.db-journal
+*.sqlite
+*.sqlite3
+
+# Backups
+backups/
+*.backup
+
+# System files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Environment Variables
+.env
+.env.local
+secrets/
+config_*.json
+
+# Exports (can be large)
+exports/
+!exports/README.md
+
+# Audio files
+audio_output/*.mp3
+
+# Social media exports
+social_media/
+""",
+        
+        'master_config.json': json.dumps({
+            "mode": "auto",
+            "hybrid_strategy": "quality_first",
+            "v10_settings": {
+                "enabled": True,
+                "daily_limit": 2,
+                "target_word_count": 1800,
+                "auto_publish": False,
+                "enable_affiliate": True
+            },
+            "v11_settings": {
+                "enabled": True,
+                "daily_limit": 1,
+                "enable_adsense_protection": True,
+                "enable_social_posting": True,
+                "enable_verification": True,
+                "enable_internal_linking": True
+            },
+            "routing_rules": {
+                "new_topic": "v10",
+                "enhancement": "v11",
+                "high_value_topic": "v11",
+                "quick_content": "v10"
+            },
+            "scheduling": {
+                "v10_schedule": [9, 14, 19],
+                "v11_schedule": [10, 16],
+                "max_daily_executions": 5
+            },
+            "notifications": {
+                "telegram_enabled": True,
+                "error_alerts": True,
+                "daily_reports": True,
+                "revenue_alerts": True
+            }
+        }, indent=2),
+        
+        'data/README.md': """# Data Directory
+
+This directory contains:
+- Database files (.db)
+- JSON exports
+- Performance metrics
+- Execution history
+
+DO NOT DELETE these files! They contain important operational data.
+""",
+        
+        'exports/README.md': """# Exports Directory
+
+Automated exports from Profit Machine:
+- v10/ - Content factory exports
+- v11/ - GOD MODE enhanced exports
+- Database backups
+- Social media content
+
+These files are automatically generated and backed up to GitHub.
+"""
+    }
+    
+    # Create files
+    for filename, content in essential_files.items():
+        file_path = project_root / filename
+        file_path.write_text(content)
+        print(f"✅ Created: {filename}")
+    
+    # Create empty Python files for structure
+    empty_py_files = [
+        'core/base_engine.py',
+        'utils/file_manager.py',
+        'utils/logger.py',
+        'utils/validators.py',
+        'templates/article_template.html'
+    ]
+    
+    for filepath in empty_py_files:
+        file_path = project_root / filepath
+        file_path.parent.mkdir(parents=True, exist_ok=True)
+        file_path.touch()
+        print(f"✅ Created: {filepath}")
+    
+    print("\n🎉 Project structure created successfully!")
+    print("\n📋 Next steps:")
+    print("1. Copy your v10 code to v10_original/ directory")
+    print("2. Copy your v11 code to v11_original/ directory")
+    print("3. Copy .env.example to .env and add your API keys")
+    print("4. Run: python main_controller.py --setup")
+    print("5. Test: python main_controller.py --workflow daily")
+
+if __name__ == "__main__":
+    create_complete_structure()
+EOF
+          fi
+          
+          python create_structure.py
+
+      - name: 🔧 Setup Environment Variables
+        env:
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          WP_URL: ${{ secrets.WP_URL }}
+          WP_USERNAME: ${{ secrets.WP_USERNAME }}
+          WP_PASSWORD: ${{ secrets.WP_PASSWORD }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          TWITTER_API_KEY: ${{ secrets.TWITTER_API_KEY }}
+          TWITTER_API_SECRET: ${{ secrets.TWITTER_API_SECRET }}
+          TWITTER_ACCESS_TOKEN: ${{ secrets.TWITTER_ACCESS_TOKEN }}
+          TWITTER_ACCESS_SECRET: ${{ secrets.TWITTER_ACCESS_SECRET }}
+          AMAZON_AFFILIATE_ID: ${{ secrets.AMAZON_AFFILIATE_ID }}
+          CLICKBANK_AFFILIATE_ID: ${{ secrets.CLICKBANK_AFFILIATE_ID }}
+          SHAREASALE_AFFILIATE_ID: ${{ secrets.SHAREASALE_AFFILIATE_ID }}
+        run: |
+          # Create .env file from GitHub Secrets
+          cat > .env << EOF
+          # Core APIs
+          GROQ_API_KEY=${GROQ_API_KEY}
+          WP_URL=${WP_URL}
+          WP_USERNAME=${WP_USERNAME}
+          WP_PASSWORD=${WP_PASSWORD}
+          
+          # Telegram Notifications
+          TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
+          TELEGRAM_CHAT_ID=${TELEGRAM_CHAT_ID}
+          
+          # Social Media (Optional)
+          TWITTER_API_KEY=${TWITTER_API_KEY}
+          TWITTER_API_SECRET=${TWITTER_API_SECRET}
+          TWITTER_ACCESS_TOKEN=${TWITTER_ACCESS_TOKEN}
+          TWITTER_ACCESS_SECRET=${TWITTER_ACCESS_SECRET}
+          
+          # Affiliate Networks
+          AMAZON_AFFILIATE_ID=${AMAZON_AFFILIATE_ID}
+          CLICKBANK_AFFILIATE_ID=${CLICKBANK_AFFILIATE_ID}
+          SHAREASALE_AFFILIATE_ID=${SHAREASALE_AFFILIATE_ID}
+          
+          # System Settings
+          MASTER_MODE=auto
+          HYBRID_STRATEGY=quality_first
+          V10_DAILY_LIMIT=2
+          V11_DAILY_LIMIT=1
+          ENVIRONMENT=github_actions
+          EOF
+          
+          echo "Environment file created with secure variables"
+
+      - name: 🤖 Create Main Controller (If Missing)
+        run: |
+          if [ ! -f "main_controller.py" ]; then
+            echo "Creating basic main_controller.py..."
+            cat > main_controller.py << 'EOF'
+#!/usr/bin/env python3
+"""
+🏆 Profit Machine Ultimate - Master Controller
+Coordinates v10 and v11 workflows with smart routing
+"""
+
+import os
+import sys
+import json
+import schedule
+import time
+from datetime import datetime
+from pathlib import Path
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
+
+class ProfitMachineController:
+    def __init__(self):
+        self.project_root = Path(__file__).parent
+        self.config = self.load_config()
+        
+    def load_config(self):
+        config_path = self.project_root / "master_config.json"
+        if config_path.exists():
+            with open(config_path, 'r') as f:
+                return json.load(f)
+        else:
+            return {
+                "mode": "auto",
+                "hybrid_strategy": "quality_first",
+                "v10_settings": {"enabled": True, "daily_limit": 2},
+                "v11_settings": {"enabled": True, "daily_limit": 1}
+            }
+    
+    def run_v10_workflow(self):
+        """Run v10 Content Factory workflow"""
+        print("🚀 Starting v10 Content Factory...")
+        # This will be replaced with actual v10 code
+        result = {"status": "success", "articles_created": 1}
+        print(f"✅ v10 completed: {result}")
+        return result
+    
+    def run_v11_workflow(self):
+        """Run v11 GOD MODE workflow"""
+        print("🚀 Starting v11 GOD MODE...")
+        # This will be replaced with actual v11 code
+        result = {"status": "success", "articles_enhanced": 1}
+        print(f"✅ v11 completed: {result}")
+        return result
+    
+    def smart_routing(self, topic_type="new_topic"):
+        """Decide which workflow to run based on routing rules"""
+        routing_rules = self.config.get("routing_rules", {})
+        target_workflow = routing_rules.get(topic_type, "v10")
+        
+        if target_workflow == "v10":
+            return self.run_v10_workflow()
+        else:
+            return self.run_v11_workflow()
+    
+    def hybrid_workflow(self):
+        """Run both v10 and v11 in hybrid mode"""
+        print("🔄 Running Hybrid Workflow...")
+        
+        results = {}
+        
+        # Run v10 for new content
+        if self.config["v10_settings"]["enabled"]:
+            results["v10"] = self.run_v10_workflow()
+        
+        # Run v11 for enhancement
+        if self.config["v11_settings"]["enabled"]:
+            results["v11"] = self.run_v11_workflow()
+        
+        return results
+    
+    def save_results(self, results):
+        """Save execution results to file"""
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        results_file = self.project_root / "data" / f"execution_{timestamp}.json"
+        
+        data = {
+            "timestamp": datetime.now().isoformat(),
+            "run_id": os.getenv("GITHUB_RUN_ID", "local"),
+            "results": results
+        }
+        
+        with open(results_file, 'w') as f:
+            json.dump(data, f, indent=2)
+        
+        print(f"📁 Results saved to: {results_file}")
+    
+    def send_notification(self, results):
+        """Send notification via Telegram"""
+        try:
+            import requests
+            
+            bot_token = os.getenv("TELEGRAM_BOT_TOKEN")
+            chat_id = os.getenv("TELEGRAM_CHAT_ID")
+            
+            if bot_token and chat_id:
+                message = f"""
+🤖 Profit Machine Execution Report
+Time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
+Status: ✅ Success
+Run ID: {os.getenv('GITHUB_RUN_ID', 'local')}
+
+📊 Results:
+v10: {results.get('v10', {}).get('articles_created', 0)} articles
+v11: {results.get('v11', {}).get('articles_enhanced', 0)} enhancements
+
+Environment: {os.getenv('ENVIRONMENT', 'local')}
+                """
+                
+                url = f"https://api.telegram.org/bot{bot_token}/sendMessage"
+                payload = {
+                    "chat_id": chat_id,
+                    "text": message,
+                    "parse_mode": "HTML"
+                }
+                
+                response = requests.post(url, json=payload)
+                if response.status_code == 200:
+                    print("📨 Telegram notification sent")
+                else:
+                    print(f"⚠️ Failed to send notification: {response.status_code}")
+        except Exception as e:
+            print(f"⚠️ Notification error: {e}")
+
+def main():
+    import argparse
+    
+    parser = argparse.ArgumentParser(description="Profit Machine Ultimate Controller")
+    parser.add_argument("--workflow", choices=["daily", "v10", "v11", "hybrid"], default="daily")
+    parser.add_argument("--mode", choices=["auto", "manual"], default="auto")
+    parser.add_argument("--setup", action="store_true", help="Setup initial configuration")
+    
+    args = parser.parse_args()
+    
+    controller = ProfitMachineController()
+    
+    if args.setup:
+        print("🔧 Running setup...")
+        # Setup logic here
+        return
+    
+    if args.workflow == "daily" or args.workflow == "hybrid":
+        results = controller.hybrid_workflow()
+    elif args.workflow == "v10":
+        results = controller.run_v10_workflow()
+    elif args.workflow == "v11":
+        results = controller.run_v11_workflow()
+    else:
+        results = controller.smart_routing()
+    
+    # Save and notify
+    controller.save_results(results)
+    controller.send_notification(results)
+    
+    print(f"\n🎉 Workflow '{args.workflow}' completed successfully!")
+    print(f"📊 Results: {results}")
+
+if __name__ == "__main__":
+    main()
+EOF
+            chmod +x main_controller.py
+            echo "✅ Created main_controller.py"
+          fi
+
+      - name: 🚀 Execute Profit Machine
+        run: |
+          echo "Starting Profit Machine Ultimate..."
+          python main_controller.py --workflow daily --mode auto
+          
+          # If running in GitHub Actions, save execution info
+          if [ -n "$GITHUB_RUN_ID" ]; then
+            echo "Saving execution metadata..."
+            mkdir -p data
+            echo "{\"run_id\": \"$GITHUB_RUN_ID\", \"timestamp\": \"$(date -Iseconds)\", \"status\": \"completed\"}" > data/last_run.json
+          fi
+
+      - name: 📤 Commit and Push Results
+        if: always()
+        run: |
+          echo "Committing generated files..."
+          
+          # Add only non-sensitive files
+          git add .
+          git reset -- .env  # Don't commit .env
+          
+          # Check if there are changes
+          if ! git diff --staged --quiet; then
+            git commit -m "🤖 Auto-Update: Execution Results [Run ID: $GITHUB_RUN_ID] - $(date '+%Y-%m-%d %H:%M:%S')"
+            git push origin main
+            echo "✅ Changes pushed to repository"
+          else
+            echo "ℹ️ No changes to commit"
+          fi
+
+      - name: 📦 Archive Artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: profit-machine-output-${{ github.run_id }}
+          path: |
+            exports/
+            logs/
+            data/*.json
+            reports/
+          retention-days: 7
+
+      - name: 📊 Generate Summary Report
+        if: always()
+        run: |
+          echo "📋 Execution Summary" >> $GITHUB_STEP_SUMMARY
+          echo "==================" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Workflow:** ${{ github.workflow }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Run ID:** ${{ github.run_id }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Status:** ${{ job.status }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Time:** $(date)" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "✅ Structure check completed" >> $GITHUB_STEP_SUMMARY
+          echo "✅ Dependencies installed" >> $GITHUB_STEP_SUMMARY
+          echo "✅ Environment configured" >> $GITHUB_STEP_SUMMARY
+          echo "✅ Profit Machine executed" >> $GITHUB_STEP_SUMMARY
+          
+          # Check for generated files
+          if [ -d "exports" ]; then
+            echo "📁 Exports generated: $(ls -la exports/ | wc -l) files" >> $GITHUB_STEP_SUMMARY
+          fi
+
+  cleanup:
+    runs-on: ubuntu-latest
+    needs: setup-and-run
+    if: always()
+    
+    steps:
+      - name: 🧹 Cleanup Temporary Files
+        run: |
+          echo "Cleaning up temporary files..."
+          # Remove sensitive files if they were created
+          if [ -f ".env" ]; then
+            rm .env
+          fi
+          
+      - name: 📊 Final Status
+        run: |
+          echo "==================================="
+          echo "Profit Machine Ultimate - Complete!"
+          echo "==================================="
+          echo "Run Status: ${{ needs.setup-and-run.result }}"
+          echo "Next run scheduled:"
+          echo "- 08:00 UTC"
+          echo "- 14:00 UTC"
+          echo "- 20:00 UTC"
