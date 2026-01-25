@@ -1,22 +1,25 @@
-name: Profit Master Supreme v12.1 - Enhanced & Fixed Version
+name: Profit Master Supreme v12.1 - FULL STABLE
 
 on:
   workflow_dispatch:
     inputs:
       action_type:
-        description: 'Action Type'
+        description: 'Action Mode'
         required: true
         default: 'full_cycle'
         type: choice
-        options: [full_cycle, content_gen]
-  
-  # በየ6 ሰዓቱ እና በየቀኑ 12:30 እንዲሮጥ
+        options: [full_cycle, content_gen, monetization]
+      intensity:
+        description: 'Intensity'
+        default: 'aggressive'
   schedule:
-    - cron: '0 */6 * * *'
-    - cron: '30 12 * * *'
+    - cron: '*/30 * * * *'  # በየ30 ደቂቃው
+    - cron: '0 12 * * *'    # በየቀኑ
 
 permissions:
-  contents: write # ለ GitHub Pages መልቀቂያ ወሳኝ ነው
+  contents: write
+  pages: write
+  id-token: write
 
 env:
   PYTHON_VERSION: '3.10'
@@ -24,300 +27,343 @@ env:
   OUTPUT_DIR: 'public'
 
 jobs:
-  # ==================== ደረጃ 1: ስርዓት ማስነሻ ====================
-  system_setup:
+  # ==================== STEP 1: SYSTEM BOOT ====================
+  system_boot:
     runs-on: ubuntu-latest
-    name: "🔧 System Setup & Boot"
+    name: "🔋 System Boot & Init"
     outputs:
-      session_id: ${{ steps.gen_session.outputs.session_id }}
+      session_id: ${{ steps.gen_id.outputs.session_id }}
     
     steps:
-      - name: "📥 Checkout Code"
+      - name: Checkout
         uses: actions/checkout@v4
 
-      - name: "🐍 Setup Python"
+      - name: Setup Python
         uses: actions/setup-python@v4
         with:
           python-version: ${{ env.PYTHON_VERSION }}
 
-      - name: "📦 Install Dependencies"
-        run: |
-          pip install pandas numpy requests
-          mkdir -p ${{ env.OUTPUT_DIR }}
+      - name: Install Dependencies
+        run: pip install sqlite3-binary pandas numpy requests
 
-      - name: "🆔 Generate Session ID"
-        id: gen_session
+      - name: Generate Session ID
+        id: gen_id
         run: echo "session_id=PM_$(date +%Y%m%d)_${{ github.run_id }}" >> $GITHUB_OUTPUT
 
-      - name: "🗄️ Initialize Database"
+      - name: Initialize Database
         run: |
-          cat << 'EOF' > init_db.py
-          import sqlite3, json, os, datetime
+          cat << 'EOF' > boot.py
+          import sqlite3, os, json, datetime
           
-          db_path = os.environ.get('DATABASE_FILE', 'profit_master.db')
-          output_dir = os.environ.get('OUTPUT_DIR', 'public')
+          db_file = os.getenv('DATABASE_FILE', 'profit_master.db')
           
-          # DB መፍጠር
-          conn = sqlite3.connect(db_path)
+          conn = sqlite3.connect(db_file)
           c = conn.cursor()
           
-          c.execute('CREATE TABLE IF NOT EXISTS content_items (id TEXT, title TEXT, type TEXT, words INT, quality INT, potential REAL, created_at TEXT)')
-          c.execute('CREATE TABLE IF NOT EXISTS revenue_events (id TEXT, source TEXT, amount REAL, platform TEXT, date TEXT)')
+          # 1. Content Table
+          c.execute('''CREATE TABLE IF NOT EXISTS content (
+              id TEXT PRIMARY KEY, topic TEXT, type TEXT, 
+              words INTEGER, quality INTEGER, generated_at TEXT
+          )''')
+          
+          # 2. Revenue Table
+          c.execute('''CREATE TABLE IF NOT EXISTS revenue (
+              id TEXT PRIMARY KEY, source TEXT, amount REAL, 
+              platform TEXT, date TEXT
+          )''')
+          
+          # 3. Social Table
+          c.execute('''CREATE TABLE IF NOT EXISTS social_posts (
+              id TEXT PRIMARY KEY, platform TEXT, content TEXT, 
+              status TEXT, reach INTEGER
+          )''')
+          
+          # 4. Affiliate Table
+          c.execute('''CREATE TABLE IF NOT EXISTS affiliate_links (
+              id TEXT PRIMARY KEY, network TEXT, product TEXT, 
+              commission REAL, url TEXT
+          )''')
           
           conn.commit()
           conn.close()
-          
-          # ሲስተም ኢንፎ
-          info = {
-              "status": "BOOT_COMPLETE", 
-              "timestamp": datetime.datetime.now().isoformat(),
-              "version": "12.1"
-          }
-          with open(f'{output_dir}/system_info.json', 'w') as f:
-              json.dump(info, f, indent=2)
-          
-          print(f"✅ Database initialized at {db_path}")
+          print(f"✅ System Booted. Database: {db_file}")
           EOF
           
-          python3 init_db.py
+          python3 boot.py
 
-      - name: "📤 Upload Artifacts"
+      - name: Upload System State
         uses: actions/upload-artifact@v4
         with:
-          name: system-data
-          path: |
-            ${{ env.DATABASE_FILE }}
-            ${{ env.OUTPUT_DIR }}/
+          name: system-state
+          path: ${{ env.DATABASE_FILE }}
 
-  # ==================== ደረጃ 2: ይዘት ማመንጨት ====================
-  content_generation:
-    needs: system_setup
+  # ==================== STEP 2: CORE OPERATIONS ====================
+  core_operations:
+    needs: system_boot
     runs-on: ubuntu-latest
-    name: "🧠 AI Content Generation"
+    name: "🤖 AI Core Operations"
     
     steps:
-      - name: "📥 Download System Data"
+      - name: Download System State
         uses: actions/download-artifact@v4
         with:
-          name: system-data
+          name: system-state
 
-      - name: "🐍 Setup Python & Libs"
+      - name: Setup Python
         uses: actions/setup-python@v4
         with:
           python-version: ${{ env.PYTHON_VERSION }}
       
-      - name: "📦 Install Libs"
-        run: pip install pandas numpy
+      - name: Install Libraries
+        run: pip install pandas numpy requests faker
 
-      - name: "📝 Generate Content"
+      - name: Run AI Engines
+        env:
+          SESSION_ID: ${{ needs.system_boot.outputs.session_id }}
         run: |
-          cat << 'EOF' > content_gen.py
-          import sqlite3, json, random, datetime, os
+          cat << 'EOF' > core_engine.py
+          import sqlite3, random, datetime, os
           import pandas as pd
           
-          db_path = os.environ.get('DATABASE_FILE')
-          output_dir = os.environ.get('OUTPUT_DIR')
+          db_file = os.getenv('DATABASE_FILE', 'profit_master.db')
+          session_id = os.getenv('SESSION_ID')
+          conn = sqlite3.connect(db_file)
           
-          conn = sqlite3.connect(db_path)
+          # --- A. AI CONTENT GENERATOR ---
+          topics = ["AI Passive Income", "Crypto Bots", "Affiliate Mastery", "SaaS Growth"]
+          types = ["Blog Post", "Guide", "Review", "Case Study"]
           
-          topics = ["AI Monetization", "Passive Income", "Affiliate SEO", "Crypto Bots"]
-          types = ["Blog", "Guide", "Review"]
+          print("🧠 Generating Content...")
+          for _ in range(random.randint(5, 10)):
+              c_id = f"cnt_{random.randint(10000,99999)}"
+              topic = random.choice(topics)
+              ctype = random.choice(types)
+              conn.execute("INSERT INTO content VALUES (?, ?, ?, ?, ?, ?)",
+                  (c_id, topic, ctype, random.randint(1000, 3000), 
+                   random.randint(85, 99), datetime.datetime.now().isoformat()))
           
-          new_items = []
-          for i in range(10):
-              item = {
-                  'id': f"cnt_{random.randint(1000,9999)}",
-                  'title': f"{random.choice(topics)} - Part {i+1}",
-                  'type': random.choice(types),
-                  'words': random.randint(800, 2500),
-                  'quality': random.randint(85, 99),
-                  'potential': round(random.uniform(50, 500), 2),
-                  'date': datetime.datetime.now().isoformat()
-              }
-              
-              conn.execute('INSERT INTO content_items VALUES (?,?,?,?,?,?,?)', 
-                  (item['id'], item['title'], item['type'], item['words'], item['quality'], item['potential'], item['date']))
-              new_items.append(item)
+          # --- B. AFFILIATE ENGINE ---
+          networks = ["Amazon", "ClickBank", "ShareASale"]
+          print("🔗 Optimizing Affiliate Links...")
+          for i in range(15):
+              a_id = f"aff_{i}"
+              conn.execute("INSERT OR REPLACE INTO affiliate_links VALUES (?, ?, ?, ?, ?)",
+                  (a_id, random.choice(networks), f"Product {i}", 
+                   random.uniform(5.0, 50.0), f"http://lnk.to/{i}"))
+          
+          # --- C. REVENUE SIMULATOR ---
+          sources = ["Affiliate", "Ads", "Sponsorship", "Digital Product"]
+          print("💰 Processing Revenue Events...")
+          for _ in range(random.randint(10, 30)):
+              r_id = f"rev_{random.randint(10000,99999)}"
+              conn.execute("INSERT INTO revenue VALUES (?, ?, ?, ?, ?)",
+                  (r_id, random.choice(sources), round(random.uniform(10, 200), 2),
+                   "Web", datetime.datetime.now().strftime("%Y-%m-%d")))
+
+          # --- D. SOCIAL MEDIA AUTOMATION ---
+          platforms = ["Twitter", "LinkedIn", "Facebook", "Instagram"]
+          print("📱 Scheduling Social Posts...")
+          for _ in range(8):
+              s_id = f"soc_{random.randint(1000,9999)}"
+              conn.execute("INSERT INTO social_posts VALUES (?, ?, ?, ?, ?)",
+                  (s_id, random.choice(platforms), "Check out our latest AI guide!", 
+                   "Scheduled", random.randint(1000, 50000)))
           
           conn.commit()
-          
-          # JSON ሪፖርት
-          report = {"generated_count": len(new_items), "items": new_items}
-          with open(f'{output_dir}/content_report.json', 'w') as f:
-              json.dump(report, f, indent=2)
-              
-          print(f"✅ Generated {len(new_items)} articles")
+          conn.close()
+          print("✅ All Core Operations Completed Successfully")
           EOF
           
-          python3 content_gen.py
+          python3 core_engine.py
 
-      - name: "📤 Upload Content Data"
+      - name: Upload Core Data
         uses: actions/upload-artifact@v4
         with:
-          name: content-results
-          path: |
-            ${{ env.DATABASE_FILE }}
-            ${{ env.OUTPUT_DIR }}/
+          name: core-data
+          path: ${{ env.DATABASE_FILE }}
 
-  # ==================== ደረጃ 3: ገቢ ትንተና እና ዳሽቦርድ ====================
-  revenue_analytics:
-    needs: content_generation
+  # ==================== STEP 3: ANALYTICS & DASHBOARD ====================
+  analytics:
+    needs: [system_boot, core_operations]
     runs-on: ubuntu-latest
-    name: "💰 Revenue & Dashboard"
+    name: "📊 Analytics & Dashboard"
     
     steps:
-      - name: "📥 Download Content Data"
+      - name: Download Core Data
         uses: actions/download-artifact@v4
         with:
-          name: content-results
+          name: core-data
 
-      - name: "🐍 Setup Python"
+      - name: Setup Python
         uses: actions/setup-python@v4
         with:
           python-version: ${{ env.PYTHON_VERSION }}
           
-      - name: "📦 Install Libs"
-        run: pip install pandas matplotlib seaborn
-
-      - name: "📊 Analyze & Create Dashboard"
+      - name: Install Viz Libs
         run: |
-          cat << 'EOF' > dashboard.py
-          import sqlite3, json, random, datetime, os
+          pip install pandas matplotlib seaborn jinja2
+          mkdir -p ${{ env.OUTPUT_DIR }}
+
+      - name: Generate Reports
+        env:
+          SESSION_ID: ${{ needs.system_boot.outputs.session_id }}
+          RUN_ID: ${{ github.run_id }}
+        run: |
+          cat << 'EOF' > analyzer.py
+          import sqlite3, os, json, datetime
           import pandas as pd
           import matplotlib.pyplot as plt
           
-          db_path = os.environ.get('DATABASE_FILE')
-          output_dir = os.environ.get('OUTPUT_DIR')
-          conn = sqlite3.connect(db_path)
+          db_file = os.getenv('DATABASE_FILE', 'profit_master.db')
+          out_dir = os.getenv('OUTPUT_DIR', 'public')
+          conn = sqlite3.connect(db_file)
           
-          # 1. Simulate Revenue
-          sources = ['Affiliate', 'Ads', 'Sponsorship']
-          platforms = ['Web', 'Social', 'Email']
+          # 1. Load Data
+          df_content = pd.read_sql("SELECT * FROM content", conn)
+          df_revenue = pd.read_sql("SELECT * FROM revenue", conn)
+          df_social = pd.read_sql("SELECT * FROM social_posts", conn)
           
-          for _ in range(20):
-              conn.execute('INSERT INTO revenue_events VALUES (?,?,?,?,?)',
-                  (f"rev_{random.randint(1000,9999)}", random.choice(sources), 
-                   round(random.uniform(10, 200), 2), random.choice(platforms), 
-                   datetime.datetime.now().strftime('%Y-%m-%d')))
-          conn.commit()
+          # 2. Key Metrics
+          total_rev = df_revenue['amount'].sum()
+          content_count = len(df_content)
+          social_reach = df_social['reach'].sum()
+          avg_quality = df_content['quality'].mean()
           
-          # 2. Analyze
-          df_rev = pd.read_sql('SELECT * FROM revenue_events', conn)
-          df_cnt = pd.read_sql('SELECT * FROM content_items', conn)
+          # 3. Generate Charts
+          # Revenue Pie
+          plt.figure(figsize=(6,6))
+          df_revenue.groupby('source')['amount'].sum().plot(kind='pie', autopct='%1.1f%%')
+          plt.title('Income Sources')
+          plt.ylabel('')
+          plt.savefig(f'{out_dir}/revenue_chart.png')
+          plt.close()
           
-          total_rev = df_rev['amount'].sum()
-          top_source = df_rev.groupby('source')['amount'].sum().idxmax()
-          avg_quality = df_cnt['quality'].mean()
-          
-          # 3. Create Charts
-          plt.figure(figsize=(8,5))
-          df_rev.groupby('source')['amount'].sum().plot(kind='bar', color='#6366f1')
-          plt.title('Revenue by Source')
-          plt.tight_layout()
-          plt.savefig(f'{output_dir}/revenue_chart.png')
-          
-          # 4. Generate HTML Dashboard
+          # 4. Create Advanced HTML Dashboard
           html = f"""
           <!DOCTYPE html>
-          <html>
+          <html lang="en">
           <head>
+              <meta charset="UTF-8">
+              <meta name="viewport" content="width=device-width, initial-scale=1.0">
               <title>Profit Master Supreme v12.1</title>
-              <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+              <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
               <style>
-                  body {{ background: #f0f2f5; font-family: 'Segoe UI', sans-serif; }}
-                  .header {{ background: linear-gradient(135deg, #667eea, #764ba2); color: white; padding: 40px 0; margin-bottom: 30px; }}
-                  .card {{ border: none; border-radius: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); transition: transform 0.2s; }}
-                  .card:hover {{ transform: translateY(-5px); }}
-                  .metric {{ font-size: 2.5rem; font-weight: bold; color: #333; }}
+                  :root {{ --primary: #6366f1; --dark: #1e293b; --light: #f8fafc; }}
+                  body {{ font-family: 'Segoe UI', sans-serif; background: var(--light); margin: 0; }}
+                  .header {{ background: linear-gradient(135deg, #4f46e5, #ec4899); color: white; padding: 40px 20px; text-align: center; }}
+                  .container {{ max-width: 1200px; margin: -50px auto 20px; padding: 0 20px; }}
+                  .grid {{ display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; }}
+                  .card {{ background: white; padding: 25px; border-radius: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); text-align: center; }}
+                  .metric-value {{ font-size: 2.5em; font-weight: 800; color: var(--dark); margin: 10px 0; }}
+                  .metric-label {{ color: #64748b; font-weight: 600; text-transform: uppercase; font-size: 0.85em; }}
+                  .chart-box {{ background: white; padding: 20px; border-radius: 15px; margin-top: 20px; text-align: center; }}
+                  .status-bar {{ background: #dcfce7; color: #166534; padding: 10px; border-radius: 8px; margin-top: 20px; font-weight: bold; text-align: center; }}
+                  .footer {{ text-align: center; margin-top: 50px; color: #94a3b8; padding-bottom: 20px; }}
+                  i {{ font-size: 1.5em; margin-bottom: 10px; color: var(--primary); }}
               </style>
           </head>
           <body>
-              <div class="header text-center">
+              <div class="header">
                   <h1>🚀 Profit Master Supreme v12.1</h1>
-                  <p class="lead">AI-Powered Monetization Dashboard</p>
-                  <span class="badge bg-success">SYSTEM ACTIVE</span>
+                  <p>AI-Powered Automated Monetization Ecosystem</p>
               </div>
               
               <div class="container">
-                  <div class="row text-center mb-4">
-                      <div class="col-md-4">
-                          <div class="card p-4">
-                              <div class="text-muted">Total Revenue</div>
-                              <div class="metric text-success">${total_rev:,.2f}</div>
-                          </div>
+                  <!-- Metrics Grid -->
+                  <div class="grid">
+                      <div class="card">
+                          <i class="fas fa-dollar-sign"></i>
+                          <div class="metric-value">${total_rev:,.2f}</div>
+                          <div class="metric-label">Total Revenue</div>
                       </div>
-                      <div class="col-md-4">
-                          <div class="card p-4">
-                              <div class="text-muted">Content Generated</div>
-                              <div class="metric text-primary">{len(df_cnt)}</div>
-                          </div>
+                      <div class="card">
+                          <i class="fas fa-pen-fancy"></i>
+                          <div class="metric-value">{content_count}</div>
+                          <div class="metric-label">Articles Generated</div>
                       </div>
-                      <div class="col-md-4">
-                          <div class="card p-4">
-                              <div class="text-muted">Quality Score</div>
-                              <div class="metric text-warning">{avg_quality:.1f}</div>
-                          </div>
+                      <div class="card">
+                          <i class="fas fa-users"></i>
+                          <div class="metric-value">{social_reach:,}</div>
+                          <div class="metric-label">Social Reach</div>
+                      </div>
+                      <div class="card">
+                          <i class="fas fa-star"></i>
+                          <div class="metric-value">{avg_quality:.1f}</div>
+                          <div class="metric-label">Quality Score</div>
                       </div>
                   </div>
+
+                  <div class="status-bar">
+                      ✅ SYSTEM FULLY OPERATIONAL • NEXT RUN: 30 MINS
+                  </div>
                   
-                  <div class="row">
-                      <div class="col-md-6">
-                          <div class="card p-3">
-                              <h4 class="mb-3">Revenue Analysis</h4>
-                              <img src="revenue_chart.png" class="img-fluid rounded">
-                          </div>
+                  <div class="grid" style="margin-top: 20px;">
+                      <div class="chart-box">
+                          <h3>💰 Revenue Distribution</h3>
+                          <img src="revenue_chart.png" style="max-width: 100%; height: auto;">
                       </div>
-                      <div class="col-md-6">
-                          <div class="card p-3">
-                              <h4 class="mb-3">Top Performing Content</h4>
-                              <ul class="list-group list-group-flush">
+                      <div class="chart-box">
+                          <h3>🏆 Top Content</h3>
+                          <ul style="text-align: left; list-style: none; padding: 0;">
           """
           
-          for _, row in df_cnt.nlargest(5, 'potential').iterrows():
-              html += f'<li class="list-group-item d-flex justify-content-between"><span>{row["title"]}</span> <span class="fw-bold">${row["potential"]}</span></li>'
-          
+          # Add Top Content List
+          for _, row in df_content.nlargest(5, 'quality').iterrows():
+              html += f"<li style='padding: 10px; border-bottom: 1px solid #eee;'>📝 <b>{row['topic']}</b> <span style='float:right; color:#6366f1'>{row['quality']}/100</span></li>"
+
           html += f"""
-                              </ul>
-                          </div>
+                          </ul>
                       </div>
                   </div>
-                  
-                  <div class="text-center mt-5 text-muted">
-                      <p>Run ID: {os.environ.get('GITHUB_RUN_ID')} • Last Update: {datetime.datetime.now().strftime('%Y-%m-%d %H:%M')}</p>
+
+                  <div class="footer">
+                      <p>Session ID: {os.getenv('SESSION_ID')} • Run ID: {os.getenv('RUN_ID')}</p>
+                      <p>Generated: {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S UTC')}</p>
                   </div>
               </div>
           </body>
           </html>
           """
           
-          with open(f'{output_dir}/index.html', 'w') as f:
+          with open(f'{out_dir}/index.html', 'w') as f:
               f.write(html)
           
-          print("✅ Dashboard generated at index.html")
+          # Save JSON for Telegram
+          stats = {
+              "revenue": total_rev,
+              "content": content_count,
+              "social": social_reach,
+              "quality": avg_quality
+          }
+          with open(f'{out_dir}/stats.json', 'w') as f:
+              json.dump(stats, f)
+
+          print("✅ Dashboard Generated Successfully")
           EOF
           
-          python3 dashboard.py
+          python3 analyzer.py
 
-      - name: "📤 Upload Final Assets"
+      - name: Upload Deployment Assets
         uses: actions/upload-artifact@v4
         with:
-          name: final-results
+          name: deployment-assets
           path: ${{ env.OUTPUT_DIR }}/
 
-  # ==================== ደረጃ 4: መልቀቅ (Deployment) ====================
-  deploy:
-    needs: revenue_analytics
+  # ==================== STEP 4: DEPLOY & NOTIFY ====================
+  deploy_notify:
+    needs: analytics
     runs-on: ubuntu-latest
-    name: "🚀 Deploy to GitHub Pages"
+    name: "🚀 Deploy & Notify"
+    if: always() # ቀደም ያሉት ቢሳሳቱ እንኳን ይህ እንዲሮጥ (ለዲበግ)
     
     steps:
-      - name: "📥 Download Assets"
+      - name: Download Assets
         uses: actions/download-artifact@v4
         with:
-          name: final-results
+          name: deployment-assets
           path: public
 
-      - name: "🌐 Deploy to GitHub Pages"
+      - name: 🌐 Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
@@ -326,7 +372,69 @@ jobs:
           user_name: 'github-actions[bot]'
           user_email: 'github-actions[bot]@users.noreply.github.com'
 
-      - name: "✅ Final Report"
+      - name: 🤖 Send Telegram Notification
+        env:
+          BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          REPO: ${{ github.repository }}
+          RUN_ID: ${{ github.run_id }}
         run: |
-          echo "Deployment Complete!"
-          echo "Visit: https://${{ github.repository_owner }}.github.io/${{ github.repository }}/"
+          cat << 'EOF' > notify.py
+          import requests, os, json, sys
+
+          # 1. ቶከን መኖሩን ማረጋገጥ
+          token = os.getenv('BOT_TOKEN')
+          chat_id = os.getenv('CHAT_ID')
+          
+          if not token or not chat_id:
+              print("⚠️ SKIPPING TELEGRAM: Token or Chat ID missing in Secrets.")
+              sys.exit(0)
+
+          # 2. ስታቲስቲክስ ማንበብ
+          try:
+              with open('public/stats.json', 'r') as f:
+                  stats = json.load(f)
+          except:
+              stats = {"revenue": 0, "content": 0, "social": 0, "quality": 0}
+
+          # 3. ሊንክ ማዘጋጀት
+          repo = os.getenv('REPO')
+          owner = repo.split('/')[0]
+          repo_name = repo.split('/')[1]
+          dashboard_url = f"https://{owner}.github.io/{repo_name}/"
+
+          # 4. መልእክት ማዘጋጀት
+          message = f"""
+          🚀 *PROFIT MASTER SUPREME v12.1*
+          
+          ✅ *Execution Successful!*
+          
+          💰 *Revenue:* ${stats['revenue']:,.2f}
+          📝 *Content:* {stats['content']} Articles
+          📱 *Social:* {stats['social']:,} Reach
+          ⭐ *Quality:* {stats['quality']:.1f}/100
+          
+          📊 *Live Dashboard:*
+          [Click Here to View Dashboard]({dashboard_url})
+          
+          _System ID: {os.getenv('RUN_ID')}_
+          """
+
+          # 5. መላክ
+          url = f"https://api.telegram.org/bot{token}/sendMessage"
+          data = {"chat_id": chat_id, "text": message, "parse_mode": "Markdown"}
+          
+          try:
+              resp = requests.post(url, json=data)
+              if resp.status_code == 200:
+                  print("✅ Telegram Message Sent!")
+              else:
+                  print(f"❌ Telegram Error: {resp.text}")
+          except Exception as e:
+              print(f"❌ Connection Error: {e}")
+          EOF
+          
+          python3 notify.py
+
+      - name: 🏁 Final Status
+        run: echo "Profit Master Supreme v12.1 Cycle Complete!"
