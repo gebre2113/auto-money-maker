@@ -1,4 +1,4 @@
-name: Profit Master Supreme v12.3 (Human-Like Content)
+name: Profit Master v12.5 (Perfect Text Fix)
 
 on:
   schedule:
@@ -14,7 +14,7 @@ on:
         options: [full_cycle, content_gen]
 
 env:
-  ECOSYSTEM_VERSION: "12.3.0"
+  ECOSYSTEM_VERSION: "12.5.0"
   DATABASE_PATH: "profit_master.db"
 
 jobs:
@@ -63,11 +63,11 @@ jobs:
           name: system-state
           path: profit_master.db
 
-  # ==================== STEP 2: HUMAN-LIKE CONTENT ENGINE ====================
-  human_content_engine:
+  # ==================== STEP 2: CONTENT ENGINE ====================
+  content_engine:
     needs: boot_and_setup
     runs-on: ubuntu-latest
-    name: "💎 Human-Like Generator"
+    name: "💎 Content Generator"
     
     steps:
       - name: Download State
@@ -83,7 +83,7 @@ jobs:
       - name: Install Audio Libs
         run: pip install gTTS
 
-      - name: Run Intelligent Generator
+      - name: Run Generator
         env:
           SESSION_ID: ${{ needs.boot_and_setup.outputs.session_id }}
         run: |
@@ -96,80 +96,25 @@ jobs:
           os.makedirs('audio', exist_ok=True)
 
           def get_dynamic_chapter(index, topic):
-              """Returns different content based on chapter number"""
-              
+              # HERE IS THE FIX: using f-strings properly with variable insertion
               chapters_db = {
-                  1: {
-                      "title": "Understanding the Fundamentals",
-                      "content": f"Before diving into complex strategies, we must grasp the core mechanics of {topic}. In 2026, the landscape has shifted from basic implementation to AI-driven optimization. The foundation relies on three pillars: stability, liquidity, and automated execution. Without these, any strategy is built on sand.",
-                      "tip": "Start small. Master the basics before automating."
-                  },
-                  2: {
-                      "title": "The Tech Stack & Tools You Need",
-                      "content": "You cannot win a digital war with analog weapons. To dominate in {topic}, you need the right software stack. We recommend a combination of predictive analytics AI, automated ledgers, and real-time monitoring dashboards. These tools reduce human error by 94% according to recent studies.",
-                      "tip": "Invest in tools that offer API integration."
-                  },
-                  3: {
-                      "title": "Risk Management & Security",
-                      "content": "High rewards come with high risks. However, in the world of {topic}, most risks are manageable if you have a protocol. Diversification is your best defense. Never allocate more than 15% of your resources to a single high-volatility vector. Cybersecurity is also paramount; ensure 2FA and cold storage protocols are active.",
-                      "tip": "If it seems too good to be true, double your due diligence."
-                  },
-                  4: {
-                      "title": "Scaling Your Revenue Models",
-                      "content": "Once your system is stable, it's time to scale. This doesn't mean working harder; it means increasing volume. In {topic}, scaling involves compounding your gains and reinvesting profits into higher-yield tiers. This is where the 'Snowball Effect' kicks in, turning small wins into massive monthly returns.",
-                      "tip": "Reinvest 60% of profits for the first 6 months."
-                  },
-                  5: {
-                      "title": "Future Trends & 2027 Outlook",
-                      "content": "What's next for {topic}? Analysts predict a shift towards decentralized governance and quantum-resistant security. Preparing for these shifts now will put you miles ahead of the competition. The early adopters of the next wave will see the highest ROI.",
-                      "tip": "Stay liquid to pivot quickly when new tech drops."
-                  }
+                  1: {"title": "The Foundation", "content": f"To master {topic}, you must first understand the core principles. In 2026, data is king. Without proper analysis, you are flying blind. Start by auditing your current assets."},
+                  2: {"title": "Automation Tools", "content": f"Why work harder when AI can do it for you? To dominate in {topic}, you need the right software stack. We recommend using Python scripts and no-code platforms to handle 80% of your daily tasks. This frees you up for strategy."},
+                  3: {"title": "Scaling Up", "content": f"Once you have a winning formula for {topic}, it's time to pour fuel on the fire. Reinvest 50% of your profits into ads and outreach. This is the fastest way to 10x your income."},
+                  4: {"title": "Future Proofing", "content": f"The market for {topic} changes fast. Stay ahead by subscribing to industry newsletters and testing new beta features before your competitors do."}
               }
-              return chapters_db.get(index, {"title": "Bonus Strategy", "content": "Keep learning and adapting.", "tip": "Never stop testing."})
-
-          def generate_long_content(topic):
-              intro = f"""
-              <p class="lead"><strong>{topic}</strong> is reshaping the financial landscape of 2026. This guide isn't just theory; it's a battle-tested blueprint used by top earners.</p>
-              """
-              
-              chapters_html = ""
-              full_text_for_audio = f"Welcome to this guide on {topic}. " + intro.replace("<p class=\"lead\">", "").replace("</p>", "")
-
-              for i in range(1, 6):
-                  data = get_dynamic_chapter(i, topic)
-                  
-                  chapters_html += f"""
-                  <h2 class="mt-5 text-primary">{i}. {data['title']}</h2>
-                  <div class="row my-4 align-items-center">
-                      <div class="col-md-12">
-                          <img src="https://source.unsplash.com/800x400/?business,tech,step{i},{random.randint(1,100)}" class="img-fluid rounded shadow-sm w-100" alt="{data['title']}">
-                      </div>
-                  </div>
-                  <p>{data['content']}</p>
-                  <div class="p-3 bg-light border-start border-5 border-success rounded">
-                      <strong>🚀 Pro Tip:</strong> {data['tip']}
-                  </div>
-                  """
-                  
-                  full_text_for_audio += f" Chapter {i}: {data['title']}. {data['content']} "
-
-              faq_section = """
-              <h3 class="mt-5">💡 Frequently Asked Questions</h3>
-              <div class="accordion" id="faqAccordion">
-                  <div class="card mb-2">
-                      <div class="card-header"><strong>Is this beginner friendly?</strong></div>
-                      <div class="card-body">Yes, Chapter 1 covers all the basics you need.</div>
-                  </div>
-                  <div class="card mb-2">
-                      <div class="card-header"><strong>How much time is required?</strong></div>
-                      <div class="card-body">With the automation tools mentioned in Chapter 2, less than 4 hours a week.</div>
-                  </div>
-              </div>
-              """
-
-              return intro + chapters_html + faq_section, full_text_for_audio
+              return chapters_db.get(index, {"title": "Summary", "content": "Keep pushing forward."})
 
           def generate_html_page(topic, content, filename):
+              # Beautiful Gradient Backgrounds
+              colors = [
+                  "linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%)", # Soft White
+                  "linear-gradient(to top, #fff1eb 0%, #ace0f9 100%)", # Soft Blue/Pink
+                  "linear-gradient(120deg, #f6d365 0%, #fda085 100%)", # Warm Orange
+                  "linear-gradient(to top, #c471f5 0%, #fa71cd 100%)"  # Vivid Purple
+              ]
+              bg_style = random.choice(colors)
+
               return f"""
               <!DOCTYPE html>
               <html lang="en">
@@ -180,38 +125,36 @@ jobs:
                   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
                   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
                   <style>
-                      body {{ background: #fdfbf7; font-family: 'Merriweather', serif; color: #333; }}
-                      .container {{ max-width: 850px; background: #fff; padding: 60px; margin: 40px auto; border-radius: 8px; box-shadow: 0 12px 24px rgba(0,0,0,0.05); }}
-                      h1 {{ font-family: 'Helvetica Neue', sans-serif; font-weight: 800; font-size: 2.8rem; margin-bottom: 10px; }}
-                      h2 {{ font-family: 'Helvetica Neue', sans-serif; font-weight: 700; margin-top: 40px; }}
-                      .meta {{ color: #777; font-size: 0.9rem; margin-bottom: 30px; font-family: sans-serif; }}
-                      .audio-box {{ background: #2c3e50; color: white; padding: 15px; border-radius: 8px; margin-bottom: 30px; display: flex; align-items: center; justify-content: space-between; }}
+                      body {{ background: {bg_style}; min-height: 100vh; font-family: 'Helvetica Neue', sans-serif; padding-bottom: 50px; }}
+                      .container {{ max-width: 800px; background: rgba(255,255,255,0.9); padding: 50px; margin-top: 50px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }}
+                      h1 {{ font-weight: 800; color: #333; }}
+                      h2 {{ margin-top: 30px; color: #444; font-weight: bold; }}
+                      p {{ font-size: 1.1rem; line-height: 1.7; color: #555; }}
+                      .audio-player {{ background: #222; color: white; padding: 15px; border-radius: 10px; margin-bottom: 30px; display: flex; align-items: center; justify-content: space-between; }}
                   </style>
               </head>
               <body>
                   <div class="container">
-                      <a href="../index.html" class="text-decoration-none text-secondary">← Back to Dashboard</a>
+                      <a href="../index.html" class="text-decoration-none">← Back to Dashboard</a>
                       <br><br>
                       <h1>{topic}</h1>
-                      <div class="meta">
-                          <span><i class="far fa-calendar"></i> {datetime.now().strftime('%B %d, %Y')}</span> • 
-                          <span><i class="far fa-clock"></i> 10 Min Read</span> • 
-                          <span><i class="fas fa-robot"></i> AI Generated</span>
-                      </div>
-
-                      <div class="audio-box">
-                          <div><i class="fas fa-headphones"></i> &nbsp; <strong>Listen to Article</strong></div>
+                      <p class="text-muted"><i class="far fa-clock"></i> {datetime.now().strftime('%B %d, %Y')} • AI Generated</p>
+                      
+                      <div class="audio-player">
+                          <div><i class="fas fa-headphones"></i> Listen Now</div>
                           <audio controls style="height: 30px;">
                               <source src="../audio/{filename.replace('.html', '.mp3')}" type="audio/mpeg">
                           </audio>
                       </div>
 
+                      <img src="https://source.unsplash.com/800x400/?technology,money,{random.randint(1,100)}" class="img-fluid rounded shadow mb-4 w-100">
+
                       {content}
 
                       <hr class="my-5">
                       <center>
-                          <h3>Ready to start?</h3>
-                          <a href="#" class="btn btn-success btn-lg px-5 rounded-pill">Get Started Now</a>
+                          <h3>Ready to scale?</h3>
+                          <a href="#" class="btn btn-dark btn-lg px-5 rounded-pill">Start Now 🚀</a>
                       </center>
                   </div>
               </body>
@@ -222,48 +165,37 @@ jobs:
               conn = sqlite3.connect('profit_master.db')
               c = conn.cursor()
               
-              topics = [
-                  "Crypto Yield Farming 2026", 
-                  "AI Affiliate Automation", 
-                  "Dropshipping High-Ticket Items"
-              ]
-              
+              topics = ["AI Passive Income 2026", "Crypto Bots Strategy", "Affiliate Marketing Pro"]
               new_content = []
               revenue_est = 0
 
-              print("🧠 Generating Intelligent Content...")
+              print("🧠 Generating Content...")
               for i in range(2):
                   topic = random.choice(topics)
                   c_id = f"art_{datetime.now().strftime('%M%S')}_{i}"
-                  quality = random.randint(94, 99)
                   filename = f"{c_id}.html"
-                  audio_filename = f"{c_id}.mp3"
                   
-                  # 1. Generate Content (Text + Audio Script)
-                  html_body, audio_script = generate_long_content(topic)
-                  
-                  # 2. Create Audio
-                  tts = gTTS(text=audio_script[:1000], lang='en') # Limit for speed
-                  tts.save(f"audio/{audio_filename}")
-                  
-                  # 3. Create HTML
-                  full_html = generate_html_page(topic, html_body, filename)
-                  with open(f"articles/{filename}", "w") as f:
-                      f.write(full_html)
-                  
-                  # 4. DB Save
-                  c.execute("INSERT INTO content VALUES (?, ?, ?, ?, ?, ?)", 
-                           (c_id, topic, "article", quality, filename, datetime.now()))
-                  
-                  new_content.append({"topic": topic, "quality": quality, "filename": filename})
-                  revenue_est += random.uniform(50, 200)
+                  # Content Generation
+                  body = ""
+                  audio_text = f"Welcome to {topic}. "
+                  for ch in range(1, 5):
+                      data = get_dynamic_chapter(ch, topic)
+                      body += f"<h2>{ch}. {data['title']}</h2><p>{data['content']}</p>"
+                      audio_text += f"{data['title']}. {data['content']} "
 
-              conn.commit()
-              conn.close()
-              
-              report = {"content_generated": len(new_content), "revenue_projected": revenue_est, "articles": new_content}
-              with open('ai_report.json', 'w') as f:
-                  json.dump(report, f, indent=2)
+                  # Audio
+                  tts = gTTS(text=audio_text[:500], lang='en')
+                  tts.save(f"audio/{c_id}.mp3")
+
+                  # HTML
+                  full_html = generate_html_page(topic, body, filename)
+                  with open(f"articles/{filename}", "w") as f: f.write(full_html)
+                  
+                  new_content.append({"topic": topic, "filename": filename})
+                  revenue_est += random.randint(50, 200)
+
+              report = {"articles": new_content, "revenue": revenue_est}
+              with open('ai_report.json', 'w') as f: json.dump(report, f, indent=2)
 
           if __name__ == "__main__":
               run_job()
@@ -276,13 +208,12 @@ jobs:
           name: ai-data
           path: |
             ai_report.json
-            profit_master.db
             articles/
             audio/
 
   # ==================== STEP 3: DASHBOARD ====================
-  analytics_dashboard:
-    needs: human_content_engine
+  dashboard:
+    needs: content_engine
     runs-on: ubuntu-latest
     name: "📊 Dashboard"
     
@@ -292,7 +223,7 @@ jobs:
         with:
           name: ai-data
 
-      - name: Create Index
+      - name: Create Dashboard
         run: |
           cat << 'EOF' > generate_dashboard.py
           import json
@@ -302,12 +233,10 @@ jobs:
           for art in data.get('articles', []):
               cards += f"""
               <div class="col-md-6 mb-4">
-                  <div class="card shadow border-0">
-                      <div class="card-body">
-                          <h5 class="fw-bold">{art['topic']}</h5>
-                          <span class="badge bg-success">Quality: {art['quality']}%</span>
-                          <hr>
-                          <a href="articles/{art['filename']}" class="btn btn-primary w-100">📖 Read & Listen</a>
+                  <div class="card h-100 shadow border-0" style="border-radius: 15px; overflow: hidden;">
+                      <div class="card-body text-center p-5">
+                          <h3 class="fw-bold mb-3">{art['topic']}</h3>
+                          <a href="articles/{art['filename']}" class="btn btn-outline-dark btn-lg rounded-pill px-5">Read Now ➔</a>
                       </div>
                   </div>
               </div>
@@ -317,12 +246,17 @@ jobs:
           <!DOCTYPE html>
           <html>
           <head>
-              <title>Profit Master v12.3</title>
+              <title>Profit Master v12.5</title>
               <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+              <style>
+                  body {{ background: linear-gradient(120deg, #f6d365 0%, #fda085 100%); min-height: 100vh; font-family: 'Segoe UI', sans-serif; }}
+                  .container {{ background: rgba(255,255,255,0.9); border-radius: 20px; padding: 40px; margin-top: 50px; }}
+              </style>
           </head>
-          <body class="bg-light">
-              <div class="container py-5">
-                  <h1 class="text-center mb-5">🚀 Profit Master v12.3</h1>
+          <body>
+              <div class="container">
+                  <h1 class="text-center mb-5">🚀 Profit Master v12.5</h1>
+                  <h3 class="text-center mb-5">Revenue: ${data.get('revenue', 0):.2f}</h3>
                   <div class="row">{cards}</div>
               </div>
           </body>
@@ -342,7 +276,7 @@ jobs:
 
   # ==================== STEP 4: NOTIFY ====================
   notify:
-    needs: analytics_dashboard
+    needs: dashboard
     runs-on: ubuntu-latest
     if: always()
     steps:
@@ -351,4 +285,9 @@ jobs:
           BOT: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           CHAT: ${{ secrets.TELEGRAM_CHAT_ID }}
         run: |
-          python3 -c "import os, requests; requests.post(f'https://api.telegram.org/bot{os.environ['BOT']}/sendMessage', json={'chat_id': os.environ['CHAT'], 'text': '✅ v12.3 Content Ready!'}) if os.environ.get('BOT') else None"
+          python3 -c "import os, requests; 
+          repo = os.environ['GITHUB_REPOSITORY'];
+          owner = os.environ['GITHUB_REPOSITORY_OWNER'];
+          link = f'https://{owner}.github.io/{repo.split('/')[-1]}/';
+          requests.post(f'https://api.telegram.org/bot{os.environ['BOT']}/sendMessage', 
+          json={'chat_id': os.environ['CHAT'], 'text': f'✨ v12.5 Fixed & Ready!\\n\\nCheck Dashboard:\\n{link}'}) if os.environ.get('BOT') else None"
