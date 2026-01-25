@@ -1,49 +1,31 @@
-name: Profit Master Supreme v12.0 - Fixed
+name: Profit Master Supreme v12.0 - Final
 
 on:
   schedule:
-    - cron: '0 */3 * * *'
+    - cron: '*/30 * * * *'
   workflow_dispatch:
 
 jobs:
-  system_run:
+  automation_run:
     runs-on: ubuntu-latest
     steps:
-      - name: "📥 ኮድ ማውረድ"
+      - name: "📥 Checkout Code"
         uses: actions/checkout@v4
 
-      - name: "🐍 Python ማዋቀር"
+      - name: "🐍 Setup Python"
         uses: actions/setup-python@v4
         with:
           python-version: '3.10'
 
-      - name: "📦 አስፈላጊ ነገሮችን መጫን"
-        run: |
-          pip install requests beautifulsoup4 pandas groq replicate huggingface-hub python-dotenv
+      - name: "📦 Install Packages"
+        run: pip install requests pandas groq replicate python-dotenv
 
-      - name: "🚀 ዋናውን ስራ ማስኬድ"
+      - name: "🚀 Run Main Engine"
         env:
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
           REPLICATE_API_TOKEN: ${{ secrets.REPLICATE_API_TOKEN }}
         run: |
-          # ፋይሉ መኖሩን እና አለመኖሩን የሚፈትሽ እና የሚፈጥር ስክሪፕት
           mkdir -p scripts
+          # ፋይሉ መኖሩን እያረጋገጠ ያንቀሳቅሰዋል
+          python3 scripts/main_engine.py
           
-          # 1. Analytics Script መፍጠር (ስህተቱን ለመከላከል)
-          cat > scripts/analytics.py << 'EOF'
-          import sys
-          print("📊 Analytics summary report generated!")
-          EOF
-
-          # 2. ዋናውን ኮድ ማስነሳት
-          echo "Running Profit Master Core..."
-          python3 -c "
-          import os
-          api_key = os.getenv('GROQ_API_KEY')
-          if not api_key:
-              print('❌ API Key missing but continuing for test...')
-          print('✅ System version 12.0.0 is live!')
-          "
-          
-          # 3. ያንን ስህተት የፈጠረውን ትዕዛዝ ማስኬድ
-          python3 scripts/analytics.py --type summary
