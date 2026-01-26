@@ -94,7 +94,7 @@ jobs:
           echo "Action: ${{ github.event.inputs.action_type || 'scheduled' }}"
           
           # የስርዓት ማረጋገጫ
-          python3 -c "
+          
 import hashlib, os, json, sqlite3
 from datetime import datetime
 
