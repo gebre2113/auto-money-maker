@@ -49,7 +49,7 @@ env:
   REQUEST_TIMEOUT: 120
   
   # የገቢ አማራጮች
-  REVENUE_STREAMS: "affiliate,ads,sponsorships,memberships,digital_products
+  REVENUE_STREAMS: "affiliate,ads,sponsorships,memberships,digital_products"
   TARGET_DAILY_REVENUE: 100
   AUTO_SCALING: true
   
