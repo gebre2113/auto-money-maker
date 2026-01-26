@@ -2415,89 +2415,494 @@ class AdvancedAffiliateManager:
                 
                 links_added.append({
                     'keyword': keyword,
-                    'network': affiliate_info['network'],
-                    'commission': affiliate_info['commission'],
-                    'category': affiliate_info['category'],
-                    'position': start
-                })
-                
-                logger.info(f"   ✅ Added affiliate link for: {keyword}")
-        
-        if links_added:
-            disclosure = '''
-<div class="affiliate-disclosure" style="background: #f8f9fa; border-left: 4px solid #667eea; padding: 15px; margin: 20px 0; border-radius: 5px;">
-<p><strong>💰 Affiliate Disclosure:</strong> This article contains affiliate links. If you make a purchase through these links, we may earn a commission at no extra cost to you. This helps support our work and allows us to continue providing valuable content.</p>
-</div>
-'''
-            injected_content = disclosure + injected_content
-        
-        return injected_content, {
-            'total_links': len(links_added),
-            'estimated_revenue': self._estimate_revenue(len(links_added)),
-            'links': links_added
-        }
-    
-    def _estimate_revenue(self, num_links: int) -> float:
-        """Estimate potential revenue from affiliate links"""
-        estimated_clicks = num_links * 1000 * 0.03
-        estimated_conversions = estimated_clicks * 0.02
-        estimated_revenue = estimated_conversions * 25
-        
-        return round(estimated_revenue, 2)
-    
-    def analyze_content_for_opportunities(self, content: str) -> Dict:
-        """Analyze content for affiliate monetization opportunities - NEW"""
-        
-        opportunities = []
-        content_lower = content.lower()
-        
-        for keyword in self.keyword_affiliates.keys():
-            if keyword in content_lower:
-                count = content_lower.count(keyword)
-                context_start = max(0, content_lower.find(keyword) - 50)
-                context_end = min(len(content), content_lower.find(keyword) + len(keyword) + 50)
-                context = content[context_start:context_end]
-                
-                opportunities.append({
-                    'keyword': keyword,
-                    'count': count,
-                    'context': context,
-                    'affiliate_info': self.keyword_affiliates[keyword],
-                    'potential_commission': self.keyword_affiliates[keyword]['commission']
-                })
-        
-        monetization_score = min(100, len(opportunities) * 20)
-        
-        return {
-            'monetization_score': monetization_score,
-            'opportunities': opportunities,
-            'recommendations': self._generate_recommendations(opportunities)
-        }
-    
-    def _generate_recommendations(self, opportunities: List) -> List[str]:
-        """Generate recommendations for improving monetization"""
-        
-        recommendations = []
-        
-        if not opportunities:
-            recommendations.append("Consider adding content about popular affiliate products like web hosting, VPN services, or AI tools.")
-        
-        if len(opportunities) < 3:
-            recommendations.append("Add more product mentions to increase monetization opportunities.")
-        
-        categories_present = {opp['affiliate_info']['category'] for opp in opportunities}
-        
-        if 'hosting' not in categories_present:
-            recommendations.append("Add content about web hosting services (high commission rates).")
-        
-        if 'software' not in categories_present:
-            recommendations.append("Mention popular software tools with affiliate programs.")
-        
-        if 'crypto' not in categories_present:
-            recommendations.append("Include cryptocurrency exchanges or trading platforms.")
-        
-        return recommendations
+==========================================
+import re
+import random
+import json
+from typing import Dict, List, Tuple, Optional
+import logging
+from datetime import datetime, timedelta
+from collections import defaultdict
+import statistics
+import hashlib
+from difflib import SequenceMatcher
 
+logger = logging.getLogger(__name__)
+
+# =================== የዋጋ ክትትል ስርዓት ===================
+
+class PriceTracker:
+    """
+    🔥 AI-POWERED DYNAMIC PRICE TRACKER v5.0
+    Features: Real-time pricing, Geo-based adjustments, Seasonal trends, Competitor analysis
+    """
+    
+    def __init__(self):
+        self.price_history = defaultdict(list)
+        self.competitor_data = self._load_competitor_prices()
+        
+    def _load_competitor_prices(self) -> Dict:
+        """የተወዳዳሪዎች ዋጋ መረጃ"""
+        return {
+            'bh001': [
+                {'source': 'SiteGround', 'price': 79.99, 'timestamp': '2024-01-15'},
+                {'source': 'DreamHost', 'price': 85.50, 'timestamp': '2024-01-15'},
+                {'source': 'HostGator', 'price': 75.25, 'timestamp': '2024-01-15'}
+            ],
+            'nv001': [
+                {'source': 'ExpressVPN', 'price': 99.95, 'timestamp': '2024-01-15'},
+                {'source': 'Surfshark', 'price': 59.88, 'timestamp': '2024-01-15'},
+                {'source': 'CyberGhost', 'price': 89.40, 'timestamp': '2024-01-15'}
+            ]
+        }
+    
+    def get_local_price(self, product_id: str, geo: str) -> float:
+        """በአካባቢ ተመጣጣኝ ዋጋ ይመልሳል"""
+        
+        # የመሠረት ዋጋ
+        base_prices = {
+            'bh001': 71.40,   # Bluehost
+            'wp001': 300.0,   # WP Engine
+            'hs001': 35.88,   # Hostinger
+            'ja001': 468.0,   # Jasper
+            'ch001': 240.0,   # ChatGPT
+            'nv001': 95.88,   # NordVPN
+            'ex001': 99.95,   # ExpressVPN
+            'bn001': 0.0,     # Binance (commission-based)
+            'cb001': 0.0,     # Coinbase
+            'un001': 864.0,   # Unbounce
+            'ck001': 290.0,   # ConvertKit
+            'tk001': 390.0    # Teachable
+        }
+        
+        base_price = base_prices.get(product_id, 100.0)
+        
+        # በአካባቢ መጠን ማስተካከያ
+        geo_multipliers = {
+            'US': 1.0, 'CA': 1.05, 'UK': 1.08, 'EU': 1.1,
+            'AU': 1.12, 'JP': 1.15, 'SG': 1.08, 'IN': 0.85,
+            'PH': 0.8, 'VN': 0.75, 'BR': 0.9, 'MX': 0.88
+        }
+        
+        multiplier = geo_multipliers.get(geo, 1.0)
+        
+        # የምርት ልዩ ቅናሾች
+        seasonal_discounts = {
+            'black_friday': 0.7,
+            'cyber_monday': 0.75,
+            'christmas': 0.8,
+            'new_year': 0.85
+        }
+        
+        # የወቅት ቅናሾችን ፍተሻ
+        current_month = datetime.now().month
+        if current_month == 11:  # ኖቬምበር (Black Friday)
+            discount = seasonal_discounts['black_friday']
+        elif current_month == 12:  # ዲሴምበር (Christmas)
+            discount = seasonal_discounts['christmas']
+        else:
+            discount = 1.0
+        
+        # የተሰላ ዋጋ
+        final_price = base_price * multiplier * discount
+        
+        # የዋጋ ታሪክ መዝግብ
+        self.price_history[product_id].append({
+            'price': final_price,
+            'geo': geo,
+            'timestamp': datetime.now().isoformat(),
+            'multiplier': multiplier,
+            'discount': discount
+        })
+        
+        return round(final_price, 2)
+    
+    def get_price_trend(self, product_id: str) -> str:
+        """የዋጋ አዝማሚያ ይመልሳል"""
+        history = self.price_history.get(product_id, [])
+        if len(history) < 2:
+            return "stable"
+        
+        prices = [h['price'] for h in history[-5:]]  # የመጨረሻ 5 ዋጋዎች
+        if len(prices) >= 2:
+            trend = prices[-1] - prices[0]
+            if trend > 5:
+                return "rising"
+            elif trend < -5:
+                return "falling"
+        
+        return "stable"
+    
+    def get_competitor_comparison(self, product_id: str) -> List[Dict]:
+        """የተወዳዳሪ ዋጋ ማወዳደሪያ"""
+        return self.competitor_data.get(product_id, [])
+
+# =================== የAI ምርት መገለጫ ስርዓት ===================
+
+class AIProductMatcher:
+    """
+    🧠 ULTRA-INTELLIGENT PRODUCT MATCHING ENGINE v6.0
+    Features: Semantic Analysis, Context Matching, User Intent Detection, Cross-Sell Opportunities
+    """
+    
+    def __init__(self):
+        self.semantic_cache = {}
+        self.intent_keywords = self._load_intent_keywords()
+        
+    def _load_intent_keywords(self) -> Dict:
+        """የተጠቃሚ ዓላማ ቁልፍ ቃላት"""
+        return {
+            'buy': ['buy', 'purchase', 'order', 'get', 'acquire', 'shop'],
+            'compare': ['compare', 'vs', 'versus', 'alternative', 'competitor'],
+            'review': ['review', 'rating', 'test', 'analysis', 'evaluate'],
+            'tutorial': ['how to', 'tutorial', 'guide', 'step by step', 'learn'],
+            'problem': ['problem', 'issue', 'fix', 'solve', 'troubleshoot']
+        }
+    
+    def match_products(self, content_analysis: Dict) -> List[Dict]:
+        """ይዘትን ተንትኖ ተገቢ ምርቶችን ያዛምዳል"""
+        
+        # 1. የይዘት አይነት መለየት
+        content_type = content_analysis.get('content_type', 'article')
+        
+        # 2. የቃላት ትንታኔ
+        top_keywords = [kw[0] for kw in content_analysis.get('top_keywords', [])]
+        
+        # 3. የተጠቃሚ ዓላማ መለየት
+        user_intent = self._detect_user_intent(content_analysis)
+        
+        # 4. የሴማንቲክ ማዛመጃ
+        matched_products = self._semantic_match(top_keywords, content_type, user_intent)
+        
+        # 5. የተሻለ ውጤት አድራሻ
+        ranked_products = self._rank_products(matched_products, content_analysis)
+        
+        logger.info(f"🧠 AI Matcher found {len(ranked_products)} products for {content_type} with intent: {user_intent}")
+        return ranked_products
+    
+    def _detect_user_intent(self, content_analysis: Dict) -> str:
+        """የተጠቃሚ ዓላማ መለየት"""
+        content_text = json.dumps(content_analysis).lower()
+        
+        intent_scores = {}
+        for intent, keywords in self.intent_keywords.items():
+            score = sum(1 for kw in keywords if kw in content_text)
+            intent_scores[intent] = score
+        
+        # ከፍተኛ ውጤት ያለው ዓላማ
+        if intent_scores:
+            return max(intent_scores.items(), key=lambda x: x[1])[0]
+        
+        return "informational"
+    
+    def _semantic_match(self, keywords: List[str], content_type: str, user_intent: str) -> List[Dict]:
+        """የሴማንቲክ ትንታኔ ማዛመጃ"""
+        
+        # የቃላት አውድ መስፋፋት
+        expanded_keywords = self._expand_keywords(keywords)
+        
+        # የምርት መረጃ ቋት (ይህ በእውነተኛ አጠቃቀም ውስጥ ከሌላ ቦታ ይመጣል)
+        product_database = {
+            'hosting': ['wordpress hosting', 'web hosting', 'cloud hosting', 'shared hosting'],
+            'ai_tools': ['ai tool', 'chatgpt', 'ai writing', 'content generator'],
+            'security': ['vpn', 'security', 'privacy', 'antivirus'],
+            'crypto': ['crypto exchange', 'bitcoin', 'trading', 'wallet'],
+            'marketing': ['email marketing', 'landing page', 'seo tool', 'social media'],
+            'education': ['course platform', 'learning', 'online course', 'tutorial']
+        }
+        
+        matched_categories = []
+        for category, category_keywords in product_database.items():
+            for kw in expanded_keywords:
+                for cat_kw in category_keywords:
+                    similarity = SequenceMatcher(None, kw.lower(), cat_kw.lower()).ratio()
+                    if similarity > 0.7:  # 70% ተመሳሳይነት
+                        matched_categories.append(category)
+                        break
+        
+        # የተገኙ ምድቦች ላይ የተመሠረቱ ምርቶችን መመለስ
+        return self._get_products_by_categories(set(matched_categories))
+    
+    def _expand_keywords(self, keywords: List[str]) -> List[str]:
+        """ቁልፍ ቃላትን ያሰፋል (ቀላል የሆነ ማስፋፊያ)"""
+        synonyms = {
+            'host': ['hosting', 'server', 'website', 'domain'],
+            'ai': ['artificial intelligence', 'machine learning', 'chatbot'],
+            'vpn': ['virtual private network', 'privacy', 'security'],
+            'crypto': ['cryptocurrency', 'bitcoin', 'ethereum', 'blockchain'],
+            'email': ['newsletter', 'mailing list', 'subscribers'],
+            'course': ['training', 'learning', 'education', 'tutorial']
+        }
+        
+        expanded = keywords.copy()
+        for kw in keywords:
+            for base, syn_list in synonyms.items():
+                if base in kw.lower():
+                    expanded.extend(syn_list)
+        
+        return list(set(expanded))  # ድገም ለማስወገድ
+    
+    def _get_products_by_categories(self, categories: set) -> List[Dict]:
+        """በምድብ የተደረደሩ ምርቶችን ይመልሳል"""
+        
+        # ይህ በእውነተኛ አጠቃቀም ውስጥ ከመሠረተ ልማት መረጃ ቋት ይመጣል
+        # ለምሳሌ የማይክተር ኮድ፣ የምርቶችን ማውጣት
+        
+        all_products = []
+        
+        # የምርት ናሙናዎች (በእውነተኛ አጠቃቀም ውስጥ ይህ ከመረጃ ቋት ይመጣል)
+        sample_products = [
+            {'id': 'bh001', 'category': 'hosting', 'name': 'Bluehost Pro'},
+            {'id': 'nv001', 'category': 'security', 'name': 'NordVPN Ultimate'},
+            {'id': 'ja001', 'category': 'ai_tools', 'name': 'Jasper AI Pro'},
+            {'id': 'bn001', 'category': 'crypto', 'name': 'Binance Pro'},
+            {'id': 'ck001', 'category': 'marketing', 'name': 'ConvertKit Pro'},
+            {'id': 'tk001', 'category': 'education', 'name': 'Teachabled Pro'}
+        ]
+        
+        for product in sample_products:
+            if product['category'] in categories:
+                all_products.append(product)
+        
+        return all_products
+    
+    def _rank_products(self, products: List[Dict], content_analysis: Dict) -> List[Dict]:
+        """ምርቶችን በግምታዊነት ደረጃ ያደርጋል"""
+        
+        # የደረጃ ነጥብ ስሌት
+        ranked = []
+        for product in products:
+            score = 0
+            
+            # 1. የይዘት ርዝመት ማስተካከያ
+            word_count = content_analysis.get('word_count', 1000)
+            if word_count > 2000:
+                score += 20  # ረጅም ይዘት = ከፍተኛ ልማት
+            
+            # 2. የይዘት ዓይነት ማስተካከያ
+            content_type = content_analysis.get('content_type', 'article')
+            if content_type == 'review':
+                score += 15  # የግምገማ ይዘት = ከፍተኛ ልማት
+            
+            # 3. የተጠቃሚ ዓላማ ማስተካከያ
+            intent = content_analysis.get('intent', 'informational')
+            if intent in ['buy', 'compare']:
+                score += 25  # የግዢ ዓላማ = ከፍተኛ ልማት
+            
+            # 4. የምርት ዓይነት ማስተካከያ
+            product_type = product.get('category', '')
+            if product_type in ['hosting', 'ai_tools']:
+                score += 30  # ከፍተኛ ኮሚሽን ምርቶች
+            
+            ranked.append({
+                'product': product,
+                'score': score
+            })
+        
+        # በነጥብ መጠን መደርደር
+        ranked.sort(key=lambda x: x['score'], reverse=True)
+        
+        # የምርት ነገሮችን ብቻ መመለስ
+        return [item['product'] for item in ranked[:6]]  # ከፍተኛ 6 ምርቶች
+
+# =================== የዋና ፍፁም አፊሊዬት አስተዳዳሪ ===================
+
+class UltraAffiliateManager:
+    """
+    🚀 ULTRA-ADVANCED AFFILIATE MONETIZATION ENGINE v12.5
+    Features: AI-Powered Product Matching, Dynamic Pricing, Multi-Format Injection,
+              A/B Testing, Performance Analytics, Geo-Targeting, Seasonal Promotions
+    """
+    
+    def __init__(self, user_geo: str = "US", user_segment: str = "premium"):
+        # የአለም ደረጃ የመረጃ ቋት - 100+ ምርቶች በማስተባበር
+        self.user_geo = user_geo
+        self.user_segment = user_segment
+        self.performance_data = defaultdict(list)
+        self.ab_test_variants = {}
+        
+        # የተለያዩ ቀረጻ ቅጦች
+        self.content_formats = {
+            'text_link': 0.3,
+            'product_card': 0.25,
+            'comparison_table': 0.2,
+            'feature_highlight': 0.15,
+            'testimonial_box': 0.1
+        }
+        
+        # የአለም ደረጃ የምርት መረጃ ቋት
+        self.affiliate_products = self._load_global_product_database()
+        
+        # የዋጋ ተለዋዋጭነት
+        self.price_tracker = PriceTracker()
+        
+        # የAI የምርት አዛባ
+        self.product_matcher = AIProductMatcher()
+        
+        logger.info(f"🚀 UltraAffiliateManager v12.5 initialized for {user_geo}")
+        
+    def _load_global_product_database(self) -> Dict:
+        """የአለም ደረጃ 100+ የተጣጣም ምርቶች መረጃ ቋት"""
+        return {
+            # ============ ሆስቲንግ ምድብ (High Commission) ============
+            'wordpress hosting': [
+                {
+                    'id': 'bh001',
+                    'name': 'Bluehost Pro',
+                    'link': 'https://www.bluehost.com/track/profitmaster/',
+                    'network': 'shareasale',
+                    'commission': {'US': 75.0, 'EU': 70.0, 'ASIA': 65.0},
+                    'category': 'hosting',
+                    'subcategory': 'wordpress',
+                    'rating': 4.8,
+                    'reviews': 12450,
+                    'features': ['Free Domain', 'SSL Certificate', '24/7 Support', '1-Click WordPress'],
+                    'pricing': {'monthly': 8.95, 'annual': 71.40, 'promo': True},
+                    'target_audience': ['beginners', 'bloggers', 'small_business'],
+                    'conversion_rate': 0.045,
+                    'epc': 15.20,
+                    'seasonal_promos': {
+                        'black_friday': {'discount': 70, 'code': 'BF70OFF'},
+                        'cyber_monday': {'discount': 65, 'code': 'CM65'},
+                        'new_year': {'discount': 60, 'code': 'NEWYEAR2024'}
+                    }
+                },
+                {
+                    'id': 'wp001',
+                    'name': 'WP Engine',
+                    'link': 'https://wpengine.com/partner/?ref=profitmaster',
+                    'network': 'wpengine',
+                    'commission': {'US': 200.0, 'EU': 180.0, 'ASIA': 160.0},
+                    'category': 'hosting',
+                    'subcategory': 'wordpress',
+                    'rating': 4.9,
+                    'reviews': 8920,
+                    'features': ['Managed WordPress', 'Global CDN', 'Daily Backups', 'Staging Sites'],
+                    'pricing': {'monthly': 25.0, 'annual': 300.0, 'promo': False},
+                    'target_audience': ['agencies', 'developers', 'enterprise'],
+                    'conversion_rate': 0.032,
+                    'epc': 42.50
+                }
+            ],
+            
+            'web hosting': [
+                {
+                    'id': 'hs001',
+                    'name': 'Hostinger Business',
+                    'link': 'https://hostinger.com?REF=profitmaster2024',
+                    'network': 'hostinger',
+                    'commission': {'US': 40.0, 'EU': 35.0, 'ASIA': 30.0},
+                    'category': 'hosting',
+                    'subcategory': 'shared',
+                    'rating': 4.7,
+                    'reviews': 34560,
+                    'features': ['LiteSpeed Cache', 'Free SSL', 'Daily Backups', 'Cloudflare'],
+                    'pricing': {'monthly': 2.99, 'annual': 35.88, 'promo': True},
+                    'target_audience': ['startups', 'freelancers', 'students'],
+                    'conversion_rate': 0.038,
+                    'epc': 9.80
+                }
+            ],
+            
+            # ============ AI መሳሪያዎች (High Demand) ============
+            'ai tool': [
+                {
+                    'id': 'ja001',
+                    'name': 'Jasper AI Pro',
+                    'link': 'https://jasper.ai?fpr=profitmaster12',
+                    'network': 'cj',
+                    'commission': {'US': 25.0, 'EU': 22.0, 'ASIA': 20.0},
+                    'category': 'software',
+                    'subcategory': 'ai_writing',
+                    'rating': 4.8,
+                    'reviews': 15620,
+                    'features': ['Long-form Assistant', 'SEO Mode', 'Plagiarism Checker', 'Team Collaboration'],
+                    'pricing': {'monthly': 49.0, 'annual': 468.0, 'promo': True},
+                    'target_audience': ['content_creators', 'marketers', 'agencies'],
+                    'conversion_rate': 0.052,
+                    'epc': 18.75
+                },
+                {
+                    'id': 'ch001',
+                    'name': 'ChatGPT Plus',
+                    'link': 'https://openai.com/chatgpt?ref=profitmaster',
+                    'network': 'openai',
+                    'commission': {'US': 12.0, 'EU': 10.0, 'ASIA': 8.0},
+                    'category': 'software',
+                    'subcategory': 'ai_chat',
+                    'rating': 4.9,
+                    'reviews': 89200,
+                    'features': ['GPT-4 Access', 'File Upload', 'Web Browsing', 'Custom Instructions'],
+                    'pricing': {'monthly': 20.0, 'annual': 240.0, 'promo': False},
+                    'target_audience': ['everyone', 'developers', 'writers'],
+                    'conversion_rate': 0.065,
+                    'epc': 7.80
+                }
+            ],
+            
+            # ============ የደህንነት ምድብ (High Commission) ============
+            'vpn': [
+                {
+                    'id': 'nv001',
+                    'name': 'NordVPN Ultimate',
+                    'link': 'https://nordvpn.com/ref/profitmastervip/',
+                    'network': 'nordvpn',
+                    'commission': {'US': 45.0, 'EU': 40.0, 'ASIA': 35.0},
+                    'category': 'security',
+                    'subcategory': 'vpn',
+                    'rating': 4.7,
+                    'reviews': 67230,
+                    'features': ['Double VPN', 'Threat Protection', 'Dark Web Monitor', '10 Devices'],
+                    'pricing': {'monthly': 11.99, 'annual': 95.88, 'promo': True},
+                    'target_audience': ['privacy_conscious', 'travelers', 'business'],
+                    'conversion_rate': 0.041,
+                    'epc': 16.45
+                },
+                {
+                    'id': 'ex001',
+                    'name': 'ExpressVPN',
+                    'link': 'https://expressvpn.com/offer/profitmaster',
+                    'network': 'expressvpn',
+                    'commission': {'US': 35.0, 'EU': 30.0, 'ASIA': 25.0},
+                    'category': 'security',
+                    'subcategory': 'vpn',
+                    'rating': 4.6,
+                    'reviews': 45210,
+                    'features': ['Lightway Protocol', 'Split Tunneling', 'Network Lock', '24/7 Support'],
+                    'pricing': {'monthly': 12.95, 'annual': 99.95, 'promo': True},
+                    'target_audience': ['streamers', 'gamers', 'journalists'],
+                    'conversion_rate': 0.036,
+                    'epc': 11.20
+                }
+            ],
+            
+            # ============ ክሪፕቶ ምድብ (High Volatility) ============
+            'crypto exchange': [
+                {
+                    'id': 'bn001',
+                    'name': 'Binance Pro',
+                    'link': 'https://binance.com/en/register?ref=PROFITMASTER888',
+                    'network': 'binance',
+                    'commission': {'US': 40.0, 'EU': 35.0, 'ASIA': 50.0},
+                    'category': 'crypto',
+                    'subcategory': 'exchange',
+                    'rating': 4.5,
+                    'reviews': 234500,
+                    'features': ['500+ Coins', 'Lowest Fees', 'Staking', 'NFT Marketplace'],
+                    'pricing': {'maker_fee': 0.1, 'taker_fee': 0.1, 'promo': True},
+                    'target_audience': ['traders', 'investors', 'crypto_enthusiasts'],
+                    'conversion_rate': 0.028,
+                    'epc': 22.50
+                },
+                {
+                    'id': 'cb001',
+                    'name': 'Coinbase Advanced',
+                    'link': 'https://coinbase.com/join/profitmaster',
+                    'network': 'coinbase',
+                    'commission': {'US': 10.0, 'EU': 8.0, 'ASIA': 12.0},
+                    'category': 'crypto',
+                    'subcategory': 'exchange',
+    
 class SocialMediaAutoPoster:
     """Advanced social media automation - NEW in v11.0"""
     
