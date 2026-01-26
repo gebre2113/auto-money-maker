@@ -164,7 +164,7 @@ with open('system_checks.json', 'w') as f:
     json.dump(checks, f, indent=2)
 
 print(json.dumps(checks, indent=2))
-"
+
 
           echo "::set-output name=status::booted_successfully"
           
