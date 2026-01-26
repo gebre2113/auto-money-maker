@@ -2415,19 +2415,6 @@ class AdvancedAffiliateManager:
                 
                 links_added.append({
                     'keyword': keyword,
-==========================================
-import re
-import random
-import json
-from typing import Dict, List, Tuple, Optional
-import logging
-from datetime import datetime, timedelta
-from collections import defaultdict
-import statistics
-import hashlib
-from difflib import SequenceMatcher
-
-logger = logging.getLogger(__name__)
 
 # =================== የዋጋ ክትትል ስርዓት ===================
 
