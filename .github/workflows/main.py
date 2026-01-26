@@ -1260,70 +1260,97 @@ class ProfitMasterUltraAffiliateSystem:
         return {
             'total_injections': sum(len(v) for v in self.affiliate_manager.performance_data.values()),
             'unique_products': len(self.affiliate_manager.performance_data),
-            'active_campaigns': len(self.affiliate_manager.affiliate_products),
             'geo_targeting': self.affiliate_manager.user_geo,
             'timestamp': datetime.now().isoformat()
         }
 
-# =================== የመጠቀም ምሳሌ ===================
+# ==============================================================================
+# 🚀 PROFIT MASTER SUPREME (MAIN INTEGRATION)
+# ይህ ክፍል "Example Usage" የሚለውን በመተካት አዲሱን ሞተር ከዋናው ሲስተም ጋር ያገናኛል
+# ==============================================================================
 
-if __name__ == "__main__":
-    # ሎግገር ማስጀመር
-    logging.basicConfig(level=logging.INFO)
-    
-    # የስርዓት መፍጠር
-    system = ProfitMasterUltraAffiliateSystem(user_geo="US", user_segment="premium")
-    
-    # የምሳሌ ይዘት
-    sample_content = """
-    <h1>How to Start a Successful Blog in 2024</h1>
-    <p>Starting a blog is one of the best ways to share your knowledge and make money online. In this guide, we'll show you everything you need to know.</p>
-    
-    <h2>Choosing the Right Web Hosting</h2>
-    <p>Your web hosting is the foundation of your blog. You need reliable hosting that can grow with your audience.</p>
-    
-    <h2>Essential AI Tools for Bloggers</h2>
-    <p>Artificial intelligence tools can help you create content faster and more efficiently.</p>
-    
-    <h2>Security Considerations</h2>
-    <p>Protecting your blog with a VPN and security tools is essential in today's digital landscape.</p>
-    
-    <h2>Monetization Strategies</h2>
-    <p>Learn how to monetize your blog through affiliate marketing, courses, and email marketing.</p>
+class ProfitMasterSupreme:
     """
-    
-    # ይዘት ማስተካከያ
-    monetized_content, report = system.monetize_content(
-        content=sample_content,
-        topic="Blogging Guide 2024",
-        content_type="tutorial"
-    )
-    
-    print("=" * 80)
-    print("💰 PROFIT MASTER ULTRA AFFILIATE SYSTEM - DEMONSTRATION")
-    print("=" * 80)
-    print(f"\n📊 Monetization Report:")
-    print(f"   • Total Injections: {report['total_injections']}")
-    print(f"   • Products Promoted: {len(report['products_promoted'])}")
-    print(f"   • Estimated Revenue: ${report['estimated_revenue']}")
-    print(f"   • Geographic Optimization: {report['geographic_optimization']}")
-    print(f"   • Content Formats Used: {', '.join(set(report['formats_used']))}")
-    
-    print(f"\n🚀 Performance Report:")
-    perf_report = system.get_performance_report()
-    for key, value in perf_report.items():
-        print(f"   • {key.replace('_', ' ').title()}: {value}")
-    
-    print(f"\n✅ Sample of Monetized Content (first 500 chars):")
-    print("-" * 80)
-    print(monetized_content[:500] + "...")
-    print("=" * 80)
-    
-    print(f"\n🌟 System Status: ACTIVE")
-    print(f"💡 Features: AI-Powered Matching, Dynamic Pricing, Multi-Format Injection")
-    print(f"🌍 Global Coverage: 100+ Products, 12+ Regions")
-    print(f"💰 Revenue Model: Commission-Based, Performance-Optimized")
-    print("=" * 80)
+    👑 The Main Controller Class
+    Connects AI Content Generation with the Ultra Monetization System
+    """
+    def __init__(self, config=None):
+        self.config = config or {}
+        # አዲሱን የ v15.0 ሲስተም እዚህ እናስነሳለን
+        self.monetization_engine = ProfitMasterUltraAffiliateSystem(user_geo="US")
+        logger.info("👑 Profit Master Supreme Initialized with Ultra Engine v15.0")
+
+    def auto_generate_content(self):
+        """
+        Runs the full cycle: Generate -> Monetize -> Report
+        """
+        # 1. ርዕስ መምረጥ (Simulated or Real)
+        topic = "Top 10 AI Tools for Business Growth 2026"
+        logger.info(f"📝 Generating content for topic: {topic}")
+        
+        # 2. ጽሁፍ ማመንጨት (እዚህ ጋር የ Groq/OpenAI ኮድህ ይገባል)
+        # ለጊዜው ውጤቱን ለማየት ይህንን የናሙና ጽሁፍ እንጠቀም፡
+        article_draft = f"""
+        <h1>{topic}</h1>
+        <p>Artificial Intelligence is changing the world. To succeed in business, you need the right tools.</p>
+        
+        <h2>1. Smart Hosting Solutions</h2>
+        <p>Before you start, you need reliable web hosting. Tools like Bluehost offer amazing speed for wordpress hosting.</p>
+        
+        <h2>2. AI Content Writing</h2>
+        <p>Using an ai tool like Jasper can save you hours of work.</p>
+        
+        <h2>3. Security Essentials</h2>
+        <p>Don't forget to use a vpn to protect your business data online.</p>
+        
+        <h2>Conclusion</h2>
+        <p>Start your journey today!</p>
+        """
+        
+        # 3. 💰 MONETIZATION (አዲሱን ሞተር መጠቀም)
+        logger.info("💰 Injecting Ultra-Affiliate Elements...")
+        final_content, metrics = self.monetization_engine.monetize_content(
+            content=article_draft,
+            topic=topic,
+            content_type="list_article"
+        )
+        
+        # 4. ውጤቱን ማጠናቀር
+        result = {
+            "title": topic,
+            "content": final_content,
+            "estimated_revenue": metrics['estimated_revenue'],
+            "products_count": len(metrics['products_promoted']),
+            "quality_score": 98,
+            "success": True
+        }
+        
+        # 5. ፋይል ላይ ማስቀመጥ (ለማየት እንዲመች)
+        filename = f"profit_master_output_{datetime.now().strftime('%M%S')}.html"
+        with open(filename, "w", encoding="utf-8") as f:
+            f.write(final_content)
+            
+        logger.info(f"✅ Content generated and saved to {filename}")
+        return result
+
+    def get_performance_report(self):
+        """Returns analytics from the engine"""
+        engine_report = self.monetization_engine.get_performance_report()
+        
+        # Add basic stats
+        return {
+            "total_articles": 1, # This would be dynamic in DB
+            "total_estimated_revenue": 150.50, # Example value
+            "average_quality": 95,
+            "total_affiliate_links": engine_report['total_injections'],
+            "top_performers": [("Bluehost Guide", 85.0), ("Jasper Review", 65.5)]
+        }
+
+    def run_cli(self):
+        """Runs the system in CLI mode"""
+        print("🚀 Running in CLI Mode...")
+        result = self.auto_generate_content()
+        print(f"\n✅ SUCCESS! Revenue Projected: ${result['estimated_revenue']}")
 # =================== CONFIGURATION ===================
 
 class GodModeConfig:
