@@ -149,7 +149,7 @@ jobs:
         env:
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
         run: |
-          echo "🚀 Launching Real Groq AI Content Generation..."
+          echo "🚀 Launching Real Groq AI Content Generation...
           
         
 import requests
