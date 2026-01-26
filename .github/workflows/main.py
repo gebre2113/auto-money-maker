@@ -151,7 +151,7 @@ jobs:
         run: |
           echo "🚀 Launching Real Groq AI Content Generation..."
           
-          python3 -c "
+        
 import requests
 import json
 import os
