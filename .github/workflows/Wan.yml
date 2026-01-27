@@ -2,11 +2,11 @@ name: Profit Master Supreme - EXECUTE
 
 on:
   schedule:
-    - cron: '0 */6 * * *'  # በየ 6 ሰዓቱ በራሱ ይሰራል
-  workflow_dispatch:       # አንተ በፈለግክ ሰዓት "Run" ብለህ ማስጀመር ትችላለህ
+    - cron: '0 */6 * * *'
+  workflow_dispatch:
     inputs:
       topic:
-        description: 'የይዘት ርዕስ (Topic)'
+        description: 'የይዘት ርዕስ'
         required: false
         default: 'AI Revolution'
       language:
@@ -23,61 +23,61 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
-      # 1. ያንተን ኮድ ከ GitHub ያወርደዋል
       - name: "📥 Checkout Repository"
         uses: actions/checkout@v4
 
-      # 2. Python 3.12 ያዘጋጃል
       - name: "🐍 Setup Python 3.12"
         uses: actions/setup-python@v5
         with:
           python-version: '3.12'
           cache: 'pip'
 
-      # 3. የቪድዮ መስራት የሚያስፈልገውን FFmpeg ይጭናል
-      - name: "🔧 Install FFmpeg"
+      - name: "🔧 Install System Dependencies"
         run: |
           sudo apt-get update
-          sudo apt-get install -y ffmpeg
+          sudo apt-get install -y ffmpeg imagemagick
+          sudo sed -i 's/none/read,write/g' /etc/ImageMagick-6/policy.xml 2>/dev/null || echo "ImageMagick policy not found"
 
-      # 4. የመሠረት Python ሊብረሪዎችን ብቻ ይጭናል (ኮድህ ሌሎቹን በራሱ ይጭናል)
-      - name: "📦 Install Base Python Libraries"
+      - name: "📦 Install Python Dependencies"
         run: |
           pip install --upgrade pip
-          # መሠረታዊ ሊብረሪዎች ብቻ
-          pip install requests pandas numpy
+          if [ -f "requirements.txt" ]; then
+            pip install -r requirements.txt
+          else
+            echo "requirements.txt not found, installing manually..."
+            pip install aiohttp httpx google-generativeai gtts moviepy==1.0.3 pytube yt-dlp \
+              tweepy selenium beautifulsoup4 langdetect googletrans==3.1.0a0 textblob \
+              nltk spacy openai transformers torch sqlalchemy redis celery \
+              prometheus-client boto3 fastapi uvicorn pydantic pillow pandas numpy<2.0.0
+          fi
 
-      # 5. ያንተን ትልቁን ስክሪፕት ያስኬዳል (ኮድህ ሌሎቹን ሊብረሪዎች በራሱ ይጭናል)
-      - name: "🤖 Execute Your Script"
+      - name: "📥 Download NLTK Data"
+        run: |
+          python -c "import nltk; nltk.download('punkt', quiet=True); nltk.download('stopwords', quiet=True); nltk.download('wordnet', quiet=True)"
+
+      - name: "🤖 Execute Main Script"
         env:
-          # እነዚህን ቁልፎች በ GitHub Settings -> Secrets ውስጥ ማስገባት አለብህ
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         run: |
           echo "🚀 Starting Profit Master System..."
           
-          # ስክሪፕትህ አለመኖሩን ማረጋገጫ
           if [ -f "main.py" ]; then
-             # ኮድህ ሊብረሪዎቹን በራሱ ይጭናል፣ ስለዚህ ያለ ማገጃ ማስኬድ
-             python main.py --topic "${{ github.event.inputs.topic || 'Future AI' }}" --language "${{ github.event.inputs.language || 'am' }}"
+            python main.py --topic "${{ github.event.inputs.topic || 'AI Revolution' }}" --language "${{ github.event.inputs.language || 'am' }}"
           else
-             echo "❌ Error: main.py ፋይል አልተገኘም!"
-             exit 1
+            echo "❌ Error: main.py not found"
+            exit 1
           fi
 
-      # 6. ውጤቱን (የተፈጠሩ ፋይሎችን) ያስቀምጣል
       - name: "💾 Upload Results"
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: profit-master-results
+          name: profit-master-output
           path: |
             profit_master.log
             generated_content/
-            output/
             *.json
             *.html
             *.txt
