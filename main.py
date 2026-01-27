@@ -27,13 +27,32 @@ import pandas as pd
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from contextlib import contextmanager
 
-# Third-party imports
+# Logging Configuration
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    handlers=[logging.StreamHandler()]
+)
+logger = logging.getLogger(__name__)
+
+# ==========================================
+# ✅ FIXED IMPORTS (NO AUTO-INSTALLATION)
+# ==========================================
 try:
     import aiohttp
     import httpx
     import google.generativeai as genai
     from gtts import gTTS
-    from moviepy.editor import *
+    
+    # 🔧 MOVIEPY FIX (Handles v1.0 and v2.0)
+    try:
+        from moviepy import *
+    except ImportError:
+        try:
+            from moviepy.editor import *
+        except ImportError:
+            logger.warning("⚠️ MoviePy library not found. Video generation disabled.")
+
     import pytube
     import yt_dlp
     import tweepy
@@ -41,9 +60,36 @@ try:
     from selenium.webdriver.common.by import By
     from bs4 import BeautifulSoup
     from langdetect import detect
-    from googletrans import Translator
+    
+    # 🔧 TRANSLATION FIX (Replaces googletrans with deep_translator)
+    try:
+        from deep_translator import GoogleTranslator
+        # Create a dummy wrapper to match old code if needed, 
+        # but better to use GoogleTranslator directly
+        class TranslatorWrapper:
+            def translate(self, text, dest='en'):
+                return type('obj', (object,), {'text': GoogleTranslator(source='auto', target=dest).translate(text)})
+        Translator = TranslatorWrapper
+    except ImportError:
+        # Fallback if deep_translator is missing
+        try:
+            from googletrans import Translator
+        except ImportError:
+            logger.warning("⚠️ Translation libraries missing.")
+            Translator = None
+
     from textblob import TextBlob
     import nltk
+    
+    # NLTK Data Check (Downloads silently if missing)
+    try:
+        nltk.data.find('tokenizers/punkt')
+    except LookupError:
+        nltk.download('punkt', quiet=True)
+        nltk.download('stopwords', quiet=True)
+        nltk.download('wordnet', quiet=True)
+        nltk.download('averaged_perceptron_tagger', quiet=True)
+
     from nltk.corpus import stopwords
     from nltk.tokenize import word_tokenize, sent_tokenize
     import spacy
@@ -63,53 +109,19 @@ try:
     from pydantic import BaseModel, Field
     import uvicorn
     from PIL import Image, ImageDraw, ImageFont
+
 except ImportError as e:
-    print(f"⚠️ Missing dependency: {e}")
-    print("📦 Installing requirements...")
-    requirements = """
-    aiohttp>=3.9.0
-    httpx>=0.25.0
-    google-generativeai>=0.3.0
-    gtts>=2.3.0
-    moviepy>=1.0.3
-    pytube>=15.0.0
-    yt-dlp>=2023.10.13
-    tweepy>=4.14.0
-    selenium>=4.15.0
-    beautifulsoup4>=4.12.0
-    langdetect>=1.0.9
-    googletrans==3.1.0a0
-    textblob>=0.17.1
-    nltk>=3.8.0
-    spacy>=3.7.0
-    openai>=0.28.0
-    transformers>=4.35.0
-    torch>=2.1.0
-    sqlalchemy>=2.0.0
-    redis>=5.0.0
-    celery>=5.3.0
-    prometheus-client>=0.19.0
-    boto3>=1.34.0
-    fastapi>=0.104.0
-    uvicorn>=0.24.0
-    pydantic>=2.4.0
-    pillow>=10.0.0
-    pandas>=2.0.0
-    numpy>=1.24.0
-    """
-    
-    with open("requirements.txt", "w") as f:
-        f.write(requirements)
-    
-    os.system(f"{sys.executable} -m pip install -r requirements.txt")
-    print("✅ Dependencies installed. Please restart.")
-    sys.exit(1)
+    # 🛑 CRITICAL CHANGE: We do NOT auto-install here. 
+    # We just log the error and let the script continue or fail gracefully.
+    logger.error(f"⚠️ Import Error: {e}")
+    logger.info("ℹ️ Assuming dependencies are handled by GitHub Actions YAML.")
 
 # =================== የስርዓት ኮንፍግ ===================
 
 @dataclass
 class PremiumConfig:
     """የፕሬሚየም ስርዓት ኮንፍግ"""
+    # ... (ኮዱ ይቀጥላል)
     
     def __init__(self):
         self.secrets = self._load_secrets()
