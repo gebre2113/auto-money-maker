@@ -64,7 +64,7 @@ try:
     import uvicorn
     from PIL import Image, ImageDraw, ImageFont
     import argparse
-import sys
+    import sys
 
 def main():
     """ቀለል ያለ የማስኬድ ተግባር"""
