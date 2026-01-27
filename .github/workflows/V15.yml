@@ -347,15 +347,13 @@ jobs:
   # ==================== JOB 3: CORE OPERATIONS ====================
   core_operations:
     needs: [initialize_system, setup_dependencies]
-    runs-on: ubuntu-latest
-    name: "🤖 Core Operations"
-    timeout-minutes: ${{ env.TIMEOUT_MINUTES }}
+  timeout-minutes: 180  # ቀጥታ 180 ደቂቃ
     
     strategy:
       matrix:
         operation: ['content', 'multimedia', 'monetization']
       fail-fast: false
-      max-parallel: ${{ env.PARALLEL_JOBS }}
+      max-parallel: 2     # ቀጥታ ቁጥር 2
     
     steps:
       - name: "🔄 Checkout Code"
