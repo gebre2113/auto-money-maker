@@ -27,32 +27,13 @@ import pandas as pd
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from contextlib import contextmanager
 
-# Logging Configuration
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    handlers=[logging.StreamHandler()]
-)
-logger = logging.getLogger(__name__)
+# Third-party imports
 
-# ==========================================
-# ✅ FIXED IMPORTS (NO AUTO-INSTALLATION)
-# ==========================================
-try:
     import aiohttp
     import httpx
     import google.generativeai as genai
     from gtts import gTTS
-    
-    # 🔧 MOVIEPY FIX (Handles v1.0 and v2.0)
-    try:
-        from moviepy import *
-    except ImportError:
-        try:
-            from moviepy.editor import *
-        except ImportError:
-            logger.warning("⚠️ MoviePy library not found. Video generation disabled.")
-
+    from moviepy.editor import *
     import pytube
     import yt_dlp
     import tweepy
@@ -60,36 +41,9 @@ try:
     from selenium.webdriver.common.by import By
     from bs4 import BeautifulSoup
     from langdetect import detect
-    
-    # 🔧 TRANSLATION FIX (Replaces googletrans with deep_translator)
-    try:
-        from deep_translator import GoogleTranslator
-        # Create a dummy wrapper to match old code if needed, 
-        # but better to use GoogleTranslator directly
-        class TranslatorWrapper:
-            def translate(self, text, dest='en'):
-                return type('obj', (object,), {'text': GoogleTranslator(source='auto', target=dest).translate(text)})
-        Translator = TranslatorWrapper
-    except ImportError:
-        # Fallback if deep_translator is missing
-        try:
-            from googletrans import Translator
-        except ImportError:
-            logger.warning("⚠️ Translation libraries missing.")
-            Translator = None
-
+    from googletrans import Translator
     from textblob import TextBlob
     import nltk
-    
-    # NLTK Data Check (Downloads silently if missing)
-    try:
-        nltk.data.find('tokenizers/punkt')
-    except LookupError:
-        nltk.download('punkt', quiet=True)
-        nltk.download('stopwords', quiet=True)
-        nltk.download('wordnet', quiet=True)
-        nltk.download('averaged_perceptron_tagger', quiet=True)
-
     from nltk.corpus import stopwords
     from nltk.tokenize import word_tokenize, sent_tokenize
     import spacy
@@ -109,12 +63,6 @@ try:
     from pydantic import BaseModel, Field
     import uvicorn
     from PIL import Image, ImageDraw, ImageFont
-
-except ImportError as e:
-    # 🛑 CRITICAL CHANGE: We do NOT auto-install here. 
-    # We just log the error and let the script continue or fail gracefully.
-    logger.error(f"⚠️ Import Error: {e}")
-    logger.info("ℹ️ Assuming dependencies are handled by GitHub Actions YAML.")
 
 # =================== የስርዓት ኮንፍግ ===================
 
