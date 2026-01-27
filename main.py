@@ -28,64 +28,111 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from contextlib import contextmanager
 
 # Third-party imports
+REQUIRED_PACKAGES = [
+    "aiohttp>=3.9.0",
+    "httpx>=0.25.0",
+    "google-generativeai>=0.3.0",
+    "gtts>=2.3.0",
+    "moviepy>=1.0.3",
+    "pytube>=15.0.0",
+    "yt-dlp>=2023.10.13",
+    "tweepy>=4.14.0",
+    "selenium>=4.15.0",
+    "beautifulsoup4>=4.12.0",
+    "langdetect>=1.0.9",
+    "googletrans==3.1.0a0",
+    "textblob>=0.17.1",
+    "nltk>=3.8.0",
+    "spacy>=3.7.0",
+    "openai>=0.28.0",
+    "transformers>=4.35.0",
+    "torch>=2.1.0",
+    "sqlalchemy>=2.0.0",
+    "redis>=5.0.0",
+    "celery>=5.3.0",
+    "prometheus-client>=0.19.0",
+    "boto3>=1.34.0",
+    "fastapi>=0.104.0",
+    "uvicorn>=0.24.0",
+    "pydantic>=2.4.0",
+    "pillow>=10.0.0",
+    "pandas>=2.0.0",
+    "numpy>=1.24.0"
+]
+
+def install_missing_packages():
+    """የጠፉ ጥገኝነቶችን ያጭናል"""
+    print("📦 Installing missing packages...")
+    import subprocess
+    import importlib
+    
+    for package in REQUIRED_PACKAGES:
+        package_name = package.split('>')[0].split('=')[0].strip()
+        try:
+            importlib.import_module(package_name if '.' not in package_name else package_name.split('.')[0])
+            print(f"✅ {package_name} already installed")
+        except ImportError:
+            print(f"📦 Installing {package_name}...")
+            try:
+                subprocess.check_call([sys.executable, "-m", "pip", "install", package])
+                print(f"✅ {package_name} installed successfully")
+            except subprocess.CalledProcessError as e:
+                print(f"❌ Failed to install {package_name}: {e}")
+                # ለቶርች ልዩ ማስተካከያ
+                if "torch" in package_name:
+                    print("🔧 Installing PyTorch with CPU-only version...")
+                    subprocess.check_call([sys.executable, "-m", "pip", "install", 
+                                         "torch", "--index-url", "https://download.pytorch.org/whl/cpu"])
+
+# ሁሉንም ጥገኝነቶች በራስ-ሰር ያጭኑ
+install_missing_packages()
+
+# አሁን ጥገኝነቶቹን መጠቀም ይቻላል
+import aiohttp
+import httpx
+import google.generativeai as genai
+from gtts import gTTS
+from moviepy.editor import *
+import pytube
+import yt_dlp as yt_dlp
+import tweepy
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from bs4 import BeautifulSoup
+from langdetect import detect
+from googletrans import Translator
+from textblob import TextBlob
+import nltk
+from nltk.corpus import stopwords
+from nltk.tokenize import word_tokenize, sent_tokenize
+import spacy
+import openai
+from transformers import pipeline
+import torch
+from sqlalchemy import create_engine, Column, String, Integer, Float, DateTime, JSON, Text, Boolean, ForeignKey
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker, relationship, scoped_session
+from sqlalchemy.pool import QueuePool
+import redis
+from celery import Celery
+from prometheus_client import start_http_server, Counter, Histogram, Gauge
+import boto3
+from botocore.exceptions import ClientError
+from fastapi import FastAPI, HTTPException, BackgroundTasks, Depends, status
+from pydantic import BaseModel, Field
+import uvicorn
+from PIL import Image, ImageDraw, ImageFont
+
+# NLTK data download
 try:
-    import aiohttp
-    import httpx
-    import google.generativeai as genai
-    from gtts import gTTS
-    from moviepy.editor import *
-    import pytube
-    import yt_dlp
-    import tweepy
-    from selenium import webdriver
-    from selenium.webdriver.common.by import By
-    from bs4 import BeautifulSoup
-    from langdetect import detect
-    from googletrans import Translator
-    from textblob import TextBlob
-    import nltk
-    from nltk.corpus import stopwords
-    from nltk.tokenize import word_tokenize, sent_tokenize
-    import spacy
-    import openai
-    from transformers import pipeline
-    import torch
-    from sqlalchemy import create_engine, Column, String, Integer, Float, DateTime, JSON, Text, Boolean, ForeignKey
-    from sqlalchemy.ext.declarative import declarative_base
-    from sqlalchemy.orm import sessionmaker, relationship, scoped_session
-    from sqlalchemy.pool import QueuePool
-    import redis
-    from celery import Celery
-    from prometheus_client import start_http_server, Counter, Histogram, Gauge
-    import boto3
-    from botocore.exceptions import ClientError
-    from fastapi import FastAPI, HTTPException, BackgroundTasks, Depends, status
-    from pydantic import BaseModel, Field
-    import uvicorn
-    from PIL import Image, ImageDraw, ImageFont
-    import argparse
-    import sys
+    nltk.data.find('tokenizers/punkt')
+except LookupError:
+    print("📦 Downloading NLTK data...")
+    nltk.download('punkt')
+    nltk.download('stopwords')
+    nltk.download('wordnet')
 
-def main():
-    """ቀለል ያለ የማስኬድ ተግባር"""
-    parser = argparse.ArgumentParser(description="Profit Master System")
-    parser.add_argument('--topic', default='Future AI', help='Topic for content generation')
-    parser.add_argument('--language', default='am', help='Language (en/am)')
-    parser.add_argument('--api-only', action='store_true', help='Run only API server')
-    
-    args = parser.parse_args()
-    
-    if args.api_only:
-        # የAPI አገልጋይ ብቻ አስኬድ
-        print(f"🚀 Starting API server for {args.topic} in {args.language}")
-        # ... የAPI አገልጋይ ኮድ ይቀጥላል
-    else:
-        # ሙሉ ስርዓት አስኬድ
-        print(f"🚀 Creating content about {args.topic} in {args.language}")
-        # ... የይዘት ፍጠር ኮድ ይቀጥላል
-
-if __name__ == "__main__":
-    main()
+# ... rest of your code continues here
 except ImportError as e:
     print(f"⚠️ Missing dependency: {e}")
     print("📦 Installing requirements...")
