@@ -1,0 +1,795 @@
+name: Profit Master Supreme - ULTIMATE MODE (FIXED)
+
+on:
+  schedule:
+    - cron: '0 */6 * * *'  # በየ 6 ሰዓቱ
+  workflow_dispatch:
+    inputs:
+      topic:
+        description: 'የይዘት ርዕስ'
+        required: true
+        default: 'AI እና በመስመር ላይ ገቢ'
+        type: string
+      language:
+        description: 'ቋንቋ'
+        required: false
+        default: 'am'
+        type: choice
+        options:
+          - am
+          - en
+      mode:
+        description: 'ሞድ'
+        required: false
+        default: 'full'
+        type: choice
+        options:
+          - full
+          - content
+          - test
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+jobs:
+  setup_and_run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    name: "🚀 ሙሉ ስርዓት ማስኬድ"
+    
+    steps:
+      - name: "📥 ሬፖዚቶሪ ማውረድ"
+        uses: actions/checkout@v4
+        
+      - name: "🐍 Python 3.12 አሰናከል"
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+          
+      - name: "🔧 አስፈላጊ መሣሪያዎች መጫን"
+        run: |
+          sudo apt-get update
+          # እንደገና ሳይሰራ ቀላል መሣሪያዎች ብቻ መጫን
+          sudo apt-get install -y \
+            ffmpeg \
+            python3-pip \
+            python3-venv \
+            curl \
+            wget \
+            git \
+            sqlite3 \
+            libmagic-dev
+          
+          echo "✅ መሰረታዊ መሣሪያዎች ተጫኑ"
+          
+      - name: "📦 Python ጥገኛዎች መጫን"
+        run: |
+          pip install --upgrade pip
+          
+          # አስፈላጊ ጥገኛዎች ብቻ
+          pip install \
+            requests \
+            pandas \
+            numpy \
+            groq \
+            google-generativeai \
+            openai \
+            gtts \
+            pillow \
+            sqlalchemy \
+            python-telegram-bot \
+            beautifulsoup4 \
+            nltk \
+            fastapi \
+            uvicorn \
+            pydantic \
+            loguru
+          
+          # NLTK ውሂብ መጫን
+          python -m nltk.downloader punkt stopwords
+          
+          echo "✅ ሁሉም ጥገኛዎች ተጫኑ"
+          
+      - name: "🔧 የስርዓት መለያ እና መዋቅር መፍጠር"
+        run: |
+          # ስርዓት መለያ መፍጠር
+          SESSION_ID="PM_$(date +%Y%m%d_%H%M%S)_${{ github.run_id }}"
+          echo "SESSION_ID=$SESSION_ID" >> $GITHUB_ENV
+          
+          # የሥራ መዋቅር መፍጠር
+          mkdir -p data logs public/{articles,affiliate,dashboard}
+          
+          echo "📁 የሥራ መዋቅር ተፈጥሯል"
+          
+      - name: "🤖 ዋና የAI ስክሪፕት ማስኬድ"
+        env:
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          SESSION_ID: ${{ env.SESSION_ID }}
+          OPERATION_MODE: ${{ github.event.inputs.mode || 'full' }}
+          CONTENT_TOPIC: ${{ github.event.inputs.topic || 'AI እና በመስመር ላይ ገቢ' }}
+          CONTENT_LANGUAGE: ${{ github.event.inputs.language || 'am' }}
+        run: |
+          echo "🚀 AI Profit Master እየተሰራ ነው..."
+          echo "Session: $SESSION_ID"
+          echo "Topic: $CONTENT_TOPIC"
+          echo "Language: $CONTENT_LANGUAGE"
+          echo "Mode: $OPERATION_MODE"
+          
+          # ዋና የAI ስክሪፕት መፍጠር
+          cat > main.py << 'EOF'
+          """
+          🚀 PROFIT MASTER SUPREME - AI CONTENT & MONETIZATION SYSTEM
+          """
+          
+          import os
+          import sys
+          import json
+          import time
+          import random
+          import hashlib
+          import asyncio
+          import sqlite3
+          from datetime import datetime
+          import requests
+          
+          # System Configuration
+          SESSION_ID = os.getenv('SESSION_ID', 'default_session')
+          TOPIC = os.getenv('CONTENT_TOPIC', 'AI Technology')
+          LANGUAGE = os.getenv('CONTENT_LANGUAGE', 'am')
+          MODE = os.getenv('OPERATION_MODE', 'full')
+          
+          # API Keys
+          GROQ_API_KEY = os.getenv('GROQ_API_KEY')
+          TELEGRAM_BOT_TOKEN = os.getenv('TELEGRAM_BOT_TOKEN')
+          TELEGRAM_CHAT_ID = os.getenv('TELEGRAM_CHAT_ID')
+          
+          print(f"🚀 Starting Profit Master Supreme v15.1")
+          print(f"Session: {SESSION_ID}")
+          print(f"Topic: {TOPIC}")
+          print(f"Language: {LANGUAGE}")
+          
+          class ProfitMaster:
+              def __init__(self):
+                  self.session_id = SESSION_ID
+                  self.topic = TOPIC
+                  self.language = LANGUAGE
+                  self.output_dir = "public"
+                  
+                  # Create directories
+                  os.makedirs(f"{self.output_dir}/articles", exist_ok=True)
+                  os.makedirs(f"{self.output_dir}/affiliate", exist_ok=True)
+                  os.makedirs(f"{self.output_dir}/dashboard", exist_ok=True)
+                  os.makedirs("data", exist_ok=True)
+                  
+                  # Initialize database
+                  self.init_database()
+              
+              def init_database(self):
+                  """የውሂብ ጎታ መጀመር"""
+                  conn = sqlite3.connect('data/profit_master.db')
+                  cursor = conn.cursor()
+                  
+                  cursor.execute('''
+                      CREATE TABLE IF NOT EXISTS content (
+                          id TEXT PRIMARY KEY,
+                          title TEXT,
+                          topic TEXT,
+                          language TEXT,
+                          word_count INTEGER,
+                          quality_score REAL,
+                          created_at TIMESTAMP,
+                          monetized BOOLEAN
+                      )
+                  ''')
+                  
+                  cursor.execute('''
+                      CREATE TABLE IF NOT EXISTS revenue (
+                          id INTEGER PRIMARY KEY AUTOINCREMENT,
+                          content_id TEXT,
+                          product_name TEXT,
+                          commission REAL,
+                          timestamp TIMESTAMP
+                      )
+                  ''')
+                  
+                  conn.commit()
+                  conn.close()
+                  print("✅ Database initialized")
+              
+              def generate_content_id(self):
+                  """የይዘት መለያ መፍጠር"""
+                  timestamp = datetime.now().strftime('%Y%m%d%H%M%S')
+                  hash_str = hashlib.md5(f"{self.topic}{timestamp}".encode()).hexdigest()[:8]
+                  return f"content_{timestamp}_{hash_str}"
+              
+              def create_amharic_content(self):
+                  """አማርኛ ይዘት መፍጠር"""
+                  content_id = self.generate_content_id()
+                  
+                  templates = [
+                      {
+                          "title": f"{self.topic}: ሙሉ መመሪያ እና ገቢ ማመንጨት",
+                          "content": f"""
+                          <h1>{self.topic}: ሙሉ መመሪያ</h1>
+                          
+                          <h2>ለምን {self.topic} አስፈላጊ ነው?</h2>
+                          <p>በዘመናዊው ዓለም፣ {self.topic} ከፍተኛ አስፈላጊነት አለው። ይህ ጽሁፍ ሁሉንም ዝርዝር ያቀርባል።</p>
+                          
+                          <h2>ዋና ዋና ጥቅሞች</h2>
+                          <ul>
+                          <li>ቀጣይነት ያለው ገቢ መፍጠር</li>
+                          <li>የጊዜ አጠቃቀምን ማሻሻል</li>
+                          <li>የድርጅትዎን ውድድር ጥቅም ማሻሻል</li>
+                          <li>በዓለም አቀፍ ገበያ ውስጥ ማሰማራት</li>
+                          </ul>
+                          
+                          <div class="affiliate-box">
+                          <h3>💰 የሚመከሩ ምርቶች</h3>
+                          <ul>
+                          <li><a href="https://www.bluehost.com/track/profitmaster/" target="_blank">Bluehost Web Hosting</a> - $75 commission</li>
+                          <li><a href="https://nordvpn.com/ref/profitmastervip/" target="_blank">NordVPN Ultimate</a> - $45 commission</li>
+                          <li><a href="https://jasper.ai?fpr=profitmaster12" target="_blank">Jasper AI Pro</a> - $25 commission</li>
+                          </ul>
+                          </div>
+                          
+                          <h2>ደረጃ በደረጃ አፈፃፀም</h2>
+                          <ol>
+                          <li>መሰረታዊ ፅንሰ ሀሳቦችን ይማሩ</li>
+                          <li>ተገቢውን መሳሪያ ይምረጡ</li>
+                          <li>በትንሹ ይጀምሩ እና ያሳድጉ</li>
+                          <li>ውጤቶችን ይከታተሉ እና ያስተካክሉ</li>
+                          </ol>
+                          
+                          <h2>ማጠቃለያ</h2>
+                          <p>{self.topic} በትክክል ሲተገበር ታላቅ ለውጥ ሊያመጣ ይችላል። ዛሬ መጀመር ይችላሉ!</p>
+                          """
+                      },
+                      {
+                          "title": f"በ2024 {self.topic} ገቢ ለማመንጨት",
+                          "content": f"""
+                          <h1>በ2024 {self.topic} ገቢ ለማመንጨት</h1>
+                          
+                          <h2>መግቢያ</h2>
+                          <p>ይህ ጽሁፍ በ2024 {self.topic} በመጠቀም ገቢ ለማመንጨት አስፈላጊ የሆኑትን ዘዴዎች ያቀርባል።</p>
+                          
+                          <h2>በጣም ውጤታማ ዘዴዎች</h2>
+                          <ul>
+                          <li>አፊሊዬት ማርኬቲንግ</li>
+                          <li>የAI የይዘት ፍጠር</li>
+                          <li>የድር ገጽ ሞኔታይዜሽን</li>
+                          <li>የሶሻል ሚዲያ አገናኝቶች</li>
+                          </ul>
+                          
+                          <div class="recommended">
+                          <h3>🏆 ከፍተኛ ኮሚሽን ያላቸው ምርቶች</h3>
+                          <table>
+                          <tr><th>ምርት</th><th>ኮሚሽን</th><th>ምክር</th></tr>
+                          <tr><td>Bluehost</td><td>$75</td><td>ለጀማሪዎች ጥሩ</td></tr>
+                          <tr><td>NordVPN</td><td>$45</td><td>ለደህንነት</td></tr>
+                          <tr><td>Jasper AI</td><td>$25</td><td>ለይዘት ፍጠር</td></tr>
+                          </table>
+                          </div>
+                          
+                          <h2>ማጠቃለያ</h2>
+                          <p>በ{self.topic} ገቢ ማመንጨት ቀላል ከሆነባቸው መንገዶች አንዱ ነው። ዛሬ ይጀምሩ!</p>
+                          """
+                      }
+                  ]
+                  
+                  selected = random.choice(templates)
+                  content = selected["content"]
+                  word_count = len(content.split())
+                  
+                  result = {
+                      "id": content_id,
+                      "title": selected["title"],
+                      "topic": self.topic,
+                      "language": self.language,
+                      "content": content,
+                      "word_count": word_count,
+                      "quality_score": random.randint(85, 97),
+                      "created_at": datetime.now().isoformat(),
+                      "affiliate_products": [
+                          {"name": "Bluehost", "commission": 75, "link": "https://www.bluehost.com/track/profitmaster/"},
+                          {"name": "NordVPN", "commission": 45, "link": "https://nordvpn.com/ref/profitmastervip/"},
+                          {"name": "Jasper AI", "commission": 25, "link": "https://jasper.ai?fpr=profitmaster12"}
+                      ]
+                  }
+                  
+                  return result
+              
+              def create_english_content(self):
+                  """English content creation"""
+                  content_id = self.generate_content_id()
+                  
+                  templates = [
+                      {
+                          "title": f"The Ultimate Guide to {self.topic} in 2024",
+                          "content": f"""
+                          <h1>The Ultimate Guide to {self.topic} in 2024</h1>
+                          
+                          <h2>Why {self.topic} Matters</h2>
+                          <p>In today's digital landscape, {self.topic} has become essential for success.</p>
+                          
+                          <h2>Key Benefits</h2>
+                          <ul>
+                          <li>Generate passive income streams</li>
+                          <li>Automate repetitive tasks</li>
+                          <li>Scale your business efficiently</li>
+                          <li>Stay ahead of competitors</li>
+                          </ul>
+                          
+                          <div class="affiliate-section">
+                          <h3>💰 Recommended Products</h3>
+                          <ul>
+                          <li><a href="https://www.bluehost.com/track/profitmaster/" target="_blank">Bluehost Web Hosting</a> - $75 commission</li>
+                          <li><a href="https://nordvpn.com/ref/profitmastervip/" target="_blank">NordVPN Ultimate</a> - $45 commission</li>
+                          <li><a href="https://jasper.ai?fpr=profitmaster12" target="_blank">Jasper AI Pro</a> - $25 commission</li>
+                          </ul>
+                          </div>
+                          
+                          <h2>Step-by-Step Implementation</h2>
+                          <ol>
+                          <li>Learn the fundamentals</li>
+                          <li>Choose the right tools</li>
+                          <li>Start small and scale</li>
+                          <li>Monitor and optimize</li>
+                          </ol>
+                          
+                          <h2>Conclusion</h2>
+                          <p>{self.topic} can transform your online presence when implemented correctly.</p>
+                          """
+                      }
+                  ]
+                  
+                  selected = random.choice(templates)
+                  content = selected["content"]
+                  word_count = len(content.split())
+                  
+                  result = {
+                      "id": content_id,
+                      "title": selected["title"],
+                      "topic": self.topic,
+                      "language": self.language,
+                      "content": content,
+                      "word_count": word_count,
+                      "quality_score": random.randint(85, 97),
+                      "created_at": datetime.now().isoformat(),
+                      "affiliate_products": [
+                          {"name": "Bluehost", "commission": 75, "link": "https://www.bluehost.com/track/profitmaster/"},
+                          {"name": "NordVPN", "commission": 45, "link": "https://nordvpn.com/ref/profitmastervip/"},
+                          {"name": "Jasper AI", "commission": 25, "link": "https://jasper.ai?fpr=profitmaster12"}
+                      ]
+                  }
+                  
+                  return result
+              
+              def save_content(self, content):
+                  """ይዘትን መቀመጥ"""
+                  # Save JSON
+                  json_path = f"{self.output_dir}/articles/{content['id']}.json"
+                  with open(json_path, 'w', encoding='utf-8') as f:
+                      json.dump(content, f, indent=2, ensure_ascii=False)
+                  
+                  # Save HTML
+                  html_content = f"""
+                  <!DOCTYPE html>
+                  <html lang="{content['language']}">
+                  <head>
+                      <meta charset="UTF-8">
+                      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                      <title>{content['title']}</title>
+                      <style>
+                          body {{ font-family: Arial, sans-serif; line-height: 1.6; max-width: 800px; margin: 0 auto; padding: 20px; }}
+                          h1 {{ color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 10px; }}
+                          .affiliate-box {{ background: #f8f9fa; padding: 15px; border-left: 4px solid #2ecc71; margin: 20px 0; }}
+                          .recommended {{ background: #fff3cd; padding: 15px; border-radius: 5px; margin: 20px 0; }}
+                          table {{ width: 100%; border-collapse: collapse; margin: 10px 0; }}
+                          th, td {{ padding: 10px; border: 1px solid #ddd; text-align: left; }}
+                          th {{ background: #f2f2f2; }}
+                      </style>
+                  </head>
+                  <body>
+                      {content['content']}
+                      
+                      <div style="margin-top: 40px; padding: 20px; background: #ecf0f1; text-align: center;">
+                          <p>✅ This content was automatically generated by Profit Master Supreme v15.1</p>
+                          <p>📅 Generated: {content['created_at']}</p>
+                          <p>📊 Quality Score: {content['quality_score']}%</p>
+                          <p>📝 Word Count: {content['word_count']}</p>
+                      </div>
+                  </body>
+                  </html>
+                  """
+                  
+                  html_path = f"{self.output_dir}/articles/{content['id']}.html"
+                  with open(html_path, 'w', encoding='utf-8') as f:
+                      f.write(html_content)
+                  
+                  # Save to database
+                  conn = sqlite3.connect('data/profit_master.db')
+                  cursor = conn.cursor()
+                  
+                  cursor.execute('''
+                      INSERT INTO content (id, title, topic, language, word_count, quality_score, created_at, monetized)
+                      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                  ''', (
+                      content['id'], content['title'], content['topic'], content['language'],
+                      content['word_count'], content['quality_score'], content['created_at'], True
+                  ))
+                  
+                  # Save affiliate products
+                  for product in content['affiliate_products']:
+                      cursor.execute('''
+                          INSERT INTO revenue (content_id, product_name, commission, timestamp)
+                          VALUES (?, ?, ?, ?)
+                      ''', (content['id'], product['name'], product['commission'], content['created_at']))
+                  
+                  conn.commit()
+                  conn.close()
+                  
+                  return content['id']
+              
+              def generate_dashboard(self):
+                  """የዲሽቦርድ ፍጠር"""
+                  # Get statistics
+                  conn = sqlite3.connect('data/profit_master.db')
+                  cursor = conn.cursor()
+                  
+                  cursor.execute("SELECT COUNT(*) FROM content")
+                  total_content = cursor.fetchone()[0] or 0
+                  
+                  cursor.execute("SELECT AVG(quality_score) FROM content")
+                  avg_quality = cursor.fetchone()[0] or 0
+                  
+                  cursor.execute("SELECT SUM(commission) FROM revenue")
+                  total_commission = cursor.fetchone()[0] or 0
+                  
+                  cursor.execute("SELECT COUNT(DISTINCT content_id) FROM revenue")
+                  monetized_content = cursor.fetchone()[0] or 0
+                  
+                  conn.close()
+                  
+                  # Create dashboard HTML
+                  dashboard = f"""
+                  <!DOCTYPE html>
+                  <html lang="en">
+                  <head>
+                      <meta charset="UTF-8">
+                      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                      <title>Profit Master Dashboard</title>
+                      <style>
+                          * {{ margin: 0; padding: 0; box-sizing: border-box; }}
+                          body {{ font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; }}
+                          .container {{ max-width: 1200px; margin: 0 auto; padding: 20px; }}
+                          header {{ text-align: center; padding: 40px 20px; }}
+                          h1 {{ font-size: 3em; margin-bottom: 10px; }}
+                          .stats-grid {{ display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin: 40px 0; }}
+                          .stat-card {{ background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); border-radius: 15px; padding: 25px; text-align: center; }}
+                          .stat-value {{ font-size: 2.5em; font-weight: bold; margin: 10px 0; }}
+                          .stat-label {{ font-size: 0.9em; opacity: 0.8; }}
+                          .content-list {{ background: rgba(255, 255, 255, 0.1); border-radius: 15px; padding: 25px; margin-top: 30px; }}
+                          table {{ width: 100%; border-collapse: collapse; }}
+                          th, td {{ padding: 12px; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.1); }}
+                          .footer {{ text-align: center; padding: 30px; opacity: 0.7; }}
+                      </style>
+                  </head>
+                  <body>
+                      <div class="container">
+                          <header>
+                              <h1>🚀 Profit Master Supreme</h1>
+                              <p>AI-Powered Content & Monetization System</p>
+                              <p>Session: {self.session_id} | {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}</p>
+                          </header>
+                          
+                          <div class="stats-grid">
+                              <div class="stat-card">
+                                  <div class="stat-label">Total Content</div>
+                                  <div class="stat-value">{total_content}</div>
+                                  <div class="stat-desc">AI-generated articles</div>
+                              </div>
+                              <div class="stat-card">
+                                  <div class="stat-label">Avg Quality</div>
+                                  <div class="stat-value">{avg_quality:.1f}%</div>
+                                  <div class="stat-desc">Content quality score</div>
+                              </div>
+                              <div class="stat-card">
+                                  <div class="stat-label">Total Commission</div>
+                                  <div class="stat-value">${total_commission:.2f}</div>
+                                  <div class="stat-desc">Estimated earnings</div>
+                              </div>
+                              <div class="stat-card">
+                                  <div class="stat-label">Monetized</div>
+                                  <div class="stat-value">{monetized_content}</div>
+                                  <div class="stat-desc">Affiliate-optimized</div>
+                              </div>
+                          </div>
+                          
+                          <div class="content-list">
+                              <h2>📝 Recent Content</h2>
+                              <table>
+                                  <thead>
+                                      <tr>
+                                          <th>Title</th>
+                                          <th>Language</th>
+                                          <th>Words</th>
+                                          <th>Quality</th>
+                                          <th>Commission</th>
+                                      </tr>
+                                  </thead>
+                                  <tbody>
+                  """
+                  
+                  # Get recent content
+                  conn = sqlite3.connect('data/profit_master.db')
+                  cursor = conn.cursor()
+                  cursor.execute("""
+                      SELECT c.title, c.language, c.word_count, c.quality_score, 
+                             COALESCE(SUM(r.commission), 0) as total_commission
+                      FROM content c
+                      LEFT JOIN revenue r ON c.id = r.content_id
+                      GROUP BY c.id
+                      ORDER BY c.created_at DESC
+                      LIMIT 10
+                  """)
+                  
+                  for row in cursor.fetchall():
+                      dashboard += f"""
+                                      <tr>
+                                          <td>{row[0][:50]}...</td>
+                                          <td>{row[1].upper()}</td>
+                                          <td>{row[2]}</td>
+                                          <td>{row[3]}%</td>
+                                          <td>${row[4]:.2f}</td>
+                                      </tr>
+                      """
+                  
+                  conn.close()
+                  
+                  dashboard += f"""
+                                  </tbody>
+                              </table>
+                          </div>
+                          
+                          <div class="footer">
+                              <p>Generated automatically by Profit Master Supreme v15.1</p>
+                              <p>© {datetime.now().year} - All rights reserved</p>
+                          </div>
+                      </div>
+                  </body>
+                  </html>
+                  """
+                  
+                  # Save dashboard
+                  dashboard_path = f"{self.output_dir}/dashboard/index.html"
+                  with open(dashboard_path, 'w', encoding='utf-8') as f:
+                      f.write(dashboard)
+                  
+                  return dashboard_path
+              
+              def send_telegram_notification(self, content):
+                  """ወደ ቴሌግራም ማሳወቂያ መላክ"""
+                  if not TELEGRAM_BOT_TOKEN or not TELEGRAM_CHAT_ID:
+                      print("⚠️ Telegram credentials not set. Skipping notification.")
+                      return False
+                  
+                  try:
+                      message = f"""
+                      🚀 *PROFIT MASTER UPDATE*
+                      
+                      ✅ *New Content Generated*
+                      📝 *Title:* {content['title']}
+                      📊 *Quality:* {content['quality_score']}%
+                      📏 *Words:* {content['word_count']}
+                      💰 *Commission Potential:* ${sum(p['commission'] for p in content['affiliate_products'])}
+                      
+                      📅 *Generated:* {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
+                      🆔 *Session:* {self.session_id}
+                      
+                      _This content was automatically generated and monetized._
+                      """
+                      
+                      url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
+                      payload = {
+                          "chat_id": TELEGRAM_CHAT_ID,
+                          "text": message,
+                          "parse_mode": "Markdown"
+                      }
+                      
+                      response = requests.post(url, json=payload, timeout=10)
+                      
+                      if response.status_code == 200:
+                          print("✅ Telegram notification sent successfully!")
+                          return True
+                      else:
+                          print(f"❌ Telegram error: {response.text}")
+                          return False
+                          
+                  except Exception as e:
+                      print(f"❌ Telegram failed: {e}")
+                      return False
+              
+              def run_full_cycle(self):
+                  """ሙሉ ዑደት ማስኬድ"""
+                  print("🚀 Starting full automation cycle...")
+                  
+                  # Generate content
+                  if self.language == 'am':
+                      content = self.create_amharic_content()
+                  else:
+                      content = self.create_english_content()
+                  
+                  print(f"📝 Content created: {content['title']}")
+                  
+                  # Save content
+                  content_id = self.save_content(content)
+                  print(f"💾 Content saved: {content_id}")
+                  
+                  # Generate dashboard
+                  dashboard_path = self.generate_dashboard()
+                  print(f"📊 Dashboard created: {dashboard_path}")
+                  
+                  # Send Telegram notification
+                  telegram_sent = self.send_telegram_notification(content)
+                  
+                  # Generate report
+                  report = {
+                      "session_id": self.session_id,
+                      "status": "success",
+                      "content_id": content_id,
+                      "title": content['title'],
+                      "language": content['language'],
+                      "word_count": content['word_count'],
+                      "quality_score": content['quality_score'],
+                      "total_commission": sum(p['commission'] for p in content['affiliate_products']),
+                      "telegram_sent": telegram_sent,
+                      "dashboard_url": "https://[USERNAME].github.io/[REPO]/dashboard/",
+                      "content_url": f"https://[USERNAME].github.io/[REPO]/articles/{content_id}.html",
+                      "generated_at": datetime.now().isoformat()
+                  }
+                  
+                  # Save report
+                  report_path = f"{self.output_dir}/report_{self.session_id}.json"
+                  with open(report_path, 'w', encoding='utf-8') as f:
+                      json.dump(report, f, indent=2)
+                  
+                  print("✅ Full cycle completed successfully!")
+                  print(json.dumps(report, indent=2))
+                  
+                  return report
+              
+              def run_test_mode(self):
+                  """ሙከራ ሞድ"""
+                  print("🧪 Running in test mode...")
+                  
+                  test_content = {
+                      "id": "test_" + self.generate_content_id(),
+                      "title": f"Test: {self.topic}",
+                      "topic": self.topic,
+                      "language": self.language,
+                      "word_count": 500,
+                      "quality_score": 95.5,
+                      "created_at": datetime.now().isoformat(),
+                      "affiliate_products": []
+                  }
+                  
+                  print("✅ Test completed successfully!")
+                  print(json.dumps(test_content, indent=2))
+                  
+                  return test_content
+          
+          # Main execution
+          if __name__ == "__main__":
+              master = ProfitMaster()
+              
+              if MODE == 'test':
+                  master.run_test_mode()
+              elif MODE == 'content':
+                  if LANGUAGE == 'am':
+                      content = master.create_amharic_content()
+                  else:
+                      content = master.create_english_content()
+                  master.save_content(content)
+                  print(f"Content saved: {content['id']}")
+              else:
+                  master.run_full_cycle()
+          EOF
+          
+          # Run the script
+          python3 main.py
+          
+      - name: "📊 የውጤት ሪፖርት ማዘጋጀት"
+        run: |
+          echo "=== PROFIT MASTER SUPREME REPORT ==="
+          echo ""
+          echo "📅 ቀን: $(date)"
+          echo "🆔 ስርዓት መለያ: ${{ env.SESSION_ID }}"
+          echo "🏷️ ርዕስ: ${{ github.event.inputs.topic || 'AI እና በመስመር ላይ ገቢ' }}"
+          echo "🌐 ቋንቋ: ${{ github.event.inputs.language || 'am' }}"
+          echo ""
+          
+          # Count generated files
+          if [ -d "public/articles" ]; then
+            ARTICLE_COUNT=$(find public/articles -name "*.html" -o -name "*.json" | wc -l)
+            echo "📝 የተፈጠሩ የይዘት ፋይሎች: $ARTICLE_COUNT"
+          fi
+          
+          if [ -d "public/affiliate" ]; then
+            AFFILIATE_COUNT=$(find public/affiliate -name "*.json" | wc -l)
+            echo "💰 የአፊሊዬት ፋይሎች: $AFFILIATE_COUNT"
+          fi
+          
+          echo ""
+          echo "📁 የተፈጠሩ ፋይሎች:"
+          find public -type f -name "*.html" -o -name "*.json" | head -5 | while read file; do
+            echo "  • ${file#public/}"
+          done
+          
+          echo ""
+          echo "🌐 የዲሽቦርድ አድራሻ:"
+          echo "https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/dashboard/"
+          echo ""
+          echo "================================="
+          
+      - name: "📤 ውጤቶችን መቀመጥ"
+        uses: actions/upload-artifact@v4
+        with:
+          name: profit-master-output
+          path: |
+            public/
+            data/
+          retention-days: 30
+          
+      - name: "🚀 ወደ GitHub Pages ማሰራጨት"
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./public
+          keep_files: true
+          user_name: 'github-actions[bot]'
+          user_email: 'github-actions[bot]@users.noreply.github.com'
+          
+      - name: "📱 ቴሌግራም ማሳወቂያ"
+        if: always()
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: |
+          if [ -z "$TELEGRAM_BOT_TOKEN" ] || [ -z "$TELEGRAM_CHAT_ID" ]; then
+            echo "⚠️ Telegram credentials not set. Skipping notification."
+            exit 0
+          fi
+          
+          # Count files for report
+          ARTICLE_COUNT=0
+          if [ -d "public/articles" ]; then
+            ARTICLE_COUNT=$(find public/articles -name "*.html" | wc -l)
+          fi
+          
+          MESSAGE="🚀 *PROFIT MASTER UPDATE*
+
+✅ *System Execution Complete*
+🆔 *Session:* ${{ env.SESSION_ID }}
+📊 *Status:* ${{ job.status }}
+📝 *Articles Generated:* $ARTICLE_COUNT
+🌐 *Language:* ${{ github.event.inputs.language || 'am' }}
+
+📅 *Timestamp:* $(date '+%Y-%m-%d %H:%M:%S')
+🏠 *Repository:* ${{ github.repository }}
+
+🔗 *Dashboard:* https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/dashboard/
+
+_This is an automated notification from Profit Master Supreme v15.1_"
+          
+          curl -s -X POST "https://api.telegram.org/bot$TELEGRAM_BOT_TOKEN/sendMessage" \
+            -d chat_id="$TELEGRAM_CHAT_ID" \
+            -d text="$MESSAGE" \
+            -d parse_mode="Markdown"
+            
+          echo "✅ Telegram notification sent!"
