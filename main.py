@@ -33,12 +33,19 @@ import aiohttp
 import httpx
 import google.generativeai as genai  # Corrected
 from gtts import gTTS  # Corrected
-- name: "🔧 Install System Dependencies"
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y ffmpeg imagemagick
-          # ImageMagick policy fix for MoviePy
-          sudo sed -i 's/none/read,write/g' /etc/ImageMagick-6/policy.xml
+# MoviePy Import Fix
+try:
+    from moviepy import * 
+except ImportError:
+    try:
+        from moviepy.editor import *
+    except ImportError:
+        print("⚠️ MoviePy library not found or incompatible. Video features disabled.")
+        # Dummy classes to prevent NameError later in the code
+        class VideoFileClip: pass
+        class TextClip: pass
+        class CompositeVideoClip: pass
+        class AudioFileClip: pass
 import pytube  # Corrected
 import yt_dlp
 import tweepy  # Corrected
