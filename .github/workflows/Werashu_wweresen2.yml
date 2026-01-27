@@ -44,17 +44,20 @@ jobs:
       - name: "📦 Install Python Libraries"
         run: |
           pip install --upgrade pip
-          
-          # ያንተ ስክሪፕት የሚፈልጋቸው ጥገኞች (Dependencies)
+          # ልክ እንደ requirements.txt የተስተካከለውን ጫን
           pip install \
             aiohttp httpx requests pandas numpy schedule \
             groq google-generativeai openai anthropic cohere \
-            gtts moviepy pytube yt-dlp Pillow \
+            gtts moviepy>=2.0.0 pytube yt-dlp Pillow \
             beautifulsoup4 selenium tweepy \
             sqlalchemy redis fastapi uvicorn \
-            nltk spacy textblob pydantic prometheus-client boto3
+            nltk spacy textblob pydantic prometheus-client boto3 \
+            deep-translator transformers
 
-          # NLTK Data ማውረድ (ለቋንቋ ትንተና ያስፈልጋል)
+          # ቶርች (Torch) ለየብቻ (ቀላል እንዲሆን)
+          pip install torch --index-url https://download.pytorch.org/whl/cpu
+
+          # NLTK Data
           python -m textblob.download_corpora
           python -m nltk.downloader punkt stopwords wordnet
           python -m spacy download en_core_web_sm || true
