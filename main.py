@@ -33,7 +33,12 @@ import aiohttp
 import httpx
 import google.generativeai as genai  # Corrected
 from gtts import gTTS  # Corrected
-from moviepy.editor import *
+- name: "🔧 Install System Dependencies"
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg imagemagick
+          # ImageMagick policy fix for MoviePy
+          sudo sed -i 's/none/read,write/g' /etc/ImageMagick-6/policy.xml
 import pytube  # Corrected
 import yt_dlp
 import tweepy  # Corrected
