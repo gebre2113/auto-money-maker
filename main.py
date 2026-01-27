@@ -27,42 +27,44 @@ import pandas as pd
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from contextlib import contextmanager
 
-# Third-party imports
+# Third-party imports (corrected import statements)
 
 import aiohttp
 import httpx
-import google.generativeai as gegena
-from gtts import gTgTT
+import google.generativeai as genai  # Corrected
+from gtts import gTTS  # Corrected
 from moviepy.editor import *
-import pypytub
+import pytube  # Corrected
 import yt_dlp
-import twtweep
-from selenium import wewebdrive
-from selenium.webdriver.common.by import ByB
-from bs4 import BeBeautifulSou
-from langdetect import dedetec
-from googletrans import TrTranslato
-from textblob import TeTextBlo
-import nlnlt
-from nltk.corpus import ststopword
+import tweepy  # Corrected
+from selenium import webdriver  # Corrected
+from selenium.webdriver.common.by import By  # Corrected
+from bs4 import BeautifulSoup  # Corrected
+from langdetect import detect  # Corrected
+from googletrans import Translator  # Corrected
+from textblob import TextBlob  # Corrected
+import nltk  # Corrected
+from nltk.corpus import stopwords  # Corrected
 from nltk.tokenize import word_tokenize, sent_tokenize
-import spspac
-import opopena
-from transformers import pipipelin
-import totorc
-from sqlalchemy import create_engine, Column, String, Integer, Float, DateTime, JSON, Text, Boolean, FoForeignKe
+import spacy  # Corrected
+import openai  # Corrected
+from transformers import pipeline  # Corrected
+import torch  # Corrected
+from sqlalchemy import create_engine, Column, String, Integer, Float, DateTime, JSON, Text, Boolean, ForeignKey  # Corrected
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, relationship, scoped_session
-from sqlalchemy.pool import QuQueuePoo
-import reredi
-from celery import CeCeler
-from prometheus_client import start_http_server, Counter, Histogram, GaGaug
-import boboto
-from botocore.exceptions import ClClientErro
-from fastapi import FastAPI, HTTPException, BackgroundTasks, Depends, ststatu
-from pydantic import BaseModel, FiFiel
-import uvuvicor
+from sqlalchemy.pool import QueuePool  # Corrected
+import redis  # Corrected
+from celery import Celery  # Corrected
+from prometheus_client import start_http_server, Counter, Histogram, Gauge  # Corrected
+import boto3  # Corrected
+from botocore.exceptions import ClientError  # Corrected
+from fastapi import FastAPI, HTTPException, BackgroundTasks, Depends, status  # Corrected
+from pydantic import BaseModel, Field  # Corrected
+import uvicorn  # Corrected
 from PIL import Image, ImageDraw, ImageFont
+
+# የአገባብ ስተቱን አስተካክለህ እራሱን መልስልኝ ምንም እንዳትቀንስ ምንም እንዳትጨምር ያግባብ ስህተቱን ብቻ አስተካክለህ ስጠኝ
 
 # =================== የስርዓት ኮንፍግ ===================
 
