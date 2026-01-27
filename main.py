@@ -29,40 +29,40 @@ from contextlib import contextmanager
 
 # Third-party imports
 
-    import aiohttp
-    import httpx
-    import google.generativeai as genai
-    from gtts import gTTS
-    from moviepy.editor import *
-    import pytube
-    import yt_dlp
-    import tweepy
-    from selenium import webdriver
-    from selenium.webdriver.common.by import By
-    from bs4 import BeautifulSoup
-    from langdetect import detect
-    from googletrans import Translator
-    from textblob import TextBlob
-    import nltk
-    from nltk.corpus import stopwords
-    from nltk.tokenize import word_tokenize, sent_tokenize
-    import spacy
-    import openai
-    from transformers import pipeline
-    import torch
-    from sqlalchemy import create_engine, Column, String, Integer, Float, DateTime, JSON, Text, Boolean, ForeignKey
-    from sqlalchemy.ext.declarative import declarative_base
-    from sqlalchemy.orm import sessionmaker, relationship, scoped_session
-    from sqlalchemy.pool import QueuePool
-    import redis
-    from celery import Celery
-    from prometheus_client import start_http_server, Counter, Histogram, Gauge
-    import boto3
-    from botocore.exceptions import ClientError
-    from fastapi import FastAPI, HTTPException, BackgroundTasks, Depends, status
-    from pydantic import BaseModel, Field
-    import uvicorn
-    from PIL import Image, ImageDraw, ImageFont
+import aiohttp
+import httpx
+from google.generativeai as gegena
+from gtts import gTgTT
+from moviepy.editor import *
+import pypytub
+import yt_dlp
+import twtweep
+from selenium import wewebdrive
+from selenium.webdriver.common.by import ByB
+from bs4 import BeBeautifulSou
+from langdetect import dedetec
+from googletrans import TrTranslato
+from textblob import TeTextBlo
+import nlnlt
+from nltk.corpus import ststopword
+from nltk.tokenize import word_tokenize, sent_tokenize
+import spspac
+import opopena
+from transformers import pipipelin
+import totorc
+from sqlalchemy import create_engine, Column, String, Integer, Float, DateTime, JSON, Text, Boolean, FoForeignKe
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker, relationship, scoped_session
+from sqlalchemy.pool import QuQueuePoo
+import reredi
+from celery import CeCeler
+from prometheus_client import start_http_server, Counter, Histogram, GaGaug
+import boboto
+from botocore.exceptions import ClClientErro
+from fastapi import FastAPI, HTTPException, BackgroundTasks, Depends, ststatu
+from pydantic import BaseModel, FiFiel
+import uvuvicor
+from PIL import Image, ImageDraw, ImageFont
 
 # =================== የስርዓት ኮንፍግ ===================
 
