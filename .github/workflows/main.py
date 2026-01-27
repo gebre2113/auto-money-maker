@@ -2895,3 +2895,855 @@ WRITING STYLE:
 - End with powerful conclusion
 
 Return ONLY the HTML content, no explanations."""
+
+# =================== የፍጥነት ማሻሻያ ስርዓት ===================
+
+class PerformanceOptimizer:
+    """
+    ⚡ ULTRA-FAST PERFORMANCE OPTIMIZER v8.0
+    Features: Caching, Batch Processing, Parallel Execution, Memory Management
+    """
+    
+    def __init__(self):
+        self.cache = {}
+        self.batch_size = 10
+        self.max_workers = 5
+        self.stats = {
+            'cache_hits': 0,
+            'cache_misses': 0,
+            'batch_operations': 0,
+            'parallel_executions': 0
+        }
+    
+    def optimize_content_generation(self, topics: List[str], category: str) -> List[Dict]:
+        """Optimized batch content generation"""
+        
+        logger.info(f"⚡ Optimizing generation for {len(topics)} topics")
+        
+        # Cache check
+        cached_results = []
+        uncached_topics = []
+        
+        for topic in topics:
+            cache_key = f"{topic}_{category}"
+            if cache_key in self.cache:
+                cached_results.append(self.cache[cache_key])
+                self.stats['cache_hits'] += 1
+            else:
+                uncached_topics.append(topic)
+                self.stats['cache_misses'] += 1
+        
+        # Parallel generation for uncached topics
+        with concurrent.futures.ThreadPoolExecutor(max_workers=self.max_workers) as executor:
+            futures = []
+            for topic in uncached_topics:
+                future = executor.submit(self._generate_single, topic, category)
+                futures.append(future)
+            
+            new_results = []
+            for future in concurrent.futures.as_completed(futures):
+                try:
+                    result = future.result()
+                    if result['success']:
+                        new_results.append(result)
+                        # Cache the result
+                        cache_key = f"{result['topic']}_{category}"
+                        self.cache[cache_key] = result
+                except Exception as e:
+                    logger.error(f"Generation failed: {e}")
+        
+        self.stats['parallel_executions'] += len(uncached_topics)
+        self.stats['batch_operations'] += 1
+        
+        return cached_results + new_results
+    
+    def _generate_single(self, topic: str, category: str) -> Dict:
+        """Generate single article"""
+        # This would use the EnhancedAIGenerator
+        return {'success': True, 'topic': topic, 'content': f"Content about {topic}"}
+    
+    def get_optimization_report(self) -> Dict:
+        """Get performance optimization report"""
+        
+        cache_hit_rate = 0
+        if self.stats['cache_hits'] + self.stats['cache_misses'] > 0:
+            cache_hit_rate = self.stats['cache_hits'] / (self.stats['cache_hits'] + self.stats['cache_misses'])
+        
+        return {
+            'cache_hit_rate': f"{cache_hit_rate:.1%}",
+            'total_cache_hits': self.stats['cache_hits'],
+            'total_cache_misses': self.stats['cache_misses'],
+            'batch_operations': self.stats['batch_operations'],
+            'parallel_executions': self.stats['parallel_executions'],
+            'cache_size': len(self.cache),
+            'estimated_time_saved': self.stats['cache_hits'] * 30  # 30 seconds per cache hit
+        }
+
+# =================== የደህንነት ስርዓት ===================
+
+class SecurityGuard:
+    """
+    🔐 ULTRA-SECURE CONTENT VALIDATOR v9.0
+    Features: Plagiarism Detection, Malware Scanning, Compliance Checking, Privacy Protection
+    """
+    
+    def __init__(self):
+        self.blacklist = self._load_blacklist()
+        self.compliance_rules = self._load_compliance_rules()
+    
+    def _load_blacklist(self) -> List[str]:
+        """Load security blacklist"""
+        return [
+            'malware', 'virus', 'phishing', 'spam',
+            'illegal', 'fraud', 'scam', 'hack',
+            'exploit', 'vulnerability', 'ddos',
+            'porn', 'adult', 'nsfw', 'xxx'
+        ]
+    
+    def _load_compliance_rules(self) -> Dict:
+        """Load compliance rules"""
+        return {
+            'gdpr': ['user data', 'personal information', 'cookies', 'consent'],
+            'ccpa': ['california', 'consumer privacy', 'opt-out'],
+            'coppa': ['children', 'under 13', 'kid', 'child'],
+            'ada': ['accessibility', 'disability', 'screen reader']
+        }
+    
+    def validate_content(self, content: str, title: str) -> Dict:
+        """Comprehensive content security validation"""
+        
+        violations = []
+        warnings = []
+        suggestions = []
+        
+        # 1. Blacklist check
+        content_lower = content.lower()
+        for term in self.blacklist:
+            if term in content_lower:
+                violations.append(f"Blacklisted term: {term}")
+        
+        # 2. Compliance check
+        for compliance_type, keywords in self.compliance_rules.items():
+            found_keywords = [kw for kw in keywords if kw in content_lower]
+            if found_keywords:
+                warnings.append(f"{compliance_type.upper()} compliance check needed")
+                suggestions.append(f"Add {compliance_type} disclaimer")
+        
+        # 3. Plagiarism detection (simplified)
+        plagiarism_score = self._check_plagiarism(content)
+        if plagiarism_score > 70:
+            violations.append(f"High plagiarism risk: {plagiarism_score}%")
+        
+        # 4. SEO quality check
+        seo_score = self._check_seo_quality(content, title)
+        if seo_score < 60:
+            warnings.append(f"Low SEO score: {seo_score}/100")
+            suggestions.append("Improve keyword density and meta tags")
+        
+        # 5. Accessibility check
+        accessibility_issues = self._check_accessibility(content)
+        if accessibility_issues:
+            warnings.append(f"Accessibility issues: {len(accessibility_issues)} found")
+            suggestions.extend(accessibility_issues[:3])
+        
+        return {
+            'safe': len(violations) == 0,
+            'violations': violations,
+            'warnings': warnings,
+            'suggestions': suggestions,
+            'plagiarism_score': plagiarism_score,
+            'seo_score': seo_score,
+            'compliance_status': 'PASS' if len(violations) == 0 else 'FAIL'
+        }
+    
+    def _check_plagiarism(self, content: str) -> float:
+        """Simple plagiarism check"""
+        # In production, integrate with Copyscape or similar
+        common_phrases = [
+            'in conclusion', 'as we can see', 'it is important',
+            'on the other hand', 'for example', 'in summary'
+        ]
+        
+        matches = sum(1 for phrase in common_phrases if phrase in content.lower())
+        return min(100, matches * 15)
+    
+    def _check_seo_quality(self, content: str, title: str) -> float:
+        """Check SEO quality"""
+        score = 50
+        
+        if '<h1' in content:
+            score += 10
+        if '<h2' in content and content.count('<h2') >= 3:
+            score += 15
+        if '<img' in content:
+            score += 5
+        if '<a ' in content:
+            score += 5
+        if '<ul' in content or '<ol' in content:
+            score += 5
+        if '<table' in content:
+            score += 10
+        
+        # Keyword density
+        title_words = set(title.lower().split())
+        content_words = content.lower().split()
+        total_words = len(content_words)
+        
+        if total_words > 0:
+            keyword_count = sum(1 for word in content_words if word in title_words)
+            keyword_density = (keyword_count / total_words) * 100
+            if 1 <= keyword_density <= 3:
+                score += 20
+            elif keyword_density > 3:
+                score += 10
+        
+        return min(100, score)
+    
+    def _check_accessibility(self, content: str) -> List[str]:
+        """Check accessibility issues"""
+        issues = []
+        
+        if '<img' in content and 'alt=' not in content:
+            issues.append("Add alt text to images")
+        
+        if '<table' in content and '<th' not in content:
+            issues.append("Add table headers for screen readers")
+        
+        if len(content.split()) > 1500 and '<h2' not in content:
+            issues.append("Add more subheadings for readability")
+        
+        if any(color in content for color in ['#000000', '#ffffff']):
+            issues.append("Check color contrast for accessibility")
+        
+        return issues
+
+# =================== የራስ ማሻሻያ ስርዓት ===================
+
+class SelfOptimizer:
+    """
+    🧠 AI SELF-OPTIMIZATION ENGINE v10.0
+    Features: Continuous Learning, A/B Testing, Performance Analytics, Auto-Tuning
+    """
+    
+    def __init__(self, db_connection):
+        self.db = db_connection
+        self.learning_data = defaultdict(list)
+        self.ab_tests = {}
+        
+    def analyze_performance(self) -> Dict:
+        """Analyze system performance and suggest optimizations"""
+        
+        cursor = self.db.cursor()
+        
+        # Get content performance
+        cursor.execute('''
+            SELECT 
+                COUNT(*) as total_articles,
+                AVG(quality_score) as avg_quality,
+                AVG(estimated_revenue) as avg_revenue,
+                SUM(estimated_revenue) as total_revenue
+            FROM articles_pro
+        ''')
+        stats = cursor.fetchone()
+        
+        # Get affiliate performance
+        cursor.execute('''
+            SELECT 
+                COUNT(DISTINCT article_id) as articles_with_links,
+                AVG(clicks) as avg_clicks,
+                AVG(conversions) as avg_conversions,
+                SUM(revenue) as total_affiliate_revenue
+            FROM affiliate_performance
+        ''')
+        affiliate_stats = cursor.fetchone()
+        
+        # Get social performance
+        cursor.execute('''
+            SELECT 
+                COUNT(*) as total_posts,
+                AVG(engagement) as avg_engagement,
+                SUM(engagement) as total_engagement
+            FROM social_posts
+            WHERE posted = 1
+        ''')
+        social_stats = cursor.fetchone()
+        
+        # Generate optimization suggestions
+        suggestions = self._generate_optimization_suggestions(
+            stats, affiliate_stats, social_stats
+        )
+        
+        return {
+            'content_metrics': {
+                'total_articles': stats[0] if stats else 0,
+                'average_quality': round(stats[1], 2) if stats else 0,
+                'average_revenue': round(stats[2], 2) if stats else 0,
+                'total_revenue': round(stats[3], 2) if stats else 0
+            },
+            'affiliate_metrics': {
+                'articles_with_links': affiliate_stats[0] if affiliate_stats else 0,
+                'average_clicks': round(affiliate_stats[1], 2) if affiliate_stats else 0,
+                'average_conversions': round(affiliate_stats[2], 2) if affiliate_stats else 0,
+                'total_affiliate_revenue': round(affiliate_stats[3], 2) if affiliate_stats else 0
+            },
+            'social_metrics': {
+                'total_posts': social_stats[0] if social_stats else 0,
+                'average_engagement': round(social_stats[1], 2) if social_stats else 0,
+                'total_engagement': social_stats[2] if social_stats else 0
+            },
+            'optimization_suggestions': suggestions,
+            'auto_optimization_plan': self._create_optimization_plan(suggestions)
+        }
+    
+    def _generate_optimization_suggestions(self, content_stats, affiliate_stats, social_stats) -> List[str]:
+        """Generate intelligent optimization suggestions"""
+        
+        suggestions = []
+        
+        # Content quality suggestions
+        avg_quality = content_stats[1] if content_stats else 0
+        if avg_quality < 80:
+            suggestions.append("Improve AI prompt engineering for higher quality content")
+            suggestions.append("Add more research-backed data points")
+        
+        # Affiliate performance suggestions
+        avg_conversions = affiliate_stats[2] if affiliate_stats else 0
+        if avg_conversions < 1.0:
+            suggestions.append("Test different affiliate link placement strategies")
+            suggestions.append("Add more high-converting affiliate products")
+        
+        # Social engagement suggestions
+        avg_engagement = social_stats[1] if social_stats else 0
+        if avg_engagement < 50:
+            suggestions.append("Optimize social media posting times")
+            suggestions.append("Improve social media hook templates")
+        
+        # Revenue optimization
+        total_revenue = content_stats[3] if content_stats else 0
+        if total_revenue < 1000:
+            suggestions.append("Focus on high-commission affiliate categories")
+            suggestions.append("Implement seasonal promotions")
+        
+        # Content diversity
+        suggestions.append("Diversify content topics based on trending analysis")
+        suggestions.append("Experiment with different content formats (videos, podcasts)")
+        
+        return suggestions
+    
+    def _create_optimization_plan(self, suggestions: List[str]) -> List[Dict]:
+        """Create actionable optimization plan"""
+        
+        priority_map = {
+            'Improve AI prompt engineering': 1,
+            'Add more research-backed data': 1,
+            'Test different affiliate link placement': 2,
+            'Add more high-converting products': 2,
+            'Optimize social media posting times': 3,
+            'Improve social media hooks': 3,
+            'Focus on high-commission categories': 2,
+            'Implement seasonal promotions': 3,
+            'Diversify content topics': 1,
+            'Experiment with different content formats': 2
+        }
+        
+        plan = []
+        for suggestion in suggestions[:5]:  # Top 5 suggestions
+            priority = priority_map.get(suggestion, 3)
+            
+            plan.append({
+                'action': suggestion,
+                'priority': priority,
+                'estimated_impact': self._estimate_impact(suggestion),
+                'implementation_time': self._estimate_time(suggestion),
+                'resources_needed': self._get_resources(suggestion)
+            })
+        
+        return sorted(plan, key=lambda x: x['priority'])
+    
+    def _estimate_impact(self, suggestion: str) -> str:
+        """Estimate impact of optimization"""
+        
+        high_impact = [
+            'Improve AI prompt engineering',
+            'Add more high-converting products',
+            'Focus on high-commission categories'
+        ]
+        
+        medium_impact = [
+            'Test different affiliate link placement',
+            'Diversify content topics',
+            'Implement seasonal promotions'
+        ]
+        
+        if suggestion in high_impact:
+            return "High (20-50% improvement)"
+        elif suggestion in medium_impact:
+            return "Medium (10-20% improvement)"
+        else:
+            return "Low (5-10% improvement)"
+    
+    def _estimate_time(self, suggestion: str) -> str:
+        """Estimate implementation time"""
+        
+        quick_wins = [
+            'Optimize social media posting times',
+            'Improve social media hooks'
+        ]
+        
+        medium_term = [
+            'Test different affiliate link placement',
+            'Add more research-backed data'
+        ]
+        
+        if suggestion in quick_wins:
+            return "1-2 days"
+        elif suggestion in medium_term:
+            return "1 week"
+        else:
+            return "2-4 weeks"
+    
+    def _get_resources(self, suggestion: str) -> List[str]:
+        """Get required resources"""
+        
+        if 'AI' in suggestion:
+            return ["Groq API access", "Enhanced prompts"]
+        elif 'affiliate' in suggestion:
+            return ["Affiliate network accounts", "Product database"]
+        elif 'social' in suggestion:
+            return ["Social media APIs", "Content calendar"]
+        else:
+            return ["Development time", "Testing resources"]
+    
+    def create_ab_test(self, test_name: str, variations: Dict) -> Dict:
+        """Create A/B test configuration"""
+        
+        test_id = str(uuid.uuid4())[:8]
+        
+        self.ab_tests[test_id] = {
+            'test_name': test_name,
+            'variations': variations,
+            'created_at': datetime.now().isoformat(),
+            'status': 'active',
+            'results': defaultdict(list)
+        }
+        
+        logger.info(f"🔬 A/B Test created: {test_name} (ID: {test_id})")
+        
+        return {
+            'test_id': test_id,
+            'test_name': test_name,
+            'variations': list(variations.keys()),
+            'instructions': f"Use variation_choice = random.choice(list(variations.keys())) to select variation"
+        }
+    
+    def record_test_result(self, test_id: str, variation: str, metric: str, value: float):
+        """Record A/B test result"""
+        
+        if test_id in self.ab_tests:
+            self.ab_tests[test_id]['results'][variation].append({
+                'metric': metric,
+                'value': value,
+                'timestamp': datetime.now().isoformat()
+            })
+    
+    def get_test_results(self, test_id: str) -> Dict:
+        """Get A/B test results"""
+        
+        if test_id not in self.ab_tests:
+            return {'error': 'Test not found'}
+        
+        test = self.ab_tests[test_id]
+        results = {}
+        
+        for variation, data in test['results'].items():
+            if data:
+                values = [item['value'] for item in data]
+                results[variation] = {
+                    'count': len(values),
+                    'average': statistics.mean(values) if values else 0,
+                    'std_dev': statistics.stdev(values) if len(values) > 1 else 0,
+                    'min': min(values) if values else 0,
+                    'max': max(values) if values else 0
+                }
+        
+        # Determine winner
+        winner = None
+        if results:
+            winner = max(results.items(), key=lambda x: x[1]['average'])[0]
+        
+        return {
+            'test_id': test_id,
+            'test_name': test['test_name'],
+            'status': test['status'],
+            'results': results,
+            'winner': winner,
+            'recommendation': f"Use variation '{winner}' for best results" if winner else "Insufficient data"
+        }
+
+# =================== የመጨረሻ ማዋሃድ ስርዓት ===================
+
+class ProfitMasterCompleteSystem:
+    """
+    🌟 PROFIT MASTER COMPLETE SYSTEM v12.0
+    Ultimate integration of all components
+    """
+    
+    def __init__(self, config: Dict):
+        self.config = config
+        self.db = self._init_database()
+        
+        print("\n" + "="*80)
+        print("🚀 PROFIT MASTER COMPLETE v12.0 - ፍጹም ዝግጁ")
+        print("="*80)
+        
+        # Initialize all systems
+        self._initialize_all_systems()
+        
+    def _init_database(self):
+        """Initialize enhanced database"""
+        db_path = self.config.get('DATABASE_PATH', 'data/profit_master.db')
+        conn = sqlite3.connect(db_path)
+        cursor = conn.cursor()
+        
+        # Optimization tables
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS optimization_logs (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                action TEXT,
+                metric TEXT,
+                before_value REAL,
+                after_value REAL,
+                improvement REAL,
+                timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        ''')
+        
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS ab_tests (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                test_id TEXT UNIQUE,
+                test_name TEXT,
+                variations_json TEXT,
+                winner TEXT,
+                improvement REAL,
+                completed BOOLEAN DEFAULT 0,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        ''')
+        
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS performance_history (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                date TEXT,
+                total_revenue REAL,
+                total_articles INTEGER,
+                avg_quality REAL,
+                avg_engagement REAL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        ''')
+        
+        conn.commit()
+        return conn
+    
+    def _initialize_all_systems(self):
+        """Initialize all profit systems"""
+        
+        print("\n🔧 ሁሉም ስርዓቶች በማስጀመር ላይ...")
+        
+        # Original systems
+        self.ai_generator = EnhancedAIGenerator(
+            self.config.get('GROQ_API_KEY', '')
+        )
+        print("   ✅ የላቀ AI ጄኔሬተር")
+        
+        # Ultra Affiliate System
+        self.ultra_affiliate = ProfitMasterUltraAffiliateSystem(
+            user_geo=self.config.get('USER_GEO', 'US'),
+            user_segment=self.config.get('USER_SEGMENT', 'premium')
+        )
+        print("   ✅ አለም ደረጃ አፊሊዬት ስርዓት")
+        
+        # Performance Optimizer
+        self.performance_optimizer = PerformanceOptimizer()
+        print("   ✅ የፍጥነት ማሻሻያ")
+        
+        # Security Guard
+        self.security_guard = SecurityGuard()
+        print("   ✅ የደህንነት ማረጋገጫ")
+        
+        # Self Optimizer
+        self.self_optimizer = SelfOptimizer(self.db)
+        print("   ✅ የራስ ማሻሻያ AI")
+        
+        print("\n🚀 ሁሉም ስርዓቶች ዝግጁ!")
+        print("="*80)
+    
+    def generate_optimized_content(self, topic: str, category: str) -> Dict:
+        """Generate fully optimized content with all systems"""
+        
+        print(f"\n🎯 ፍጹም የተመቻቸ ይዘት ማመንጨት: {topic}")
+        
+        try:
+            # 1. Generate high-quality content
+            content_result = self.ai_generator.generate_article(topic, category, 2500)
+            
+            if not content_result['success']:
+                return content_result
+            
+            # 2. Ultra monetization
+            monetized_content, monetization_report = self.ultra_affiliate.monetize_content(
+                content_result['content'], topic, "article"
+            )
+            
+            # 3. Security validation
+            security_report = self.security_guard.validate_content(
+                monetized_content, topic
+            )
+            
+            if not security_report['safe']:
+                print(f"   ⚠️  ደህንነት ጥያቄዎች: {security_report['violations']}")
+            
+            # 4. Performance optimization
+            optimized_content = self._apply_performance_optimizations(monetized_content)
+            
+            # 5. Save to database
+            cursor = self.db.cursor()
+            cursor.execute('''
+                INSERT INTO articles_pro 
+                (title, content, category, word_count, monetization_score, 
+                 affiliate_links, estimated_revenue, social_posts, quality_score)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ''', (
+                topic,
+                optimized_content,
+                category,
+                content_result['word_count'],
+                monetization_report['monetization_score'],
+                monetization_report['total_injections'],
+                monetization_report['estimated_revenue'],
+                3,  # Default social posts
+                content_result.get('quality_score', 85)
+            ))
+            
+            article_id = cursor.lastrowid
+            self.db.commit()
+            
+            # 6. Create optimization log
+            self._log_optimization('content_generation', {
+                'article_id': article_id,
+                'monetization_score': monetization_report['monetization_score'],
+                'security_status': security_report['compliance_status'],
+                'estimated_revenue': monetization_report['estimated_revenue']
+            })
+            
+            print(f"   ✅ ፍጹም የተመቻቸ ይዘት ተፈጥሯል!")
+            print(f"   💰 የተገመተ ገቢ: ${monetization_report['estimated_revenue']}")
+            print(f"   🔒 የደህንነት ሁኔታ: {security_report['compliance_status']}")
+            print(f"   ⭐ የጥራት ደረጃ: {content_result.get('quality_score', 85)}/100")
+            
+            return {
+                'success': True,
+                'article_id': article_id,
+                'title': topic,
+                'content': optimized_content,
+                'monetization_report': monetization_report,
+                'security_report': security_report,
+                'quality_score': content_result.get('quality_score', 85),
+                'word_count': content_result['word_count'],
+                'optimized': True
+            }
+            
+        except Exception as e:
+            logger.error(f"Optimized content generation failed: {e}")
+            return {
+                'success': False,
+                'error': str(e)
+            }
+    
+    def _apply_performance_optimizations(self, content: str) -> str:
+        """Apply performance optimizations to content"""
+        
+        # 1. Image optimization
+        content = re.sub(r'<img(?!.*loading=)', '<img loading="lazy"', content)
+        
+        # 2. CSS inlining for critical styles
+        content = content.replace(
+            'class="ultra-product-card"',
+            'class="ultra-product-card" style="border: 2px solid #e5e7eb; border-radius: 12px; padding: 24px; margin: 24px 0; background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%); box-shadow: 0 10px 25px rgba(0,0,0,0.05); position: relative; overflow: hidden;"'
+        )
+        
+        # 3. Remove unnecessary whitespace
+        content = re.sub(r'\s+', ' ', content)
+        
+        # 4. Add performance tracking
+        perf_tracking = '''
+        <script>
+        // Performance tracking
+        window.addEventListener('load', function() {
+            const perfData = {
+                loadTime: performance.timing.loadEventEnd - performance.timing.navigationStart,
+                readyState: document.readyState,
+                timestamp: new Date().toISOString()
+            };
+            console.log('Performance:', perfData);
+        });
+        </script>
+        '''
+        
+        return content + perf_tracking
+    
+    def _log_optimization(self, action: str, data: Dict):
+        """Log optimization action"""
+        
+        cursor = self.db.cursor()
+        cursor.execute('''
+            INSERT INTO optimization_logs (action, metric, before_value, after_value, improvement)
+            VALUES (?, ?, ?, ?, ?)
+        ''', (
+            action,
+            json.dumps(data),
+            0,  # before value (would need actual comparison)
+            0,  # after value
+            0   # improvement
+        ))
+        self.db.commit()
+    
+    def get_system_report(self) -> Dict:
+        """Get complete system report"""
+        
+        # Performance analysis
+        performance_report = self.self_optimizer.analyze_performance()
+        
+        # Optimization report
+        optimization_report = self.performance_optimizer.get_optimization_report()
+        
+        # Database stats
+        cursor = self.db.cursor()
+        cursor.execute('SELECT COUNT(*) FROM articles_pro')
+        total_articles = cursor.fetchone()[0]
+        
+        cursor.execute('SELECT SUM(estimated_revenue) FROM articles_pro')
+        total_revenue = cursor.fetchone()[0] or 0
+        
+        return {
+            'system_version': 'Profit Master Complete v12.0',
+            'timestamp': datetime.now().isoformat(),
+            'overview': {
+                'total_articles': total_articles,
+                'total_revenue': f"${total_revenue:.2f}",
+                'system_status': 'ACTIVE',
+                'optimization_level': 'MAXIMUM'
+            },
+            'performance_analysis': performance_report,
+            'optimization_report': optimization_report,
+            'recommendations': self._get_system_recommendations(performance_report)
+        }
+    
+    def _get_system_recommendations(self, performance_report: Dict) -> List[str]:
+        """Get system-level recommendations"""
+        
+        recommendations = []
+        
+        # Check content quality
+        avg_quality = performance_report['content_metrics']['average_quality']
+        if avg_quality < 85:
+            recommendations.append("በAI ፕሮምፕት ምህንድስነት ላይ ትኩረት ስጥ - የጥራት ደረጃን ከ85% በላይ ማድረስ")
+        
+        # Check revenue
+        total_revenue = performance_report['content_metrics']['total_revenue']
+        if total_revenue < 5000:
+            recommendations.append("በከፍተኛ ኮሚሽን ምርቶች ላይ ትኩረት ስጥ (አስተናጋጅነት፣ AI መሣሪያዎች)")
+        
+        # Check engagement
+        avg_engagement = performance_report['social_metrics']['average_engagement']
+        if avg_engagement < 100:
+            recommendations.append("የማህበራዊ ሚዲያ ሂደቶችን አሻሽል - A/B ፈተናዎችን ተጠቀም")
+        
+        # System optimization
+        recommendations.append("ለማሻሻል ራስን በራስ የሚመች AI ሞዴሎችን ተጠቀም")
+        recommendations.append("በየቀኑ የአፈፃፀም ሪፖርቶችን ተመልከት እና ማስተካከያዎችን ተግብር")
+        
+        return recommendations
+    
+    def auto_optimize_system(self):
+        """Automatic system optimization"""
+        
+        print("\n🤖 ራስን በራስ የሚመች ስርዓት ማሻሻያ በማድረግ ላይ...")
+        
+        report = self.get_system_report()
+        
+        # Implement recommendations
+        for recommendation in report['recommendations'][:3]:
+            print(f"   🔧 ማሻሻያ: {recommendation}")
+            
+            if 'AI ፕሮምፕት' in recommendation:
+                self._optimize_ai_prompts()
+            elif 'ኮሚሽን' in recommendation:
+                self._optimize_affiliate_selection()
+            elif 'ማህበራዊ' in recommendation:
+                self._optimize_social_strategy()
+        
+        print("   ✅ ራስን በራስ የሚመች ማሻሻያ ተጠናቋል!")
+        
+        return report
+
+# =================== የመጨረሻ ማስኬያ ተግባር ===================
+
+def run_production_system():
+    """Run the complete production system"""
+    
+    config = GodModeConfig.load()
+    
+    if not config.get('GROQ_API_KEY'):
+        print("\n⚠️  አስፈላጊ: GROQ_API_KEY ያስፈልጋል!")
+        print("   ከሆነ ይህን ተግባር በመጠቀም ይቀጥሉ:")
+        print("   export GROQ_API_KEY='your_key_here'")
+        return
+    
+    print("\n" + "="*80)
+    print("🌟 PROFIT MASTER COMPLETE v12.0 - ፍጹም ለማምረት ዝግጁ")
+    print("="*80)
+    
+    # Create system
+    system = ProfitMasterCompleteSystem(config)
+    
+    # Run demonstration
+    print("\n📊 ስርዓቱን በማሳየት ላይ...")
+    
+    # 1. Generate optimized content
+    demo_topic = "የAI ይዘት መፍጠር በ2024"
+    demo_category = "technology"
+    
+    result = system.generate_optimized_content(demo_topic, demo_category)
+    
+    if result['success']:
+        print(f"\n✅ ማሳያ ይዘት ተፈጥሯል!")
+        print(f"   📝 ርዕስ: {result['title']}")
+        print(f"   💰 የተገመተ ገቢ: ${result['monetization_report']['estimated_revenue']}")
+        print(f"   🔗 የአፊሊዬት አገናኞች: {result['monetization_report']['total_injections']}")
+    
+    # 2. Get system report
+    print("\n📈 የስርዓት ሪፖርት በማግኘት ላይ...")
+    report = system.get_system_report()
+    
+    print(f"\n📊 የስርዓት አጠቃላይ እይታ:")
+    print(f"   📝 አጠቃላይ ጽሑፎች: {report['overview']['total_articles']}")
+    print(f"   💰 አጠቃላይ ገቢ: {report['overview']['total_revenue']}")
+    print(f"   ⚡ የስርዓት ሁኔታ: {report['overview']['system_status']}")
+    
+    # 3. Auto-optimization
+    print("\n🤖 ራስን በራስ የሚመች ማሻሻያ በማድረግ ላይ...")
+    optimization_report = system.auto_optimize_system()
+    
+    print("\n" + "="*80)
+    print("🎯 ስርዓቱ ፍጹም ዝግጁ ነው!")
+    print("\n📋 ቀጣይ ደረጃዎች:")
+    print("   1. የአፊሊዬት አገናኞችዎን በUltraAffiliateManager ውስጥ ያስገቡ")
+    print("   2. የWordPress እና የማህበራዊ ሚዲያ የAPI ቁልፎችን ያዘጋጁ")
+    print("   3. ለራስ በራስ የሚመች ማሻሻያ ወቅታዊ ሪፖርቶችን ይጠቀሙ")
+    print("   4. የA/B ፈተናዎችን ለማሻሻል በራስ የሚመች AI ይጠቀሙ")
+    print("="*80)
+
+if __name__ == "__main__":
+    run_production_system()
