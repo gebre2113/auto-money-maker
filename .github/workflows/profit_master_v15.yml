@@ -1,0 +1,340 @@
+name: Profit Master Supreme v15.0 - Ultimate Mega-System
+
+on:
+  schedule:
+    - cron: '*/30 * * * *'    # በየ30 ደቂቃው
+    - cron: '0 */3 * * *'     # በየ3 ሰዓቱ
+  workflow_dispatch:          # በእጅ ማስኬጃ
+    inputs:
+      operation_type:
+        description: 'Operation Mode'
+        required: true
+        default: 'full-cycle'
+        type: choice
+        options:
+        - full-cycle
+        - content-only
+        - social-only
+        - report-only
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+env:
+  PYTHON_VERSION: '3.10'
+  DATABASE_FILE: 'profit_master.db'
+  OUTPUT_DIR: 'public'
+
+jobs:
+  # ==================== JOB 1: SYSTEM SETUP & BOOT ====================
+  system_boot:
+    runs-on: ubuntu-latest
+    name: "🚀 System Boot & Setup"
+    outputs:
+      session_id: ${{ steps.gen_id.outputs.session_id }}
+    
+    steps:
+      - name: "📥 Checkout Repository"
+        uses: actions/checkout@v4
+
+      - name: "🐍 Setup Python"
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
+
+      - name: "📦 Install Dependencies"
+        run: |
+          sudo apt-get update && sudo apt-get install -y ffmpeg
+          python -m pip install --upgrade pip
+          
+          # Core Dependencies
+          pip install pandas numpy requests schedule plotly streamlit
+          pip install groq google-generativeai openai anthropic cohere
+          pip install tweepy facebook-sdk python-telegram-bot discord-webhook
+          pip install beautifulsoup4 lxml Pillow gTTS moviepy yt-dlp
+          pip install sqlalchemy streamlit-option-menu pydantic fastapi uvicorn
+          
+          # NLTK Setup
+          python -m nltk.downloader punkt stopwords averaged_perceptron_tagger
+          
+          echo "✅ All dependencies installed successfully"
+
+      - name: "🆔 Generate Session ID"
+        id: gen_id
+        run: echo "session_id=PM_$(date +%Y%m%d)_${{ github.run_id }}" >> $GITHUB_OUTPUT
+
+      - name: "📂 Prepare Environment"
+        run: |
+          mkdir -p data images reports public audio_output
+          
+          # Initialize Database
+          cat << 'EOF' > init_db.py
+          import sqlite3, os
+          from datetime import datetime
+          
+          conn = sqlite3.connect('data/profit_master.db')
+          c = conn.cursor()
+          
+          tables = [
+              '''CREATE TABLE IF NOT EXISTS articles (
+                  id TEXT PRIMARY KEY, title TEXT, content TEXT, 
+                  category TEXT, word_count INTEGER, quality_score REAL,
+                  created_at TEXT, monetization_status TEXT
+              )''',
+              '''CREATE TABLE IF NOT EXISTS revenue (
+                  id TEXT PRIMARY KEY, source TEXT, amount REAL, 
+                  date TEXT, article_id TEXT
+              )''',
+              '''CREATE TABLE IF NOT EXISTS social_posts (
+                  id TEXT PRIMARY KEY, platform TEXT, content TEXT, 
+                  status TEXT, scheduled_time TEXT
+              )'''
+          ]
+          
+          for t in tables:
+              c.execute(t)
+          
+          conn.commit()
+          conn.close()
+          print("✅ Database initialized")
+          EOF
+          
+          python3 init_db.py
+
+      - name: "📤 Upload System State"
+        uses: actions/upload-artifact@v4
+        with:
+          name: system-state
+          path: |
+            data/
+            public/
+
+  # ==================== JOB 2: CORE OPERATIONS (Using main.py) ====================
+  core_operations:
+    needs: system_boot
+    runs-on: ubuntu-latest
+    name: "🤖 Execute Core Engine"
+    timeout-minutes: 120
+    
+    steps:
+      - name: "📥 Download System State"
+        uses: actions/download-artifact@v4
+        with:
+          name: system-state
+
+      - name: "🐍 Setup Python"
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          
+      - name: "📦 Install Dependencies (Again)"
+        run: |
+          python -m pip install --upgrade pip
+          pip install pandas numpy requests schedule plotly streamlit
+          pip install groq google-generativeai openai anthropic cohere
+          pip install tweepy facebook-sdk python-telegram-bot discord-webhook
+          pip install beautifulsoup4 lxml Pillow gTTS moviepy yt-dlp
+          pip install sqlalchemy streamlit-option-menu pydantic fastapi uvicorn
+          python -m nltk.downloader punkt stopwords averaged_perceptron_tagger
+
+      - name: "🤖 Run Profit Master Script"
+        env:
+          # AI Keys
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          HUGGINGFACE_TOKEN: ${{ secrets.HUGGINGFACE_TOKEN }}
+          
+          # Social Media Keys
+          TWITTER_API_KEY: ${{ secrets.TWITTER_API_KEY }}
+          TWITTER_API_SECRET: ${{ secrets.TWITTER_API_SECRET }}
+          TWITTER_ACCESS_TOKEN: ${{ secrets.TWITTER_ACCESS_TOKEN }}
+          TWITTER_ACCESS_SECRET: ${{ secrets.TWITTER_ACCESS_SECRET }}
+          FACEBOOK_ACCESS_TOKEN: ${{ secrets.FACEBOOK_ACCESS_TOKEN }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          
+          # Config
+          DATABASE_URL: "sqlite:///data/profit_master.db"
+          OPERATION: ${{ github.event.inputs.operation_type || 'full-cycle' }}
+        run: |
+          echo "🚀 Launching Profit Master Engine..."
+          
+          # ስክሪፕቱን ፈልጎ ማግኘት
+          SCRIPT_PATH=$(find . -maxdepth 2 -name "main.py" -o -name "profit_master_supreme.py" | head -n 1)
+          
+          if [ -z "$SCRIPT_PATH" ]; then
+            echo "❌ CRITICAL ERROR: Main script not found! Please ensure 'main.py' exists."
+            ls -R
+            exit 1
+          fi
+          
+          echo "✅ Found script: $SCRIPT_PATH"
+          
+          # ስክሪፕቱን ማስኬድ
+          if [ "$OPERATION" == "report-only" ]; then
+            python3 -u "$SCRIPT_PATH" --report
+          else
+            # ሙሉ አውቶማቲክ ሞድ
+            python3 -u "$SCRIPT_PATH" --auto
+          fi
+
+      - name: "📤 Upload Results"
+        uses: actions/upload-artifact@v4
+        with:
+          name: execution-results
+          path: |
+            data/
+            public/
+            *.json
+            *.html
+
+  # ==================== JOB 3: REPORTING & DEPLOYMENT ====================
+  reporting_deployment:
+    needs: core_operations
+    runs-on: ubuntu-latest
+    name: "📊 Report & Deploy"
+    
+    steps:
+      - name: "📥 Download Results"
+        uses: actions/download-artifact@v4
+        with:
+          name: execution-results
+
+      - name: "🐍 Setup Python"
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          
+      - name: "📦 Install Libs"
+        run: pip install pandas matplotlib
+
+      - name: "📊 Generate Dashboard (Fallback)"
+        run: |
+          cat << 'EOF' > generate_dashboard.py
+          import sqlite3, os, json, datetime
+          
+          os.makedirs('public', exist_ok=True)
+          stats = {'articles': 0, 'revenue': 0.0, 'posts': 0}
+          
+          if os.path.exists('data/profit_master.db'):
+              try:
+                  conn = sqlite3.connect('data/profit_master.db')
+                  c = conn.cursor()
+                  
+                  try:
+                      c.execute("SELECT COUNT(*) FROM articles")
+                      stats['articles'] = c.fetchone()[0]
+                  except: pass
+                  
+                  try:
+                      c.execute("SELECT SUM(estimated_revenue) FROM articles_pro")
+                      res = c.fetchone()[0]
+                      stats['revenue'] = res if res else 0.0
+                  except: pass
+                  
+                  conn.close()
+              except: pass
+          
+          html = f"""
+          <!DOCTYPE html>
+          <html>
+          <head>
+              <title>Profit Master Supreme v15.0</title>
+              <style>
+                  body {{ font-family: sans-serif; background: #1a1a2e; color: white; padding: 40px; }}
+                  .card {{ background: #16213e; padding: 30px; border-radius: 15px; margin: 20px; display: inline-block; width: 250px; text-align: center; }}
+                  .value {{ font-size: 2.5em; font-weight: bold; color: #e94560; }}
+                  .label {{ color: #a8a8a8; }}
+                  h1 {{ text-align: center; color: #e94560; }}
+              </style>
+          </head>
+          <body>
+              <h1>🚀 PROFIT MASTER SUPREME v15.0</h1>
+              <div style="text-align: center;">
+                  <div class="card">
+                      <div class="value">{stats['articles']}</div>
+                      <div class="label">Articles Generated</div>
+                  </div>
+                  <div class="card">
+                      <div class="value">${stats['revenue']:.2f}</div>
+                      <div class="label">Estimated Revenue</div>
+                  </div>
+                  <div class="card">
+                      <div class="value">ACTIVE</div>
+                      <div class="label">System Status</div>
+                  </div>
+              </div>
+              <p style="text-align: center; margin-top: 40px;">Last Update: {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S UTC')}</p>
+          </body>
+          </html>
+          """
+          
+          with open('public/index.html', 'w') as f:
+              f.write(html)
+          
+          with open('public/stats.json', 'w') as f:
+              json.dump(stats, f)
+          EOF
+          
+          python3 generate_dashboard.py
+
+      - name: "🌐 Deploy to GitHub Pages"
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./public
+          publish_branch: gh-pages
+          keep_files: true
+          user_name: 'github-actions[bot]'
+          user_email: 'github-actions[bot]@users.noreply.github.com'
+
+      - name: "📲 Send Telegram Notification"
+        if: always()
+        env:
+          TG_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TG_CHAT: ${{ secrets.TELEGRAM_CHAT_ID }}
+          REPO: ${{ github.repository }}
+          RUN_ID: ${{ github.run_id }}
+        run: |
+          cat << 'EOF' > notify.py
+          import requests, os, json, sys
+          
+          token = os.getenv('TG_TOKEN')
+          chat = os.getenv('TG_CHAT')
+          
+          if not token or not chat:
+              print("⚠️ Telegram secrets missing")
+              sys.exit(0)
+              
+          try:
+              with open('public/stats.json') as f:
+                  stats = json.load(f)
+          except:
+              stats = {'articles': 0, 'revenue': 0}
+              
+          repo = os.getenv('REPO').split('/')
+          url = f"https://{repo[0]}.github.io/{repo[1]}/"
+          
+          msg = f"""
+          🚀 *PROFIT MASTER v15.0 REPORT*
+          
+          📄 *Content:* {stats['articles']} Articles
+          💰 *Revenue:* ${stats['revenue']:.2f}
+          ✅ *Status:* SUCCESS
+          
+          🔗 [View Dashboard]({url})
+          """
+          
+          try:
+              requests.post(f"https://api.telegram.org/bot{token}/sendMessage", 
+                  json={'chat_id': chat, 'text': msg, 'parse_mode': 'Markdown'})
+              print("✅ Notification Sent")
+          except Exception as e:
+              print(f"❌ Notification Failed: {e}")
+          EOF
+          
+          python3 notify.py
