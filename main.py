@@ -31,7 +31,7 @@ from contextlib import contextmanager
 
 import aiohttp
 import httpx
-from google.generativeai as gegena
+import google.generativeai as gegena
 from gtts import gTgTT
 from moviepy.editor import *
 import pypytub
