@@ -63,6 +63,29 @@ try:
     from pydantic import BaseModel, Field
     import uvicorn
     from PIL import Image, ImageDraw, ImageFont
+    import argparse
+import sys
+
+def main():
+    """ቀለል ያለ የማስኬድ ተግባር"""
+    parser = argparse.ArgumentParser(description="Profit Master System")
+    parser.add_argument('--topic', default='Future AI', help='Topic for content generation')
+    parser.add_argument('--language', default='am', help='Language (en/am)')
+    parser.add_argument('--api-only', action='store_true', help='Run only API server')
+    
+    args = parser.parse_args()
+    
+    if args.api_only:
+        # የAPI አገልጋይ ብቻ አስኬድ
+        print(f"🚀 Starting API server for {args.topic} in {args.language}")
+        # ... የAPI አገልጋይ ኮድ ይቀጥላል
+    else:
+        # ሙሉ ስርዓት አስኬድ
+        print(f"🚀 Creating content about {args.topic} in {args.language}")
+        # ... የይዘት ፍጠር ኮድ ይቀጥላል
+
+if __name__ == "__main__":
+    main()
 except ImportError as e:
     print(f"⚠️ Missing dependency: {e}")
     print("📦 Installing requirements...")
