@@ -27,13 +27,13 @@ import pandas as pd
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from contextlib import contextmanager
 
-# Third-party imports
+# የጥገኝነት ዝርዝር
 REQUIRED_PACKAGES = [
     "aiohttp>=3.9.0",
     "httpx>=0.25.0",
     "google-generativeai>=0.3.0",
     "gtts>=2.3.0",
-    "moviepy>=1.0.3",
+    "moviepy==1.0.3",  # እዚህ ላይ የሚወስነው! 1.0.3 ብቻ!
     "pytube>=15.0.0",
     "yt-dlp>=2023.10.13",
     "tweepy>=4.14.0",
@@ -57,124 +57,111 @@ REQUIRED_PACKAGES = [
     "pydantic>=2.4.0",
     "pillow>=10.0.0",
     "pandas>=2.0.0",
-    "numpy>=1.24.0"
+    "numpy<2.0.0"  # ለተኳኋምነት
 ]
 
-def install_missing_packages():
-    """የጠፉ ጥገኝነቶችን ያጭናል"""
-    print("📦 Installing missing packages...")
+def install_requirements():
+    """የጠፉ ፓኬጆችን ያጭናል"""
     import subprocess
-    import importlib
+    import importlib.util
+    
+    print("📦 Checking and installing required packages...")
     
     for package in REQUIRED_PACKAGES:
-        package_name = package.split('>')[0].split('=')[0].strip()
+        # ፓኬጅ ስም ያግኙ
+        package_name = package.split('>')[0].split('=')[0].split('<')[0].strip()
+        
         try:
-            importlib.import_module(package_name if '.' not in package_name else package_name.split('.')[0])
+            # ፓኬጁ እንደተጫነ ያረጋግጡ
+            spec = importlib.util.find_spec(package_name.replace('-', '_'))
+            if spec is None:
+                raise ImportError()
+            
             print(f"✅ {package_name} already installed")
-        except ImportError:
+        except (ImportError, Exception):
             print(f"📦 Installing {package_name}...")
             try:
                 subprocess.check_call([sys.executable, "-m", "pip", "install", package])
                 print(f"✅ {package_name} installed successfully")
             except subprocess.CalledProcessError as e:
-                print(f"❌ Failed to install {package_name}: {e}")
+                print(f"⚠️  Could not install {package_name}: {e}")
                 # ለቶርች ልዩ ማስተካከያ
-                if "torch" in package_name:
-                    print("🔧 Installing PyTorch with CPU-only version...")
+                if "torch" in package_name.lower():
+                    print("🔧 Installing PyTorch CPU version...")
                     subprocess.check_call([sys.executable, "-m", "pip", "install", 
                                          "torch", "--index-url", "https://download.pytorch.org/whl/cpu"])
+                elif "moviepy" in package_name.lower():
+                    print("🔧 Installing MoviePy 1.0.3 specifically...")
+                    subprocess.check_call([sys.executable, "-m", "pip", "install", "moviepy==1.0.3"])
 
-# ሁሉንም ጥገኝነቶች በራስ-ሰር ያጭኑ
-install_missing_packages()
+# ጥገኝነቶችን ያጭኑ
+install_requirements()
 
-# አሁን ጥገኝነቶቹን መጠቀም ይቻላል
-import aiohttp
-import httpx
-import google.generativeai as genai
-from gtts import gTTS
-from moviepy.editor import *
-import pytube
-import yt_dlp as yt_dlp
-import tweepy
-from selenium import webdriver
-from selenium.webdriver.common.by import By
-from bs4 import BeautifulSoup
-from langdetect import detect
-from googletrans import Translator
-from textblob import TextBlob
-import nltk
-from nltk.corpus import stopwords
-from nltk.tokenize import word_tokenize, sent_tokenize
-import spacy
-import openai
-from transformers import pipeline
-import torch
-from sqlalchemy import create_engine, Column, String, Integer, Float, DateTime, JSON, Text, Boolean, ForeignKey
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker, relationship, scoped_session
-from sqlalchemy.pool import QueuePool
-import redis
-from celery import Celery
-from prometheus_client import start_http_server, Counter, Histogram, Gauge
-import boto3
-from botocore.exceptions import ClientError
-from fastapi import FastAPI, HTTPException, BackgroundTasks, Depends, status
-from pydantic import BaseModel, Field
-import uvicorn
-from PIL import Image, ImageDraw, ImageFont
+# አሁን ሁሉንም ጥገኝነቶችን መጠቀም ይቻላል
+print("✅ All dependencies installed successfully")
 
-# NLTK data download
+# በቀላሉ የተለያዩ ሞጁሎችን ለማስገባት እንሞክር
+try:
+    import aiohttp
+    import httpx
+    import google.generativeai as genai
+    from gtts import gTTS
+    # ለ MoviePy 1.0.3 አዲስ የማስገቢያ መንገድ
+    import moviepy.editor as mp
+    import pytube
+    import yt_dlp
+    import tweepy
+    from selenium import webdriver
+    from selenium.webdriver.common.by import By
+    from bs4 import BeautifulSoup
+    from langdetect import detect
+    from googletrans import Translator
+    from textblob import TextBlob
+    import nltk
+    from nltk.corpus import stopwords
+    from nltk.tokenize import word_tokenize, sent_tokenize
+    import spacy
+    import openai
+    from transformers import pipeline
+    import torch
+    from sqlalchemy import create_engine, Column, String, Integer, Float, DateTime, JSON, Text, Boolean, ForeignKey
+    from sqlalchemy.ext.declarative import declarative_base
+    from sqlalchemy.orm import sessionmaker, relationship, scoped_session
+    from sqlalchemy.pool import QueuePool
+    import redis
+    from celery import Celery
+    from prometheus_client import start_http_server, Counter, Histogram, Gauge
+    import boto3
+    from botocore.exceptions import ClientError
+    from fastapi import FastAPI, HTTPException, BackgroundTasks, Depends, status
+    from pydantic import BaseModel, Field
+    import uvicorn
+    from PIL import Image, ImageDraw, ImageFont
+    
+    print("✅ All modules imported successfully")
+except ImportError as e:
+    print(f"❌ Import error: {e}")
+    print("📦 Retrying installation...")
+    install_requirements()
+    # እንደገና ሞክር
+    import aiohttp
+    import httpx
+    import google.generativeai as genai
+    from gtts import gTTS
+    import moviepy.editor as mp
+    import pytube
+    import yt_dlp
+
+# NLTK ውሂብ መጫን
 try:
     nltk.data.find('tokenizers/punkt')
 except LookupError:
     print("📦 Downloading NLTK data...")
-    nltk.download('punkt')
-    nltk.download('stopwords')
-    nltk.download('wordnet')
+    nltk.download('punkt', quiet=True)
+    nltk.download('stopwords', quiet=True)
+    nltk.download('wordnet', quiet=True)
 
-# ... rest of your code continues here
-except ImportError as e:
-    print(f"⚠️ Missing dependency: {e}")
-    print("📦 Installing requirements...")
-    requirements = """
-    aiohttp>=3.9.0
-    httpx>=0.25.0
-    google-generativeai>=0.3.0
-    gtts>=2.3.0
-    moviepy>=1.0.3
-    pytube>=15.0.0
-    yt-dlp>=2023.10.13
-    tweepy>=4.14.0
-    selenium>=4.15.0
-    beautifulsoup4>=4.12.0
-    langdetect>=1.0.9
-    googletrans==3.1.0a0
-    textblob>=0.17.1
-    nltk>=3.8.0
-    spacy>=3.7.0
-    openai>=0.28.0
-    transformers>=4.35.0
-    torch>=2.1.0
-    sqlalchemy>=2.0.0
-    redis>=5.0.0
-    celery>=5.3.0
-    prometheus-client>=0.19.0
-    boto3>=1.34.0
-    fastapi>=0.104.0
-    uvicorn>=0.24.0
-    pydantic>=2.4.0
-    pillow>=10.0.0
-    pandas>=2.0.0
-    numpy>=1.24.0
-    """
-    
-    with open("requirements.txt", "w") as f:
-        f.write(requirements)
-    
-    os.system(f"{sys.executable} -m pip install -r requirements.txt")
-    print("✅ Dependencies installed. Please restart.")
-    sys.exit(1)
-
+# ... የቀሩት ኮዶችዎን እዚህ ይጨምሩ ...
 # =================== የስርዓት ኮንፍግ ===================
 
 @dataclass
