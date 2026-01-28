@@ -1,0 +1,91 @@
+name: Profit Master Supreme - EXECUTE
+
+on:
+  schedule:
+    - cron: '0 */6 * * *'
+  workflow_dispatch:
+    inputs:
+      topic:
+        description: 'የይዘት ርዕስ'
+        required: false
+        default: 'AI Revolution'
+      language:
+        description: 'ቋንቋ (am/en)'
+        required: false
+        default: 'am'
+
+permissions:
+  contents: write
+
+jobs:
+  run_profit_master:
+    name: "🚀 Run Profit Master System"
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: "📥 Checkout Repository"
+        uses: actions/checkout@v4
+
+      - name: "🐍 Setup Python 3.12"
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+
+      - name: "🔧 Install System Dependencies"
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg imagemagick
+          sudo sed -i 's/none/read,write/g' /etc/ImageMagick-6/policy.xml 2>/dev/null || true
+
+      - name: "📦 Install Python Dependencies"
+        run: |
+          pip install --upgrade pip
+          pip install aiohttp==3.9.0 httpx==0.25.0 requests==2.31.0
+          pip install google-generativeai==0.3.0 openai==0.28.0
+          pip install moviepy==1.0.3 imageio==2.31.1
+          pip install pytube==15.0.0 yt-dlp==2023.10.13
+          pip install tweepy==4.14.0 selenium==4.15.0 beautifulsoup4==4.12.0
+          pip install deep-translator==1.11.4 langdetect==1.0.9  # ከ googletrans ይልቅ
+          pip install textblob==0.17.1 nltk==3.8.0 spacy==3.7.0
+          pip install transformers==4.35.0 torch==2.1.0
+          pip install sqlalchemy==2.0.0 redis==5.0.0 celery==5.3.0
+          pip install prometheus-client==0.19.0 boto3==1.34.0
+          pip install fastapi==0.104.0 uvicorn==0.24.0 pydantic==2.4.0
+          pip install pillow==10.0.0 pandas==2.0.0 numpy==1.24.0
+          pip install psycopg2-binary==2.9.0 python-dotenv==1.0.0
+
+      - name: "📚 Download NLTK Data"
+        run: |
+          python -c "import nltk; nltk.download('punkt', quiet=True); nltk.download('stopwords', quiet=True); nltk.download('wordnet', quiet=True)"
+
+      - name: "🚀 Execute Main Script"
+        env:
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: |
+          echo "🚀 Starting Profit Master System..."
+          
+          if [ -f "main.py" ]; then
+            # ፈተና ማስኬድ
+            python main.py --test
+            
+            # ሙሉ ስርዓት
+            python main.py --topic "${{ github.event.inputs.topic || 'AI Revolution' }}" --language "${{ github.event.inputs.language || 'am' }}"
+          else
+            echo "❌ Error: main.py not found"
+            exit 1
+          fi
+
+      - name: "💾 Upload Results"
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: profit-master-output
+          path: |
+            profit_master.log
+            *.json
+            *.html
+            *.txt
+          retention-days: 5
