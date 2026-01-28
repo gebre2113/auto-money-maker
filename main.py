@@ -146,11 +146,6 @@ logging.basicConfig(
 
 logger = logging.getLogger(__name__)
 
-# =================== የዋና ኮድ መስጀመሪያ ===================
-
-print("🚀 ULTIMATE PROFIT MASTER MEGA-SYSTEM v15.0")
-print("✅ System initialized successfully")
-
 # =================== የስርዓት ኮንፍግ ===================
 
 @dataclass
