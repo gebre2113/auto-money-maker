@@ -1,43 +1,95 @@
-name: Run Profit Master
+name: Profit Master Supreme - EXECUTE
 
 on:
-  workflow_dispatch: # እራስህ ማስጀመር እንድትችል
   schedule:
-    - cron: '0 */6 * * *' # በየ 6 ሰዓቱ በራሱ እንዲሰራ
+    - cron: '0 */6 * * *'
+  workflow_dispatch:
+    inputs:
+      topic:
+        description: 'የይዘት ርዕስ'
+        required: false
+        default: 'AI Revolution'
+      language:
+        description: 'ቋንቋ (am/en)'
+        required: false
+        default: 'am'
+
+permissions:
+  contents: write
 
 jobs:
-  run-script:
+  run_profit_master:
+    name: "🚀 Run Profit Master System"
     runs-on: ubuntu-latest
     
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
+      - name: "📥 Checkout Repository"
+        uses: actions/checkout@v4
 
-    - name: Set up Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: '3.10'
-        cache: 'pip'
+      - name: "🐍 Setup Python 3.12"
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
 
-    # 1. መጀመሪያ ለ MoviePy የሚያስፈልገውን ሲስተም ሶፍትዌር መጫን
-    - name: Install System Dependencies (ImageMagick)
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y imagemagick ffmpeg
-        sudo sed -i 's/none/read,write/g' /etc/ImageMagick-6/policy.xml
+      - name: "🔧 Install System Dependencies"
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg imagemagick wget
+          sudo sed -i 's/none/read,write/g' /etc/ImageMagick-6/policy.xml 2>/dev/null || true
 
-    # 2. ቀጥሎ የፓይተን ፓኬጆችን (NLTKን ጨምሮ) መጫን
-    - name: Install Python Dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
+      - name: "📦 Install Python Dependencies from requirements.txt"
+        run: |
+          pip install --upgrade pip
+          # በቀላሉ ዋና ዋና ፓኬጆችን ይጭኑ
+          pip install aiohttp httpx google-generativeai gtts
+          pip install moviepy==1.0.3 imageio==2.31.1
+          pip install deep-translator  # ከ googletrans ይልቅ
+          pip install pandas numpy<2.0.0
+          
+          # ቀሪዎቹን በቀላሉ
+          pip install pytube yt-dlp tweepy selenium beautifulsoup4 \
+            langdetect textblob nltk spacy openai transformers \
+            sqlalchemy redis celery prometheus-client boto3 \
+            fastapi uvicorn pydantic pillow
 
-    # 3. ፓኬጆቹ ከተጫኑ በኋላ ስክሪፕቱን ማስኬድ
-    # (ማሳሰቢያ፡ ስክሪፕቱ ራሱ ሲጀምር NLTK Data ያወርዳል፣ ስለዚህ ለብቻው ማውረድ አያስፈልግም)
-    - name: Run Profit Master Script
-      env:
-        GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
-        GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-        # ሌሎች ቁልፎች ካሉህ እዚህ ጨምር
-      run: |
-        python profit_master.py
+      - name: "📥 Install PyTorch (CPU)"
+        run: |
+          pip install torch --index-url https://download.pytorch.org/whl/cpu
+
+      - name: "📥 Download NLTK Data"
+        run: |
+          python -c "import nltk; nltk.download('punkt', quiet=True); nltk.download('stopwords', quiet=True); nltk.download('wordnet', quiet=True)"
+
+      - name: "🤖 Execute Main Script"
+        env:
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: |
+          echo "🚀 Starting Profit Master System..."
+          
+          if [ -f "main.py" ]; then
+            # በመጀመሪያ ፈተና አስኬድ
+            echo "🧪 Running system test..."
+            python main.py --topic "Test" --language "am" --test
+            
+            # ከዚያ ሙሉ ስርዓት
+            echo "🎯 Running full system..."
+            python main.py --topic "${{ github.event.inputs.topic || 'AI Revolution' }}" --language "${{ github.event.inputs.language || 'am' }}"
+          else
+            echo "❌ Error: main.py not found"
+            exit 1
+          fi
+
+      - name: "💾 Upload Results"
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: profit-master-output
+          path: |
+            profit_master.log
+            *.json
+            *.html
+            *.txt
+          retention-days: 5
