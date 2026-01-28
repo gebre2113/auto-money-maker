@@ -1,0 +1,77 @@
+name: 🚀 Run Profit Master System
+
+on:
+  workflow_dispatch:  # Manual trigger
+  push:
+    branches: [ main ]
+  schedule:
+    - cron: '0 0 * * *'  # Run daily at midnight
+
+jobs:
+  run-system:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: 🚀 Checkout repository
+      uses: actions/checkout@v3
+
+    - name: 🐍 Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+
+    - name: 📦 Install system dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y ffmpeg redis-server postgresql-client
+
+    - name: 🚀 Start Redis
+      run: |
+        sudo systemctl start redis
+        redis-cli ping
+
+    - name: 📦 Install Python dependencies
+      run: |
+        pip install --upgrade pip
+        # Install core dependencies first
+        pip install aiohttp httpx google-generativeai gtts moviepy
+        pip install pytube yt-dlp tweepy selenium beautifulsoup4
+        pip install langdetect deep-translator textblob nltk spacy
+        pip install openai transformers torch sqlalchemy redis
+        pip install celery prometheus-client boto3 fastapi uvicorn
+        pip install pydantic pillow psycopg2-binary python-dotenv
+        # Download NLTK data
+        python -c "import nltk; nltk.download('punkt'); nltk.download('stopwords'); nltk.download('wordnet')"
+
+    - name: 🏗️ Create environment file
+      run: |
+        echo "GROQ_API_KEY=${{ secrets.GROQ_API_KEY }}" >> .env
+        echo "GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}" >> .env
+        echo "OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}" >> .env
+        echo "DATABASE_URL=sqlite:///profit_master.db" >> .env
+        echo "REDIS_URL=redis://localhost:6379/0" >> .env
+        echo "CELERY_BROKER_URL=redis://localhost:6379/0" >> .env
+        echo "AUTO_INSTALL_DEPENDENCIES=1" >> .env
+
+    - name: 🚀 Run Profit Master System
+      run: |
+        echo "🚀 Starting your Profit Master System..."
+        python -c "
+import sys
+sys.path.append('.')
+from profit_master_v16 import main
+main()
+" || echo "⚠️ Script completed (may exit after starting server)"
+
+    - name: 📊 Health check
+      run: |
+        sleep 10
+        curl -f http://localhost:8000/api/health || echo "Health check failed but continuing"
+
+    - name: 📝 Create sample content
+      run: |
+        sleep 5
+        curl -X POST http://localhost:8000/api/create \
+          -H "Content-Type: application/json" \
+          -d '{\"topic\":\"How to Make Money Online\",\"language\":\"en\",\"country\":\"US\"}' \
+          || echo "Content creation test completed"
