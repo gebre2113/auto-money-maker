@@ -1,0 +1,39 @@
+[Unit]
+Description=Profit Master Mega-System v{{ system_version }}
+After=network.target postgresql.service redis-server.service
+Requires=postgresql.service redis-server.service
+
+[Service]
+Type=simple
+User={{ app_user }}
+Group={{ app_user }}
+WorkingDirectory={{ app_dir }}
+Environment="PATH={{ app_dir }}/venv/bin"
+EnvironmentFile={{ app_dir }}/.env
+ExecStart={{ app_dir }}/venv/bin/uvicorn main:app --host 0.0.0.0 --port 8000 --workers 4
+ExecReload=/bin/kill -s HUP $MAINPID
+ExecStop=/bin/kill -s TERM $MAINPID
+Restart=always
+RestartSec=10
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=profitmaster
+
+# Security
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectSystem=strict
+ReadWritePaths={{ app_dir }}/content {{ app_dir }}/multimedia {{ app_dir }}/backups /var/log/profitmaster
+ReadOnlyPaths=/
+PrivateDevices=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectControlGroups=yes
+
+# Resource limits
+LimitNOFILE=65536
+LimitNPROC=65536
+LimitCORE=infinity
+
+[Install]
+WantedBy=multi-user.target
