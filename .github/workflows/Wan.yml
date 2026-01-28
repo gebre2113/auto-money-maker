@@ -2,8 +2,8 @@ name: Profit Master Supreme - EXECUTE
 
 on:
   schedule:
-    - cron: '0 */6 * * *'  # በየ 6 ሰዓቱ በራሱ ይሰራል።
-  workflow_dispatch:       # አንተ በፈለግክ ሰዓት "Run" ብለህ ማስጀመር ትችላለህ።
+    - cron: '0 */6 * * *'  # በየ 6 ሰዓቱ በራሱ ይሰራል
+  workflow_dispatch:       # አንተ በፈለግክ ሰዓት "Run" ብለህ ማስጀመር ትችላለህ
     inputs:
       topic:
         description: 'የይዘት ርዕስ (Topic)'
@@ -34,463 +34,131 @@ jobs:
           python-version: '3.12'
           cache: 'pip'
 
-      # 3. ቪድዮ ለመስራት የሚያስፈልገውን FFmpeg ይጭናል
+      # 3. ሲስተም ጥገኝነቶች (FFmpeg እና ImageMagick)
       - name: "🔧 Install System Dependencies"
         run: |
           sudo apt-get update
-          sudo apt-get install -y ffmpeg wget
+          sudo apt-get install -y ffmpeg imagemagick
+          sudo sed -i 's/none/read,write/g' /etc/ImageMagick-6/policy.xml 2>/dev/null || true
 
-      # 4. FIXED: ሁሉንም የሚፈልጋቸውን ላይብረሪዎች በትክክል ይጭናል
+      # 4. ፓይተን ጥገኝነቶችን በቡድን መጠን ይጭናል (የጥገኝነት ግጭት ለማስወገድ)
       - name: "📦 Install Python Libraries"
         run: |
-          pip install --upgrade pip setuptools wheel
+          pip install --upgrade pip
           
-          # በመጀመሪያ ቀላል ላይብረሪዎች
-          pip install \
-            aiohttp httpx requests pandas numpy \
-            gtts==2.3.0 pytube==15.0.0 pillow==10.0.0 \
-            beautifulsoup4==4.12.0 selenium==4.15.0 \
-            sqlalchemy==2.0.0 redis==5.0.0 \
-            fastapi==0.104.0 uvicorn==0.24.0 \
-            nltk==3.8.0 textblob==0.17.0 pydantic==2.4.0 \
-            prometheus-client==0.19.0 boto3==1.34.0 \
-            deep-translator==1.11.4 langdetect==1.0.9 \
-            python-dotenv==1.0.0
+          # ለውጫዊ ምንጮች መስመር ላይ የተገለጹ የተስተካከሉ ጥገኝነቶች
+          # መሰረታዊ ፓኬጆች
+          pip install aiohttp==3.9.0 httpx==0.25.0 requests==2.31.0
           
-          # AI ላይብረሪዎች (አማራጭ)
-          pip install google-generativeai==0.3.0 openai==0.28.0
+          # AI አገልግሎቶች
+          pip install google-generativeai==0.3.0 openai==0.28.0 groq==0.5.0 anthropic==0.25.0 cohere==4.41
           
-          # ቻርቲንግ እና ቪድዮ
-          pip install moviepy==1.0.3 yt-dlp==2023.10.13
+          # ሙልቲሚዲያ
+          pip install gtts==2.3.0 moviepy==1.0.3 imageio==2.31.1
+          pip install pytube==15.0.0 yt-dlp==2023.10.13 Pillow==10.0.0
           
-          # NLTK ውሂብ መጫን
-          python -c "
-import nltk
-nltk.download('punkt', quiet=True)
-nltk.download('stopwords', quiet=True)
-nltk.download('wordnet', quiet=True)
-print('✅ NLTK data downloaded')
-"
+          # ድር እና ማህበራዊ ሚዲያ
+          pip install tweepy==4.14.0 selenium==4.15.0 beautifulsoup4==4.12.0
           
-          # ለታይብሎች ማጠራቀሚያ
-          mkdir -p public
+          # ቋንቋ ማስተርጓሚ (deep-translator ከ googletrans ይልቅ)
+          pip install langdetect==1.0.9 deep-translator==1.11.4
+          
+          # NLP
+          pip install textblob==0.17.1 nltk==3.8.0 spacy==3.7.0
+          
+          # የማሽን ለርኒንግ
+          pip install transformers==4.35.0
+          
+          # የውሂብ መሠረት
+          pip install sqlalchemy==2.0.0 redis==5.0.0 celery==5.3.0
+          
+          # Monitoring እና Cloud
+          pip install prometheus-client==0.19.0 boto3==1.34.0
+          
+          # API
+          pip install fastapi==0.104.0 uvicorn==0.24.0 pydantic==2.4.0
+          
+          # የውሂብ ምህዋር
+          pip install pandas==2.0.0 numpy==1.24.0
+          
+          # ሌሎች
+          pip install python-dotenv==1.0.0 psycopg2-binary==2.9.0
 
-      # 5. FIXED: ቀለል ያለ ስክሪፕት ይሰራል
-      - name: "🤖 Execute Simplified Profit Master"
+      # 5. የPyTorch ልዩ ጫን (CPU ብቻ)
+      - name: "🤖 Install PyTorch (CPU)"
+        run: |
+          pip install torch==2.1.0 --index-url https://download.pytorch.org/whl/cpu
+
+      # 6. NLTK ውሂብ እና spaCy ሞዴል
+      - name: "📚 Download NLP Data"
+        run: |
+          python -c "
+          import nltk
+          nltk.download('punkt', quiet=True)
+          nltk.download('stopwords', quiet=True)
+          nltk.download('wordnet', quiet=True)
+          print('✅ NLTK data downloaded')
+          "
+          
+          # spaCy ሞዴል
+          python -m spacy download en_core_web_sm 2>/dev/null || echo "⚠️ spaCy model download skipped"
+
+      # 7. የስክሪፕት ማስኬድ
+      - name: "🚀 Execute Main Script"
         env:
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         run: |
           echo "🚀 Starting Profit Master System..."
+          echo "📅 Date: $(date)"
+          echo "🎯 Topic: ${{ github.event.inputs.topic || 'AI Revolution' }}"
+          echo "🌐 Language: ${{ github.event.inputs.language || 'am' }}"
           
-          # ቀለል ያለ ስክሪፕት ፍጠር
-          cat > profit_master_simple.py << 'EOF'
-#!/usr/bin/env python3
-"""
-🚀 PROFIT MASTER SIMPLIFIED v1.0
-Optimized for GitHub Actions
-"""
-
-import os
-import sys
-import json
-import time
-import asyncio
-import logging
-import hashlib
-from datetime import datetime
-from typing import Dict, List
-
-# Setup logging
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
-
-# Check API keys
-def check_api_keys():
-    """Check if we have API keys"""
-    apis = []
-    if os.getenv('GROQ_API_KEY'):
-        apis.append('GROQ')
-    if os.getenv('GEMINI_API_KEY'):
-        apis.append('Gemini')
-    if os.getenv('OPENAI_API_KEY'):
-        apis.append('OpenAI')
-    
-    if not apis:
-        logger.warning("⚠️ No AI API keys found. Using template mode.")
-        return False
-    logger.info(f"✅ AI APIs available: {', '.join(apis)}")
-    return True
-
-# Content templates
-TEMPLATES = {
-    'en': {
-        'ai_revolution': '''# The AI Revolution: Complete Guide
-
-## 🤖 What is AI?
-Artificial Intelligence is transforming every industry. From healthcare to finance, AI is creating new opportunities.
-
-## 💡 How to Benefit from AI
-1. **Learn AI Tools**: Master ChatGPT, Midjourney, DALL-E
-2. **Automate Tasks**: Use AI for content creation, data analysis
-3. **Build AI Products**: Create chatbots, automation tools
-4. **Offer AI Services**: Consultation, implementation, training
-
-## 🚀 Top AI Tools for 2024
-- **ChatGPT**: Best for text generation
-- **Midjourney**: Best for images
-- **Google Bard**: Free alternative
-- **Claude**: Excellent for long-form content
-
-## 💰 Monetization Strategies
-1. **AI Content Creation**: $1000-5000/month
-2. **AI Automation Services**: $2000-10000/month
-3. **AI Course Creation**: $5000-20000/course
-4. **AI Consultation**: $100-500/hour
-
-## 📈 Action Plan
-1. Start learning AI today
-2. Choose your niche
-3. Build your portfolio
-4. Find your first clients
-5. Scale your business
-
-*Generated by Profit Master Supreme*''',
-        
-        'make_money_online': '''# How to Make Money Online in 2024
-
-## 💻 Digital Skills That Pay
-1. **Web Development**: $50-150/hour
-2. **Digital Marketing**: $40-120/hour
-3. **Content Creation**: $30-100/hour
-4. **AI Services**: $50-200/hour
-
-## 🛠️ Tools You Need
-- Computer with internet
-- Free tools: Canva, ChatGPT, Google Docs
-- Learning platforms: YouTube, Udemy, Coursera
-
-## 📊 Realistic Income
-- **Beginner**: $500-2000/month
-- **Intermediate**: $2000-5000/month
-- **Advanced**: $5000-20000/month
-
-## 🚀 Quick Start Guide
-1. Learn one skill deeply
-2. Create free samples
-3. Join freelance platforms
-4. Deliver excellent work
-5. Ask for testimonials
-
-*Start today, not tomorrow!*'''
-    },
-    
-    'am': {
-        'ai_revolution': '''# አርቴፊሻል ኢንተሊጀንስ ማለት ምንድን ነው?
-
-## 🤖 አይ ምንድን ነው?
-አርቴፊሻል ኢንተሊጀንስ (AI) የተለያዩ ኢንዱስትሪዎችን እየቀየረ ነው። ከጤና እስከ ባንክ ድረስ አዲስ እድሎችን ይፈጥራል።
-
-## 💡 ከአይ ጋር ገንዘብ የሚሰራበት መንገድ
-1. **አይ መሣሪያዎችን ይማሩ**: ቻትጂፒቲ፣ ሚድጀርኒ፣ ዳል-ኢ
-2. **ስራዎችን አውቶማቲክ ያድርጉ**: ይዘት ማመንጨት፣ ውሂብ ትንተና
-3. **አይ ምርቶችን ይገንቡ**: ቻትቦት፣ አውቶሜሽን መሳሪያዎች
-4. **አይ አገልግሎት ይስጡ**: ኮንስልቴሽን፣ አተገባበር፣ ስልጠና
-
-## 🚀 ለ2024 ከፍተኛ አይ መሣሪያዎች
-- **ቻትጂፒቲ**: ለጽሑፍ ፍጠር
-- **ሚድጀርኒ**: ለምስል ፍጠር
-- **ጉግል ባርድ**: ነፃ አማራጭ
-- **ክላውድ**: ለረጅም ጽሑፍ ጥሩ
-
-## 💰 ገቢ ማመንጫ ስልቶች
-1. **አይ ይዘት ፍጠር**: $1000-5000/ወር
-2. **አይ አውቶሜሽን አገልግሎት**: $2000-10000/ወር
-3. **አይ ኮርስ ፍጠር**: $5000-20000/ኮርስ
-4. **አይ ኮንስልቴሽን**: $100-500/ሰዓት
-
-## 📈 የተግባር እቅድ
-1. ዛሬ አይ ይማሩ
-2. አይነት ይምረጡ
-3. ፖርትፎሊዮ ይገንቡ
-4. የመጀመሪያ ደንበኞች ይፈልጉ
-5. ንግድዎን ያሳድጉ
-
-*የተፈጠረው በፕሮፊት ማስተር ሱፕሪም*''',
-        
-        'make_money_online': '''# በ2024 በኢንተርኔት ገንዘብ መስራት
-
-## 💻 ገንዘብ የሚያመጡ ዲጂታል ክህሎቶች
-1. **ዌብ ዲቨሎፕመንት**: $50-150/ሰዓት
-2. **ዲጂታል ማርኬቲንግ**: $40-120/ሰዓት
-3. **ይዘት ፍጠር**: $30-100/ሰዓት
-4. **አይ አገልግሎት**: $50-200/ሰዓት
-
-## 🛠️ የሚያስፈልጉዎት መሳሪያዎች
-- ኮምፒውተር ከኢንተርኔት ጋር
-- ነፃ መሣሪያዎች: ካንቫ፣ ቻትጂፒቲ፣ ጉግል ዶክስ
-- የመማር መድረኮች: ዩቱብ፣ ዩዴሚ፣ ኩርሰራ
-
-## 📊 ተጨባጭ ገቢ
-- **ጀማሪ**: $500-2000/ወር
-- **መካከለኛ**: $2000-5000/ወር
-- **ላቀ**: $5000-20000/ወር
-
-## 🚀 ፈጣን መጀመሪያ መመሪያ
-1. አንድ ክህሎት በጥልቀት ይማሩ
-2. ነፃ ናሙናዎችን ይፍጠሩ
-3. ፍሪላንስ መድረኮችን ይቀላቀሉ
-4. ከፍተኛ ጥራት ያለው ስራ ያቅርቡ
-5. ምስክር ወረቀቶችን ይጠይቁ
-
-*ነገ ሳይሆን ዛሬ ይጀምሩ!*'''
-    }
-}
-
-class ProfitMaster:
-    """Simplified Profit Master for GitHub Actions"""
-    
-    def __init__(self):
-        self.has_ai = check_api_keys()
-        logger.info("✅ Profit Master initialized")
-    
-    def generate_content(self, topic: str, language: str = 'en') -> Dict:
-        """Generate content based on template"""
-        
-        try:
-            # Clean topic
-            clean_topic = topic.lower().strip()
+          if [ -f "main.py" ]; then
+            # በመጀመሪያ ስርዓትን ፈትን
+            echo "🧪 Running system test..."
+            python main.py --test
             
-            # Select template
-            template_key = 'ai_revolution' if 'ai' in clean_topic else 'make_money_online'
-            
-            if language == 'am':
-                content = TEMPLATES['am'].get(template_key, TEMPLATES['am']['ai_revolution'])
-            else:
-                content = TEMPLATES['en'].get(template_key, TEMPLATES['en']['ai_revolution'])
-            
-            # Add monetization
-            monetized_content = self.add_monetization(content, language)
-            
-            return {
-                'id': f"content_{hashlib.md5(f'{topic}{time.time()}'.encode()).hexdigest()[:8]}",
-                'topic': topic,
-                'language': language,
-                'content': monetized_content,
-                'word_count': len(monetized_content.split()),
-                'revenue_estimate': self.calculate_revenue(language),
-                'created_at': datetime.now().isoformat(),
-                'has_ai': self.has_ai
-            }
-            
-        except Exception as e:
-            logger.error(f"Content generation error: {e}")
-            return self.generate_fallback(topic, language)
-    
-    def add_monetization(self, content: str, language: str) -> str:
-        """Add affiliate links to content"""
-        
-        affiliate_links = {
-            'en': '''
-## 💰 Recommended Tools (Affiliate Links)
-- **Bluehost Hosting**: Get 70% off: https://www.bluehost.com/track/profitmaster
-- **NordVPN**: Secure your connection: https://nordvpn.com/ref/profitmaster
-- **ConvertKit**: Email marketing made easy: https://convertkit.com?ref=profitmaster
+            # ከዚያ ሙሉ ስርዓት አስኬድ
+            echo "🎬 Starting content generation..."
+            python main.py \
+              --topic "${{ github.event.inputs.topic || 'AI Revolution' }}" \
+              --language "${{ github.event.inputs.language || 'am' }}"
+          else
+            echo "❌ Error: main.py ፋይል አልተገኘም!"
+            exit 1
+          fi
 
-*Note: These are affiliate links. We earn a commission at no extra cost to you.*''',
-            
-            'am': '''
-## 💰 የሚመከሩ መሣሪያዎች (አፊሊዬት አገናኞች)
-- **Bluehost ሆስቲንግ**: 70% ቅናሽ: https://www.bluehost.com/track/profitmaster
-- **NordVPN**: ግንኙነትዎን ያረጋግጡ: https://nordvpn.com/ref/profitmaster
-- **ConvertKit**: ኢሜይል ማርኬቲንግ ቀላል: https://convertkit.com?ref=profitmaster
-
-*ማስታወሻ: እነዚህ አፊሊዬት አገናኞች ናቸው። ምንም ተጨማሪ ክፍያ ሳይኖር ኮሚሽን እንወስዳለን።*'''
-        }
-        
-        return content + '\n\n' + affiliate_links.get(language, affiliate_links['en'])
-    
-    def calculate_revenue(self, language: str) -> Dict:
-        """Calculate estimated revenue"""
-        
-        base = 100 if language == 'en' else 80
-        
-        return {
-            'per_content': base,
-            'daily': base * 10,
-            'weekly': base * 10 * 7,
-            'monthly': base * 10 * 30,
-            'currency': 'USD'
-        }
-    
-    def generate_fallback(self, topic: str, language: str) -> Dict:
-        """Generate fallback content"""
-        
-        return {
-            'id': f"fallback_{hashlib.md5(topic.encode()).hexdigest()[:8]}",
-            'topic': topic,
-            'language': language,
-            'content': f"# {topic}\n\nContent about {topic} in {language}",
-            'word_count': 50,
-            'revenue_estimate': {'per_content': 50, 'currency': 'USD'},
-            'created_at': datetime.now().isoformat(),
-            'has_ai': False
-        }
-
-async def main():
-    """Main function"""
-    
-    print("\n" + "="*60)
-    print("🚀 PROFIT MASTER SUPREME".center(60))
-    print("በ GitHub Actions".center(60))
-    print("="*60)
-    
-    # Get inputs
-    topic = os.getenv('INPUT_TOPIC', 'AI Revolution')
-    language = os.getenv('INPUT_LANGUAGE', 'am')
-    
-    print(f"\n📝 Topic: {topic}")
-    print(f"🌍 Language: {language}")
-    print(f"🕐 Time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
-    
-    # Create instance
-    pm = ProfitMaster()
-    
-    # Generate content
-    print("\n⚡ Generating content...")
-    result = pm.generate_content(topic, language)
-    
-    # Save results
-    output_file = f"public/profit_master_{result['id']}.json"
-    os.makedirs('public', exist_ok=True)
-    
-    with open(output_file, 'w', encoding='utf-8') as f:
-        json.dump(result, f, indent=2, ensure_ascii=False)
-    
-    # Save content as HTML
-    html_file = f"public/{result['id']}.html"
-    html_content = f'''
-<!DOCTYPE html>
-<html lang="{language}">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{result['topic']} - Profit Master</title>
-    <style>
-        body {{ font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }}
-        h1 {{ color: #10b981; }}
-        h2 {{ color: #3b82f6; }}
-        .info {{ background: #f0f9ff; padding: 15px; border-radius: 8px; margin: 20px 0; }}
-        .revenue {{ background: #f0fdf4; padding: 15px; border-radius: 8px; }}
-    </style>
-</head>
-<body>
-    <h1>🚀 {result['topic']}</h1>
-    <div class="info">
-        <strong>Generated:</strong> {result['created_at']}<br>
-        <strong>Language:</strong> {result['language']}<br>
-        <strong>Word Count:</strong> {result['word_count']}
-    </div>
-    
-    <div class="revenue">
-        <h3>💰 Revenue Estimate</h3>
-        <p>Per Content: ${result['revenue_estimate']['per_content']}</p>
-        <p>Monthly Potential: ${result['revenue_estimate']['monthly']}</p>
-    </div>
-    
-    <hr>
-    
-    <div>
-        {result['content'].replace('\n', '<br>')}
-    </div>
-    
-    <hr>
-    
-    <footer>
-        <p>Generated by Profit Master Supreme • {datetime.now().strftime('%Y-%m-%d')}</p>
-        <p>AI Enabled: {result['has_ai']}</p>
-    </footer>
-</body>
-</html>
-'''
-    
-    with open(html_file, 'w', encoding='utf-8') as f:
-        f.write(html_content)
-    
-    # Print summary
-    print("\n" + "="*60)
-    print("✅ CONTENT GENERATED SUCCESSFULLY")
-    print("="*60)
-    print(f"\n📊 Summary:")
-    print(f"   • ID: {result['id']}")
-    print(f"   • Topic: {result['topic']}")
-    print(f"   • Language: {result['language']}")
-    print(f"   • Word Count: {result['word_count']}")
-    print(f"   • Revenue Estimate: ${result['revenue_estimate']['per_content']}")
-    print(f"   • Monthly Potential: ${result['revenue_estimate']['monthly']}")
-    print(f"   • AI Enabled: {result['has_ai']}")
-    print(f"\n💾 Files Saved:")
-    print(f"   • JSON: {output_file}")
-    print(f"   • HTML: {html_file}")
-    
-    # Save log
-    with open('profit_master.log', 'a') as f:
-        f.write(f"{datetime.now()}: Generated content - {result['id']}\n")
-
-if __name__ == "__main__":
-    asyncio.run(main())
-EOF
-          
-          # ስክሪፕቱን ማስኬድ
-          python profit_master_simple.py
-          
-          echo "✅ Script execution completed"
-
-      # 6. ውጤቱን (የተፈጠሩ ፋይሎችን) ያስቀምጣል
+      # 8. ውጤቶች ማስቀመጥ
       - name: "💾 Upload Artifacts"
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: profit-master-results
           path: |
-            public/
             profit_master.log
-            profit_master_simple.py
-          retention-days: 30
+            profit_master_v16.log
+            generated_content/
+            output/
+            *.json
+            *.html
+            *.txt
+            *.md
+          retention-days: 7
 
-      # 7. ውጤቱን በአርቴፋክት ላይ ለማየት ማስገባት
-      - name: "📤 Display Results"
+      # 9. ለሚቀጥለው ሂደት ማረጋገጫ
+      - name: "✅ Completion Status"
         if: always()
         run: |
-          echo "📊 Execution Results:"
-          echo "======================"
-          
-          if [ -d "public" ]; then
-            echo "📁 Generated Files:"
-            ls -la public/
-            
-            # Show content summary
-            for file in public/*.json; do
-              if [ -f "$file" ]; then
-                echo "📄 Content from $file:"
-                jq -r '.topic, .language, .revenue_estimate.per_content' "$file" 2>/dev/null || cat "$file" | grep -A3 '"topic"\|"language"\|"per_content"'
-              fi
-            done
-          fi
-          
           if [ -f "profit_master.log" ]; then
-            echo "📋 Log File (last 10 lines):"
-            tail -10 profit_master.log
-          fi
-
-      # 8. የአስፈፃሚነት ማረጋገጫ
-      - name: "✅ Verify Execution"
-        run: |
-          if [ -f "profit_master.log" ] && grep -q "Generated content" profit_master.log; then
-            echo "🎉 SUCCESS: Profit Master executed successfully!"
-            echo "📈 Content generated and monetized"
-            echo "💰 Ready for deployment"
+            echo "📊 Log file created: profit_master.log"
+            echo "🔍 Last 10 lines of log:"
+            tail -10 profit_master.log || echo "No log content"
           else
-            echo "⚠️ WARNING: Execution completed but no content found"
-            echo "Check logs for details"
+            echo "⚠️ No log file created"
           fi
+          
+          echo "🏁 Job completed at: $(date)"
