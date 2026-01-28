@@ -2,7 +2,6 @@
 """
 🌟 ULTIMATE PROFIT MASTER MEGA-SYSTEM v15.0
 🔥 የፍፁም አውቶማቲክ የይዘት ፍጠር፣ ሙልቲሚዲያ ማሻሻል እና አፊሊዬት ሞኔታይዜሽን ስርዓት
-💎 አንድ ሙሉ የማምረት ፕሮግራም - ቀጥታ ለማምረቻ
 """
 
 import os
@@ -27,83 +26,129 @@ import pandas as pd
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from contextlib import contextmanager
 
-# Third-party imports
-try:
-    import aiohttp
-    import httpx
-    import google.generativeai as genai
-    from gtts import gTTS
-    from moviepy.editor import *
-    import pytube
-    import yt_dlp
-    import tweepy
-    from selenium import webdriver
-    from selenium.webdriver.common.by import By
-    from bs4 import BeautifulSoup
-    from langdetect import detect
-    from googletrans import Translator
-    from textblob import TextBlob
-    import nltk
-    from nltk.corpus import stopwords
-    from nltk.tokenize import word_tokenize, sent_tokenize
-    import spacy
-    import openai
-    from transformers import pipeline
-    import torch
-    from sqlalchemy import create_engine, Column, String, Integer, Float, DateTime, JSON, Text, Boolean, ForeignKey
-    from sqlalchemy.ext.declarative import declarative_base
-    from sqlalchemy.orm import sessionmaker, relationship, scoped_session
-    from sqlalchemy.pool import QueuePool
-    import redis
-    from celery import Celery
-    from prometheus_client import start_http_server, Counter, Histogram, Gauge
-    import boto3
-    from botocore.exceptions import ClientError
-    from fastapi import FastAPI, HTTPException, BackgroundTasks, Depends, status
-    from pydantic import BaseModel, Field
-    import uvicorn
-    from PIL import Image, ImageDraw, ImageFont
-except ImportError as e:
-    print(f"⚠️ Missing dependency: {e}")
-    print("📦 Installing requirements...")
-    requirements = """
-    aiohttp>=3.9.0
-    httpx>=0.25.0
-    google-generativeai>=0.3.0
-    gtts>=2.3.0
-    moviepy>=1.0.3
-    pytube>=15.0.0
-    yt-dlp>=2023.10.13
-    tweepy>=4.14.0
-    selenium>=4.15.0
-    beautifulsoup4>=4.12.0
-    langdetect>=1.0.9
-    googletrans==3.1.0a0
-    textblob>=0.17.1
-    nltk>=3.8.0
-    spacy>=3.7.0
-    openai>=0.28.0
-    transformers>=4.35.0
-    torch>=2.1.0
-    sqlalchemy>=2.0.0
-    redis>=5.0.0
-    celery>=5.3.0
-    prometheus-client>=0.19.0
-    boto3>=1.34.0
-    fastapi>=0.104.0
-    uvicorn>=0.24.0
-    pydantic>=2.4.0
-    pillow>=10.0.0
-    pandas>=2.0.0
-    numpy>=1.24.0
-    """
+# =================== ጥገኝነት ማረጋገጫ ===================
+
+def check_dependencies():
+    """ጥገኝነቶች መኖራቸውን ያረጋግጣል"""
+    missing_deps = []
     
-    with open("requirements.txt", "w") as f:
-        f.write(requirements)
+    required_modules = [
+        ('aiohttp', 'aiohttp'),
+        ('httpx', 'httpx'),
+        ('google.generativeai', 'google-generativeai'),
+        ('gtts', 'gtts'),
+        ('moviepy.editor', 'moviepy==1.0.3'),
+        ('pytube', 'pytube'),
+        ('yt_dlp', 'yt-dlp'),
+        ('tweepy', 'tweepy'),
+        ('selenium.webdriver', 'selenium'),
+        ('bs4', 'beautifulsoup4'),
+        ('langdetect', 'langdetect'),
+        ('deep_translator', 'deep-translator'),
+        ('textblob', 'textblob'),
+        ('nltk', 'nltk'),
+        ('spacy', 'spacy'),
+        ('openai', 'openai'),
+        ('transformers', 'transformers'),
+        ('torch', 'torch'),
+        ('sqlalchemy', 'sqlalchemy'),
+        ('redis', 'redis'),
+        ('celery', 'celery'),
+        ('prometheus_client', 'prometheus-client'),
+        ('boto3', 'boto3'),
+        ('fastapi', 'fastapi'),
+        ('uvicorn', 'uvicorn'),
+        ('pydantic', 'pydantic'),
+        ('PIL', 'pillow'),
+    ]
     
-    os.system(f"{sys.executable} -m pip install -r requirements.txt")
-    print("✅ Dependencies installed. Please restart.")
-    sys.exit(1)
+    for module_name, package_name in required_modules:
+        try:
+            __import__(module_name.split('.')[0])
+        except ImportError:
+            missing_deps.append((module_name, package_name))
+    
+    if missing_deps:
+        print("❌ Missing dependencies:")
+        for module_name, package_name in missing_deps:
+            print(f"   - {module_name} (pip install {package_name})")
+        print("\n📦 Please install dependencies first:")
+        print("   pip install -r requirements.txt")
+        sys.exit(1)
+    
+    print("✅ All dependencies are installed")
+
+# ጥገኝነቶችን ያረጋግጡ
+check_dependencies()
+
+# =================== ሞጁሎችን ያስገቡ ===================
+
+import aiohttp
+import httpx
+import google.generativeai as genai
+from gtts import gTTS
+import moviepy.editor as mp
+import pytube
+import yt_dlp
+import tweepy
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from bs4 import BeautifulSoup
+from langdetect import detect
+from deep_translator import GoogleTranslator
+from textblob import TextBlob
+import nltk
+from nltk.corpus import stopwords
+from nltk.tokenize import word_tokenize, sent_tokenize
+import spacy
+import openai
+from transformers import pipeline
+import torch
+from sqlalchemy import create_engine, Column, String, Integer, Float, DateTime, JSON, Text, Boolean, ForeignKey
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker, relationship, scoped_session
+from sqlalchemy.pool import QueuePool
+import redis
+from celery import Celery
+from prometheus_client import start_http_server, Counter, Histogram, Gauge
+import boto3
+from botocore.exceptions import ClientError
+from fastapi import FastAPI, HTTPException, BackgroundTasks, Depends, status
+from pydantic import BaseModel, Field
+import uvicorn
+from PIL import Image, ImageDraw, ImageFont
+
+# =================== NLTK ውሂብ ማረጋገጫ ===================
+
+def setup_nltk():
+    """NLTK ውሂብ መኖሩን ያረጋግጣል"""
+    try:
+        nltk.data.find('tokenizers/punkt')
+    except LookupError:
+        print("📦 Downloading NLTK data...")
+        nltk.download('punkt', quiet=True)
+        nltk.download('stopwords', quiet=True)
+        nltk.download('wordnet', quiet=True)
+
+setup_nltk()
+
+# =================== የሎገር ማሰናጃ ===================
+
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.FileHandler('profit_master.log', encoding='utf-8'),
+        logging.StreamHandler()
+    ]
+)
+
+logger = logging.getLogger(__name__)
+
+# =================== የዋና ኮድ መስጀመሪያ ===================
+
+print("🚀 ULTIMATE PROFIT MASTER MEGA-SYSTEM v15.0")
+print("✅ System initialized successfully")
 
 # =================== የስርዓት ኮንፍግ ===================
 
@@ -123,6 +168,7 @@ class PremiumConfig:
     def _load_secrets(self) -> Dict[str, str]:
         """Secrets መጫን ከአከባቢ ተለዋዋጮች"""
         secrets = {}
+        
         # የAI API ቁልፎች - FAILOVER SYSTEM
         ai_keys = {
             'GROQ_API_KEY': os.getenv('GROQ_API_KEY', ''),
@@ -225,6 +271,67 @@ class PremiumConfig:
         
         return services
 
+# =================== ዋና የማስኬድ ተግባር ===================
+
+def main():
+    """ዋና የማስኬድ ተግባር"""
+    print("\n" + "="*80)
+    print("🚀 ULTIMATE PROFIT MASTER MEGA-SYSTEM v15.0".center(80))
+    print("="*80)
+    
+    print("\n📊 System initialized successfully!")
+    print("✅ All dependencies verified")
+    print("✅ All modules imported")
+    print("✅ NLTK data available")
+    
+    # የማስኬድ ምክንያቶችን ያንብቡ
+    import argparse
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--topic', default='AI Revolution', help='Topic for content')
+    parser.add_argument('--language', default='am', help='Language (en/am)')
+    parser.add_argument('--test', action='store_true', help='Run test mode')
+    
+    args = parser.parse_args()
+    
+    if args.test:
+        print(f"\n🧪 Test Mode: Topic={args.topic}, Language={args.language}")
+        # ቀላል ፈተና አስኬድ
+        try:
+            # የትርጉም ፈተና
+            translator = GoogleTranslator(source='auto', target=args.language)
+            test_translation = translator.translate("Hello World")
+            print(f"✅ Translation test: 'Hello World' -> '{test_translation}'")
+            
+            # የNLTK ፈተና
+            test_text = "This is a test sentence."
+            tokens = word_tokenize(test_text)
+            print(f"✅ NLP test: Tokenized '{test_text}' -> {tokens}")
+            
+            # የConfig ፈተና
+            config = PremiumConfig()
+            print(f"✅ Config loaded: {len(config.get_ai_service_priority())} AI services available")
+            
+            print("\n🎉 All tests passed! System is ready.")
+        except Exception as e:
+            print(f"❌ Test failed: {e}")
+            traceback.print_exc()
+    else:
+        print(f"\n🎯 Starting full system with topic: {args.topic}, language: {args.language}")
+        print(f"📅 Date: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+        
+        try:
+            # የስርዓት ኮንፍግ መጫን
+            config = PremiumConfig()
+            ai_services = config.get_ai_service_priority()
+            
+            print(f"🤖 AI Services Available: {len(ai_services)}")
+            for service in ai_services:
+                print(f"   - {service['name']} (Priority: {service['priority']})")
+            
+            # በዚህ ላይ የስርዓትዎን ዋና ኮድ ይጨምሩ
+            # ... የይዘት ፍጠር እና ሞኔታይዜሽን ኮድ ይቀጥላል ...
+            
+        
 # =================== የAI FAILOVER ስርዓት ===================
 
 class AIFailoverSystem:
