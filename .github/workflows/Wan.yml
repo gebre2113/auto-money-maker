@@ -2,8 +2,8 @@ name: Profit Master Supreme - EXECUTE
 
 on:
   schedule:
-    - cron: '0 */6 * * *'
-  workflow_dispatch:
+    - cron: '0 */6 * * *'  # በየ 6 ሰዓቱ ይሰራል
+  workflow_dispatch:       # በእጅ ማስጀመር
     inputs:
       topic:
         description: 'የይዘት ርዕስ'
@@ -23,73 +23,84 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
+      # 1. ኮድ መውረድ
       - name: "📥 Checkout Repository"
         uses: actions/checkout@v4
 
+      # 2. Python ማዋቀር
       - name: "🐍 Setup Python 3.12"
         uses: actions/setup-python@v5
         with:
           python-version: '3.12'
           cache: 'pip'
 
+      # 3. የሲስተም ጥገኝነቶች
       - name: "🔧 Install System Dependencies"
         run: |
           sudo apt-get update
-          sudo apt-get install -y ffmpeg imagemagick wget
+          sudo apt-get install -y ffmpeg imagemagick
           sudo sed -i 's/none/read,write/g' /etc/ImageMagick-6/policy.xml 2>/dev/null || true
 
-      - name: "📦 Install Python Dependencies from requirements.txt"
+      # 4. ፓይተን ጥገኝነቶች
+      - name: "📦 Install Python Dependencies"
         run: |
           pip install --upgrade pip
-          # በቀላሉ ዋና ዋና ፓኬጆችን ይጭኑ
-          pip install aiohttp httpx google-generativeai gtts
-          pip install moviepy==1.0.3 imageio==2.31.1
-          pip install deep-translator  # ከ googletrans ይልቅ
-          pip install pandas numpy<2.0.0
-          
-          # ቀሪዎቹን በቀላሉ
-          pip install pytube yt-dlp tweepy selenium beautifulsoup4 \
-            langdetect textblob nltk spacy openai transformers \
-            sqlalchemy redis celery prometheus-client boto3 \
-            fastapi uvicorn pydantic pillow
+          if [ -f "requirements.txt" ]; then
+            pip install -r requirements.txt
+          else
+            echo "❌ requirements.txt not found!"
+            exit 1
+          fi
 
-      - name: "📥 Install PyTorch (CPU)"
+      # 5. የPyTorch ልዩ ጫን (CPU)
+      - name: "🤖 Install PyTorch (CPU)"
         run: |
           pip install torch --index-url https://download.pytorch.org/whl/cpu
 
-      - name: "📥 Download NLTK Data"
+      # 6. NLTK ውሂብ
+      - name: "📚 Download NLTK Data"
         run: |
-          python -c "import nltk; nltk.download('punkt', quiet=True); nltk.download('stopwords', quiet=True); nltk.download('wordnet', quiet=True)"
+          python -c "
+          import nltk
+          nltk.download('punkt', quiet=True)
+          nltk.download('stopwords', quiet=True)
+          nltk.download('wordnet', quiet=True)
+          print('✅ NLTK data downloaded')
+          "
 
-      - name: "🤖 Execute Main Script"
+      # 7. የስክሪፕት ማስኬድ
+      - name: "🚀 Execute Main Script"
         env:
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         run: |
           echo "🚀 Starting Profit Master System..."
+          echo "📊 Dependencies installed successfully"
           
           if [ -f "main.py" ]; then
-            # በመጀመሪያ ፈተና አስኬድ
-            echo "🧪 Running system test..."
-            python main.py --topic "Test" --language "am" --test
-            
-            # ከዚያ ሙሉ ስርዓት
-            echo "🎯 Running full system..."
-            python main.py --topic "${{ github.event.inputs.topic || 'AI Revolution' }}" --language "${{ github.event.inputs.language || 'am' }}"
+            # አማራጭ ነጋሪት እንዲቀበል
+            python main.py \
+              --topic "${{ github.event.inputs.topic || 'AI Revolution' }}" \
+              --language "${{ github.event.inputs.language || 'am' }}"
           else
-            echo "❌ Error: main.py not found"
+            echo "❌ Error: main.py not found!"
             exit 1
           fi
 
-      - name: "💾 Upload Results"
+      # 8. ውጤቶች ማስቀመጥ
+      - name: "💾 Upload Artifacts"
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: profit-master-output
+          name: profit-master-results
           path: |
             profit_master.log
             *.json
             *.html
             *.txt
-          retention-days: 5
+            generated_content/
+            output/
+          retention-days: 7
