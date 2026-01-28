@@ -270,7 +270,167 @@ class PremiumConfig:
             raise Exception("❌ ምንም AI አገልግሎት አልተገኘም. GROQ_API_KEY ወይም GEMINI_API_KEY አስገባ።")
         
         return services
+# =================== የሙሉ ስርዓት አማካኝ ===================
 
+class UltimateProfitMasterSystem:
+    """
+    🚀 ULTIMATE PROFIT MASTER MEGA-SYSTEM v15.0
+    Complete integration of AI content generation, multimedia enhancement, and affiliate monetization
+    """
+    
+    def __init__(self, config: PremiumConfig):
+        self.config = config
+        self.content_generator = AdvancedAIContentGenerator(config)
+        self.multimedia_enhancer = PremiumMultimediaEnhancer()
+        self.affiliate_system = ProfitMasterUltraAffiliateSystem(user_geo="US", user_segment="premium")
+        
+        logger.info("🚀 Ultimate Profit Master Mega-System v15.0 initialized")
+    
+    async def create_ultimate_content_package(self, topic: str, language: str = 'en', 
+                                            country: str = 'US') -> Dict:
+        """የሙሉ የይዘት ፍጠር እና ሞኔታይዜሽን ፕሮቴስ"""
+        
+        start_time = time.time()
+        
+        try:
+            logger.info(f"🚀 Starting ultimate content package: {topic} [{language}]")
+            
+            # 1. የመሠረት ይዘት ፍጠር
+            base_content = await self.content_generator.generate_premium_content(topic, language)
+            
+            # 2. ሙልቲሚዲያ መለጠፍ
+            multimedia_result = await self.multimedia_enhancer.enhance_content_with_multimedia(base_content)
+            
+            # 3. አፊሊዬት ሞኔታይዜሽን
+            monetized_content, monetization_report = self.affiliate_system.monetize_content(
+                base_content['content'],
+                topic,
+                'article'
+            )
+            
+            # 4. የገቢ ስሌት
+            revenue_analysis = await self._calculate_comprehensive_revenue(base_content, multimedia_result, monetization_report)
+            
+            # 5. የውጤት ማዋቀር
+            duration = time.time() - start_time
+            
+            result = {
+                'status': 'success',
+                'system_version': '15.0',
+                'package_id': base_content['id'],
+                'created_at': datetime.now().isoformat(),
+                'generation_time_seconds': round(duration, 2),
+                
+                'content': {
+                    'title': base_content['title'],
+                    'word_count': base_content['word_count'],
+                    'quality_score': base_content['human_likeness_score'],
+                    'language': base_content['language'],
+                    'summary': base_content['summary'],
+                    'quality_verified': base_content['quality_verified']
+                },
+                
+                'multimedia': {
+                    'enhancements': multimedia_result['enhancements'],
+                    'quality_score': multimedia_result['quality_score']
+                },
+                
+                'monetization': {
+                    'report': monetization_report,
+                    'revenue_analysis': revenue_analysis,
+                    'monetized_content_preview': monetized_content[:500] + "..."
+                },
+                
+                'distribution': {
+                    'platforms': self._get_distribution_platforms(base_content, multimedia_result),
+                    'urls': multimedia_result.get('view_urls', {}),
+                    'downloads': multimedia_result.get('download_urls', {})
+                },
+                
+                'ai_services': base_content.get('ai_services_used', {}),
+            }
+            
+            logger.info(f"✅ Ultimate content package created: {base_content['id']}")
+            return result
+            
+        except Exception as e:
+            logger.error(f"❌ Ultimate package creation failed: {e}")
+            return {
+                'status': 'error',
+                'error': str(e),
+                'package_id': f"error_{hashlib.md5(topic.encode()).hexdigest()[:8]}",
+                'created_at': datetime.now().isoformat()
+            }
+    
+    async def _calculate_comprehensive_revenue(self, content: Dict, multimedia: Dict, monetization: Dict) -> Dict:
+        """ሙሉ የገቢ ትንተና"""
+        try:
+            base_revenue = monetization.get('estimated_revenue', 0)
+            return {
+                'base_revenue': round(base_revenue, 2),
+                'total_revenue': round(base_revenue * 1.5, 2), # Simplified calculation
+                'projections': {'monthly': round(base_revenue * 30, 2)}
+            }
+        except Exception:
+            return {'base_revenue': 0, 'total_revenue': 0}
+    
+    def _get_distribution_platforms(self, content: Dict, multimedia: Dict) -> List[Dict]:
+        return [{'platform': 'Website', 'priority': 'high'}]
+
+# =================== ፋስትAPI አገልግሎት ===================
+
+app = FastAPI(
+    title="🚀 ULTIMATE PROFIT MASTER MEGA-SYSTEM v15.0",
+    version="15.0"
+)
+
+# ግሎባል ተለዋዋጭ
+system = None
+
+@app.on_event("startup")
+async def startup_event():
+    """ስርዓት መጀመር"""
+    global system
+    try:
+        config = PremiumConfig()
+        system = UltimateProfitMasterSystem(config)
+        logger.info("🚀 System started successfully")
+    except Exception as e:
+        logger.error(f"❌ Startup failed: {e}")
+
+class ContentRequest(BaseModel):
+    topic: str
+    language: str = "en"
+    country: str = "US"
+
+@app.get("/")
+async def root():
+    return {"status": "operational", "message": "Profit Master System v15.0 is Running 🚀"}
+
+@app.post("/api/create")
+async def create_content(request: ContentRequest):
+    if not system:
+        raise HTTPException(status_code=500, detail="System not initialized")
+    return await system.create_ultimate_content_package(request.topic, request.language, request.country)
+
+@app.get("/api/health")
+async def health_check():
+    return {"status": "healthy", "timestamp": datetime.now().isoformat()}
+
+# =================== ዋና ማስጀመሪያ ===================
+
+if __name__ == "__main__":
+    print("\n" + "="*80)
+    print("🚀 STARTING PROFIT MASTER WEB SERVER".center(80))
+    print("="*80)
+    print("🌐 Server will run at: http://0.0.0.0:8000")
+    
+    # ሰርቨሩን ማስጀመር (ይህ መስመር ወሳኝ ነው!)
+    try:
+        uvicorn.run(app, host="0.0.0.0", port=8000)
+    except Exception as e:
+        print(f"❌ Server Failed to Start: {e}")
+        sys.exit(1)
 # =================== የAI FAILOVER ስርዓት ===================
 
 class AIFailoverSystem:
