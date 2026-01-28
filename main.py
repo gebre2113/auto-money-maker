@@ -27,83 +27,157 @@ import pandas as pd
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from contextlib import contextmanager
 
-# Third-party imports
-try:
-    import aiohttp
-    import httpx
-    import google.generativeai as genai
-    from gtts import gTTS
-    from moviepy.editor import *
-    import pytube
-    import yt_dlp
-    import tweepy
-    from selenium import webdriver
-    from selenium.webdriver.common.by import By
-    from bs4 import BeautifulSoup
-    from langdetect import detect
-    from googletrans import Translator
-    from textblob import TextBlob
-    import nltk
-    from nltk.corpus import stopwords
-    from nltk.tokenize import word_tokenize, sent_tokenize
-    import spacy
-    import openai
-    from transformers import pipeline
-    import torch
-    from sqlalchemy import create_engine, Column, String, Integer, Float, DateTime, JSON, Text, Boolean, ForeignKey
-    from sqlalchemy.ext.declarative import declarative_base
-    from sqlalchemy.orm import sessionmaker, relationship, scoped_session
-    from sqlalchemy.pool import QueuePool
-    import redis
-    from celery import Celery
-    from prometheus_client import start_http_server, Counter, Histogram, Gauge
-    import boto3
-    from botocore.exceptions import ClientError
-    from fastapi import FastAPI, HTTPException, BackgroundTasks, Depends, status
-    from pydantic import BaseModel, Field
-    import uvicorn
-    from PIL import Image, ImageDraw, ImageFont
-except ImportError as e:
-    print(f"⚠️ Missing dependency: {e}")
-    print("📦 Installing requirements...")
-    requirements = """
-    aiohttp>=3.9.0
-    httpx>=0.25.0
-    google-generativeai>=0.3.0
-    gtts>=2.3.0
-    moviepy>=1.0.3
-    pytube>=15.0.0
-    yt-dlp>=2023.10.13
-    tweepy>=4.14.0
-    selenium>=4.15.0
-    beautifulsoup4>=4.12.0
-    langdetect>=1.0.9
-    googletrans==3.1.0a0
-    textblob>=0.17.1
-    nltk>=3.8.0
-    spacy>=3.7.0
-    openai>=0.28.0
-    transformers>=4.35.0
-    torch>=2.1.0
-    sqlalchemy>=2.0.0
-    redis>=5.0.0
-    celery>=5.3.0
-    prometheus-client>=0.19.0
-    boto3>=1.34.0
-    fastapi>=0.104.0
-    uvicorn>=0.24.0
-    pydantic>=2.4.0
-    pillow>=10.0.0
-    pandas>=2.0.0
-    numpy>=1.24.0
-    """
+# =================== የጥገኝነት ማረጋገጫ ተግባር ===================
+
+def check_dependencies():
+    """ሁሉንም አስፈላጊ ሞጁሎች እንዳሉ ያረጋግጣል"""
+    required_modules = [
+        ('aiohttp', 'aiohttp'),
+        ('httpx', 'httpx'),
+        ('google.generativeai', 'google-generativeai'),
+        ('gtts', 'gtts'),
+        ('moviepy.editor', 'moviepy==1.0.3'),
+        ('pytube', 'pytube'),
+        ('yt_dlp', 'yt-dlp'),
+        ('tweepy', 'tweepy'),
+        ('selenium.webdriver', 'selenium'),
+        ('bs4', 'beautifulsoup4'),
+        ('langdetect', 'langdetect'),
+        ('googletrans', 'googletrans==3.1.0a0'),
+        ('textblob', 'textblob'),
+        ('nltk', 'nltk'),
+        ('spacy', 'spacy'),
+        ('openai', 'openai'),
+        ('transformers', 'transformers'),
+        ('torch', 'torch'),
+        ('sqlalchemy', 'sqlalchemy'),
+        ('redis', 'redis'),
+        ('celery', 'celery'),
+        ('prometheus_client', 'prometheus-client'),
+        ('boto3', 'boto3'),
+        ('fastapi', 'fastapi'),
+        ('uvicorn', 'uvicorn'),
+        ('pydantic', 'pydantic'),
+        ('PIL', 'pillow'),
+        ('pandas', 'pandas'),
+        ('numpy', 'numpy')
+    ]
     
-    with open("requirements.txt", "w") as f:
-        f.write(requirements)
+    missing_deps = []
     
-    os.system(f"{sys.executable} -m pip install -r requirements.txt")
-    print("✅ Dependencies installed. Please restart.")
-    sys.exit(1)
+    for module_name, package_name in required_modules:
+        try:
+            # የሙሉ ሞጁል ስም የሚያስተካክለው የመጀመሪያ ክፍልን ብቻ እንፈትናለን
+            base_module = module_name.split('.')[0]
+            __import__(base_module)
+        except ImportError:
+            missing_deps.append((module_name, package_name))
+    
+    if missing_deps:
+        print("❌ የሚከተሉት ጥገኝነቶች አልተገኙም:")
+        for module_name, package_name in missing_deps:
+            print(f"   - {module_name} (pip install {package_name})")
+        
+        print("\n📦 ጥገኝነቶችን ለመጫን:")
+        print("   1. requirements.txt ፋይል ይፍጠሩ:")
+        print("      nano requirements.txt")
+        print("   2. ከታች ያለውን ይግለጹ ወደ ፋይሉ ይጻፉ:")
+        
+        requirements_content = """aiohttp>=3.9.0
+httpx>=0.25.0
+google-generativeai>=0.3.0
+gtts>=2.3.0
+moviepy==1.0.3
+pytube>=15.0.0
+yt-dlp>=2023.10.13
+tweepy>=4.14.0
+selenium>=4.15.0
+beautifulsoup4>=4.12.0
+langdetect>=1.0.9
+googletrans==3.1.0a0
+textblob>=0.17.1
+nltk>=3.8.0
+spacy>=3.7.0
+openai>=0.28.0
+transformers>=4.35.0
+torch>=2.1.0
+sqlalchemy>=2.0.0
+redis>=5.0.0
+celery>=5.3.0
+prometheus-client>=0.19.0
+boto3>=1.34.0
+fastapi>=0.104.0
+uvicorn>=0.24.0
+pydantic>=2.4.0
+pillow>=10.0.0
+pandas>=2.0.0
+numpy>=1.24.0"""
+        
+        print(f"\n{requirements_content}")
+        print("\n   3. ጥገኝነቶችን ያጭኑ:")
+        print("      pip install -r requirements.txt")
+        print("\n   4. ከዚያ ይህንን ስክሪፕት እንደገና ያስኬዱ")
+        sys.exit(1)
+
+# ጥገኝነቶችን እንፈትን
+check_dependencies()
+
+# =================== ሞጁሎችን መጠቀም እንጀምር ===================
+
+print("✅ ሁሉም ጥገኝነቶች አሉ")
+print("📦 ሞጁሎችን በማስገባት ላይ...")
+
+# ሁሉንም አስፈላጊ ሞጁሎች አሁን ማስገባት እንችላለን
+import aiohttp
+import httpx
+import google.generativeai as genai
+from gtts import gTTS
+from moviepy.editor import *
+import pytube
+import yt_dlp
+import tweepy
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from bs4 import BeautifulSoup
+from langdetect import detect
+from googletrans import Translator
+from textblob import TextBlob
+import nltk
+from nltk.corpus import stopwords
+from nltk.tokenize import word_tokenize, sent_tokenize
+import spacy
+import openai
+from transformers import pipeline
+import torch
+from sqlalchemy import create_engine, Column, String, Integer, Float, DateTime, JSON, Text, Boolean, ForeignKey
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker, relationship, scoped_session
+from sqlalchemy.pool import QueuePool
+import redis
+from celery import Celery
+from prometheus_client import start_http_server, Counter, Histogram, Gauge
+import boto3
+from botocore.exceptions import ClientError
+from fastapi import FastAPI, HTTPException, BackgroundTasks, Depends, status
+from pydantic import BaseModel, Field
+import uvicorn
+from PIL import Image, ImageDraw, ImageFont
+
+print("✅ ሁሉም ሞጁሎች ተጫኑ")
+
+# =================== NLTK ውሂብ ማረጋገጫ ===================
+
+def setup_nltk():
+    """NLTK ውሂብ መኖሩን ያረጋግጣል"""
+    try:
+        nltk.data.find('tokenizers/punkt')
+    except LookupError:
+        print("📦 NLTK ውሂብ በማውረድ ላይ...")
+        nltk.download('punkt', quiet=True)
+        nltk.download('stopwords', quiet=True)
+        nltk.download('wordnet', quiet=True)
+
+setup_nltk()
 
 # =================== ሎጋር ማስጀመር ===================
 logging.basicConfig(
@@ -115,6 +189,9 @@ logging.basicConfig(
     ]
 )
 logger = logging.getLogger(__name__)
+
+print("🚀 ULTIMATE PROFIT MASTER MEGA-SYSTEM v16.0 ተጀምሯል")
+print("✅ ስርዓት ዝግጁ ነው")
 
 # =================== የስርዓት ኮንፍግ ===================
 
@@ -235,6 +312,7 @@ class PremiumConfig:
             raise Exception("❌ ምንም AI አገልግሎት አልተገኘም. GROQ_API_KEY ወይም GEMINI_API_KEY አስገባ።")
         
         return services
+
 
 # =================== የAI FAILOVER ስርዓት ===================
 
