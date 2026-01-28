@@ -1,78 +1,70 @@
 # requirements.txt
-# የተስተካከሉ ጥገኝነቶች (ተግባራዊ)
+# የተስተካከሉ ጥገኝነቶች (ሚሰራ)
 
 # መሰረታዊ
-aiohttp>=3.9.0
-httpx>=0.25.0
-requests>=2.31.0
+aiohttp==3.9.0
+httpx==0.25.0
+requests==2.31.0
 
-# AI እና ML
-google-generativeai>=0.3.0
-openai>=0.28.0
-transformers>=4.35.0
-torch>=2.2.0  # ከ2.1.0 ወደ 2.2.0 ቀይር
+# AI ሞዴሎች
+google-generativeai==0.3.0
+openai==0.28.0
 
 # ሙልቲሚዲያ
-gtts>=2.3.0
-moviepy>=1.0.3
-pytube>=15.0.0
-yt-dlp>=2023.10.13
-pillow>=10.0.0
+gtts==2.3.0
+moviepy==1.0.3
+imageio==2.31.1
+pytube==15.0.0
+yt-dlp==2023.10.13
+Pillow==10.0.0
 
 # ድር እና ማህበራዊ ሚዲያ
-tweepy>=4.14.0
-selenium>=4.15.0
-beautifulsoup4>=4.12.0
+tweepy==4.14.0
+selenium==4.15.0
+beautifulsoup4==4.12.0
 
-# ቋንቋ እና NLP
-langdetect>=1.0.9
-deep-translator>=1.11.4  # ከ googletrans ይልቅ
-textblob>=0.17.1
-nltk>=3.8.0
-spacy>=3.7.0
+# ቋንቋ ማስተርጓሚ
+deep-translator==1.11.4  # ከ googletrans ይልቅ
+langdetect==1.0.9
 
-# የውሂብ መሠረት እና አገልግሎቶች
-sqlalchemy>=2.0.0
-redis>=5.0.0
-celery>=5.3.0
-prometheus-client>=0.19.0
-boto3>=1.34.0
-psycopg2-binary>=2.9.0
+# NLP
+textblob==0.17.1
+nltk==3.8.0
+spacy==3.7.0
+transformers==4.35.0
 
-# API እና ድር
-fastapi>=0.104.0
-uvicorn>=0.24.0
-pydantic>=2.4.0
+# ማሽን ለርኒንግ
+torch==2.1.0
+
+# የውሂብ መሠረት
+sqlalchemy==2.0.0
+redis==5.0.0
+celery==5.3.0
+psycopg2-binary==2.9.0
+
+# Monitoring
+prometheus-client==0.19.0
+
+# Cloud
+boto3==1.34.0
+
+# API
+fastapi==0.104.0
+uvicorn==0.24.0
+pydantic==2.4.0
 
 # የውሂብ ምህዋር
-pandas>=2.0.0
-numpy>=1.26.0  # ከ1.24.0 ወደ 1.26.0 ቀይር
+pandas==2.0.0
+numpy==1.24.0
 
 # ሌሎች
-python-dotenv>=1.0.0
-cryptography>=41.0.0
-PyYAML>=6.0
-markdown>=3.5
-jinja2>=3.1.0
-# requirements-minimal.txt
-# በጣም የሚፈለጉ ፓኬጆች ብቻ
+python-dotenv==1.0.0
+cryptography==41.0.0
+PyYAML==6.0
+markdown==3.5
+jinja2==3.1.0
 
-aiohttp>=3.9.0
-httpx>=0.25.0
-requests>=2.31.0
-google-generativeai>=0.3.0
-openai>=0.28.0
-gtts>=2.3.0
-moviepy>=1.0.3
-pytube>=15.0.0
-tweepy>=4.14.0
-beautifulsoup4>=4.12.0
-deep-translator>=1.11.4
-textblob>=0.17.1
-nltk>=3.8.0
-transformers>=4.35.0
-fastapi>=0.104.0
-uvicorn>=0.24.0
-pydantic>=2.4.0
-pandas>=2.0.0
-numpy>=1.26.0
+# የተጨማሪ ሚዛን
+python-dateutil==2.8.2
+tqdm==4.66.4
+colorama==0.4.6
