@@ -2,7 +2,6 @@
 """
 🚀 ULTIMATE PROFIT MASTER MEGA-SYSTEM v16.0
 🔥 ፍጹም አውቶማቲክ የይዘት ፍጠር፣ ሙልቲሚዲያ ማሻሻል እና አፊሊዬት ሞኔታይዜሽን ስርዓት
-💎 ከመጀመሪያ እስከ መጨረሻ - ሙሉ የማምረት ፕሮግራም
 """
 
 import os
@@ -27,107 +26,71 @@ import pandas as pd
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from contextlib import contextmanager
 
-# =================== የጥገኝነት ማረጋገጫ ተግባር ===================
+# =================== የጥገኝነት ማረጋገጫ ===================
 
 def check_dependencies():
     """ሁሉንም አስፈላጊ ሞጁሎች እንዳሉ ያረጋግጣል"""
     required_modules = [
-        ('aiohttp', 'aiohttp'),
-        ('httpx', 'httpx'),
-        ('google.generativeai', 'google-generativeai'),
-        ('gtts', 'gtts'),
+        ('aiohttp', 'aiohttp==3.9.0'),
+        ('httpx', 'httpx==0.25.0'),
+        ('google.generativeai', 'google-generativeai==0.3.0'),
+        ('gtts', 'gtts==2.3.0'),
         ('moviepy.editor', 'moviepy==1.0.3'),
-        ('pytube', 'pytube'),
-        ('yt_dlp', 'yt-dlp'),
-        ('tweepy', 'tweepy'),
-        ('selenium.webdriver', 'selenium'),
-        ('bs4', 'beautifulsoup4'),
-        ('langdetect', 'langdetect'),
-        ('googletrans', 'googletrans==3.1.0a0'),
-        ('textblob', 'textblob'),
-        ('nltk', 'nltk'),
-        ('spacy', 'spacy'),
-        ('openai', 'openai'),
-        ('transformers', 'transformers'),
-        ('torch', 'torch'),
-        ('sqlalchemy', 'sqlalchemy'),
-        ('redis', 'redis'),
-        ('celery', 'celery'),
-        ('prometheus_client', 'prometheus-client'),
-        ('boto3', 'boto3'),
-        ('fastapi', 'fastapi'),
-        ('uvicorn', 'uvicorn'),
-        ('pydantic', 'pydantic'),
-        ('PIL', 'pillow'),
-        ('pandas', 'pandas'),
-        ('numpy', 'numpy')
+        ('pytube', 'pytube==15.0.0'),
+        ('yt_dlp', 'yt-dlp==2023.10.13'),
+        ('tweepy', 'tweepy==4.14.0'),
+        ('selenium.webdriver', 'selenium==4.15.0'),
+        ('bs4', 'beautifulsoup4==4.12.0'),
+        ('langdetect', 'langdetect==1.0.9'),
+        ('deep_translator', 'deep-translator==1.11.4'),  # ከ googletrans ይልቅ
+        ('textblob', 'textblob==0.17.1'),
+        ('nltk', 'nltk==3.8.0'),
+        ('spacy', 'spacy==3.7.0'),
+        ('openai', 'openai==0.28.0'),
+        ('transformers', 'transformers==4.35.0'),
+        ('torch', 'torch==2.1.0'),
+        ('sqlalchemy', 'sqlalchemy==2.0.0'),
+        ('redis', 'redis==5.0.0'),
+        ('celery', 'celery==5.3.0'),
+        ('prometheus_client', 'prometheus-client==0.19.0'),
+        ('boto3', 'boto3==1.34.0'),
+        ('fastapi', 'fastapi==0.104.0'),
+        ('uvicorn', 'uvicorn==0.24.0'),
+        ('pydantic', 'pydantic==2.4.0'),
+        ('PIL', 'pillow==10.0.0'),
+        ('psycopg2', 'psycopg2-binary==2.9.0'),
+        ('dotenv', 'python-dotenv==1.0.0'),
     ]
     
     missing_deps = []
     
     for module_name, package_name in required_modules:
         try:
-            # የሙሉ ሞጁል ስም የሚያስተካክለው የመጀመሪያ ክፍልን ብቻ እንፈትናለን
             base_module = module_name.split('.')[0]
             __import__(base_module)
         except ImportError:
             missing_deps.append((module_name, package_name))
     
     if missing_deps:
+        print("=" * 80)
         print("❌ የሚከተሉት ጥገኝነቶች አልተገኙም:")
+        print("=" * 80)
         for module_name, package_name in missing_deps:
-            print(f"   - {module_name} (pip install {package_name})")
+            print(f"   🔸 {module_name}: pip install '{package_name}'")
         
         print("\n📦 ጥገኝነቶችን ለመጫን:")
-        print("   1. requirements.txt ፋይል ይፍጠሩ:")
-        print("      nano requirements.txt")
-        print("   2. ከታች ያለውን ይግለጹ ወደ ፋይሉ ይጻፉ:")
-        
-        requirements_content = """aiohttp>=3.9.0
-httpx>=0.25.0
-google-generativeai>=0.3.0
-gtts>=2.3.0
-moviepy==1.0.3
-pytube>=15.0.0
-yt-dlp>=2023.10.13
-tweepy>=4.14.0
-selenium>=4.15.0
-beautifulsoup4>=4.12.0
-langdetect>=1.0.9
-googletrans==3.1.0a0
-textblob>=0.17.1
-nltk>=3.8.0
-spacy>=3.7.0
-openai>=0.28.0
-transformers>=4.35.0
-torch>=2.1.0
-sqlalchemy>=2.0.0
-redis>=5.0.0
-celery>=5.3.0
-prometheus-client>=0.19.0
-boto3>=1.34.0
-fastapi>=0.104.0
-uvicorn>=0.24.0
-pydantic>=2.4.0
-pillow>=10.0.0
-pandas>=2.0.0
-numpy>=1.24.0"""
-        
-        print(f"\n{requirements_content}")
-        print("\n   3. ጥገኝነቶችን ያጭኑ:")
-        print("      pip install -r requirements.txt")
-        print("\n   4. ከዚያ ይህንን ስክሪፕት እንደገና ያስኬዱ")
+        print("   pip install -r requirements.txt")
+        print("\n💡 ማስታወሻ: deep-translator ከ googletrans ይልቅ ተጠቅሟል")
+        print("=" * 80)
         sys.exit(1)
+    
+    print("✅ ሁሉም ጥገኝነቶች ተገኝተዋል")
 
 # ጥገኝነቶችን እንፈትን
 check_dependencies()
 
 # =================== ሞጁሎችን መጠቀም እንጀምር ===================
 
-print("✅ ሁሉም ጥገኝነቶች አሉ")
-print("📦 ሞጁሎችን በማስገባት ላይ...")
-
-# ሁሉንም አስፈላጊ ሞጁሎች አሁን ማስገባት እንችላለን
 import aiohttp
 import httpx
 import google.generativeai as genai
@@ -140,7 +103,7 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from bs4 import BeautifulSoup
 from langdetect import detect
-from googletrans import Translator
+from deep_translator import GoogleTranslator  # ከ googletrans ይልቅ
 from textblob import TextBlob
 import nltk
 from nltk.corpus import stopwords
@@ -162,36 +125,33 @@ from fastapi import FastAPI, HTTPException, BackgroundTasks, Depends, status
 from pydantic import BaseModel, Field
 import uvicorn
 from PIL import Image, ImageDraw, ImageFont
+import psycopg2
+from dotenv import load_dotenv
 
 print("✅ ሁሉም ሞጁሎች ተጫኑ")
 
-# =================== NLTK ውሂብ ማረጋገጫ ===================
+# =================== NLTK ውሂብ ===================
 
-def setup_nltk():
-    """NLTK ውሂብ መኖሩን ያረጋግጣል"""
-    try:
-        nltk.data.find('tokenizers/punkt')
-    except LookupError:
-        print("📦 NLTK ውሂብ በማውረድ ላይ...")
-        nltk.download('punkt', quiet=True)
-        nltk.download('stopwords', quiet=True)
-        nltk.download('wordnet', quiet=True)
+try:
+    nltk.data.find('tokenizers/punkt')
+except LookupError:
+    print("📦 NLTK ውሂብ በማውረድ ላይ...")
+    nltk.download('punkt', quiet=True)
+    nltk.download('stopwords', quiet=True)
+    nltk.download('wordnet', quiet=True)
 
-setup_nltk()
+# =================== ሎጋር ===================
 
-# =================== ሎጋር ማስጀመር ===================
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     handlers=[
-        logging.FileHandler('profit_master_v16.log', encoding='utf-8'),
+        logging.FileHandler('profit_master.log'),
         logging.StreamHandler()
     ]
 )
 logger = logging.getLogger(__name__)
 
-print("🚀 ULTIMATE PROFIT MASTER MEGA-SYSTEM v16.0 ተጀምሯል")
-print("✅ ስርዓት ዝግጁ ነው")
 
 # =================== የስርዓት ኮንፍግ ===================
 
