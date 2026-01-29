@@ -18,10 +18,11 @@ import re
 import argparse
 import textwrap
 import statistics
-from datetime import datetime, timedelta  # ✅ FIXED: Added timedelta here
+from datetime import datetime, timedelta
 from typing import Dict, List, Tuple, Any, Optional, Union
 from dataclasses import dataclass, field
 from collections import defaultdict
+from difflib import SequenceMatcher  # ✅ FIXED: Added SequenceMatcher
 
 # =================== IMPORT HANDLING ===================
 try:
@@ -31,11 +32,11 @@ try:
     import requests
     import openai
     
-    # Google AI (With fallback for deprecated package)
+    # Google AI (With fallback)
     try:
         import google.generativeai as genai
     except ImportError:
-        print("⚠️ Warning: google.generativeai not found. Gemini features may be limited.")
+        pass
 
     # NLP & Text
     from textblob import TextBlob
@@ -48,7 +49,7 @@ try:
     try:
         from langdetect import detect
     except ImportError:
-        def detect(text): return "en"  # Fallback
+        def detect(text): return "en"
         
     try:
         from googletrans import Translator
@@ -66,7 +67,7 @@ try:
         import yt_dlp
         from PIL import Image, ImageDraw, ImageFont
     except ImportError:
-        print("⚠️ Multimedia libraries missing. Skipping video/audio generation.")
+        pass
 
     # Scraping & Social
     try:
@@ -87,7 +88,6 @@ try:
 
 except ImportError as e:
     print(f"⚠️  WARNING: Missing dependency: {e}")
-    # Don't exit, just warn
 
 # =================== LOGGING SETUP ===================
 logging.basicConfig(
