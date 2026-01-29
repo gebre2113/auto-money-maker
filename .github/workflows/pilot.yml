@@ -1,0 +1,155 @@
+name: 🚀 Profit Master Elite - Production Auto-Pilot
+
+on:
+  # 1. በየቀኑ ማታ 10:00 UTC (ማለዳ 1:00 Ethiopia)
+  schedule:
+    - cron: '0 22 * * *'  # ከመኝታ አልጋ በፊት እንዲሰራ
+  
+  # 2. በሚፈልጉበት ጊዜ
+  workflow_dispatch:
+    inputs:
+      topic:
+        description: 'የይዘት ርዕስ'
+        required: false
+        default: 'Digital Marketing Strategy'
+      country:
+        description: 'ታርጋት ሀገር'
+        required: false
+        default: 'US'
+
+  # 3. ወደ main ሲገባ ለማስተካከል
+  push:
+    branches: [main]
+    paths:
+      - 'profit_master_v17.py'
+      - 'requirements.txt'
+
+jobs:
+  elite-content-factory:
+    name: 🏭 Elite Content Factory
+    runs-on: ubuntu-latest
+    timeout-minutes: 30  # ከላይ ሊጠፋ እንዳይችል
+    
+    # የሚስጥር ቁልፎች ከGitHub Secrets ማስተላለፍ
+    env:
+      GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+      GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      DATABASE_URL: sqlite:///profit_master.db
+      REDIS_URL: redis://localhost:6379/0
+    
+    steps:
+    - name: 📥 ኮድ ማውረድ
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    
+    - name: 🐍 Python ማዋቀር
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+        cache: 'pip'
+    
+    - name: 📦 ጥገኛ መጫን
+      run: |
+        pip install --upgrade pip
+        pip install -r requirements.txt
+        # ተጨማሪ የስርዓት ጥገኛዎች
+        pip install python-dotenv redis hiredis
+    
+    - name: 🔧 ሚስጥሮች ማዘጋጀት
+      run: |
+        # ለአካባቢ ሙከራ የሚስጥር ፋይል መፍጠር
+        echo "GROQ_API_KEY=$GROQ_API_KEY" > .env
+        echo "GEMINI_API_KEY=$GEMINI_API_KEY" >> .env
+        echo "OPENAI_API_KEY=$OPENAI_API_KEY" >> .env
+        echo "DATABASE_URL=$DATABASE_URL" >> .env
+    
+    - name: 🧪 ሙከራ ማስኬድ
+      run: |
+        # የስርዓቱን የመጀመሪያ ሙከራ
+        python -c "
+        try:
+            from profit_master_v17 import PremiumConfig
+            config = PremiumConfig()
+            print('✅ PremiumConfig: PASS')
+            services = config.get_ai_service_priority()
+            print(f'✅ AI Services: {len(services)} found')
+        except Exception as e:
+            print(f'❌ Test failed: {e}')
+            exit(1)
+        "
+    
+    - name: 🚀 የይዘት ማመንጨት
+      run: |
+        # የአውቶማቲክ ስክሪፕት መፍጠር
+        cat > generate_content.py << 'EOF'
+        import asyncio
+        import json
+        import os
+        import sys
+        
+        # የርዕስ እና ሀገር ማስተላለፍ
+        topic = os.getenv('INPUT_TOPIC', 'Future of AI in Business')
+        country = os.getenv('INPUT_COUNTRY', 'US')
+        
+        async def main():
+            try:
+                from profit_master_v17 import ProfitMasterEliteSystem, PremiumConfig
+                
+                print(f"🚀 Starting generation for: {topic} [{country}]")
+                
+                config = PremiumConfig()
+                system = ProfitMasterEliteSystem(config)
+                
+                # Generate content
+                result = await system.create_elite_content_package(
+                    topic=topic,
+                    country=country,
+                    language='en'
+                )
+                
+                # Save result
+                output_file = f"elite_output_{country}_{int(time.time())}.json"
+                with open(output_file, 'w', encoding='utf-8') as f:
+                    json.dump(result, f, indent=2, ensure_ascii=False)
+                
+                print(f"✅ Content generated: {output_file}")
+                print(f"📊 Estimated value: ${result.get('estimated_values', {}).get('total_package_value', 0):,.2f}")
+                
+                return result
+                
+            except Exception as e:
+                print(f"❌ Generation failed: {e}")
+                import traceback
+                traceback.print_exc()
+                return None
+        
+        if __name__ == "__main__":
+            import time
+            asyncio.run(main())
+        EOF
+        
+        # ስክሪፕቱን ማስኬድ
+        python generate_content.py
+    
+    - name: 💾 ውጤቶችን ማስቀመጥ
+      uses: actions/upload-artifact@v4
+      with:
+        name: elite-content-${{ github.run_id }}
+        path: |
+          elite_output_*.json
+          profit_master_v17.log
+        retention-days: 7
+    
+    - name: 📊 ማጠቃለያ ማተም
+      if: always()
+      run: |
+        echo "## 📈 Profit Master Elite Run Summary" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "**Run ID:** ${{ github.run_id }}" >> $GITHUB_STEP_SUMMARY
+        echo "**Topic:** ${{ github.event.inputs.topic || 'AI Business Strategies' }}" >> $GITHUB_STEP_SUMMARY
+        echo "**Country:** ${{ github.event.inputs.country || 'US' }}" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "✅ Content generation pipeline completed" >> $GITHUB_STEP_SUMMARY
+        echo "📁 Artifacts available for download" >> $GITHUB_STEP_SUMMARY
