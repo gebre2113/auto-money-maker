@@ -3369,70 +3369,154 @@ async def create_elite_content(topic: str, country: str = "US", language: str = 
         logger.error(f"Generation failed: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
-def main():
-    """
-    Command Line Interface Runner (ለሙከራ)
-    """
-    print("\n" + "="*80)
-    print("🚀 PROFIT MASTER ELITE v17.5 - SYSTEM INITIALIZATION".center(80))
-    print("="*80 + "\n")
+# =================== 🏁 DUAL MODE EXECUTION SYSTEM ===================
+
+import argparse # ይህ አስፈላጊ ነው
+
+def parse_arguments():
+    """ለአውቶማቲክ እና ለሰው እጅ አሰራር ትዕዛዞችን የሚያነብ"""
+    parser = argparse.ArgumentParser(description='Profit Master Elite v17.5 Runner')
     
-    # 1. Initialize Configuration
+    # Flags
+    parser.add_argument('--auto', action='store_true', help='Run in headless automated mode (for GitHub Actions/Cron)')
+    
+    # Parameters (Optional for manual mode, required for auto if not default)
+    parser.add_argument('--topic', type=str, default='Artificial Intelligence in Business', help='Topic to generate content about')
+    parser.add_argument('--country', type=str, default='US', help='Target country code (e.g., US, ET, DE)')
+    parser.add_argument('--language', type=str, default='en', help='Language code (e.g., en, am)')
+    
+    return parser.parse_args()
+
+async def run_automated_mode(args):
+    """
+    🤖 AUTOMATED MODE (For GitHub Actions / Servers)
+    ምንም የሰው ጣልቃ ገብነት ሳይኖር ይዘትን አምርቶ በፋይል ያስቀምጣል።
+    """
+    print(f"\n🤖 AUTO-PILOT ENGAGED")
+    print(f"📍 Topic: {args.topic}")
+    print(f"🌍 Target: {args.country} ({args.language})")
+    print("-" * 40)
+    
     try:
+        # Initialize System
         config = PremiumConfig()
-        print("✅ Configuration Loaded")
-    except Exception as e:
-        print(f"❌ Config Error: {e}")
-        return
-
-    # 2. Initialize System
-    try:
         system = ProfitMasterEliteSystem(config)
-        print("✅ Elite System Modules Loaded: [AI, Culture, Sensory, Neuro, Affiliate]")
-    except Exception as e:
-        print(f"❌ System Init Error: {e}")
-        return
-
-    # 3. Interactive Mode
-    print("\n💡 MODE SELECTION:")
-    print("1. Start API Server (FastAPI)")
-    print("2. Run Test Generation (CLI)")
-    
-    choice = input("\nEnter choice (1/2): ").strip()
-    
-    if choice == "1":
-        print("\n🌐 Starting API Server on http://0.0.0.0:8000...")
-        uvicorn.run(app, host="0.0.0.0", port=8000)
         
-    elif choice == "2":
-        topic = input("\nEnter Topic (e.g., 'Digital Marketing'): ") or "Digital Marketing"
-        country = input("Enter Country Code (e.g., 'US', 'ET'): ") or "US"
-        
-        print(f"\n⏳ Generating Elite Package for '{topic}' in '{country}'...")
-        
-        # Async execution in sync context
-        loop = asyncio.get_event_loop()
+        # Generate Content
         start_time = time.time()
-        result = loop.run_until_complete(system.create_elite_content_package(topic, country=country))
-        end_time = time.time()
+        result = await system.create_elite_content_package(
+            topic=args.topic,
+            language=args.language,
+            country=args.country
+        )
+        duration = round(time.time() - start_time, 2)
         
-        print("\n" + "="*80)
-        print("🎉 GENERATION SUCCESSFUL!".center(80))
-        print("="*80)
-        print(f"⏱️ Time Taken: {round(end_time - start_time, 2)} seconds")
-        print(f"📄 Package ID: {result['package_id']}")
-        print(f"💰 Estimated Annual Value: ${result['estimated_values']['annual_enterprise_value']:,.2f}")
-        print(f"🧠 Neuro-Triggers: {len(result['monetization']['formats_used'])}")
-        print(f"🎥 Multimedia: {result['multimedia']['youtube_videos_found']} Videos Found")
+        # Save Result to JSON File
+        timestamp = int(time.time())
+        # Clean topic for filename
+        safe_topic = re.sub(r'[^a-zA-Z0-9]', '_', args.topic[:20])
+        filename = f"elite_output_{args.country}_{safe_topic}_{timestamp}.json"
         
-        # Save output to file for inspection
-        filename = f"elite_output_{country}_{int(time.time())}.json"
         with open(filename, 'w', encoding='utf-8') as f:
             json.dump(result, f, indent=4, ensure_ascii=False)
-        print(f"\n📂 Full result saved to: {filename}")
+            
+        print(f"✅ SUCCESS: Generated in {duration}s")
+        print(f"📂 FILE SAVED: {filename}")
         
+        return result
+
+    except Exception as e:
+        print(f"❌ CRITICAL ERROR IN AUTO MODE: {e}")
+        traceback.print_exc()
+        sys.exit(1)
+
+def run_interactive_mode():
+    """
+    👤 INTERACTIVE MODE (For Humans)
+    ተጠቃሚውን እየጠየቀ የሚያሰራ።
+    """
+    print("\n" + "="*80)
+    print("🚀 PROFIT MASTER ELITE v17.5 - INTERACTIVE CONSOLE".center(80))
+    print("="*80 + "\n")
+    
+    # 1. System Check
+    print("⚙️  Checking System Configuration...")
+    try:
+        config = PremiumConfig()
+        # Check for API keys but don't crash if missing (for demo)
+        missing_keys = [k for k, v in config.secrets.items() if not v and 'API_KEY' in k]
+        if missing_keys:
+            print(f"⚠️  Warning: Missing API Keys: {', '.join(missing_keys[:3])}...")
+        
+        print("✅ Config Loaded")
+        system = ProfitMasterEliteSystem(config)
+        print("✅ Elite System Initialized\n")
+    except Exception as e:
+        print(f"❌ Initialization Failed: {e}")
+        return
+
+    # 2. Get User Input
+    print("📝 PROJECT DETAILS:")
+    topic = input("   👉 Enter Topic (default: Digital Marketing): ").strip() or "Digital Marketing"
+    country = input("   👉 Enter Country Code (default: US): ").strip().upper() or "US"
+    language = input("   👉 Enter Language Code (default: en): ").strip().lower() or "en"
+    
+    print(f"\n⏳ GENERATING ELITE PACKAGE FOR '{topic}'...")
+    print("   (This involves AI, Video Search, and Neuro-Marketing analysis...)")
+    
+    # 3. Execute
+    # Create new event loop for this execution
+    try:
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        
+        start_time = time.time()
+        result = loop.run_until_complete(system.create_elite_content_package(topic, language, country))
+        duration = round(time.time() - start_time, 2)
+        
+        print("\n" + "="*80)
+        print("🎉 GENERATION COMPLETE!".center(80))
+        print("="*80)
+        print(f"⏱️  Time: {duration} seconds")
+        print(f"📄 Package ID: {result.get('package_id', 'N/A')}")
+        print(f"💰 Est. Value: ${result.get('estimated_values', {}).get('total_package_value', 0):,.2f}")
+        
+        videos_found = result.get('multimedia', {}).get('youtube_videos_found', 0)
+        print(f"🎥 Multimedia: {videos_found} Videos Found")
+        
+        # Save Option
+        save = input("\n💾 Save result to file? (y/n): ").lower()
+        if save == 'y' or save == 'yes':
+            filename = f"manual_output_{country}_{int(time.time())}.json"
+            with open(filename, 'w', encoding='utf-8') as f:
+                json.dump(result, f, indent=4, ensure_ascii=False)
+            print(f"✅ Saved to {filename}")
+            
+        loop.close()
+            
+    except Exception as e:
+        print(f"\n❌ ERROR DURING GENERATION: {e}")
+        traceback.print_exc()
+
+# =================== MAIN ENTRY POINT ===================
+
+def main():
+    # ነጋሪቶችን (Arguments) እናነባለን
+    args = parse_arguments()
+    
+    if args.auto:
+        # አውቶማቲክ ሞድ (YAML / GitHub Actions)
+        try:
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+            loop.run_until_complete(run_automated_mode(args))
+            loop.close()
+        except Exception as e:
+            print(f"❌ Auto-Loop Error: {e}")
+            sys.exit(1)
     else:
-        print("❌ Invalid choice. Exiting.")
+        # ማኑዋል ሞድ (Interactive)
+        run_interactive_mode()
 
 if __name__ == "__main__":
     main()
