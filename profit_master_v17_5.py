@@ -233,6 +233,100 @@ class PremiumConfig:
         
         return services
 
+# =================== 🔐 SECURITY & MONITORING UTILS ===================
+
+class SecureAPIKeyManager:
+    """
+    API Key Validator & Manager
+    ይህ ክፍል API Keys እንዳሉ እና ትክክል መሆናቸውን ያረጋግጣል
+    """
+    def __init__(self):
+        self.keys = {}
+        self._load_keys()
+    
+    def _load_keys(self):
+        # ቁልፎችን ከ Environment Variables ይጭናል
+        sources = ['GROQ', 'GEMINI', 'OPENAI', 'HUGGINGFACE', 'COHERE']
+        for source in sources:
+            key = os.getenv(f"{source}_API_KEY") or os.getenv(f"{source}_TOKEN")
+            if key and len(key) > 5:
+                self.keys[source.lower()] = key
+    
+    def get_key(self, service: str) -> str:
+        # ለአገልግሎቱ የሚሆን ቁልፍ ይመልሳል
+        return self.keys.get(service.lower())
+    
+    def get_available_services(self) -> List[str]:
+        # ቁልፍ ያላቸውን አገልግሎቶች ብቻ ዝርዝር ይመልሳል
+        return list(self.keys.keys())
+
+class RateLimiter:
+    """
+    Rate Limiter per Service
+    አገልግሎቶች እንዳይጨናነቁ ይቆጣጠራል
+    """
+    def __init__(self):
+        self.last_request = {}
+        # በየአገልግሎቱ ስንት ሰከንድ መቆየት እንዳለበት
+        self.limits = {'groq': 1, 'gemini': 1, 'openai': 1, 'huggingface': 5, 'cohere': 2}
+        
+    async def wait_if_needed(self, service: str):
+        now = time.time()
+        last = self.last_request.get(service, 0)
+        wait = self.limits.get(service, 1) - (now - last)
+        if wait > 0:
+            await asyncio.sleep(wait)
+        self.last_request[service] = time.time()
+
+class AdvancedMonitoring:
+    """
+    Performance & Cost Tracker
+    የስራ አፈፃፀምን እና ወጪን ይከታተላል
+    """
+    def __init__(self):
+        self.stats = {'requests': 0, 'success': 0, 'cost': 0.0, 'tokens': 0}
+        
+    def track_request(self, service: str, success: bool, tokens: int = 0, duration: float = 0):
+        self.stats['requests'] += 1
+        if success: self.stats['success'] += 1
+        self.stats['tokens'] += tokens
+        # ግምታዊ ወጪ (Average per 1K tokens)
+        costs = {'openai': 0.03, 'gemini': 0.001, 'groq': 0.0, 'huggingface': 0.0}
+        self.stats['cost'] += (tokens / 1000) * costs.get(service, 0.0)
+
+class ContentAnalyzer:
+    """
+    Content Analyzer for Smart Routing
+    ጽሁፉ ምን አይነት እንደሆነ ለይቶ ለትክክለኛው AI ይመራዋል
+    """
+    def __init__(self):
+        self.best_providers = {
+            'technical': 'groq',
+            'creative': 'gemini',
+            'general': 'groq'
+        }
+    
+    def get_best_service_for_prompt(self, prompt: str, available: List[str]) -> str:
+        # ለጊዜው Groqን እንደ ምርጫ እንወስዳለን (ፈጣን ስለሆነ)
+        if 'groq' in available:
+            return 'groq'
+        return available[0] if available else 'groq'
+
+class ModelPerformanceTracker:
+    """Tracks which model is performing best"""
+    def __init__(self):
+        self.stats = {}
+    
+    async def track_model_performance(self, provider, model, success, time=None, tokens=0):
+        key = f"{provider}:{model}"
+        if key not in self.stats:
+            self.stats[key] = {'success': 0, 'fail': 0}
+        
+        if success:
+            self.stats[key]['success'] += 1
+        else:
+            self.stats[key]['fail'] += 1
+
 # =================== 🚀 THE ULTIMATE AI FAILOVER SYSTEM ===================
 
 class AIFailoverSystem:
