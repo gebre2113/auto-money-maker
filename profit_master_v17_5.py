@@ -233,261 +233,229 @@ class PremiumConfig:
         
         return services
 
-# =================== የAI FAILOVER ስርዓት ===================
+# =================== 🚀 THE ULTIMATE AI FAILOVER SYSTEM ===================
 
 class AIFailoverSystem:
-    """አንዱ ሲጠፋ ሌላው እንዲተካ የሚያደርግ የAI ፋይሎቨር ስርዓት"""
+    """
+    Multilayer AI Execution Engine with INTERNAL MODEL ROTATION & SMART ROUTING
+    Features:
+    - Multi-Model Fallback (e.g., Llama 3 -> Mixtral -> Llama 8B)
+    - Auto-Healing (Disables bad services automatically)
+    - Smart Context Routing (Long prompts -> High context models)
+    """
     
     def __init__(self, config: PremiumConfig):
         self.config = config
-        self.ai_services = config.get_ai_service_priority()
-        self.current_service_index = 0
-        self.service_stats = {}
-        self.logger = logging.getLogger(__name__)
+        self.key_manager = SecureAPIKeyManager()
+        self.error_handler = AdvancedErrorHandling()
+        self.healer = SelfHealingSystem()
+        self.limiter = RateLimiter()
+        self.monitor = AdvancedMonitoring()
+        self.content_analyzer = ContentAnalyzer()
+        self.model_tracker = ModelPerformanceTracker()
         
-        # የአገልግሎት ስታቲስቲክስ መጀመር
-        for service in self.ai_services:
-            self.service_stats[service['name']] = {
-                'success': 0,
-                'failures': 0,
-                'response_time': [],
-                'last_used': None
-            }
-    
-    async def generate_content(self, prompt: str, max_tokens: int = 2000) -> str:
-        """ይዘት ፍጠር በፋይሎቨር ስርዓት"""
+        # አገልግሎቶችን በቅድሚያ (Priority) ደርድር
+        self.services = [
+            {'name': 'groq', 'priority': 1, 'func': self._generate_with_groq},
+            {'name': 'gemini', 'priority': 2, 'func': self._generate_with_gemini},
+            {'name': 'openai', 'priority': 3, 'func': self._generate_with_openai},
+            {'name': 'huggingface', 'priority': 4, 'func': self._generate_with_huggingface},
+            {'name': 'cohere', 'priority': 5, 'func': self._generate_with_cohere}
+        ]
         
-        attempts = 0
-        max_attempts = len(self.ai_services)
+        logger.info("🛡️ Ultimate AI Failover System Initialized")
+    
+    async def generate_content(self, prompt: str, max_tokens: int = 3000, 
+                             preferred_service: str = None, content_type: str = "general") -> str:
+        """ዋና የይዘት መፍጠሪያ Function (The Brain)"""
         
-        while attempts < max_attempts:
-            service = self.ai_services[self.current_service_index]
-            service_name = service['name']
-            
-            try:
-                self.logger.info(f"🔧 የAI አገልግሎት እየተጠቀም ነው: {service_name}")
-                
-                start_time = time.time()
-                
-                # በአገልግሎት ስም የሚለየው የመፍጠሪያ ተግባር
-                if service_name == 'groq':
-                    content = await self._generate_with_groq(prompt, max_tokens, service)
-                elif service_name == 'gemini':
-                    content = await self._generate_with_gemini(prompt, max_tokens, service)
-                elif service_name == 'openai':
-                    content = await self._generate_with_openai(prompt, max_tokens, service)
-                elif service_name == 'huggingface':
-                    content = await self._generate_with_huggingface(prompt, max_tokens, service)
-                elif service_name == 'cohere':
-                    content = await self._generate_with_cohere(prompt, max_tokens, service)
-                else:
-                    raise Exception(f"ያልታወቀ አገልግሎት: {service_name}")
-                
-                response_time = time.time() - start_time
-                
-                # ስታቲስቲክስ መዝግብ
-                self.service_stats[service_name]['success'] += 1
-                self.service_stats[service_name]['response_time'].append(response_time)
-                self.service_stats[service_name]['last_used'] = datetime.now()
-                
-                self.logger.info(f"✅ {service_name} ይዘትን በ{response_time:.2f} ሰከንድ ፈጥሯል")
-                return content
-                
-            except Exception as e:
-                self.logger.error(f"❌ {service_name} ላይ ስህተት: {str(e)[:100]}")
-                
-                # ስታቲስቲክስ መዝግብ
-                self.service_stats[service_name]['failures'] += 1
-                
-                # ወደ ቀጣዩ አገልግሎት ቀይር
-                self.current_service_index = (self.current_service_index + 1) % len(self.ai_services)
-                attempts += 1
-                
-                # አጭር የጊዜ እረፍት
-                await asyncio.sleep(1)
-        
-        # ሁሉም አገልግሎቶች ከውጡ ቢያመልጡ
-        raise Exception("🚨 ሁሉም AI አገልግሎቶች ከውጡ ተወግደዋል!")
-    
-    async def _generate_with_groq(self, prompt: str, max_tokens: int, service: Dict) -> str:
-        """GROQ API በመጠቀም ይዘት ፍጠር"""
-        try:
-            # GROQ ቀጥታ REST API ጥቆማ
-            url = "https://api.groq.com/openai/v1/chat/completions"
-            headers = {
-                "Authorization": f"Bearer {service['api_key']}",
-                "Content-Type": "application/json"
-            }
-            
-            data = {
-                "model": service['models'][0],
-                "messages": [
-                    {
-                        "role": "system",
-                        "content": "You are a professional content writer and SEO specialist. Create original, engaging, and informative content."
-                    },
-                    {
-                        "role": "user",
-                        "content": prompt
-                    }
-                ],
-                "max_tokens": max_tokens,
-                "temperature": 0.7,
-                "top_p": 0.9
-            }
-            
-            async with httpx.AsyncClient(timeout=30.0) as client:
-                response = await client.post(url, headers=headers, json=data)
-                
-                if response.status_code == 200:
-                    result = response.json()
-                    return result['choices'][0]['message']['content']
-                else:
-                    raise Exception(f"GROQ API error: {response.status_code}")
-                    
-        except Exception as e:
-            raise Exception(f"GROQ generation failed: {str(e)}")
-    
-    async def _generate_with_gemini(self, prompt: str, max_tokens: int, service: Dict) -> str:
-        """Gemini API በመጠቀም ይዘት ፍጠር"""
-        try:
-            # Gemini REST API ጥቆማ
-            url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key={service['api_key']}"
-            
-            data = {
-                "contents": [{
-                    "parts": [{
-                        "text": prompt
-                    }]
-                }],
-                "generationConfig": {
-                    "temperature": 0.7,
-                    "top_p": 0.9,
-                    "maxOutputTokens": max_tokens
-                }
-            }
-            
-            async with httpx.AsyncClient(timeout=30.0) as client:
-                response = await client.post(url, json=data)
-                
-                if response.status_code == 200:
-                    result = response.json()
-                    if 'candidates' in result and len(result['candidates']) > 0:
-                        return result['candidates'][0]['content']['parts'][0]['text']
-                    else:
-                        raise Exception("No content generated by Gemini")
-                else:
-                    raise Exception(f"Gemini API error: {response.status_code}")
-                    
-        except Exception as e:
-            raise Exception(f"Gemini generation failed: {str(e)}")
-    
-    async def _generate_with_openai(self, prompt: str, max_tokens: int, service: Dict) -> str:
-        """OpenAI API በመጠቀም ይዘት ፍጠር"""
-        try:
-            openai.api_key = service['api_key']
-            
-            response = await asyncio.to_thread(
-                openai.ChatCompletion.create,
-                model=service['models'][0],
-                messages=[
-                    {"role": "system", "content": "You are a professional content writer."},
-                    {"role": "user", "content": prompt}
-                ],
-                max_tokens=max_tokens,
-                temperature=0.7,
-                top_p=0.9
+        # የይዘት ትንተና እና ምርጥ አገልግሎት ምርጫ
+        if not preferred_service:
+            preferred_service = self.content_analyzer.get_best_service_for_prompt(
+                prompt, self.key_manager.get_available_services()
             )
+        
+        # አገልግሎቶችን ማዘጋጀት (ምርጥ አገልግሎት በመጀመሪያ)
+        sorted_services = sorted(
+            self.services,
+            key=lambda x: 0 if x['name'] == preferred_service else x['priority']
+        )
+        
+        last_error = None
+        
+        for service in sorted_services:
+            name = service['name']
             
-            return response.choices[0].message.content
+            # 1. አገልግሎቱ ጤነኛ ነው?
+            if not self.healer.is_service_healthy(name):
+                # logger.debug(f"⚠️ Skipping {name} (Unhealthy)")
+                continue
             
-        except Exception as e:
-            raise Exception(f"OpenAI generation failed: {str(e)}")
-    
-    async def _generate_with_huggingface(self, prompt: str, max_tokens: int, service: Dict) -> str:
-        """Hugging Face API በመጠቀም ይዘት ፍጠር"""
-        try:
-            url = "https://api-inference.huggingface.co/models/gpt2"
-            headers = {"Authorization": f"Bearer {service['api_key']}"}
+            # 2. Key አለ?
+            api_key = self.key_manager.get_key(name)
+            if not api_key:
+                continue
             
-            payload = {
-                "inputs": prompt,
-                "parameters": {
-                    "max_length": max_tokens,
-                    "temperature": 0.7,
-                    "top_p": 0.9
-                }
-            }
-            
-            async with httpx.AsyncClient(timeout=30.0) as client:
-                response = await client.post(url, headers=headers, json=payload)
-                
-                if response.status_code == 200:
-                    result = response.json()
-                    if isinstance(result, list) and len(result) > 0:
-                        return result[0].get('generated_text', '')
+            # 3. ሙከራ (With Retry Logic)
+            attempts = 0
+            while attempts < 2:
+                try:
+                    await self.limiter.wait_if_needed(name)
+                    # logger.info(f"🔧 Engaging {name} (Attempt {attempts+1})...")
+                    
+                    start_t = time.time()
+                    
+                    # ሞዴሉን ጥራ
+                    content = await service['func'](prompt, max_tokens, api_key, content_type)
+                    
+                    if not content or len(content) < 50:
+                        raise Exception("Generated content too short or empty")
+                        
+                    duration = time.time() - start_t
+                    logger.info(f"✅ {name} Success ({duration:.2f}s)")
+                    
+                    # ስታቲስቲክስ መዝግብ
+                    await self.healer.monitor_service_health(name, True, duration)
+                    self.monitor.track_request(name, True, len(content.split()), duration)
+                    
+                    return content
+                    
+                except Exception as e:
+                    error_msg = str(e)
+                    error_type = self.error_handler.classify_error(error_msg)
+                    duration = time.time() - start_t
+                    
+                    logger.warning(f"⚠️ {name} Failed: {error_msg[:100]}")
+                    
+                    await self.healer.monitor_service_health(name, False, duration)
+                    last_error = e
+                    
+                    if self.error_handler.should_retry(error_type, attempts):
+                        await asyncio.sleep(2)
+                        attempts += 1
                     else:
-                        raise Exception("No content generated by Hugging Face")
-                else:
-                    raise Exception(f"Hugging Face API error: {response.status_code}")
-                    
-        except Exception as e:
-            raise Exception(f"Hugging Face generation failed: {str(e)}")
+                        break # ወደ ቀጣዩ አገልግሎት ሂድ
+        
+        raise Exception(f"🚨 All AI Services Failed. Last Error: {last_error}")
+
+    # --- INDIVIDUAL PROVIDER IMPLEMENTATIONS ---
     
-    async def _generate_with_cohere(self, prompt: str, max_tokens: int, service: Dict) -> str:
-        """Cohere API በመጠቀም ይዘት ፍጠር"""
-        try:
-            url = "https://api.cohere.ai/v1/generate"
-            headers = {
-                "Authorization": f"Bearer {service['api_key']}",
-                "Content-Type": "application/json"
-            }
+    async def _generate_with_groq(self, prompt: str, max_tokens: int, api_key: str, content_type: str = "general") -> str:
+        """
+        Groq Strategy: Llama 3.1 -> Llama 3 -> Mixtral -> Llama 8B
+        """
+        url = "https://api.groq.com/openai/v1/chat/completions"
+        headers = {"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"}
+        
+        # በይዘት አይነት መሰረት ሞዴል መምረጥ
+        models = [
+            "llama-3.1-70b-versatile", # ምርጥ እና አዲስ
+            "llama3-70b-8192",         # አስተማማኝ
+            "mixtral-8x7b-32768",      # ረጅም ጽሁፍ
+            "llama3-8b-8192"           # በጣም ፈጣን (Backup)
+        ]
+        
+        # ለረጅም ጽሁፍ Mixtralን ወደፊት እናምጣ
+        if len(prompt.split()) > 2000 or content_type == "long_form":
+            models.insert(0, models.pop(2)) # Mixtral first
             
-            data = {
-                "model": service['models'][0],
-                "prompt": prompt,
-                "max_tokens": max_tokens,
-                "temperature": 0.7,
-                "p": 0.9
-            }
-            
-            async with httpx.AsyncClient(timeout=30.0) as client:
-                response = await client.post(url, headers=headers, json=data)
+        for model in models:
+            try:
+                # Temperature ማስተካከያ
+                temp = 0.9 if content_type == "creative" else 0.7
                 
-                if response.status_code == 200:
-                    result = response.json()
-                    return result['generations'][0]['text']
-                else:
-                    raise Exception(f"Cohere API error: {response.status_code}")
+                data = {
+                    "model": model,
+                    "messages": [{"role": "user", "content": prompt}],
+                    "temperature": temp,
+                    "max_tokens": max_tokens
+                }
+                
+                async with httpx.AsyncClient(timeout=45.0) as client:
+                    resp = await client.post(url, headers=headers, json=data)
                     
-        except Exception as e:
-            raise Exception(f"Cohere generation failed: {str(e)}")
-    
-    def get_service_status(self) -> Dict:
-        """የአገልግሎቶች ሁኔታ ያግኙ"""
-        status = {}
+                    if resp.status_code == 200:
+                        content = resp.json()['choices'][0]['message']['content']
+                        await self.model_tracker.track_model_performance('groq', model, True, None, len(content.split()))
+                        return content
+                    
+                    # 429 (Rate Limit) ወይም 400 (Bad Request)
+                    # logger.debug(f"   Groq {model} status: {resp.status_code}")
+                    
+            except Exception as e:
+                # logger.debug(f"   Groq {model} error: {e}")
+                await self.model_tracker.track_model_performance('groq', model, False)
+                continue
+                
+        raise Exception("All Groq models failed")
+
+    async def _generate_with_gemini(self, prompt: str, max_tokens: int, api_key: str, content_type: str = "general") -> str:
+        """
+        Gemini Strategy: 1.5 Pro -> 1.5 Flash -> Pro
+        """
+        models = ["gemini-1.5-pro", "gemini-1.5-flash", "gemini-pro"]
         
-        for service_name, stats in self.service_stats.items():
-            success = stats['success']
-            failures = stats['failures']
-            total = success + failures
-            
-            if total > 0:
-                success_rate = (success / total) * 100
-                avg_time = sum(stats['response_time']) / len(stats['response_time']) if stats['response_time'] else 0
-            else:
-                success_rate = 0
-                avg_time = 0
-            
-            status[service_name] = {
-                'success_rate': round(success_rate, 2),
-                'avg_response_time': round(avg_time, 2),
-                'total_requests': total,
-                'last_used': stats['last_used'].isoformat() if stats['last_used'] else None,
-                'current_service': (self.ai_services[self.current_service_index]['name'] == service_name)
-            }
+        for model in models:
+            try:
+                url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={api_key}"
+                data = {"contents": [{"parts": [{"text": prompt}]}]}
+                
+                async with httpx.AsyncClient(timeout=60.0) as client:
+                    resp = await client.post(url, json=data)
+                    
+                    if resp.status_code == 200:
+                        result = resp.json()
+                        if 'candidates' in result:
+                            text = result['candidates'][0]['content']['parts'][0]['text']
+                            await self.model_tracker.track_model_performance('gemini', model, True, None, len(text.split()))
+                            return text
+                    
+            except Exception as e:
+                await self.model_tracker.track_model_performance('gemini', model, False)
+                continue
+                
+        raise Exception("All Gemini models failed")
+
+    async def _generate_with_openai(self, prompt: str, max_tokens: int, api_key: str, content_type: str = "general") -> str:
+        import openai
+        openai.api_key = api_key
+        models = ["gpt-4", "gpt-3.5-turbo"]
         
-        return status
+        for model in models:
+            try:
+                resp = await asyncio.to_thread(
+                    openai.ChatCompletion.create,
+                    model=model,
+                    messages=[{"role": "user", "content": prompt}]
+                )
+                return resp.choices[0].message.content
+            except:
+                continue
+        raise Exception("OpenAI models failed")
+
+    async def _generate_with_huggingface(self, prompt: str, max_tokens: int, api_key: str, content_type: str = "general") -> str:
+        url = "https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.2"
+        headers = {"Authorization": f"Bearer {api_key}"}
+        payload = {"inputs": prompt, "parameters": {"max_new_tokens": 2000}}
+        
+        async with httpx.AsyncClient(timeout=60.0) as client:
+            resp = await client.post(url, headers=headers, json=payload)
+            if resp.status_code == 200:
+                result = resp.json()
+                if isinstance(result, list) and 'generated_text' in result[0]:
+                    return result[0]['generated_text'].replace(prompt, "").strip()
+        raise Exception("HF failed")
+
+    async def _generate_with_cohere(self, prompt: str, max_tokens: int, api_key: str, content_type: str = "general") -> str:
+        url = "https://api.cohere.ai/v1/generate"
+        headers = {"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"}
+        data = {"model": "command", "prompt": prompt, "max_tokens": 2000}
+        
+        async with httpx.AsyncClient(timeout=60.0) as client:
+            resp = await client.post(url, headers=headers, json=data)
+            if resp.status_code == 200:
+                return resp.json()['generations'][0]['text']
+        raise Exception("Cohere failed")
 
 # =================== የላቀ የይዘት ጀነሬተር ===================
 
