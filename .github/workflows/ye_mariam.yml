@@ -1,0 +1,103 @@
+name: 🚀 Profit Master Elite - PRODUCTION RUN
+
+on:
+  workflow_dispatch:
+    inputs:
+      topic:
+        description: 'Content Topic'
+        required: false
+        default: 'Artificial Intelligence in Business'
+      country:
+        description: 'Target Country Code'
+        required: false
+        default: 'US'
+      language:
+        description: 'Language Code'
+        required: false
+        default: 'en'
+  schedule:
+    - cron: '0 0 * * *'
+
+jobs:
+  run-profit-machine:
+    name: 🏭 Running The Elite Machine
+    runs-on: ubuntu-22.04
+    timeout-minutes: 60
+    
+    services:
+      redis:
+        image: redis
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 6379:6379
+
+    steps:
+    - name: 📥 Checkout Repository
+      uses: actions/checkout@v4
+
+    - name: 🐍 Set up Python 3.10
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.10'
+        cache: 'pip'
+
+    - name: 🎥 Install System Dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y ffmpeg chromium-browser chromium-chromedriver libxml2-dev libxslt-dev
+
+    - name: 📦 Install Python Libraries (Fixed & Optimized)
+      run: |
+        python -m pip install --upgrade pip
+        
+        # 1. AI እና ዋና ዋናዎቹ (groq ተጨምሯል)
+        pip install groq
+        pip install google-generativeai
+        pip install openai==0.28.0
+        
+        # 2. ትርጉም (Googletransን በ Deep-Translator ተክተናል - ይሄ ግጭት አይፈጥርም)
+        pip install deep-translator
+        
+        # 3. ሚዲያ እና ዳታ
+        pip install moviepy==1.0.3
+        pip install pillow numpy pandas beautifulsoup4 selenium requests
+        pip install nltk textblob spacy gTTS pytube yt-dlp
+        
+        # 4. ሰርቨር እና ሌሎች
+        pip install fastapi uvicorn python-dotenv sqlalchemy redis celery prometheus-client boto3 pydantic
+        
+        # 5. NLTK ዳታ
+        python -m textblob.download_corpora
+        python -c "import nltk; nltk.download('punkt'); nltk.download('stopwords')"
+
+    - name: 🚀 Run Profit Master Elite
+      env:
+        GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+        OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
+        INPUT_TOPIC: ${{ github.event.inputs.topic || 'Future Tech' }}
+        INPUT_COUNTRY: ${{ github.event.inputs.country || 'US' }}
+        INPUT_LANGUAGE: ${{ github.event.inputs.language || 'en' }}
+      run: |
+        echo "🔥 Starting Production Engine..."
+        
+        # ባዶ requirements.txt እንፍጠር (ስክሪፕቱ በራሱ እንዳይጭን ለመከላከል)
+        touch requirements.txt 
+        
+        python profit_master_v17_5.py --auto --topic "$INPUT_TOPIC" --country "$INPUT_COUNTRY" --language "$INPUT_LANGUAGE"
+
+    - name: 💾 Save Generated Content
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: elite-production-output
+        path: |
+          *.json
+          *.html
+          *.log
+        retention-days: 90
