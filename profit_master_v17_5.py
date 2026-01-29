@@ -51,9 +51,24 @@ try:
     except ImportError:
         def detect(text): return "en"
         
+    # === ትርጉም (Translation) በ Deep-Translator ===
     try:
-        from googletrans import Translator
+        from deep_translator import GoogleTranslator
+        
+        # የድሮውን ኮድ ላለማበላሸት Wrapper Class እንፈጥራለን
+        class Translator:
+            def translate(self, text, dest='en'):
+                try:
+                    # Deep Translator መጠቀም
+                    translated_text = GoogleTranslator(source='auto', target=dest).translate(text)
+                    class Result: text = translated_text
+                    return Result()
+                except Exception:
+                    # ካልሰራ ዝም ብሎ ኦሪጅናሉን ይመልስ
+                    class Result: text = text
+                    return Result()
     except ImportError:
+        # ላይብረሪው ከሌለ Fallback
         class Translator:
             def translate(self, text, dest='en'):
                 class Result: text = text
