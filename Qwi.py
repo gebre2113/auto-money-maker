@@ -2549,3 +2549,404 @@ class UltraAffiliateManager:
         ''').format(            initials=product['name'][:2].upper(),
             product_name=product['name'],
             rating=product['
+   testimonial_box = textwrap.dedent('''\
+        <div style="background: white; border: 1px solid #e5e7eb; border-radius: 12px;
+                    padding: 24px; margin: 24px 0; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+            <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
+                <div style="width: 48px; height: 48px; background: linear-gradient(135deg, #8b5cf6 0%, #a78bfa 100%);
+                            border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold;">
+                    {initials}
+                </div>
+                <div>
+                    <div style="font-weight: 600; color: #1f2937;">{product_name} Users Say</div>
+                    <div style="font-size: 14px; color: #6b7280;">
+                        ⭐ {rating}/5 from {reviews:,} verified reviews
+                    </div>
+                </div>
+            </div>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px;">
+                {testimonial_items}
+            </div>
+            <div style="margin-top: 20px; text-align: center;">
+                <a href="{link}" target="_blank" rel="nofollow sponsored"
+                   style="background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+                          color: white; padding: 12px 32px; border-radius: 8px;
+                          text-decoration: none; font-weight: 600; display: inline-block;">
+                    Join {reviews:,}+ Satisfied Users →
+                </a>
+            </div>
+        </div>
+        ''').format(
+            initials=product['name'][:2].upper(),
+            product_name=product['name'],
+            rating=product['rating'],
+            reviews=product['reviews'],
+            testimonial_items=testimonial_items,
+            link=product['link']
+        )
+        
+        # በይዘቱ መሃል ላይ ማስገባት
+        paragraphs = content.split('</p>')
+        if len(paragraphs) > 3:
+            insert_idx = len(paragraphs) // 3
+            content = '</p>'.join(paragraphs[:insert_idx]) + testimonial_box + '</p>'.join(paragraphs[insert_idx:])
+            return content, True
+        return content, False
+    
+    def _inject_price_alert(self, content: str, products: List[Dict]) -> str:
+        """የዋጋ ማሳወቂያ ማስገባት (Scarcity & Urgency)"""
+        if not products:
+            return content
+        
+        product = products[0]        current_price = product.get('local_pricing', product['pricing']['annual'])
+        original_price = current_price * 1.4  # 40% higher original price
+        
+        price_alert = textwrap.dedent(f'''\
+        <div style="background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+                    border: 2px solid #f59e0b; border-radius: 12px; padding: 20px;
+                    margin: 30px 0; position: relative; overflow: hidden;">
+            <div style="position: absolute; top: -10px; right: -30px; background: #f59e0b;
+                        color: white; padding: 8px 40px; transform: rotate(45deg);
+                        font-weight: bold; font-size: 14px; letter-spacing: 1px;">
+                LIMITED TIME
+            </div>
+            <div style="display: flex; align-items: center; gap: 15px;">
+                <div style="background: #f59e0b; color: white; width: 50px; height: 50px;
+                            border-radius: 50%; display: flex; align-items: center;
+                            justify-content: center; font-size: 24px; flex-shrink: 0;">
+                    ⚡
+                </div>
+                <div style="flex: 1;">
+                    <div style="font-weight: 600; color: #78350f; font-size: 18px; margin-bottom: 5px;">
+                        Price Alert: Save ${original_price - current_price:.2f} Today Only!
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
+                        <div style="text-decoration: line-through; color: #92400e; font-size: 16px;">
+                            ${original_price:.2f}
+                        </div>
+                        <div style="background: #78350f; color: white; padding: 5px 15px;
+                                    border-radius: 20px; font-weight: bold; font-size: 20px;">
+                            ${current_price:.2f}
+                        </div>
+                        <div style="color: #92400e; font-weight: 500;">
+                            ({((original_price - current_price) / original_price * 100):.0f}% OFF)
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div style="margin-top: 15px; text-align: center;">
+                <a href="{product['link']}" target="_blank" rel="nofollow sponsored"
+                   style="background: linear-gradient(135deg, #b45309 0%, #92400e 100%);
+                          color: white; padding: 12px 30px; border-radius: 8px;
+                          text-decoration: none; font-weight: 600; display: inline-block;
+                          box-shadow: 0 4px 10px rgba(120, 53, 15, 0.3);">
+                    🔥 Claim Discount Now (Expires in 23:59:59)
+                </a>
+            </div>
+        </div>
+        ''')
+        
+        # በመጨረሻው አንቀፅ በፊት ማስገባት
+        last_para = content.rfind('</p>')        if last_para != -1:
+            return content[:last_para] + price_alert + content[last_para:]
+        return content + price_alert
+    
+    def _inject_smart_disclosure(self, content: str, injection_count: int) -> str:
+        """በ FTC መመሪያ የተሰራ የተጣጣም ማስታወቂያ"""
+        if injection_count == 0:
+            return content
+        
+        disclosure = textwrap.dedent('''\
+        <div style="background: #f8fafc; border-left: 4px solid #3b82f6; padding: 15px;
+                    margin: 30px 0; border-radius: 0 8px 8px 0; font-size: 14px;
+                    color: #334155;">
+            <div style="display: flex; align-items: flex-start; gap: 10px;">
+                <div style="flex-shrink: 0; color: #3b82f6; font-weight: bold;">ℹ️</div>
+                <div>
+                    <strong>Transparency Notice:</strong> This article contains affiliate links.
+                    If you make a purchase through these links, we may earn a commission at
+                    no additional cost to you. We only recommend products we've personally
+                    tested and believe provide exceptional value. Our recommendations are
+                    based on real-world usage and independent research.
+                </div>
+            </div>
+        </div>
+        ''')
+        
+        return content + disclosure
+    
+    def _calculate_estimated_revenue(self, injections: int, products: List[Dict]) -> float:
+        """የተገመተ የገቢ ስሌት"""
+        if not products:
+            return 0.0
+        
+        avg_epc = sum(p.get('epc', 15.0) for p in products[:3]) / min(3, len(products))
+        estimated_clicks = injections * 0.08  # 8% CTR assumption
+        estimated_conversions = estimated_clicks * 0.035  # 3.5% conversion rate
+        return round(estimated_conversions * avg_epc, 2)
+    
+    def _detect_content_type(self, content: str) -> str:
+        """የይዘት አይነት መለየት"""
+        content_lower = content.lower()
+        if any(word in content_lower for word in ['review', 'tested', 'compared', 'vs']):
+            return 'review'
+        elif any(word in content_lower for word in ['how to', 'step by step', 'tutorial', 'guide']):
+            return 'tutorial'
+        elif any(word in content_lower for word in ['best', 'top 10', 'top 5', 'ranking']):
+            return 'listicle'
+        return 'article'
+    
+    def _analyze_sentiment(self, content: str) -> str:        """ስሜት ትንተና"""
+        positive_words = ['amazing', 'excellent', 'fantastic', 'incredible', 'best', 'love']
+        negative_words = ['terrible', 'awful', 'worst', 'hate', 'disappointing', 'poor']
+        
+        content_lower = content.lower()
+        pos_count = sum(1 for word in positive_words if word in content_lower)
+        neg_count = sum(1 for word in negative_words if word in content_lower)
+        
+        if pos_count > neg_count + 2:
+            return 'positive'
+        elif neg_count > pos_count + 2:
+            return 'negative'
+        return 'neutral'
+    
+    def _estimate_reading_level(self, content: str) -> str:
+        """የንባብ ደረጃ ግምት"""
+        words = content.split()
+        avg_word_length = sum(len(word) for word in words) / len(words) if words else 0
+        sentences = content.split('.')
+        avg_sentence_length = len(words) / len(sentences) if sentences and len(sentences) > 1 else 0
+        
+        if avg_sentence_length < 15:
+            return 'beginner'
+        elif avg_sentence_length < 25:
+            return 'intermediate'
+        return 'advanced'
+    
+    def _optimize_for_seo(self, content: str) -> str:
+        """SEO ማሻሻያ"""
+        # Schema.org structured data for affiliate products
+        schema_markup = textwrap.dedent('''\
+        <script type="application/ld+json">
+        {
+          "@context": "https://schema.org",
+          "@type": "Article",
+          "headline": "Premium Content with Affiliate Recommendations",
+          "description": "Expert recommendations with affiliate links for maximum value",
+          "author": {
+            "@type": "Person",
+            "name": "Profit Master AI"
+          },
+          "publisher": {
+            "@type": "Organization",
+            "name": "Profit Master Elite",
+            "logo": {
+              "@type": "ImageObject",
+              "url": "https://example.com/logo.png"
+            }
+          }
+        }        </script>
+        ''')
+        
+        # Open Graph tags for social sharing
+        og_tags = textwrap.dedent('''\
+        <meta property="og:type" content="article">
+        <meta property="og:title" content="Premium Content Guide">
+        <meta property="og:description" content="Expert recommendations with affiliate opportunities">
+        <meta property="og:image" content="https://example.com/og-image.jpg">
+        <meta name="twitter:card" content="summary_large_image">
+        ''')
+        
+        # በመጨረሻ ላይ ማከል
+        return content + schema_markup + og_tags
+
+# =================== የዋና የስክሪፕት አፈጻጸም ===================
+async def main():
+    """ዋና የስክሪፕት አፈጻጸም"""
+    print("🚀 Profit Master Elite v17.5 - የምርት ዝግጁ ስርዓት")
+    print("=" * 60)
+    
+    # የስርዓት ኮንፍግ መፍጠር
+    config = PremiumConfig()
+    
+    # የAI ይዘት ጀነሬተር መጀመር
+    content_generator = AdvancedAIContentGenerator(config)
+    
+    # የባህል አጥኚ ሞተር መጀመር
+    cultural_engine = CulturalAnthropologistEngine(config)
+    
+    # የሙልቲሚዲያ ማሻሻያ መጀመር
+    multimedia_enhancer = PremiumMultimediaEnhancer()
+    
+    # የተጣጣም አስተዳዳሪ መጀመር
+    affiliate_manager = UltraAffiliateManager(user_geo="US", user_segment="premium")
+    
+    # የ Sensory ጽሁፍ ሞተር መጀመር
+    sensory_engine = SensoryWritingEngine()
+    
+    # የቪዥዋል አርክቴክት መጀመር
+    visual_architect = HypnoticVisualArchitect()
+    
+    # የ Gamification ሌየር መጀመር
+    gamification = GamificationLayer()
+    
+    # የዩቲዩብ ኢንተሊጀንስ ሃንተር መጀመር
+    youtube_hunter = YouTubeIntelligenceHunterPro()
+    
+    # 1. ይዘት ፍጠር
+    print("\n📝 ይዘት ፍጠር እየጀመረ ነው...")    topic = "AI-Powered Digital Marketing Strategies for 2024"
+    content_result = await content_generator.generate_premium_content(topic, language='en')
+    
+    if not content_result.get('quality_verified'):
+        print("⚠️ ይዘቱ የጥራት መመዘኛ አልለገሰም - ማሻሻያ እየተፈፀመ ነው...")
+        # ማሻሻያ ዑደት እንደገና ማስጀመር
+        content_result = await content_generator.generate_premium_content(topic, language='en')
+    
+    print(f"✅ ይዘት ተፈጥሯል! ቃላት: {content_result['word_count']}, ጥራት: {content_result['quality_report']['overall_score']}%")
+    
+    # 2. ባህላዊ ትንተና
+    print("\n🌍 ባህላዊ ትንተና እየተፈፀመ ነው...")
+    cultural_analysis = await cultural_engine.analyze_content_for_country(
+        content_result['content'], 'US'
+    )
+    print(f"✅ ባህላዊ ተገቢነት: {cultural_analysis['cultural_compatibility']}%")
+    
+    # 3. Sensory ጽሁፍ ማሻሻያ
+    print("\n🧠 Sensory ጽሁፍ ማሻሻያ እየተፈፀመ ነው...")
+    sensory_content = sensory_engine.transform_to_sensory_content(
+        content_result['content'], content_type="article"
+    )
+    print("✅ Sensory ጽሁፍ ተፈጥሯል!")
+    
+    # 4. የዩቲዩብ ቪድዮ እናብሮ ማስገባት
+    print("\n🎬 የዩቲዩብ ቪድዮዎች እየተፈለጉ ነው...")
+    videos = await youtube_hunter.find_relevant_videos(topic, 'US', max_results=2)
+    if videos:
+        video_embed = youtube_hunter.generate_video_embed(videos[0], topic)
+        sensory_content = sensory_content.replace('</h2>', f'</h2>{video_embed}', 1)
+        print(f"✅ የዩቲዩብ ቪድዮ ተጨምሯል: {videos[0]['title']}")
+    
+    # 5. የተጣጣም አገናኞች ማስገባት
+    print("\n💰 የተጣጣም አገናኞች እየተጨመሩ ነው...")
+    monetized_content, monetization_report = affiliate_manager.inject_affiliate_links(
+        sensory_content, topic=topic, content_type="article"
+    )
+    print(f"✅ የተጣጣም አገናኞች ተጨምረዋል! ግብአት: ${monetization_report['estimated_revenue']}")
+    
+    # 6. Gamification ንጥረ ነገሮች ማስገባት
+    print("\n🎮 Gamification ንጥረ ነገሮች እየተጨመሩ ነው...")
+    gamified_content = gamification.add_progress_tracker(monetized_content)
+    gamified_content = gamification.add_interactive_quiz(gamified_content, topic)
+    print("✅ Gamification ተጨምሯል!")
+    
+    # 7. የሙልቲሚዲያ ማሻሻያ
+    print("\n✨ የሙልቲሚዲያ ማሻሻያ እየተፈፀመ ነው...")
+    enhancement_result = await multimedia_enhancer.enhance_content_with_multimedia(content_result)
+    print(f"✅ ሙልቲሚዲያ ማሻሻያ ተጠናቅቋል! ጥራት: {enhancement_result['quality_score']}%")
+        # 8. ውጤት ማስቀመጥ
+    output_filename = f"profit_master_content_{content_result['id'][:8]}.html"
+    with open(output_filename, 'w', encoding='utf-8') as f:
+        # የሙሉ የ HTML ገጽ መዋቅር
+        html_content = textwrap.dedent(f'''\
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>{content_result['title']} | Profit Master Elite</title>
+            <meta name="description" content="{content_result['summary'][:155]}">
+            <style>
+                body {{
+                    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+                    line-height: 1.6;
+                    color: #1f2937;
+                    max-width: 800px;
+                    margin: 0 auto;
+                    padding: 20px;
+                    background: #f9fafb;
+                }}
+                h1 {{ font-size: 2.5rem; margin-bottom: 20px; color: #111827; }}
+                h2 {{ font-size: 1.8rem; margin: 30px 0 15px 0; color: #1f2937; }}
+                h3 {{ font-size: 1.4rem; margin: 25px 0 12px 0; color: #374151; }}
+                p {{ margin-bottom: 16px; font-size: 1.05rem; }}
+                a {{ color: #3b82f6; text-decoration: none; }}
+                a:hover {{ text-decoration: underline; }}
+                ul, ol {{ padding-left: 20px; margin: 15px 0; }}
+                li {{ margin-bottom: 8px; }}
+                .reading-stats {{
+                    background: #e0f2fe;
+                    padding: 15px;
+                    border-radius: 8px;
+                    margin: 20px 0;
+                    text-align: center;
+                    font-size: 0.95rem;
+                }}
+                .quality-badge {{
+                    display: inline-block;
+                    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+                    color: white;
+                    padding: 4px 12px;
+                    border-radius: 20px;
+                    font-weight: bold;
+                    font-size: 0.85rem;
+                    margin-left: 10px;
+                }}
+            </style>
+        </head>        <body>
+            <div id="reading-progress-container"></div>
+            <article>
+                <h1>{content_result['title']} <span class="quality-badge">✅ 99% Human-Quality</span></h1>
+                <div class="reading-stats">
+                    📖 {content_result['word_count']} words &nbsp;|&nbsp; ⏱️ {content_result['reading_time']} min read &nbsp;|&nbsp; 
+                    🌍 Culturally Optimized for US &nbsp;|&nbsp; 💰 Estimated Revenue: ${monetization_report['estimated_revenue']}
+                </div>
+                {gamified_content}
+                <div style="margin-top: 40px; padding-top: 20px; border-top: 1px solid #e5e7eb; text-align: center; color: #6b7280; font-size: 0.9rem;">
+                    <p>Generated by Profit Master Elite v17.5 • Quality Score: {content_result['quality_report']['overall_score']}%</p>
+                    <p>AI Services Used: {', '.join([k for k, v in content_result.get('ai_services_used', {{}}).items() if v.get('current_service')])}</p>
+                </div>
+            </article>
+            <script>
+                // Reading progress tracker
+                window.addEventListener('scroll', () => {{
+                    const scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
+                    const scrollHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+                    const progress = (scrollTop / scrollHeight) * 100;
+                    document.getElementById('reading-progress-container').innerHTML = 
+                        `<div style="position: fixed; top: 0; left: 0; width: 100%; height: 4px; background: #e5e7eb; z-index: 9999;">
+                            <div style="width: ${{progress}}%; height: 100%; background: linear-gradient(90deg, #3b82f6, #8b5cf6); transition: width 0.2s;"></div>
+                        </div>`;
+                }});
+            </script>
+        </body>
+        </html>
+        ''')
+        f.write(html_content)
+    
+    print("\n" + "=" * 60)
+    print(f"✅ ሙሉ በሙሉ ተጠናቅቋል! ውጤት በ '{output_filename}' ተቀምጧል")
+    print(f"📊 የጥራት ሪፖርት: {content_result['quality_report']['overall_score']}%")
+    print(f"💰 የተገመተ ግብአት: ${monetization_report['estimated_revenue']}")
+    print(f"🌍 ባህላዊ ተገቢነት: {cultural_analysis['cultural_compatibility']}%")
+    print(f"🎬 ሙልቲሚዲያ ማሻሻያ: {enhancement_result['quality_score']}%")
+    print("=" * 60)
+    
+    # የ AI አገልግሎቶች ሪፖርት
+    ai_status = content_result.get('ai_services_used', {})
+    print("\n🤖 የ AI አገልግሎቶች ሁኔታ:")
+    for service, stats in ai_status.items():
+        if stats.get('current_service'):
+            print(f"   ✅ {service.upper()} - በስኬት ጥቅም ላይ ውሏል (በ{stats['avg_response_time']}s)")
+    
+    return output_filename
+
+if __name__ == "__main__":
+    # የ Asyncio አፈጻጸም    try:
+        asyncio.run(main())
+    except KeyboardInterrupt:
+        print("\n⚠️ በተጠቃሚ ተቋርጧል")
+        sys.exit(0)
+    except Exception as e:
+        print(f"\n❌ ስህተት ተከስቷል: {e}")
+        traceback.print_exc()
+        sys.exit(1)
