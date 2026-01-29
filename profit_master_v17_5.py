@@ -2269,153 +2269,12 @@ class PriceTracker:
         
         return round(final_price, 2)
 
-# =================== የAI ምርት መገለጫ ስርዓት ===================
-
-class AIProductMatcher:
-    """
-    🧠 ULTRA-INTELLIGENT PRODUCT MATCHING ENGINE v6.0
-    Features: Semantic Analysis, Context Matching, User Intent Detection, Cross-Sell Opportunities
-    """
-    
-    def __init__(self):
-        self.semantic_cache = {}
-        self.intent_keywords = self._load_intent_keywords()
-        
-    def _load_intent_keywords(self) -> Dict:
-        """የተጠቃሚ ዓላማ ቁልፍ ቃላት"""
-        return {
-            'buy': ['buy', 'purchase', 'order', 'get', 'acquire', 'shop'],
-            'compare': ['compare', 'vs', 'versus', 'alternative', 'competitor'],
-            'review': ['review', 'rating', 'test', 'analysis', 'evaluate'],
-            'tutorial': ['how to', 'tutorial', 'guide', 'step by step', 'learn'],
-            'problem': ['problem', 'issue', 'fix', 'solve', 'troubleshoot']
-        }
-    
-    def match_products(self, content_analysis: Dict) -> List[Dict]:
-        """ይዘትን ተንትኖ ተገቢ ምርቶችን ያዛምዳል"""
-        
-        content_type = content_analysis.get('content_type', 'article')
-        top_keywords = [kw[0] for kw in content_analysis.get('top_keywords', [])]
-        user_intent = self._detect_user_intent(content_analysis)
-        matched_products = self._semantic_match(top_keywords, content_type, user_intent)
-        ranked_products = self._rank_products(matched_products, content_analysis)
-        
-        logger.info(f"🧠 AI Matcher found {len(ranked_products)} products")
-        return ranked_products
-    
-    def _detect_user_intent(self, content_analysis: Dict) -> str:
-        """የተጠቃሚ ዓላማ መለየት"""
-        content_text = json.dumps(content_analysis).lower()
-        
-        intent_scores = {}
-        for intent, keywords in self.intent_keywords.items():
-            score = sum(1 for kw in keywords if kw in content_text)
-            intent_scores[intent] = score
-        
-        if intent_scores:
-            return max(intent_scores.items(), key=lambda x: x[1])[0]
-        
-        return "informational"
-    
-    def _semantic_match(self, keywords: List[str], content_type: str, user_intent: str) -> List[Dict]:
-        """የሴማንቲክ ትንታኔ ማዛመጃ"""
-        expanded_keywords = self._expand_keywords(keywords)
-        
-        product_database = {
-            'hosting': ['wordpress hosting', 'web hosting', 'cloud hosting', 'shared hosting'],
-            'ai_tools': ['ai tool', 'chatgpt', 'ai writing', 'content generator'],
-            'security': ['vpn', 'security', 'privacy', 'antivirus'],
-            'crypto': ['crypto exchange', 'bitcoin', 'trading', 'wallet'],
-            'marketing': ['email marketing', 'landing page', 'seo tool', 'social media'],
-            'education': ['course platform', 'learning', 'online course', 'tutorial']
-        }
-        
-        matched_categories = []
-        for category, category_keywords in product_database.items():
-            for kw in expanded_keywords:
-                for cat_kw in category_keywords:
-                    similarity = SequenceMatcher(None, kw.lower(), cat_kw.lower()).ratio()
-                    if similarity > 0.7:
-                        matched_categories.append(category)
-                        break
-        
-        return self._get_products_by_categories(set(matched_categories))
-    
-    def _expand_keywords(self, keywords: List[str]) -> List[str]:
-        """ቁልፍ ቃላትን ያሰፋል"""
-        synonyms = {
-            'host': ['hosting', 'server', 'website', 'domain'],
-            'ai': ['artificial intelligence', 'machine learning', 'chatbot'],
-            'vpn': ['virtual private network', 'privacy', 'security'],
-            'crypto': ['cryptocurrency', 'bitcoin', 'ethereum', 'blockchain'],
-            'email': ['newsletter', 'mailing list', 'subscribers'],
-            'course': ['training', 'learning', 'education', 'tutorial']
-        }
-        
-        expanded = keywords.copy()
-        for kw in keywords:
-            for base, syn_list in synonyms.items():
-                if base in kw.lower():
-                    expanded.extend(syn_list)
-        
-        return list(set(expanded))
-    
-    def _get_products_by_categories(self, categories: set) -> List[Dict]:
-        """በምድብ የተደረደሩ ምርቶችን ይመልሳል"""
-        all_products = []
-        
-        sample_products = [
-            {'id': 'bh001', 'category': 'hosting', 'name': 'Bluehost Pro'},
-            {'id': 'nv001', 'category': 'security', 'name': 'NordVPN Ultimate'},
-            {'id': 'ja001', 'category': 'ai_tools', 'name': 'Jasper AI Pro'},
-            {'id': 'bn001', 'category': 'crypto', 'name': 'Binance Pro'},
-            {'id': 'ck001', 'category': 'marketing', 'name': 'ConvertKit Pro'},
-            {'id': 'tk001', 'category': 'education', 'name': 'Teachabled Pro'}
-        ]
-        
-        for product in sample_products:
-            if product['category'] in categories:
-                all_products.append(product)
-        
-        return all_products
-    
-    def _rank_products(self, products: List[Dict], content_analysis: Dict) -> List[Dict]:
-        """ምርቶችን በግምታዊነት ደረጃ ያደርጋል"""
-        ranked = []
-        for product in products:
-            score = 0
-            
-            word_count = content_analysis.get('word_count', 1000)
-            if word_count > 2000:
-                score += 20
-            
-            content_type = content_analysis.get('content_type', 'article')
-            if content_type == 'review':
-                score += 15
-            
-            intent = content_analysis.get('intent', 'informational')
-            if intent in ['buy', 'compare']:
-                score += 25
-            
-            product_type = product.get('category', '')
-            if product_type in ['hosting', 'ai_tools']:
-                score += 30
-            
-            ranked.append({
-                'product': product,
-                'score': score
-            })
-        
-        ranked.sort(key=lambda x: x['score'], reverse=True)
-        return [item['product'] for item in ranked[:6]]
-
 # =================== የዋና ፍፁም አፊሊዬት አስተዳዳሪ ===================
 
 class UltraAffiliateManager:
     """
     🚀 ULTRA-ADVANCED AFFILIATE MONETIZATION ENGINE v12.5
-    Features: AI-Powered Product Matching, Dynamic Pricing, Multi-Format Injection,
-              A/B Testing, Performance Analytics, Geo-Targeting, Seasonal Promotions
+    Features: AI-Powered Product Matching, Dynamic Pricing, Multi-Format Injection
     """
     
     def __init__(self, user_geo: str = "US", user_segment: str = "premium"):
@@ -2437,7 +2296,7 @@ class UltraAffiliateManager:
         self.product_matcher = AIProductMatcher()
         
         logger.info(f"🚀 UltraAffiliateManager v12.5 initialized for {user_geo}")
-    
+        
     def _load_global_product_database(self) -> Dict:
         """የአለም ደረጃ 100+ የተጣጣም ምርቶች መረጃ ቋት"""
         return {
@@ -2463,6 +2322,24 @@ class UltraAffiliateManager:
                         'new_year': {'discount': 60, 'code': 'NEWYEAR2024'}
                     }
                 }
+            ],
+            'ai tool': [
+                {
+                    'id': 'ja001',
+                    'name': 'Jasper AI Pro',
+                    'link': 'https://jasper.ai?fpr=profitmaster12',
+                    'network': 'cj',
+                    'commission': {'US': 25.0, 'EU': 22.0, 'ASIA': 20.0},
+                    'category': 'software',
+                    'subcategory': 'ai_writing',
+                    'rating': 4.8,
+                    'reviews': 15620,
+                    'features': ['Long-form Assistant', 'SEO Mode', 'Plagiarism Checker', 'Team Collaboration'],
+                    'pricing': {'monthly': 49.0, 'annual': 468.0, 'promo': True},
+                    'target_audience': ['content_creators', 'marketers', 'agencies'],
+                    'conversion_rate': 0.052,
+                    'epc': 18.75
+                }
             ]
         }
     
@@ -2486,15 +2363,22 @@ class UltraAffiliateManager:
         geo_optimized_products = self._get_geo_optimized_products(matched_products)
         format_distribution = self._calculate_format_distribution(content_type)
         
+        # ቢያንስ አንድ ምርት ካልተገኘ ነባሪ ምርቶችን እንጠቀማለን
+        if not geo_optimized_products:
+            default_products = self.affiliate_products.get('ai tool', [])
+            geo_optimized_products = self._get_geo_optimized_products(default_products)
+
         for product in geo_optimized_products[:6]:
             content_format = self._select_content_format(format_distribution)
+            success = False
             
             if content_format == 'text_link':
                 injected_content, success = self._inject_text_link(injected_content, product)
             elif content_format == 'product_card':
                 injected_content, success = self._inject_product_card(injected_content, product)
             elif content_format == 'comparison_table':
-                injected_content, success = self._inject_dynamic_comparison_table(injected_content, [product])
+                # Comparison table is injected separately below
+                pass 
             elif content_format == 'feature_highlight':
                 injected_content, success = self._inject_feature_highlight(injected_content, product)
             elif content_format == 'testimonial_box':
@@ -2513,8 +2397,9 @@ class UltraAffiliateManager:
         
         if len(geo_optimized_products) >= 2:
             comparison_products = geo_optimized_products[:3]
-            injected_content = self._inject_dynamic_comparison_table(injected_content, comparison_products)
-            monetization_report['formats_used'].append('comparison_table')
+            injected_content, success = self._inject_dynamic_comparison_table(injected_content, comparison_products)
+            if success:
+                monetization_report['formats_used'].append('comparison_table')
         
         injected_content = self._inject_price_alert(injected_content, geo_optimized_products)
         injected_content = self._inject_smart_disclosure(injected_content, monetization_report['total_injections'])
@@ -2551,16 +2436,28 @@ class UltraAffiliateManager:
         for product in products:
             product_id = product.get('id')
             if product_id:
+                # Direct check if product is already enriched
+                if 'optimized_commission' in product:
+                    all_products.append(product)
+                    continue
+                    
+                # Search in database
+                found = False
                 for category, product_list in self.affiliate_products.items():
                     for prod in product_list:
                         if prod['id'] == product_id:
-                            geo_commission = prod.get('commission', {}).get(self.user_geo, 0)
-                            if geo_commission > 0:
-                                prod['optimized_commission'] = geo_commission
-                                prod['local_pricing'] = self.price_tracker.get_local_price(
-                                    prod['id'], self.user_geo
-                                )
-                                all_products.append(prod)
+                            geo_commission = prod.get('commission', {}).get(self.user_geo, 30.0) # Default to 30 if geo not found
+                            
+                            # Create a copy to avoid modifying original DB
+                            prod_copy = prod.copy()
+                            prod_copy['optimized_commission'] = geo_commission
+                            prod_copy['local_pricing'] = self.price_tracker.get_local_price(
+                                prod['id'], self.user_geo
+                            )
+                            all_products.append(prod_copy)
+                            found = True
+                            break
+                    if found: break
         
         return sorted(all_products, 
                      key=lambda x: (x.get('optimized_commission', 0) * x.get('conversion_rate', 0.03)), 
@@ -2584,7 +2481,7 @@ class UltraAffiliateManager:
             base_distribution['text_link'] += 0.05
         
         total = sum(base_distribution.values())
-        if total != 1.0:
+        if total != 1.0 and total > 0:
             for key in base_distribution:
                 base_distribution[key] /= total
         
@@ -2594,7 +2491,10 @@ class UltraAffiliateManager:
         """በዘፈቀደ የተመረጠ ቅርጽ ይመልሳል"""
         formats = list(distribution.keys())
         weights = list(distribution.values())
-        return random.choices(formats, weights=weights, k=1)[0]
+        try:
+            return random.choices(formats, weights=weights, k=1)[0]
+        except:
+            return 'text_link' # Fallback
     
     def _inject_text_link(self, content: str, product: Dict) -> Tuple[str, bool]:
         """ተሻሻለ የጽሁፍ አገናኝ ማስገባት"""
@@ -2606,90 +2506,58 @@ class UltraAffiliateManager:
         
         for pattern in keyword_patterns:
             if pattern and len(pattern) > 3:
-                regex = re.compile(r'\b' + re.escape(pattern) + r'\b', re.IGNORECASE)
-                matches = list(regex.finditer(content))
-                
-                if matches:
-                    match = matches[0]
-                    link_html = f'''
-                    <a href="{product['link']}" target="_blank" rel="nofollow sponsored" 
-                       class="ultra-affiliate-link" 
-                       data-product="{product['id']}" 
-                       data-commission="{product.get('optimized_commission', 0)}"
-                       style="color: #10b981; font-weight: 600; text-decoration: none; border-bottom: 2px dotted #10b981;">
-                       <strong>{match.group()}</strong>
-                    </a>
-                    '''
+                try:
+                    regex = re.compile(r'\b' + re.escape(pattern) + r'\b', re.IGNORECASE)
+                    matches = list(regex.finditer(content))
                     
-                    start, end = match.span()
-                    content = content[:start] + link_html + content[end:]
-                    return content, True
+                    if matches:
+                        match = matches[0]
+                        link_html = f'''<a href="{product['link']}" target="_blank" rel="nofollow sponsored" class="ultra-affiliate-link" style="color: #10b981; font-weight: 600; text-decoration: none; border-bottom: 2px dotted #10b981;"><strong>{match.group()}</strong></a>'''
+                        
+                        start, end = match.span()
+                        content = content[:start] + link_html + content[end:]
+                        return content, True
+                except:
+                    continue
         
         return content, False
     
     def _inject_product_card(self, content: str, product: Dict) -> Tuple[str, bool]:
         """ከፍተኛ ሽያጭ የሚያመጣ የምርት ካርድ ማስገባት"""
         discount = product.get('seasonal_promos', {}).get('black_friday', {}).get('discount', 0)
-        current_price = product.get('local_pricing', product['pricing']['annual'])
+        current_price = product.get('local_pricing', product.get('pricing', {}).get('annual', 99.0))
         
-        card_html = f'''
-        <div class="ultra-product-card" style="
-            border: 2px solid #e5e7eb;
-            border-radius: 12px;
-            padding: 24px;
-            margin: 24px 0;
-            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
-            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
-            position: relative;
-            overflow: hidden;
-        ">
-            {f'<div style="position: absolute; top: 15px; right: -35px; background: #ef4444; color: white; padding: 8px 40px; transform: rotate(45deg); font-weight: bold; font-size: 14px;">{discount}% OFF</div>' if discount > 0 else ''}
+        # Prepare feature list HTML separately to avoid f-string syntax error
+        features_html = ""
+        for feature in product.get('features', [])[:3]:
+            features_html += f'<li style="margin-bottom: 4px;">{feature}</li>'
             
-            <div style="display: flex; align-items: flex-start; gap: 20px;">
-                <div style="flex: 2;">
-                    <h3 style="margin: 0 0 8px 0; color: #1f2937; font-size: 20px;">
-                        🚀 {product['name']}
-                    </h3>
-                    
+        discount_html = ""
+        if discount > 0:
+            discount_html = f'<div style="position: absolute; top: 15px; right: -35px; background: #ef4444; color: white; padding: 8px 40px; transform: rotate(45deg); font-weight: bold; font-size: 14px;">{discount}% OFF</div>'
+
+        card_html = f'''
+        <div class="ultra-product-card" style="border: 2px solid #e5e7eb; border-radius: 12px; padding: 24px; margin: 24px 0; background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%); box-shadow: 0 10px 25px rgba(0,0,0,0.05); position: relative; overflow: hidden;">
+            {discount_html}
+            <div style="display: flex; align-items: flex-start; gap: 20px; flex-wrap: wrap;">
+                <div style="flex: 2; min-width: 250px;">
+                    <h3 style="margin: 0 0 8px 0; color: #1f2937; font-size: 20px;">🚀 {product['name']}</h3>
                     <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
-                        <span style="color: #f59e0b; font-size: 18px;">{"⭐" * int(product['rating'])}{"½" if product['rating'] % 1 >= 0.5 else ""}</span>
-                        <span style="color: #6b7280; font-size: 14px;">{product['rating']}/5 ({product['reviews']:,} reviews)</span>
+                        <span style="color: #f59e0b; font-size: 18px;">⭐⭐⭐⭐⭐</span>
+                        <span style="color: #6b7280; font-size: 14px;">{product.get('rating', 4.5)}/5 ({product.get('reviews', 1000):,} reviews)</span>
                     </div>
-                    
                     <div style="margin-bottom: 16px;">
-                        <p style="color: #374151; margin: 0 0 8px 0; font-size: 15px;">
-                            Premium service with excellent features
-                        </p>
+                        <p style="color: #374151; margin: 0 0 8px 0; font-size: 15px;">Premium service with excellent features</p>
                         <ul style="color: #4b5563; font-size: 14px; padding-left: 20px; margin: 8px 0;">
-                            {''.join([f'<li style="margin-bottom: 4px;">{feature}</li>' for feature in product['features'][:3]])}
+                            {features_html}
                         </ul>
                     </div>
                 </div>
-                
-                <div style="flex: 1; background: #f0f9ff; padding: 16px; border-radius: 8px; border: 1px solid #dbeafe;">
+                <div style="flex: 1; min-width: 200px; background: #f0f9ff; padding: 16px; border-radius: 8px; border: 1px solid #dbeafe;">
                     <div style="text-align: center;">
                         <div style="font-size: 14px; color: #6b7280; margin-bottom: 4px;">Starting from</div>
-                        <div style="font-size: 28px; font-weight: bold; color: #1f2937; margin-bottom: 8px;">
-                            ${current_price}<span style="font-size: 14px; color: #6b7280;">/yr</span>
-                        </div>
-                        
-                        <div style="font-size: 13px; color: #10b981; background: #d1fae5; padding: 4px 8px; border-radius: 4px; margin-bottom: 12px;">
-                            💰 ${product.get('optimized_commission', 0)} commission
-                        </div>
-                        
-                        <a href="{product['link']}" target="_blank" rel="nofollow sponsored"
-                           style="display: block; background: linear-gradient(135deg, #10b981 0%, #059669 100%); 
-                                  color: white; padding: 12px 24px; text-decoration: none; 
-                                  border-radius: 8px; font-weight: bold; text-align: center;
-                                  transition: all 0.3s ease;"
-                           onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 8px 25px rgba(16, 185, 129, 0.3)';"
-                           onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none';">
-                           👉 Get Special Offer
-                        </a>
-                        
-                        <div style="font-size: 12px; color: #9ca3af; margin-top: 8px;">
-                            ⚡ {product.get('conversion_rate', 0.03)*100}% conversion rate
-                        </div>
+                        <div style="font-size: 28px; font-weight: bold; color: #1f2937; margin-bottom: 8px;">${current_price}<span style="font-size: 14px; color: #6b7280;">/yr</span></div>
+                        <a href="{product['link']}" target="_blank" rel="nofollow sponsored" style="display: block; background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: bold; text-align: center; margin-top: 10px;">👉 Get Special Offer</a>
                     </div>
                 </div>
             </div>
@@ -2714,56 +2582,48 @@ class UltraAffiliateManager:
         
         table_rows = ""
         for idx, product in enumerate(products, 1):
-            features_list = ', '.join(product['features'][:3])
+            features_list = ', '.join(product.get('features', [])[:3])
             commission = product.get('optimized_commission', 0)
+            pricing = product.get('local_pricing', product.get('pricing', {}).get('annual', 99))
+            
+            bg_color = 'background: #f9fafb' if idx % 2 == 0 else ''
             
             table_rows += f'''
-            <tr style="{'background: #f9fafb' if idx % 2 == 0 else ''}">
+            <tr style="{bg_color}">
                 <td style="padding: 16px; border-bottom: 1px solid #e5e7eb; vertical-align: top;">
                     <div style="font-weight: 600; color: #1f2937; margin-bottom: 4px;">{product['name']}</div>
                     <div style="font-size: 13px; color: #6b7280;">{features_list}</div>
                 </td>
                 <td style="padding: 16px; border-bottom: 1px solid #e5e7eb; text-align: center; vertical-align: top;">
-                    <div style="color: #f59e0b;">{"⭐" * int(product['rating'])}</div>
-                    <div style="font-size: 12px; color: #9ca3af;">{product['rating']}/5</div>
+                    <div style="color: #f59e0b;">⭐⭐⭐⭐⭐</div>
+                    <div style="font-size: 12px; color: #9ca3af;">{product.get('rating', 4.5)}/5</div>
                 </td>
                 <td style="padding: 16px; border-bottom: 1px solid #e5e7eb; text-align: center; vertical-align: top;">
-                    <div style="font-weight: 600; color: #10b981;">${product.get('local_pricing', product['pricing']['annual'])}</div>
+                    <div style="font-weight: 600; color: #10b981;">${pricing}</div>
                     <div style="font-size: 12px; color: #6b7280;">per year</div>
                 </td>
                 <td style="padding: 16px; border-bottom: 1px solid #e5e7eb; text-align: center; vertical-align: top;">
-                    <a href="{product['link']}" target="_blank" rel="nofollow sponsored"
-                       style="background: #3b82f6; color: white; padding: 8px 16px; 
-                              border-radius: 6px; text-decoration: none; font-weight: 500;
-                              display: inline-block; font-size: 14px;">
-                       View Offer
-                    </a>
-                    <div style="font-size: 11px; color: #10b981; margin-top: 4px;">
-                        💰 ${commission} commission
-                    </div>
+                    <a href="{product['link']}" target="_blank" rel="nofollow sponsored" style="background: #3b82f6; color: white; padding: 8px 16px; border-radius: 6px; text-decoration: none; font-weight: 500; display: inline-block; font-size: 14px;">View Offer</a>
                 </td>
             </tr>
             '''
         
+        category_title = products[0].get('category', 'Service').title()
+        
         table_html = f'''
         <div style="margin: 32px 0; overflow-x: auto; border-radius: 12px; border: 1px solid #e5e7eb;">
-            <h3 style="padding: 20px; margin: 0; background: #f8fafc; border-bottom: 1px solid #e5e7eb; color: #1f2937;">
-                🏆 Top {len(products)} {products[0]['category'].title()} Services Compared
-            </h3>
+            <h3 style="padding: 20px; margin: 0; background: #f8fafc; border-bottom: 1px solid #e5e7eb; color: #1f2937;">🏆 Top {len(products)} {category_title} Services Compared</h3>
             <table style="width: 100%; border-collapse: collapse; min-width: 600px;">
                 <thead>
                     <tr style="background: #f3f4f6;">
-                        <th style="padding: 16px; text-align: left; font-weight: 600; color: #374151; border-bottom: 2px solid #d1d5db;">Service</th>
-                        <th style="padding: 16px; text-align: center; font-weight: 600; color: #374151; border-bottom: 2px solid #d1d5db;">Rating</th>
-                        <th style="padding: 16px; text-align: center; font-weight: 600; color: #374151; border-bottom: 2px solid #d1d5db;">Price</th>
-                        <th style="padding: 16px; text-align: center; font-weight: 600; color: #374151; border-bottom: 2px solid #d1d5db;">Action</th>
+                        <th style="padding: 16px; text-align: left; font-weight: 600; color: #374151;">Service</th>
+                        <th style="padding: 16px; text-align: center; font-weight: 600; color: #374151;">Rating</th>
+                        <th style="padding: 16px; text-align: center; font-weight: 600; color: #374151;">Price</th>
+                        <th style="padding: 16px; text-align: center; font-weight: 600; color: #374151;">Action</th>
                     </tr>
                 </thead>
                 <tbody>{table_rows}</tbody>
             </table>
-            <div style="padding: 16px; background: #f0f9ff; border-top: 1px solid #dbeafe; font-size: 14px; color: #0369a1;">
-                💡 <strong>Pro Tip:</strong> All prices include our affiliate commission at no extra cost to you.
-            </div>
         </div>
         '''
         
@@ -2776,26 +2636,24 @@ class UltraAffiliateManager:
     
     def _inject_feature_highlight(self, content: str, product: Dict) -> Tuple[str, bool]:
         """የምርት ባህሪያትን የሚያብራራ ክፍል ማስገባት"""
-        highlight_html = f'''
-        <div style="background: linear-gradient(135deg, #e0f2fe 0%, #f0f9ff 100%); 
-                    padding: 20px; border-radius: 10px; margin: 20px 0; border-left: 4px solid #0ea5e9;">
-            <h4 style="margin-top: 0; color: #0369a1; display: flex; align-items: center; gap: 8px;">
-                ✨ Why Choose {product['name']}?
-            </h4>
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 12px;">
-                {''.join([f'''
+        
+        # Build features HTML safely outside f-string
+        features_html = ""
+        for feature in product.get('features', [])[:4]:
+            features_html += f'''
                 <div style="background: white; padding: 12px; border-radius: 8px; border: 1px solid #dbeafe;">
                     <div style="font-weight: 600; color: #1e40af; margin-bottom: 4px;">{feature}</div>
-                    <div style="font-size: 13px; color: #4b5563;">Best-in-class feature for optimal performance</div>
-                </div>
-                ''' for feature in product['features'][:4]])}
+                    <div style="font-size: 13px; color: #4b5563;">Best-in-class feature</div>
+                </div>'''
+
+        highlight_html = f'''
+        <div style="background: linear-gradient(135deg, #e0f2fe 0%, #f0f9ff 100%); padding: 20px; border-radius: 10px; margin: 20px 0; border-left: 4px solid #0ea5e9;">
+            <h4 style="margin-top: 0; color: #0369a1;">✨ Why Choose {product['name']}?</h4>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 12px;">
+                {features_html}
             </div>
             <div style="margin-top: 16px; text-align: center;">
-                <a href="{product['link']}" target="_blank" rel="nofollow sponsored"
-                   style="display: inline-block; background: #0ea5e9; color: white; 
-                          padding: 10px 20px; border-radius: 6px; text-decoration: none; font-weight: 600;">
-                   Explore {product['name']} Features →
-                </a>
+                <a href="{product['link']}" target="_blank" rel="nofollow sponsored" style="display: inline-block; background: #0ea5e9; color: white; padding: 10px 20px; border-radius: 6px; text-decoration: none; font-weight: 600;">Explore {product['name']} Features →</a>
             </div>
         </div>
         '''
@@ -2813,49 +2671,40 @@ class UltraAffiliateManager:
         testimonials = [
             "This service transformed my workflow completely!",
             "Best investment I've made this year.",
-            "The support team is incredibly responsive.",
-            "Worth every penny for the time it saves."
+            "The support team is incredibly responsive."
         ]
         
-        testimonial_box = f'''
-        <div style="background: white; border: 1px solid #e5e7eb; border-radius: 12px; 
-                    padding: 24px; margin: 24px 0; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
-            <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
-                <div style="width: 48px; height: 48px; background: linear-gradient(135deg, #8b5cf6 0%, #a78bfa 100%); 
-                            border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold;">
-                    {product['name'][:2].upper()}
-                </div>
-                <div>
-                    <div style="font-weight: 600; color: #1f2937;">{product['name']} Users Say</div>
-                    <div style="font-size: 14px; color: #6b7280;">
-                        ⭐ {product['rating']}/5 from {product['reviews']:,} verified reviews
-                    </div>
-                </div>
-            </div>
-            
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px;">
-                {''.join([f'''
+        # Build testimonials HTML safely
+        testimonials_html = ""
+        for testimonial in testimonials:
+            testimonials_html += f'''
                 <div style="background: #f9fafb; padding: 16px; border-radius: 8px; border-left: 3px solid #10b981;">
                     <div style="color: #4b5563; font-style: italic; margin-bottom: 8px;">"{testimonial}"</div>
                     <div style="display: flex; align-items: center; gap: 8px;">
-                        <div style="color: #f59e0b;">{"⭐" * 5}</div>
+                        <div style="color: #f59e0b;">⭐⭐⭐⭐⭐</div>
                         <div style="font-size: 12px; color: #9ca3af;">Verified User</div>
                     </div>
+                </div>'''
+
+        testimonial_box = f'''
+        <div style="background: white; border: 1px solid #e5e7eb; border-radius: 12px; padding: 24px; margin: 24px 0; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+            <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
+                <div style="width: 48px; height: 48px; background: linear-gradient(135deg, #8b5cf6 0%, #a78bfa 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold;">{product['name'][:2].upper()}</div>
+                <div>
+                    <div style="font-weight: 600; color: #1f2937;">{product['name']} Users Say</div>
+                    <div style="font-size: 14px; color: #6b7280;">⭐ 4.8/5 from verified reviews</div>
                 </div>
-                ''' for testimonial in random.sample(testimonials, min(3, len(testimonials)))])}
             </div>
-            
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px;">
+                {testimonials_html}
+            </div>
             <div style="margin-top: 20px; text-align: center;">
-                <a href="{product['link']}" target="_blank" rel="nofollow sponsored"
-                   style="background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); 
-                          color: white; padding: 12px 32px; border-radius: 8px; 
-                          text-decoration: none; font-weight: 600; display: inline-block;">
-                   Join {product['reviews']:,}+ Satisfied Users →
-                </a>
+                <a href="{product['link']}" target="_blank" rel="nofollow sponsored" style="background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); color: white; padding: 12px 32px; border-radius: 8px; text-decoration: none; font-weight: 600; display: inline-block;">Join Satisfied Users →</a>
             </div>
         </div>
         '''
         
+        # Regex to find heading
         content_parts = re.split(r'(<h[23][^>]*>.*?</h[23]>)', content)
         if len(content_parts) > 2:
             content = content_parts[0] + content_parts[1] + testimonial_box + ''.join(content_parts[2:])
@@ -2870,44 +2719,26 @@ class UltraAffiliateManager:
         if not discounted_products:
             return content
         
-        price_alert = '''
-        <div style="background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%); 
-                    border: 2px solid #fbbf24; border-radius: 10px; padding: 20px; 
-                    margin: 25px 0; position: relative;">
-            <div style="position: absolute; top: -12px; left: 20px; background: #f59e0b; 
-                        color: white; padding: 4px 12px; border-radius: 6px; font-weight: bold; font-size: 14px;">
-                🔥 LIMITED TIME OFFER
-            </div>
-            
-            <h4 style="margin-top: 10px; color: #92400e;">Special Discounts Available!</h4>
-            <div style="color: #78350f; margin-bottom: 16px;">
-                The following services currently have special promotions:
-            </div>
-            
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px;">
-        '''
-        
+        # Build items HTML safely
+        items_html = ""
         for product in discounted_products[:2]:
-            price_alert += f'''
+            price = product.get('local_pricing', product.get('pricing', {}).get('annual', 99))
+            items_html += f'''
                 <div style="background: white; padding: 12px; border-radius: 8px; border: 1px solid #fbbf24;">
                     <div style="font-weight: 600; color: #1f2937; margin-bottom: 4px;">{product['name']}</div>
                     <div style="display: flex; align-items: center; gap: 8px;">
-                        <span style="color: #dc2626; font-weight: bold;">${product.get('local_pricing', product['pricing']['annual'])}/yr</span>
+                        <span style="color: #dc2626; font-weight: bold;">${price}/yr</span>
                         <span style="color: #16a34a; font-size: 13px;">Special Price</span>
                     </div>
-                    <a href="{product['link']}" target="_blank" rel="nofollow sponsored"
-                       style="display: inline-block; background: #f59e0b; color: white; 
-                              padding: 6px 12px; border-radius: 4px; text-decoration: none; 
-                              font-size: 13px; margin-top: 8px;">
-                       Claim Discount →
-                    </a>
-                </div>
-            '''
-        
-        price_alert += '''
-            </div>
-            <div style="font-size: 12px; color: #92400e; margin-top: 12px;">
-                ⏰ These offers may expire soon. Click to secure discounted pricing.
+                    <a href="{product['link']}" target="_blank" rel="nofollow sponsored" style="display: inline-block; background: #f59e0b; color: white; padding: 6px 12px; border-radius: 4px; text-decoration: none; font-size: 13px; margin-top: 8px;">Claim Discount →</a>
+                </div>'''
+
+        price_alert = f'''
+        <div style="background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%); border: 2px solid #fbbf24; border-radius: 10px; padding: 20px; margin: 25px 0; position: relative;">
+            <div style="position: absolute; top: -12px; left: 20px; background: #f59e0b; color: white; padding: 4px 12px; border-radius: 6px; font-weight: bold; font-size: 14px;">🔥 LIMITED TIME OFFER</div>
+            <h4 style="margin-top: 10px; color: #92400e;">Special Discounts Available!</h4>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px;">
+                {items_html}
             </div>
         </div>
         '''
@@ -2917,6 +2748,52 @@ class UltraAffiliateManager:
     def _inject_smart_disclosure(self, content: str, injection_count: int) -> str:
         """ዘመናዊ የቅጽበታዊ ማስታወሻ አሰጣጥ"""
         disclosure = f'''
+        <div class="smart-disclosure" style="background: #f8fafc; border-left: 4px solid #10b981; padding: 20px; margin-bottom: 30px; border-radius: 0 8px 8px 0; font-size: 14px; color: #475569;">
+            <div style="display: flex; align-items: flex-start; gap: 12px; margin-bottom: 12px;">
+                <div style="background: #10b981; color: white; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; flex-shrink: 0;">i</div>
+                <div>
+                    <strong style="color: #1e293b;">Transparency Notice:</strong>
+                    <div style="margin-top: 4px;">This article contains <strong>{injection_count} affiliate links</strong>. We earn a commission at no extra cost to you.</div>
+                </div>
+            </div>
+        </div>
+        '''
+        
+        return disclosure + content
+    
+    def _optimize_for_seo(self, content: str) -> str:
+        """ለSEO የተመቻቸ ኮድ ማሻሻያ"""
+        content = re.sub(r'<img(?!.*alt=)', '<img alt="affiliate product"', content)
+        content = re.sub(r'<img(?!.*loading=)', '<img loading="lazy"', content)
+        return content
+    
+    def _detect_content_type(self, content: str) -> str:
+        """የይዘት አይነት መለየት"""
+        if len(content) < 1000:
+            return "short_post"
+        elif re.search(r'(step|tutorial|guide|how to)', content, re.IGNORECASE):
+            return "tutorial"
+        elif re.search(r'(review|comparison|vs\.|versus)', content, re.IGNORECASE):
+            return "review"
+        return "article"
+    
+    def _analyze_sentiment(self, content: str) -> str:
+        """የይዘት ስሜት ትንታኔ"""
+        return "positive" # Simplified for robustness
+    
+    def _estimate_reading_level(self, content: str) -> str:
+        """የንባብ ደረጃ ግምት"""
+        return "intermediate"
+    
+    def _calculate_estimated_revenue(self, injection_count: int, products: List[Dict]) -> float:
+        """በAI የሚመረተ ገቢ ግምት"""
+        if not products: return 0.0
+        total_epc = sum(p.get('epc', 15.0) for p in products[:injection_count])
+        return round(total_epc * 1000 * 0.03, 2)
+        
+# =================== የዋና ፍፁም አፊሊዬት አስተዳዳሪ ===================
+
+
         <div class="smart-disclosure" style="
             background: #f8fafc;
             border-left: 4px solid #10b981;
@@ -2985,7 +2862,7 @@ class UltraAffiliateManager:
           "publisher": {
             "@type": "Organization",
             "name": "Profit Master",
-            "url": "https://profitmaster.com"
+            "url": "https://paster.com"
           }
         }
         </script>
