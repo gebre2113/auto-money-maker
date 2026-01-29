@@ -1,113 +1,78 @@
-name: 🚀 Profit Master Elite - NO ERRORS VERSION
+name: 🚀 Profit Master Elite Auto-Pilot
 
 on:
+  schedule:
+    - cron: '0 9 * * *' # በየቀኑ ጠዋት 9 AM ይነሳል
   workflow_dispatch:
     inputs:
       topic:
-        description: 'Content Topic'
-        required: true
-        default: 'How to Make Money Online'
+        description: 'Topic'
+        required: false
+        default: 'Artificial Intelligence Trends'
       country:
-        description: 'Target Country'
+        description: 'Country'
         required: false
         default: 'US'
 
 jobs:
-  money-maker:
-    name: 💰 Make Money with AI
+  run-profit-machine:
     runs-on: ubuntu-latest
     
+    services:
+      redis:
+        image: redis
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 6379:6379
+
     steps:
-    - uses: actions/checkout@v4
-    
-    - uses: actions/setup-python@v4
+    - name: 📥 Checkout Repository
+      uses: actions/checkout@v3
+
+    - name: 🐍 Set up Python 3.10
+      uses: actions/setup-python@v4
       with:
         python-version: '3.10'
-    
-    - name: Generate Content
+
+    - name: 🎥 Install System Dependencies
       run: |
-        # Write Python script to file
-        cat > generate.py << "SCRIPT_END"
-import json
-import os
-import sys
-from datetime import datetime
+        sudo apt-get update
+        sudo apt-get install -y ffmpeg chromium-browser chromium-chromedriver
 
-def main():
-    print("="*60)
-    print("🚀 PROFIT MASTER ELITE - MONEY MAKING MACHINE")
-    print("="*60)
-    
-    # Get inputs
-    topic = os.getenv('INPUT_TOPIC', 'AI Business')
-    country = os.getenv('INPUT_COUNTRY', 'US')
-    
-    print(f"🎯 Topic: {topic}")
-    print(f"🌍 Country: {country}")
-    print()
-    
-    # Generate content structure
-    content = {
-        "system": "Profit Master Elite v17.5",
-        "timestamp": datetime.now().isoformat(),
-        "topic": topic,
-        "country": country,
-        "package": {
-            "content_type": "premium_article",
-            "word_count": 2850,
-            "reading_time": "14 minutes",
-            "quality_score": 96,
-            "seo_score": 92,
-            "monetization_ready": True
-        },
-        "revenue_model": {
-            "affiliate_commissions": 8,
-            "estimated_monthly": 3200.00,
-            "estimated_annual": 38400.00,
-            "streams": ["ads", "affiliate", "sponsorships", "digital_products"]
-        },
-        "content_preview": f"<h1>The Ultimate Guide to {topic}</h1><p>This comprehensive guide will show you exactly how to master {topic}...</p>"
-    }
-    
-    # Save to file
-    import hashlib
-    import time
-    file_id = hashlib.md5(f"{topic}{country}{time.time()}".encode()).hexdigest()[:8]
-    json_file = f"profit_{file_id}.json"
-    
-    with open(json_file, 'w') as f:
-        json.dump(content, f, indent=2)
-    
-    print("✅ CONTENT PACKAGE GENERATED")
-    print(f"📁 File: {json_file}")
-    print(f"📊 Word Count: {content['package']['word_count']}")
-    print(f"💰 Monthly Revenue: ${content['revenue_model']['estimated_monthly']:,.2f}")
-    print(f"💰 Annual Revenue: ${content['revenue_model']['estimated_annual']:,.2f}")
-    print()
-    print("🎯 MONETIZATION STRATEGY:")
-    print(f"- {content['revenue_model']['affiliate_commissions']} affiliate links")
-    print(f"- {len(content['revenue_model']['streams'])} revenue streams")
-    print("- SEO optimized for search engines")
-    print("- Mobile responsive design")
-    print()
-    print("="*60)
-    print("💡 TIP: Add your API keys to unlock full AI content generation!")
-    print("="*60)
-    
-    return 0
+    - name: 📦 Install Python Libraries
+      run: |
+        python -m pip install --upgrade pip
+        # አስፈላጊ ላይብረሪዎችን መጫን
+        pip install fastapi uvicorn aiohttp httpx google-generativeai openai requests 
+        pip install beautifulsoup4 nltk textblob moviepy selenium python-dotenv 
+        pip install sqlalchemy redis celery prometheus-client boto3 pydantic
 
-if __name__ == "__main__":
-    sys.exit(main())
-SCRIPT_END
-        
-        # Run the generator
-        INPUT_TOPIC="${{ github.event.inputs.topic }}"
-        INPUT_COUNTRY="${{ github.event.inputs.country }}"
-        python generate.py
-    
-    - name: Upload Results
-      uses: actions/upload-artifact@v4
+    - name: 🧠 Download AI Models Data
+      run: |
+        python -m textblob.download_corpora
+        python -c "import nltk; nltk.download('punkt'); nltk.download('stopwords')"
+
+    - name: 🚀 Run Profit Master Elite
+      env:
+        GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+        OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
+        INPUT_TOPIC: ${{ github.event.inputs.topic || 'Future Tech' }}
+        INPUT_COUNTRY: ${{ github.event.inputs.country || 'US' }}
+      run: |
+        # እዚህ ጋር ግዙፍ ኮድ መፃፍ አያስፈልግም!
+        # ፋይሉ አስቀድሞ በRepo ውስጥ ስላለ እሱን መጥራት ብቻ በቂ ነው።
+        python profit_master_v17_5.py --auto --topic "$INPUT_TOPIC" --country "$INPUT_COUNTRY"
+
+    - name: 💾 Upload Artifacts
+      uses: actions/upload-artifact@v3
       with:
-        name: money-content
-        path: profit_*.json
-        retention-days: 30
+        name: elite-content-package
+        path: |
+          *.json
+          *.html
