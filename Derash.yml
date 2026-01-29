@@ -3812,7 +3812,103 @@ class VisualAssetGenerator:
             '''
         
         return items_html
-      
+        
+      # =================== 🧠 NEURO-CONVERSION ENGINE (v17.5) ===================
+
+class NeuroConversionEngine:
+    """
+    የሰዎችን ስነ-ልቦና በመጠቀም (Psychological Triggers) ወደ ውሳኔ የሚመራ ሞተር።
+    """
+    
+    def apply_neuro_marketing(self, content: str) -> str:
+        """
+        ስነ-ልቦናዊ ተፅእኖ የሚፈጥሩ ቃላትን እና አረፍተ ነገሮችን ይጨምራል።
+        """
+        # Anchoring Effect (የዋጋ ማነፃፀሪያ)
+        neuro_content = content.replace(
+            "price", 
+            "<span style='text-decoration: line-through; color: #EF4444; font-size: 0.9em;'>$997</span> <span style='color: #10B981; font-weight: bold; font-size: 1.2em;'>$497 (Limited)</span>"
+        )
+        
+        # Social Proof Injection
+        social_proof = """
+        <div style="background: #ECFDF5; border: 1px solid #10B981; padding: 10px; margin: 15px 0; border-radius: 8px; font-size: 14px; display: flex; align-items: center; gap: 10px;">
+            <span>👥</span> <strong>1,240+ Professionals</strong> have already implemented this strategy this month.
+        </div>
+        """
+        
+        # ከመጀመሪያው አንቀጽ በኋላ Social Proof ማስገባት
+        if "</p>" in neuro_content:
+            neuro_content = neuro_content.replace("</p>", f"</p>{social_proof}", 1)
+            
+        return neuro_content
+
+    def create_urgency_elements(self, content: str) -> str:
+        """
+        Scarcity & Urgency (የጊዜ ገደብ) ይፈጥራል።
+        """
+        # Countdown Timer (JavaScript Simulation)
+        timer_html = """
+        <div style="background: #111827; color: white; padding: 15px; border-radius: 8px; margin: 20px 0; text-align: center;">
+            <span style="color: #FCA5A5; font-weight: bold;">🔥 SPECIAL OFFER ENDS IN:</span>
+            <span style="font-family: monospace; font-size: 20px; color: #34D399; font-weight: bold; margin-left: 10px;">04:59:00</span>
+        </div>
+        """
+        
+        # በመጨረሻው ክፍል ላይ መጨመር
+        return content + timer_html
+
+# =================== 🎮 GAMIFICATION LAYER (v17.5) ===================
+
+class GamificationLayer:
+    """
+    ንባቡን ወደ ጨዋታ የሚቀይር እና ተሳትፎን የሚጨምር ክፍል።
+    """
+    
+    def add_interactive_quiz(self, content: str, topic: str) -> str:
+        """
+        በይዘቱ መሃል በይነተገናኝ ጥያቄ (Quiz) ያስገባል።
+        """
+        quiz_html = f"""
+        <div style="background: #F8FAFC; border: 2px solid #3B82F6; border-radius: 12px; padding: 25px; margin: 30px 0;">
+            <h3 style="color: #1E40AF; margin-top: 0;">🧠 Quick Knowledge Check</h3>
+            <p>What is the most critical factor in {topic} success?</p>
+            <div style="display: flex; flex-direction: column; gap: 10px;">
+                <button style="padding: 10px; border: 1px solid #CBD5E1; border-radius: 6px; background: white; cursor: pointer; text-align: left;">A. Strategy & Planning</button>
+                <button style="padding: 10px; border: 1px solid #CBD5E1; border-radius: 6px; background: white; cursor: pointer; text-align: left;">B. Luck</button>
+                <button style="padding: 10px; border: 1px solid #CBD5E1; border-radius: 6px; background: white; cursor: pointer; text-align: left;">C. Budget only</button>
+            </div>
+            <p style="font-size: 12px; color: #64748B; margin-top: 10px;">*Answer correctly to unlock a bonus tip!</p>
+        </div>
+        """
+        
+        # በይዘቱ መሃል ላይ ማስገባት
+        mid_point = len(content) // 2
+        insertion_point = content.find("</p>", mid_point)
+        
+        if insertion_point != -1:
+            return content[:insertion_point+4] + quiz_html + content[insertion_point+4:]
+        return content + quiz_html
+
+    def add_progress_tracker(self, content: str) -> str:
+        """
+        ከላይ የንባብ ግስጋሴ ጠቋሚ (Reading Progress Bar) ይጨምራል።
+        """
+        progress_bar = """
+        <div style="position: fixed; top: 0; left: 0; width: 100%; height: 5px; background: #E2E8F0; z-index: 9999;">
+            <div style="width: 0%; height: 100%; background: linear-gradient(90deg, #3B82F6, #8B5CF6); transition: width 0.3s;" id="reading-progress"></div>
+        </div>
+        <script>
+            window.addEventListener('scroll', () => {
+                const scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
+                const scrollHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+                const progress = (scrollTop / scrollHeight) * 100;
+                document.getElementById('reading-progress').style.width = progress + '%';
+            });
+        </script>
+        """
+        return progress_bar + content
+        
 class ProfitMasterEliteSystem(UltimateProfitMasterSystem):
     """የሁሉንም አካላት የሚያገናኝ ዋና ማሽን"""
     
@@ -4087,3 +4183,104 @@ class ProfitMasterEliteSystem(UltimateProfitMasterSystem):
                 'total_package_value': 7500
             }
         }
+# =================== 🏁 MAIN EXECUTION & API SERVER ===================
+
+# FastAPI instance
+app = FastAPI(
+    title="PROFIT MASTER ELITE v17.5",
+    description="The Ultimate AI Content & Monetization System",
+    version="17.5"
+)
+
+# Global System Instance
+elite_system = None
+
+@app.on_event("startup")
+async def startup_event():
+    global elite_system
+    config = PremiumConfig()
+    elite_system = ProfitMasterEliteSystem(config)
+    logger.info("🚀 Profit Master Elite API Started")
+
+@app.post("/api/create-elite")
+async def create_elite_content(topic: str, country: str = "US", language: str = "en"):
+    """
+    Generates the full Elite package (Content + Multimedia + Neuro + Affiliate)
+    """
+    if not elite_system:
+        raise HTTPException(status_code=500, detail="System not initialized")
+    
+    try:
+        result = await elite_system.create_elite_content_package(topic, language, country)
+        return {"status": "success", "data": result}
+    except Exception as e:
+        logger.error(f"Generation failed: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+def main():
+    """
+    Command Line Interface Runner (ለሙከራ)
+    """
+    print("\n" + "="*80)
+    print("🚀 PROFIT MASTER ELITE v17.5 - SYSTEM INITIALIZATION".center(80))
+    print("="*80 + "\n")
+    
+    # 1. Initialize Configuration
+    try:
+        config = PremiumConfig()
+        print("✅ Configuration Loaded")
+    except Exception as e:
+        print(f"❌ Config Error: {e}")
+        return
+
+    # 2. Initialize System
+    try:
+        system = ProfitMasterEliteSystem(config)
+        print("✅ Elite System Modules Loaded: [AI, Culture, Sensory, Neuro, Affiliate]")
+    except Exception as e:
+        print(f"❌ System Init Error: {e}")
+        return
+
+    # 3. Interactive Mode
+    print("\n💡 MODE SELECTION:")
+    print("1. Start API Server (FastAPI)")
+    print("2. Run Test Generation (CLI)")
+    
+    choice = input("\nEnter choice (1/2): ").strip()
+    
+    if choice == "1":
+        print("\n🌐 Starting API Server on http://0.0.0.0:8000...")
+        uvicorn.run(app, host="0.0.0.0", port=8000)
+        
+    elif choice == "2":
+        topic = input("\nEnter Topic (e.g., 'Digital Marketing'): ") or "Digital Marketing"
+        country = input("Enter Country Code (e.g., 'US', 'ET'): ") or "US"
+        
+        print(f"\n⏳ Generating Elite Package for '{topic}' in '{country}'...")
+        
+        # Async execution in sync context
+        loop = asyncio.get_event_loop()
+        start_time = time.time()
+        result = loop.run_until_complete(system.create_elite_content_package(topic, country=country))
+        end_time = time.time()
+        
+        print("\n" + "="*80)
+        print("🎉 GENERATION SUCCESSFUL!".center(80))
+        print("="*80)
+        print(f"⏱️ Time Taken: {round(end_time - start_time, 2)} seconds")
+        print(f"📄 Package ID: {result['package_id']}")
+        print(f"💰 Estimated Annual Value: ${result['estimated_values']['annual_enterprise_value']:,.2f}")
+        print(f"🧠 Neuro-Triggers: {len(result['monetization']['formats_used'])}")
+        print(f"🎥 Multimedia: {result['multimedia']['youtube_videos_found']} Videos Found")
+        
+        # Save output to file for inspection
+        filename = f"elite_output_{country}_{int(time.time())}.json"
+        with open(filename, 'w', encoding='utf-8') as f:
+            json.dump(result, f, indent=4, ensure_ascii=False)
+        print(f"\n📂 Full result saved to: {filename}")
+        
+    else:
+        print("❌ Invalid choice. Exiting.")
+
+if __name__ == "__main__":
+    main()
