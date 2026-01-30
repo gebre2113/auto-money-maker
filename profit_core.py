@@ -2645,3 +2645,11 @@ Copy `.env.example` to `.env` and add your API keys.
 ## Deployment
 ```bash
 docker-compose up -d
+
+
+## Configuration
+Copy `.env.example` to `.env` and add your API keys.
+
+## Deployment
+```bash
+docker-compose up -d
