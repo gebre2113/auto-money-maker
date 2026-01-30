@@ -97,6 +97,8 @@ logging.basicConfig(
 )
 logger = logging.getLogger("ProfitMaster")
 
+# ... (ቀሪው ኮድ ይቀጥላል) ...
+
 # ... (ቀሪው ኮድ ይቀጥላል) ..
 # =================== የስርዓት ኮንፍግ ===================
 
