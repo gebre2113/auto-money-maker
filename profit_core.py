@@ -43,23 +43,41 @@ except ImportError as e:
     print(f"⚠️  WARNING: Missing dependency: {e}")
 
 # =================== LOGGING SETUP ===================
+import logging
+from pathlib import Path
+
 def setup_logging(config=None):
     """Set up comprehensive logging system"""
     log_dir = Path('logs')
     log_dir.mkdir(exist_ok=True)
     
+    # 1. መጀመሪያ ቤዝክ ኮንፊግሬሽን በስትሪም እና በዋናው ፋይል መስራት
     logging.basicConfig(
         level=logging.INFO,
         format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
         handlers=[
             logging.StreamHandler(),
-            logging.FileHandler(log_dir / 'profit_master.log'),
-            logging.FileHandler(log_dir / 'error.log', level=logging.ERROR)
+            logging.FileHandler(log_dir / 'profit_master.log')
         ]
     )
-    return logging.getLogger("ProfitMaster")
+    
+    logger = logging.getLogger("ProfitMaster")
+    
+    # 2. ለ error.log ብቻ የተለየ ሃንድለር መጨመር
+    error_handler = logging.FileHandler(log_dir / 'error.log')
+    error_handler.setLevel(logging.ERROR) # እዚጋ ነው ሌቭሉ የሚሰጠው
+    
+    # ፎርማቱን ለ error_handler መስጠት
+    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    error_handler.setFormatter(formatter)
+    
+    logger.addHandler(error_handler)
+    
+    return logger
 
+# ሎገሩን ማስነሳት
 logger = setup_logging()
+
 
 # =================== የስርዓት ኮንፍግ ===================
 
