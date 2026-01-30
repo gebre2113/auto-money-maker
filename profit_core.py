@@ -2637,7 +2637,7 @@ def setup_project_structure():
 ## Quick Start
 1. Set up API keys in `.env` file
 2. Install dependencies: `pip install -r requirements.txt`
-3. Run demo: `python main.py --demo`
+3. Run demo: `python main.py --demo`"""}
 
 ## Configuration
 Copy `.env.example` to `.env` and add your API keys.
