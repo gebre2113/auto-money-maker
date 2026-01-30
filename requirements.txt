@@ -41,5 +41,6 @@ requests==2.31.0
 httpx==0.25.0
 sqlalchemy==2.0.0
 python-dotenv==1.0.0
+PyYAML
 nltk==3.8.0
 textblob==0.17.1" > requirements_simple.txt
