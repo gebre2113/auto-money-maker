@@ -1032,7 +1032,7 @@ check_dependencies()
 from production_system import UltimateProductionSystem
 
 async def main():
-    """Main entry point"""
+    Main entry point
     print("=" * 70)
     print("🚀 Ultimate Profit Master System v18.0")
     print("=" * 70)
