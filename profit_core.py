@@ -2620,6 +2620,10 @@ def setup_project_structure():
         'docs'
     ]
     
+    # ዳይሬክተሪዎችን መፍጠር
+    for directory in directories:
+        Path(project_root / directory).mkdir(parents=True, exist_ok=True)
+
     files = {
         'README.md': """# Ultimate Profit Master System v18.0
 
@@ -2638,14 +2642,6 @@ def setup_project_structure():
 1. Set up API keys in `.env` file
 2. Install dependencies: `pip install -r requirements.txt`
 3. Run demo: `python main.py --demo`
-
-## Configuration
-Copy `.env.example` to `.env` and add your API keys.
-
-## Deployment
-```bash
-docker-compose up -d"""}
-
 
 ## Configuration
 Copy `.env.example` to `.env` and add your API keys.
