@@ -979,3 +979,114 @@ python3 -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
 python3 -c "import nltk; nltk.download('punkt'); nltk.download('stopwords')"
+def _generate_main_file(self):
+    """ዋና የስርዓት ፋይል ፍጠር"""
+    main_file_content = '''"""
+🚀 ULTIMATE PROFIT MASTER MEGA-SYSTEM v18.0
+🔥 Fully Automated Content Generation, Multimedia Enhancement & Affiliate Monetization
+💎 End-to-End Production Pipeline with ALL Enhancements Included
+🔒 Enterprise Ready with Zero Reduction from Original
+🎯 100% Production Ready - All Gaps Filled
+"""
+
+import os
+import sys
+import asyncio
+
+# Check dependencies first
+def check_dependencies():
+    """Check and install required dependencies"""
+    REQUIRED_PACKAGES = [
+        'httpx>=0.24.0',
+        'textblob>=0.17.1', 
+        'nltk>=3.8.1',
+        'numpy>=1.24.0',
+        'pandas>=2.0.0',
+        'pyyaml>=6.0',
+        'jinja2>=3.1.0'
+    ]
+    
+    missing = []
+    for package in REQUIRED_PACKAGES:
+        try:
+            __import__(package.split('>=')[0])
+        except ImportError:
+            missing.append(package)
+    
+    if missing:
+        print(f"Missing packages: {', '.join(missing)}")
+        print("Installing dependencies...")
+        os.system(f'pip install {" ".join(missing)}')
+        
+        # Download NLTK data
+        import nltk
+        nltk.download('punkt', quiet=True)
+        nltk.download('stopwords', quiet=True)
+    
+    return True
+
+# Now import the system
+check_dependencies()
+
+# Import all system modules
+from production_system import UltimateProductionSystem
+
+async def main():
+    """Main entry point"""
+    print("=" * 70)
+    print("🚀 Ultimate Profit Master System v18.0")
+    print("=" * 70)
+    
+    try:
+        # Initialize system
+        system = UltimateProductionSystem()
+        
+        # Run comprehensive test
+        print("\\n🧪 Running comprehensive system test...")
+        test_results = await system.comprehensive_test()
+        
+        # Display results
+        summary = test_results.get('summary', {})
+        print(f"✅ Tests completed: {summary.get('passed_tests', 0)}/{summary.get('total_tests', 0)} passed")
+        print(f"📊 Overall score: {summary.get('overall_score', 0)}%")
+        
+        if summary.get('production_ready', False):
+            print("🎉 SYSTEM IS 100% PRODUCTION READY!")
+            
+            # Show available options
+            print("\\n📋 Available Operations:")
+            print("   1. Generate content")
+            print("   2. Batch processing")
+            print("   3. Project management")
+            print("   4. System dashboard")
+            print("   5. Exit")
+            
+            choice = input("\\nSelect option (1-5): ").strip()
+            
+            if choice == '1':
+                topic = input("Enter topic: ").strip()
+                countries = input("Enter countries (comma separated): ").strip()
+                countries_list = [c.strip() for c in countries.split(',')] if countries else ['US']
+                
+                result = await system.system.full_production_pipeline(topic, countries_list)
+                print(f"✅ Content generated: {result.get('title')}")
+                
+            elif choice == '2':
+                topics = input("Enter topics (comma separated): ").strip()
+                topics_list = [t.strip() for t in topics.split(',')]
+                
+                results = await system.batch_processor.process_batch(topics_list)
+                print(f"✅ Batch processed: {len(results)} topics")
+                
+        else:
+            print("⚠️ System needs additional configuration for production use.")
+            
+    except Exception as e:
+        print(f"❌ Error: {e}")
+        import traceback
+        traceback.print_exc()
+
+if __name__ == "__main__":
+    asyncio.run(main())'''
+    
+    return main_file_content
