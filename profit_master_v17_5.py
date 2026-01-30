@@ -316,7 +316,80 @@ class ModelPerformanceTracker:
             self.stats[key]['success'] += 1
         else:
             self.stats[key]['fail'] += 1
+# =================== 🛠️ HELPER SYSTEMS (ERROR HANDLING & SELF HEALING) ===================
 
+class AdvancedErrorHandling:
+    """
+    ስህተቶችን የሚለይ እና የሚቆጣጠር ክፍል
+    """
+    def __init__(self):
+        self.error_types = {
+            'rate_limit': ['429', 'rate limit', 'quota', 'too many requests'],
+            'auth_error': ['401', '403', 'unauthorized', 'invalid key', 'authentication'],
+            'server_error': ['500', '502', '503', 'overloaded', 'bad gateway'],
+            'content_policy': ['safety', 'blocked', 'harmful', 'violation']
+        }
+
+    def classify_error(self, error_msg: str) -> str:
+        """የስህተቱን አይነት ይለያል"""
+        error_msg = str(error_msg).lower()
+        for type_name, keywords in self.error_types.items():
+            if any(keyword in error_msg for keyword in keywords):
+                return type_name
+        return 'unknown'
+
+    def should_retry(self, error_type: str, attempt: int) -> bool:
+        """እንደገና መሞከር እንዳለበት ይወስናል"""
+        if attempt >= 2:  # ከ2 ሙከራ በኋላ አቁም
+            return False
+            
+        # እነዚህን ስህተቶች ደጋግሞ መሞከር ዋጋ የለውም
+        if error_type in ['auth_error', 'content_policy']:
+            return False
+            
+        # ለሌሎች (Network error, Rate limit) ደግመህ ሞክር
+        return True
+
+class SelfHealingSystem:
+    """
+    የተበላሹ አገልግሎቶችን ለይቶ የሚያስወግድ እና የሚያስተካክል (Self-Healing)
+    """
+    def __init__(self):
+        self.service_health = defaultdict(lambda: {'failures': 0, 'last_failure': 0, 'status': 'healthy'})
+        self.cooldown_period = 300  # 5 ደቂቃ ቅጣት
+
+    def is_service_healthy(self, service_name: str) -> bool:
+        """አገልግሎቱ ጤነኛ መሆኑን ያረጋግጣል"""
+        health = self.service_health[service_name]
+        
+        # አገልግሎቱ "Dead" ከተባለ እና ጊዜው ካላለፈ
+        if health['status'] == 'dead':
+            if time.time() - health['last_failure'] > self.cooldown_period:
+                # ጊዜው ካለፈ እንደገና እድል ስጠው (Reset)
+                health['status'] = 'healthy'
+                health['failures'] = 0
+                return True
+            return False
+            
+        return True
+
+    async def monitor_service_health(self, service_name: str, success: bool, duration: float):
+        """የአገልግሎቱን ጤንነት ይከታተላል"""
+        if success:
+            # ከተሳካ የውድቀት ቆጣሪውን ቀንስ
+            self.service_health[service_name]['failures'] = 0
+            self.service_health[service_name]['status'] = 'healthy'
+        else:
+            # ካልተሳካ የውድቀት ቆጣሪውን ጨምር
+            self.service_health[service_name]['failures'] += 1
+            self.service_health[service_name]['last_failure'] = time.time()
+            
+            # 3 ጊዜ ተከታታይ ከወደቀ "Dead" በለው
+            if self.service_health[service_name]['failures'] >= 3:
+                self.service_health[service_name]['status'] = 'dead'
+                print(f"🚫 Service {service_name} marked as DEAD (Self-Healing activated)")
+
+# =================== END OF HELPER SYSTEMS ===================
 # =================== 🚀 THE ULTIMATE AI FAILOVER SYSTEM ===================
 
 class AIFailoverSystem:
