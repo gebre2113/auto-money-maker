@@ -1140,7 +1140,7 @@ class EnhancedAIFailoverSystem:
 
 # =================== 📝 የተሻሻለ የይዘት ጀነሬተር ===================
 
-class EnhancedContentGenerator:
+class AdvancedAIContentGenerator:
     """ከፍተኛ ብልጠት ያለው የይዘት ጀነሬተር"""
     
     def __init__(self, config: PremiumConfig):
