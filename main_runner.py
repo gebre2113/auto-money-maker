@@ -8,10 +8,9 @@ import os
 import requests
 
 # Import from other modules
-from profit_core import PremiumConfig, AdvancedAIContentGenerator, CulturalAnthropologistEngine
-from profit_monetization import UltraAffiliateManager, VideoAffiliateIntegrationEngine, YouTubeIntelligenceHunterPro
+from profit_core import PremiumConfig, AdvancedAIContentGenerator
+from profit_monetization import UltraAffiliateManager, YouTubeIntelligenceHunterPro
 
-# Logging Setup
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger("ProfitMasterElite")
 
@@ -19,84 +18,60 @@ class UltimateProfitMasterEliteSystem:
     def __init__(self):
         self.config = PremiumConfig()
         self.ai_generator = AdvancedAIContentGenerator(self.config)
-        self.cultural_engine = CulturalAnthropologistEngine(self.config)
         self.youtube_hunter = YouTubeIntelligenceHunterPro(self.config.__dict__)
-        self.affiliate_manager = UltraAffiliateManager(user_geo=self.config.default_country)
-        self.video_integrator = VideoAffiliateIntegrationEngine(enable_ethical_mode=True)
-
-    def send_to_telegram(self, topic, content, revenue, link):
-        """መረጃውን ወደ ቴሌግራም ቦት ይልካል"""
-        token = os.getenv('TELEGRAM_BOT_TOKEN')
-        chat_id = os.getenv('TELEGRAM_CHAT_ID')
-        
-        if not token or not chat_id: return
-
-        message = (
-            f"🚀 <b>Profit Master Elite - LIVE RUN</b>\n\n"
-            f"🎯 <b>ርዕስ:</b> {topic}\n"
-            f"💰 <b>የሚጠበቅ ገቢ:</b> ${revenue}\n"
-            f"🔗 <b>የሽያጭ ሊንክ:</b> {link}\n\n"
-            f"✅ <i>ይዘቱ በ WordPress ላይ ታትሟል።</i>"
-        )
-        
-        url = f"https://api.telegram.org/bot{token}/sendMessage"
-        try:
-            requests.post(url, data={"chat_id": chat_id, "text": message, "parse_mode": "HTML"})
-            logger.info("✅ Telegram notification sent!")
-        except Exception as e:
-            logger.error(f"❌ Telegram Error: {e}")
+        self.affiliate_manager = UltraAffiliateManager(user_geo='US')
 
     def send_to_wordpress(self, title, content):
-        """ይዘቱን ወደ ዎርድፕረስ ይልካል"""
         wp_url = os.getenv('WP_URL')
         wp_user = os.getenv('WP_USERNAME')
         wp_pass = os.getenv('WP_PASSWORD')
-
         if not all([wp_url, wp_user, wp_pass]): return
-
-        payload = {'title': title, 'content': content, 'status': 'publish'} # በቀጥታ እንዲወጣ 'publish' አድርጌዋለሁ
+        
+        payload = {'title': title, 'content': content, 'status': 'publish'}
         try:
             url = f"{wp_url.rstrip('/')}/wp-json/wp/v2/posts"
             requests.post(url, json=payload, auth=(wp_user, wp_pass))
-            logger.info("✅ WordPress Post Published!")
+            logger.info("✅ WordPress Post with Video Published!")
         except Exception as e:
             logger.error(f"❌ WP Error: {e}")
 
-    async def run(self, topic, country, language):
-        logger.info(f"🚀 Execution Started: {topic}")
+    async def run(self, topic, country):
+        logger.info(f"🚀 Running Multimedia Engine for: {topic}")
         
-        # 1. AI Content Generation
-        content_package = await self.ai_generator.generate_premium_content(topic, language)
-        raw_text = content_package.get('content')
-        
-        if not raw_text or raw_text == "None":
-            raw_text = f"<h2>Strategic Insights: {topic}</h2><p>Exploring the future of business through {topic}.</p>"
+        # 1. AI Content
+        content_package = await self.ai_generator.generate_premium_content(topic, 'en')
+        raw_text = content_package.get('content', f"Analysis on {topic}")
 
-        # 2. Affiliate Link Injection (የሙከራ ሊንክ)
-        # እዚህ ጋር የምንጠቀመው የሙከራ ሊንክ ነው
-        affiliate_link = "https://www.bluehost.com/track/habtamu_test/" 
-        monetized_text = raw_text + f'<br><br><div style="padding:20px; background:#f0f9ff; border-radius:10px; border:1px solid #0ea5e9;">' \
-                                    f'<h3>🚀 Recommended Tool for {topic}</h3>' \
-                                    f'<p>Start your business today with our top-rated platform.</p>' \
-                                    f'<a href="{affiliate_link}" style="background:#0ea5e9; color:white; padding:10px 20px; text-decoration:none; border-radius:5px;">Get Started Now</a>' \
-                                    f'</div>'
+        # 2. YouTube Video Hunter (ቪዲዮ መፈለጊያ)
+        videos = await self.youtube_hunter.find_relevant_videos(topic, country)
+        video_embed = ""
+        if videos and len(videos) > 0:
+            video_id = videos[0].get('video_id')
+            video_embed = f'<br><br><div class="video-container"><iframe width="560" height="315" src="https://www.youtube.com/embed/{video_id}" frameborder="0" allowfullscreen></iframe></div><br>'
+            logger.info(f"✅ Found Video ID: {video_id}")
 
-        # 3. Report Generation
-        report = {"predicted_revenue": "65.00"} # ለሙከራ $65 ገቢ ብለነዋል
+        # 3. Monetization Link
+        affiliate_link = "https://www.bluehost.com/track/habtamu_test/"
+        cta_box = f'''<div style="padding:20px; background:#f0f9ff; border:2px solid #0ea5e9; border-radius:15px; margin:20px 0;">
+                        <h3>🚀 Expert Recommended for {topic}</h3>
+                        <p>Get started with the best tools to scale your business.</p>
+                        <a href="{affiliate_link}" style="background:#0ea5e9; color:white; padding:12px 25px; text-decoration:none; border-radius:8px; display:inline-block; font-weight:bold;">Get Started Now</a>
+                     </div>'''
+
+        # ጽሁፉን፣ ቪዲዮውን እና ሊንኩን ማዋሃድ
+        final_html = f"{raw_text}{video_embed}{cta_box}"
 
         # 4. Deployment
-        self.send_to_wordpress(f"Master Guide: {topic}", monetized_text)
-        self.send_to_telegram(topic, monetized_text, report['predicted_revenue'], affiliate_link)
-
-        return {'content': monetized_text, 'report': report}
+        self.send_to_wordpress(f"Elite Guide: {topic}", final_html)
+        
+        return {"status": "Success", "video_found": bool(video_embed)}
 
 async def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--topic', type=str, required=True)
     args = parser.parse_args()
-    
     system = UltimateProfitMasterEliteSystem()
-    await system.run(args.topic, 'US', 'en')
+    await system.run(args.topic, 'US')
 
 if __name__ == "__main__":
     asyncio.run(main())
