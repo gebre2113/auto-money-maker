@@ -1018,6 +1018,18 @@ async def main():
 
 # =================== ፕሮግራሙን መጀመር ===================
 
+        # የ main() ፋንክሽን መጨረሻ
+        orchestrator.monitor.print_report()
+        print("\n" + "="*70)
+        print("🎉 PRODUCTION COMPLETE!")
+        print("="*70)
+
+    except Exception as e:
+        print(f"\n💥 Critical error in main: {e}")
+        traceback.print_exc()
+
+# --- ከዚህ በታች ያለው ከማንኛውም ፋንክሽን ውጭ ነው ---
+
 if __name__ == "__main__":
     # Handle keyboard interrupt gracefully
     def signal_handler(sig, frame):
@@ -1030,7 +1042,8 @@ if __name__ == "__main__":
     
     try:
         asyncio.run(main())
-    except KeyboardInterrupt:        print("\n\n⚠️ Production interrupted by user")
+    except KeyboardInterrupt:
+        print("\n\n⚠️ Production interrupted by user")
         sys.exit(0)
     except Exception as e:
         print(f"\n💥 Fatal error: {e}")
