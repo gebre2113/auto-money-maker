@@ -956,7 +956,7 @@ async def main():
         "Custom Topic (Enter your own)"
     ]    
 
-print("\n📚 Available Topics:")
+    print("\n📚 Available Topics:")
     for i, t in enumerate(topics, 1):
         print(f"   {i}. {t}")
     
@@ -977,13 +977,9 @@ print("\n📚 Available Topics:")
     elif choice.isdigit() and 1 <= int(choice) <= 5:
         topic = topics[int(choice) - 1]
     else:
-    # በማንኛውም ምክንያት ምርጫ ከጠፋ የመጀመሪያውን ርዕስ ውሰድ
+        # ትኩረት፦ ይህ መስመር አሁን በትክክል ገባ ብሏል
         topic = topics[0]
-        print(f"✅ Proceeding with default: {topic}")
-
-    # Target countries
-    countries_input = input("\nEnter target countries (comma-separated, default: US): ").strip()
-    countries = [c.strip() for c in countries_input.split(',')] if countries_input else ['US']
+        print(f"✅ Proceeding with default: {topic}"
     
     # Content type
     content_types = ['blog_post', 'product_review', 'how_to_guide', 'general']
