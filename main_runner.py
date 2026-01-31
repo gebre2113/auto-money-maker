@@ -956,6 +956,15 @@ async def main():
         "Custom Topic (Enter your own)"
     ]    
 
+        topics = [
+        "AI-Powered Content Creation Strategies 2026",
+        "Digital Marketing Trends for Ethiopian Businesses",
+        "Passive Income Streams for Tech Professionals",
+        "Building an Online Business from Scratch",
+        "Social Media Monetization Techniques",
+        "Custom Topic (Enter your own)"
+    ]    
+
     print("\n📚 Available Topics:")
     for i, t in enumerate(topics, 1):
         print(f"   {i}. {t}")
@@ -968,7 +977,6 @@ async def main():
         print("\n🤖 GitHub Actions detected. Automatically selecting Topic 1 for production...")
         choice = '1'
     else:
-        # በራስህ ኮምፒውተር ላይ ስታሄደው ብቻ ጥያቄ ይጠይቃል
         choice = input("\nSelect topic number (1-6): ").strip()
 
     # ምርጫውን የማረጋገጫ ሂደት
@@ -977,17 +985,18 @@ async def main():
     elif choice.isdigit() and 1 <= int(choice) <= 5:
         topic = topics[int(choice) - 1]
     else:
-        # ትኩረት፦ ይህ መስመር አሁን በትክክል ገባ ብሏል
         topic = topics[0]
-        print(f"✅ Proceeding with default: {topic}"
+        print(f"✅ Proceeding with: {topic}")
     
-    # Content type
+    # Content type selection
     content_types = ['blog_post', 'product_review', 'how_to_guide', 'general']
-    print(f"\n📋 Available Content Types: {', '.join(content_types)}")
-    
-    content_type = input("Enter content type (default: blog_post): ").strip()
-    if not content_type or content_type not in content_types:
+    if is_github:
         content_type = 'blog_post'
+    else:
+        print(f"\n📋 Available Content Types: {', '.join(content_types)}")
+        content_type = input("Enter content type (default: blog_post): ").strip()
+        if not content_type or content_type not in content_types:
+            content_type = 'blog_post'
     
     # Summary
     print("\n" + "="*70)
@@ -998,8 +1007,12 @@ async def main():
     print(f"📋 Content Type: {content_type}")
     print("="*70)
     
-    # Confirm
-    confirm = input("\nStart production? (y/n): ").strip().lower()
+    # Confirm - GitHub ላይ ከሆነ በራሱ 'yes' ይላል
+    if is_github:
+        confirm = 'y'
+    else:
+        confirm = input("\nStart production? (y/n): ").strip().lower()
+
     if confirm not in ['y', 'yes', 'yep', 'yeah']:
         print("\n⚠️ Production cancelled by user")
         return
@@ -1007,7 +1020,6 @@ async def main():
     print(f"\n🚀 Starting production pipeline...")
     print("⏳ This may take several minutes. Please wait...")
     
-    # 'try' መስመር ከ 'print' ጋር በትክክል እኩል መሆን አለበት
     try:
         # Execute production
         results = await orchestrator.execute_production(
@@ -1018,7 +1030,7 @@ async def main():
         
         # Print performance report
         orchestrator.monitor.print_report()
-
+        
 # =================== ፕሮግራሙን መጀመር ===================
 
         # የ main() ፋንክሽን መጨረሻ
