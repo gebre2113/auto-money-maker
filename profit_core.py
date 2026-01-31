@@ -655,479 +655,117 @@ class ComprehensiveErrorHandler:
 
 # =================== 🔄 የተሻሻለ የAI ፌይልኦቨር ሲስተም ===================
 class EnhancedAIFailoverSystem:
-    """ከፍተኛ ብልጠት ያለው AI ፌይልኦቨር ሲስተም"""
+    """
+    ከፍተኛ ብልጠት ያለው እና ራሱን የሚፈውስ AI Failover System
+    ዓላማ፡ ምንም አይነት ጥያቄ ያለ መልስ እንዳይቀር ማድረግ (Zero Failure Policy)
+    """
     
     def __init__(self, config: PremiumConfig):
         self.config = config
         self.key_manager = SecureAPIKeyManager()
-        self.error_handler = AdvancedErrorHandling()
         self.healer = SelfHealingSystem()
-        self.limiter = RateLimiter()
         self.monitor = AdvancedMonitoring()
-        self.content_analyzer = ContentAnalyzer()
-        self.model_tracker = ModelPerformanceTracker()
         
-        # 🚨 እዚህ ጋር ነው ስህተቱ የታረመው - እነዚህ መስመሮች መኖራቸውን አረጋግጥ
-        self.content_cache = {}
-        self.cache_ttl = 3600 
-        self.performance_history = defaultdict(list)
-        
-        # የተሻሻለ የሞዴል ዝርዝሮች (2026 Updated)
-        self.model_details = {
+        # የሞዴሎች ማዕከላዊ ዝርዝር (2026 Updated)
+        self.model_configs = {
             'groq': {
-                'models': [
-                    'llama-3.3-70b-versatile',
-                    'llama-3.1-70b-versatile',
-                    'llama-3.1-8b-instant',
-                    'mixtral-8x7b-32768'
-                ],
-                'endpoint': 'https://api.groq.com/openai/v1/chat/completions',
-                'timeout': 60
+                'models': {
+                    'technical': 'llama-3.3-70b-versatile',
+                    'creative': 'mixtral-8x7b-32768',
+                    'general': 'llama-3.1-8b-instant'
+                },
+                'endpoint': 'https://api.groq.com/openai/v1/chat/completions'
             },
             'gemini': {
-                'models': [
-                    'gemini-1.5-pro',
-                    'gemini-1.5-flash',
-                    'gemini-2.0-flash-exp'
-                ],
-                'endpoint': 'https://generativelanguage.googleapis.com/v1/models',
-                'timeout': 90
-            },
-            'openai': {
-                'models': ['gpt-4o', 'gpt-4-turbo', 'gpt-3.5-turbo'],
-                'timeout': 60
+                'models': {
+                    'pro': 'gemini-1.5-pro',
+                    'flash': 'gemini-1.5-flash'
+                },
+                'endpoint': 'https://generativelanguage.googleapis.com/v1/models'
             }
         }
-        
-        logger.info("🛡️ Enhanced AI Failover System Initialized")
+        self.content_cache = {}
+        logger.info("🛡️ Elite AI Failover System Initialized & Locked")
 
-    async def generate_content(self, prompt: str, max_tokens: int = 3000, 
-                             preferred_service: str = None, content_type: str = "general") -> str:
-        if not preferred_service:
-            preferred_service = self.content_analyzer.get_best_service_for_prompt(
-                prompt, self.key_manager.get_available_services()
-            )
+    async def generate_content(self, prompt: str, content_type: str = "general", max_tokens: int = 4000) -> str:
+        """ዋናው ይዘት ማመንጫ ፈንክሽን"""
         
-        # ማህደረ ትውስታ ማረጋገጫ
-        cache_key = hashlib.md5(f"{prompt[:500]}_{content_type}".encode()).hexdigest()
+        # 1. መጀመሪያ Cache ፍተሻ (ጊዜ ለመቆጠብ)
+        cache_key = hashlib.md5(f"{prompt[:200]}".encode()).hexdigest()
         if cache_key in self.content_cache:
-            cached_item = self.content_cache[cache_key]
-            cache_age = time.time() - cached_item['timestamp']
-            if cache_age < self.cache_ttl:
-                logger.info(f"💾 ከማህደረ ትውስታ ማግኘት (age: {cache_age:.0f}s)")
-                return cached_item['content']
-        
-        # አገልግሎቶችን በቅድሚያ መሠረት ማዘጋጀት
-        services = [
-            {'name': 'groq', 'priority': 1},
-            {'name': 'gemini', 'priority': 2},
-            {'name': 'openai', 'priority': 3},
-            {'name': 'huggingface', 'priority': 4},
-            {'name': 'cohere', 'priority': 5}
-        ]
-        
-        sorted_services = sorted(
-            services,
-            key=lambda x: 0 if x['name'] == preferred_service else x['priority']
-        )
-        
+            logger.info("💾 Cached content found. Reusing...")
+            return self.content_cache[cache_key]
+
+        # 2. አገልግሎቶችን በቅደም ተከተል መሞከር (Groq -> Gemini -> OpenAI)
+        services_to_try = ['groq', 'gemini', 'openai']
         last_error = None
-        
-        for service in sorted_services:
-            name = service['name']
-            if not self.healer.is_service_healthy(name):
+
+        for service in services_to_try:
+            if not self.healer.is_service_healthy(service):
                 continue
-            api_key = self.key_manager.get_key(name)
+
+            api_key = self.key_manager.get_key(service)
             if not api_key:
                 continue
-            
-            attempts = 0
-            while attempts < 2:
-                try:
-                    await self.limiter.wait_if_needed(name)
-                    start_t = time.time()
-                    content = await self._call_service(name, prompt, max_tokens, api_key, content_type)
-                    if not content or len(content) < 50:
-                        raise Exception("Generated content too short or empty")
-                    duration = time.time() - start_t
-                    logger.info(f"✅ {name} Success ({duration:.2f}s)")
-                    await self.healer.monitor_service_health(name, True, duration)
-                    self.monitor.track_request(name, True, len(content.split()), duration)
-                    
-                    # ወደ ማህደረ ትውስታ ማስገባት
-                    self.content_cache[cache_key] = {
-                        'content': content,
-                        'timestamp': time.time(),
-                        'content_type': content_type,
-                        'prompt_hash': cache_key
-                    }
-                    self._cleanup_cache()
-                    
-                    return content
-                except Exception as e:
-                    error_msg = str(e)
-                    error_type = self.error_handler.classify_error(error_msg)
-                    duration = time.time() - start_t
-                    logger.warning(f"⚠️ {name} Failed: {error_msg[:100]}")
-                    await self.healer.monitor_service_health(name, False, duration)
-                    last_error = e
-                    if self.error_handler.should_retry(error_type, attempts):
-                        await asyncio.sleep(2)
-                        attempts += 1
-                    else:
-                        break
-        
-        raise Exception(f"🚨 All AI Services Failed. Last Error: {last_error}")
-    
-    async def _call_service(self, service_name: str, prompt: str, 
-                          max_tokens: int, api_key: str, content_type: str) -> str:
-        """AI አገልግሎት ጥሪ ማድረግ"""
-        
-        try:
-            if service_name == 'groq':
-                return await self._enhanced_groq_call(prompt, max_tokens, api_key, content_type)
-            elif service_name == 'gemini':
-                return await self._enhanced_gemini_call(prompt, max_tokens, api_key, content_type)
-            elif service_name == 'openai':
-                return await self._enhanced_openai_call(prompt, max_tokens, api_key, content_type)
-            elif service_name == 'huggingface':
-                return await self._enhanced_huggingface_call(prompt, max_tokens, api_key, content_type)
-            elif service_name == 'cohere':
-                return await self._enhanced_cohere_call(prompt, max_tokens, api_key, content_type)
-            else:
-                raise Exception(f"ያልታወቀ AI አገልግሎት: {service_name}")
+
+            try:
+                start_t = time.time()
+                content = await self._execute_api_call(service, prompt, api_key, content_type, max_tokens)
                 
-        except Exception as e:
-            # የአፈፃፀም ታሪክ መዝግብ
-            self.performance_history[service_name].append({
-                'success': False,
-                'timestamp': datetime.now().isoformat(),
-                'error': str(e)
-            })
-            raise
-    
-    async def _enhanced_groq_call(self, prompt: str, max_tokens: int, 
-                                api_key: str, content_type: str) -> str:
-        """የተሻሻለ የGroq ጥሪ"""
-        url = "https://api.groq.com/openai/v1/chat/completions"
-        headers = {
-            "Authorization": f"Bearer {api_key}",
-            "Content-Type": "application/json",
-            "User-Agent": "ProfitMaster/18.0"
-        }
-        
-        # በይዘት አይነት መሠረት የሞዴል ምርጫ
-        model_map = {
-            'technical': 'llama-3.1-70b-versatile',
-            'creative': 'mixtral-8x7b-32768',
-            'long_form': 'llama3-70b-8192',
-            'general': 'llama3-8b-8192'
-        }
-        
-        model = model_map.get(content_type, 'llama-3.1-70b-versatile')
-        
-        # በይዘት አይነት መሠረት የሙቀት መጠን ማስተካከል
-        temperature_map = {
-            'technical': 0.3,
-            'creative': 0.9,
-            'long_form': 0.7,
-            'general': 0.5
-        }
-        
-        temperature = temperature_map.get(content_type, 0.7)
-        
-        data = {
-            "model": model,
-            "messages": [
-                {"role": "system", "content": "You are an expert content creator for Profit Master System."},
-                {"role": "user", "content": prompt}
-            ],
-            "temperature": temperature,
-            "max_tokens": max_tokens,
-            "top_p": 0.95,
-            "frequency_penalty": 0.1,
-            "presence_penalty": 0.1,
-            "stream": False
-        }
-        
-        try:
-            async with httpx.AsyncClient(timeout=60.0) as client:
-                response = await client.post(url, headers=headers, json=data)
-                
-                if response.status_code == 200:
-                    result = response.json()
-                    content = result['choices'][0]['message']['content']
+                if content and len(content.strip()) > 150: # ጥራት ማረጋገጫ
+                    duration = time.time() - start_t
+                    logger.info(f"✅ {service.upper()} Success in {duration:.2f}s")
                     
-                    # የአፈፃፀም ታሪክ መዝግብ
-                    self.performance_history['groq'].append({
-                        'success': True,
-                        'timestamp': datetime.now().isoformat(),
-                        'model': model,
-                        'tokens_used': result.get('usage', {}).get('total_tokens', 0)
-                    })
-                    
+                    # ስኬቱን መመዝገብ
+                    self.content_cache[cache_key] = content
+                    await self.healer.report_success(service)
                     return content
                 else:
-                    error_msg = f"Groq ስህተት: {response.status_code} - {response.text}"
-                    raise Exception(error_msg)
-                    
-        except httpx.TimeoutException:
-            raise Exception("Groq ጥሪ ጊዜ አልቋል")
-        except httpx.NetworkError:
-            raise Exception("የኔትዎርክ ስህተት በGroq ጥሪ")
-        except Exception as e:
-            raise Exception(f"Groq ስህተት: {str(e)}")
-    
-    async def _enhanced_gemini_call(self, prompt: str, max_tokens: int,
-                                  api_key: str, content_type: str) -> str:
-        """የተሻሻለ የGemini ጥሪ"""
+                    raise Exception("Content too short or empty")
+
+            except Exception as e:
+                last_error = str(e)
+                logger.warning(f"⚠️ {service.upper()} failed: {last_error[:50]}")
+                await self.healer.report_failure(service)
+                continue # ወደ ቀጣዩ ሞዴል ይለፋል
+
+        raise Exception(f"🚨 All AI Engines failed. Last error: {last_error}")
+
+    async def _execute_api_call(self, service, prompt, api_key, content_type, max_tokens):
+        """API ጥሪዎችን በተናጠል ማስተናገድ"""
         
-        # በይዘት አይነት መሠረት የሞዴል ምርጫ
-        model_map = {
-            'technical': 'gemini-1.5-pro',
-            'creative': 'gemini-1.5-pro',
-            'long_form': 'gemini-1.5-pro',
-            'general': 'gemini-1.5-flash'
-        }
-        
-        model = model_map.get(content_type, 'gemini-1.5-flash')
-        url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={api_key}"
-        
-        # የማረጋገጫ ስርዓት
-        safety_settings = [
-            {"category": "HARM_CATEGORY_HARASSMENT", "threshold": "BLOCK_NONE"},
-            {"category": "HARM_CATEGORY_HATE_SPEECH", "threshold": "BLOCK_NONE"},
-            {"category": "HARM_CATEGORY_SEXUALLY_EXPLICIT", "threshold": "BLOCK_NONE"},
-            {"category": "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold": "BLOCK_NONE"}
-        ]
-        
-        data = {
-            "contents": [{"parts": [{"text": prompt}]}],
-            "safetySettings": safety_settings,
-            "generationConfig": {
-                "temperature": 0.8 if content_type == 'creative' else 0.4,
-                "topP": 0.95,
-                "topK": 40,
-                "maxOutputTokens": max_tokens
-            }
-        }
-        
-        try:
-            async with httpx.AsyncClient(timeout=90.0) as client:
-                response = await client.post(url, json=data)
-                
-                if response.status_code == 200:
-                    result = response.json()
-                    
-                    if 'candidates' in result and len(result['candidates']) > 0:
-                        content = result['candidates'][0]['content']['parts'][0]['text']
-                        
-                        # የአፈፃፀም ታሪክ መዝግብ
-                        self.performance_history['gemini'].append({
-                            'success': True,
-                            'timestamp': datetime.now().isoformat(),
-                            'model': model,
-                            'tokens_used': len(content.split())
-                        })
-                        
-                        return content
-                    else:
-                        raise Exception("Gemini: ምንም ይዘት አልተመለሰም")
-                else:
-                    error_msg = f"Gemini ስህተት: {response.status_code} - {response.text}"
-                    raise Exception(error_msg)
-                    
-        except httpx.TimeoutException:
-            raise Exception("Gemini ጥሪ ጊዜ አልቋል")
-        except httpx.NetworkError:
-            raise Exception("የኔትዎርክ ስህተት በGemini ጥሪ")
-        except Exception as e:
-            raise Exception(f"Gemini ስህተት: {str(e)}")
-    
-    async def _enhanced_openai_call(self, prompt: str, max_tokens: int,
-                                  api_key: str, content_type: str) -> str:
-        """የተሻሻለ የOpenAI ጥሪ"""
-        try:
-            import openai
-            openai.api_key = api_key
-            
-            # በይዘት አይነት መሠረት የሞዴል ምርጫ
-            model = 'gpt-4' if content_type in ['technical', 'long_form'] else 'gpt-3.5-turbo'
-            
-            response = await asyncio.to_thread(
-                openai.ChatCompletion.create,
-                model=model,
-                messages=[
-                    {"role": "system", "content": "You are an expert content creator."},
-                    {"role": "user", "content": prompt}
-                ],
-                max_tokens=max_tokens,
-                temperature=0.7,
-                top_p=0.95,
-                frequency_penalty=0.1,
-                presence_penalty=0.1
-            )
-            
-            content = response.choices[0].message.content
-            
-            # የአፈፃፀም ታሪክ መዝግብ
-            self.performance_history['openai'].append({
-                'success': True,
-                'timestamp': datetime.now().isoformat(),
-                'model': model,
-                'tokens_used': response.usage.total_tokens
-            })
-            
-            return content
-            
-        except ImportError:
-            raise Exception("OpenAI ሞጁል አልተጫነም")
-        except openai.error.RateLimitError:
-            raise Exception("OpenAI የጥያቄ ገደብ ተሞልቷል")
-        except openai.error.AuthenticationError:
-            raise Exception("የOpenAI ቁልፍ ማረጋገጫ አልተሳካም")
-        except Exception as e:
-            raise Exception(f"OpenAI ስህተት: {str(e)}")
-    
-    async def _enhanced_huggingface_call(self, prompt: str, max_tokens: int, api_key: str, content_type: str = "general") -> str:
-        """Enhanced HuggingFace API call"""
-        url = "https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.2"
-        headers = {"Authorization": f"Bearer {api_key}", "User-Agent": "ProfitMaster/18.0"}
-        
-        # Format prompt for Mistral
-        formatted_prompt = f"<s>[INST] {prompt} [/INST]"
-        
-        payload = {
-            "inputs": formatted_prompt,
-            "parameters": {
-                "max_new_tokens": max_tokens,
+        # --- GROQ CALL ---
+        if service == 'groq':
+            model = self.model_configs['groq']['models'].get(content_type, 'llama-3.1-8b-instant')
+            headers = {"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"}
+            data = {
+                "model": model,
+                "messages": [{"role": "user", "content": prompt}],
                 "temperature": 0.7,
-                "top_p": 0.95,
-                "do_sample": True,
-                "return_full_text": False
+                "max_tokens": max_tokens
             }
-        }
-        
-        try:
-            async with httpx.AsyncClient(timeout=120.0) as client:
-                response = await client.post(url, headers=headers, json=payload)
-                
-                if response.status_code == 200:
-                    result = response.json()
-                    if isinstance(result, list) and len(result) > 0:
-                        content = result[0].get('generated_text', '').strip()
-                        
-                        # Track performance
-                        self.performance_history['huggingface'].append({
-                            'success': True,
-                            'timestamp': datetime.now().isoformat(),
-                            'model': 'Mistral-7B-Instruct-v0.2',
-                            'tokens_used': len(content.split())
-                        })
-                        
-                        return content
-                    else:
-                        raise Exception("HuggingFace: No content generated")
-                else:
-                    error_msg = f"HuggingFace Error: {response.status_code} - {response.text}"
-                    raise Exception(error_msg)
-                    
-        except httpx.TimeoutException:
-            raise Exception("HuggingFace request timed out")
-        except httpx.NetworkError:
-            raise Exception("Network error with HuggingFace")
-        except Exception as e:
-            raise Exception(f"HuggingFace error: {str(e)}")
-    
-    async def _enhanced_cohere_call(self, prompt: str, max_tokens: int, api_key: str, content_type: str = "general") -> str:
-        """Enhanced Cohere API call"""
-        url = "https://api.cohere.ai/v1/generate"
-        headers = {
-            "Authorization": f"Bearer {api_key}",
-            "Content-Type": "application/json",
-            "User-Agent": "ProfitMaster/18.0"
-        }
-        
-        # Adjust parameters based on content type
-        temperature = 0.7
-        if content_type == 'creative':
-            temperature = 0.9
-        elif content_type == 'technical':
-            temperature = 0.3
-        
-        data = {
-            "model": "command",
-            "prompt": prompt,
-            "max_tokens": max_tokens,
-            "temperature": temperature,
-            "p": 0.95,
-            "k": 0,
-            "stop_sequences": [],
-            "return_likelihoods": "NONE"
-        }
-        
-        try:
+            async with httpx.AsyncClient(timeout=40.0) as client:
+                resp = await client.post(self.model_configs['groq']['endpoint'], headers=headers, json=data)
+                if resp.status_code == 200:
+                    return resp.json()['choices'][0]['message']['content']
+                raise Exception(f"Groq Error {resp.status_code}")
+
+        # --- GEMINI CALL ---
+        elif service == 'gemini':
+            model = self.model_configs['gemini']['models'].get('pro' if content_type == 'technical' else 'flash')
+            # 🚨 v1 Stable Endpoint (ከ v1beta የተቀየረ)
+            url = f"{self.model_configs['gemini']['endpoint']}/{model}:generateContent?key={api_key}"
+            data = {
+                "contents": [{"parts": [{"text": prompt}]}],
+                "generationConfig": {"temperature": 0.7, "maxOutputTokens": max_tokens}
+            }
             async with httpx.AsyncClient(timeout=60.0) as client:
-                response = await client.post(url, headers=headers, json=data)
-                
-                if response.status_code == 200:
-                    result = response.json()
-                    content = result['generations'][0]['text']
-                    
-                    # Track performance
-                    self.performance_history['cohere'].append({
-                        'success': True,
-                        'timestamp': datetime.now().isoformat(),
-                        'model': 'command',
-                        'tokens_used': len(content.split())
-                    })
-                    
-                    return content
-                else:
-                    error_msg = f"Cohere Error: {response.status_code} - {response.text}"
-                    raise Exception(error_msg)
-                    
-        except httpx.TimeoutException:
-            raise Exception("Cohere request timed out")
-        except httpx.NetworkError:
-            raise Exception("Network error with Cohere")
-        except Exception as e:
-            raise Exception(f"Cohere error: {str(e)}")
-    
-    def _cleanup_cache(self):
-        """የማህደረ ትውስታ ማጽዳት"""
-        max_cache_size = 100
-        if len(self.content_cache) > max_cache_size:
-            # በጊዜ መሰረት አሮጌ እቃዎችን ማጥፋት
-            sorted_items = sorted(self.content_cache.items(), 
-                                key=lambda x: x[1]['timestamp'])
-            items_to_remove = sorted_items[:len(self.content_cache) - max_cache_size]
-            
-            for key, _ in items_to_remove:
-                del self.content_cache[key]
-    
-    def get_performance_report(self) -> Dict:
-        """የAI አገልግሎቶች አፈፃፀም ሪፖርት"""
-        report = {}
-        
-        for service_name, history in self.performance_history.items():
-            if history:
-                successful = [h for h in history if h['success']]
-                failed = [h for h in history if not h['success']]
-                
-                total_requests = len(history)
-                success_rate = (len(successful) / total_requests * 100) if total_requests > 0 else 0
-                
-                report[service_name] = {
-                    'total_requests': total_requests,
-                    'successful': len(successful),
-                    'failed': len(failed),
-                    'success_rate': round(success_rate, 2),
-                    'recent_errors': [e['error'] for e in failed[-3:]] if failed else [],
-                    'average_tokens': round(np.mean([h.get('tokens_used', 0) for h in successful]), 2) if successful else 0
-                }
-        
-        return report
+                resp = await client.post(url, json=data)
+                if resp.status_code == 200:
+                    return resp.json()['candidates'][0]['content']['parts'][0]['text']
+                raise Exception(f"Gemini Error {resp.status_code}")
+
+        return None
 
 # =================== 📝 የተሻሻለ የይዘት ጀነሬተር ===================
 
