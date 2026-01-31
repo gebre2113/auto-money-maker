@@ -718,7 +718,7 @@ class EnhancedAIFailoverSystem:
                     
                     # ስኬቱን መመዝገብ
                     self.content_cache[cache_key] = content
-                    await self.healer.report_success(service)
+                    await self.healer.monitor_service_health(service, True, duration) 
                     return content
                 else:
                     raise Exception("Content too short or empty")
@@ -726,7 +726,7 @@ class EnhancedAIFailoverSystem:
             except Exception as e:
                 last_error = str(e)
                 logger.warning(f"⚠️ {service.upper()} failed: {last_error[:50]}")
-                await self.healer.report_failure(service)
+                await self.healer.monitor_service_health(service, False, 0) 
                 continue # ወደ ቀጣዩ ሞዴል ይለፋል
 
         raise Exception(f"🚨 All AI Engines failed. Last error: {last_error}")
