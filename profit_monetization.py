@@ -220,7 +220,7 @@ class YouTubeIntelligenceHunterPro:
         
         logger.info(f"🚀 YouTube Intelligence Hunter v2.1 initialized")
     
-async def initialize(self):
+   async def initialize(self):
         """ስርዓት አሰራጭ"""
         if self._initialized:
             return
@@ -233,7 +233,7 @@ async def initialize(self):
             logger.error(f"❌ System initialization failed: {e}")
             raise
     
-     async def __aenter__(self):
+    async def __aenter__(self):
         """Async context manager support"""
         await self.initialize()
         return self
