@@ -81,7 +81,7 @@ logger = setup_logging()
 # main_runner.py የሚፈልገው ስም እና አንተ የጻፍከው ስም እንዲገጥሙ ለማድረግ፡
 # ይህንን መስመር መጨመር Import Error እንዳይመጣ ይከላከላል።
 
-class AdvancedAIContentGenerator:
+class EnhancedContentGenerator:
     """Advanced AI content generation engine - Refactored Name"""
     def __init__(self, config=None):
         self.config = config
