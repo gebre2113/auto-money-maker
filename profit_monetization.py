@@ -220,7 +220,7 @@ class YouTubeIntelligenceHunterPro:
         
         logger.info(f"🚀 YouTube Intelligence Hunter v2.1 initialized")
     
-    async def initialize(self):
+async def initialize(self):
         """ስርዓት አሰራጭ"""
         if self._initialized:
             return
@@ -311,7 +311,7 @@ class YouTubeIntelligenceHunterPro:
             logger.error(f"❌ Search failed for '{topic}': {e}")
             return await self._get_fallback_videos(topic, max_results)
     
-        async def _smart_search_strategy(self, topic: str, country: str, max_results: int) -> List[Dict]:
+    async def _smart_search_strategy(self, topic: str, country: str, max_results: int) -> List[Dict]:
         """ትክክለኛ የዩቲዩብ API ፍለጋ ስልት"""
         api_key = self.api_keys['youtube_v3']
         if not api_key:
