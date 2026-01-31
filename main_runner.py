@@ -1003,7 +1003,9 @@ async def main():
     
     print(f"\n🚀 Starting production pipeline...")
     print("⏳ This may take several minutes. Please wait...")
-        try:
+    
+    # 'try' መስመር ከ 'print' ጋር በትክክል እኩል መሆን አለበት
+    try:
         # Execute production
         results = await orchestrator.execute_production(
             topic=topic,
@@ -1013,30 +1015,6 @@ async def main():
         
         # Print performance report
         orchestrator.monitor.print_report()
-        
-        # Final summary
-        print("\n" + "="*70)
-        print("🎉 PRODUCTION COMPLETE!")
-        print("="*70)
-        
-        if results['status'] == 'completed':
-            print(f"✅ Production {results['production_id']} completed successfully!")
-            print(f"📊 {len(results['stages_completed'])}/{len(results['stages_completed']) + len(results['stages_failed'])} stages successful")
-            
-            if results.get('metrics'):
-                print(f"📝 Word Count: {results['metrics'].get('word_count', 0)}")
-                print(f"💰 Predicted Revenue: ${results['metrics'].get('predicted_revenue', 0):.2f}")
-                print(f"🌍 Localized Versions: {results['metrics'].get('localized_versions', 0)}")
-            
-            print(f"\n💾 Results saved to: production_outputs/")
-            
-        else:
-            print(f"❌ Production failed: {results.get('error', 'Unknown error')}")
-            print(f"📋 Check logs for details: logs/")
-    
-    except Exception as e:
-        print(f"\n💥 Critical error: {e}")
-        traceback.print_exc()
 
 # =================== ፕሮግራሙን መጀመር ===================
 
