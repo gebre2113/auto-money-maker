@@ -959,21 +959,26 @@ async def main():
     for i, t in enumerate(topics, 1):
         print(f"   {i}. {t}")
     
-    while True:
+    # ሰርቨሩ (GitHub) በራሱ እንዲመርጥ ለማድረግ
+    import os
+    is_github = os.getenv('GITHUB_ACTIONS') == 'true'
+
+    if is_github:
+        print("\n🤖 GitHub Actions detected. Automatically selecting Topic 1...")
+        choice = '1'
+    else:
         choice = input("\nSelect topic number (1-6): ").strip()
-        
-        if choice == '6':
-            topic = input("Enter your custom topic: ").strip()
-            if topic:
-                break
-            else:
-                print("❌ Please enter a valid topic")
-        elif choice.isdigit() and 1 <= int(choice) <= 5:
-            topic = topics[int(choice) - 1]
-            break
-        else:
-            print("❌ Invalid choice. Please enter a number between 1-6")
-    
+
+    # ምርጫውን የማረጋገጫ ሂደት
+    if choice == '6' and not is_github:
+        topic = input("Enter your custom topic: ").strip()
+    elif choice.isdigit() and 1 <= int(choice) <= 5:
+        topic = topics[int(choice) - 1]
+    else:
+        # ምንም ካልተመረጠ የመጀመሪያውን ርዕስ ውሰድ
+        topic = topics[0]
+        print(f"✅ Proceeding with: {topic}")
+
     # Target countries
     countries_input = input("\nEnter target countries (comma-separated, default: US): ").strip()
     countries = [c.strip() for c in countries_input.split(',')] if countries_input else ['US']
