@@ -755,7 +755,9 @@ class ProductionOrchestrator:
         success_rate = (successful_stages / total_stages * 100) if total_stages > 0 else 0
         
         performance = self.monitor.get_performance_report()
-                return {
+        
+        # return የሚለው ቃል ከ performance ጋር እኩል መሆን አለበት (ትርፍ ስፔስ የለም)
+        return {
             'summary': {
                 'production_id': results['production_id'],
                 'topic': results['topic'],
