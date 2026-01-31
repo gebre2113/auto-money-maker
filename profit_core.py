@@ -162,7 +162,7 @@ class PremiumConfig:
         return secrets
     
     def get_ai_service_priority(self) -> List[Dict]:
-        """የAI አገልግሎቶችን በቅድሚያ የሚደረገው ዝርዝር (FAILOVER SYSTEM)"""
+        """የAI አገልግሎቶችን በቅድሚያ የሚደረገው ዝርዝር (FAILOVER SYSTEM) - 2026 UPDATED"""
         services = []
         
         if self.secrets.get('GROQ_API_KEY'):
@@ -170,7 +170,8 @@ class PremiumConfig:
                 'name': 'groq',
                 'api_key': self.secrets['GROQ_API_KEY'],
                 'priority': 1,
-                'models': ['llama-3.1-70b-versatile', 'mixtral-8x7b-32768'],
+                # 🚨 አሮጌውን llama3-8b-8192 በ llama-3.1-8b-instant ተክተነዋል
+                'models': ['llama-3.3-70b-versatile', 'llama-3.1-8b-instant', 'mixtral-8x7b-32768'],
                 'fallback': True
             })
         
@@ -179,7 +180,8 @@ class PremiumConfig:
                 'name': 'gemini',
                 'api_key': self.secrets['GEMINI_API_KEY'],
                 'priority': 2,
-                'models': ['gemini-pro', 'gemini-pro-vision'],
+                # 🚨 gemini-pro ን በ gemini-1.5-flash ተክተነዋል
+                'models': ['gemini-1.5-flash', 'gemini-1.5-pro'],
                 'fallback': True
             })
         
@@ -188,25 +190,8 @@ class PremiumConfig:
                 'name': 'openai',
                 'api_key': self.secrets['OPENAI_API_KEY'],
                 'priority': 3,
-                'models': ['gpt-4', 'gpt-3.5-turbo'],
-                'fallback': True
-            })
-        
-        if self.secrets.get('HUGGINGFACE_TOKEN'):
-            services.append({
-                'name': 'huggingface',
-                'api_key': self.secrets['HUGGINGFACE_TOKEN'],
-                'priority': 4,
-                'models': ['gpt2', 'facebook/bart-large-cnn'],
-                'fallback': True
-            })
-        
-        if self.secrets.get('COHERE_API_KEY'):
-            services.append({
-                'name': 'cohere',
-                'api_key': self.secrets['COHERE_API_KEY'],
-                'priority': 5,
-                'models': ['command'],
+                # 🚨 gpt-4o ተጨምሯል
+                'models': ['gpt-4o', 'gpt-4-turbo'],
                 'fallback': True
             })
         
@@ -214,6 +199,7 @@ class PremiumConfig:
         if not services:
             raise Exception("❌ ምንም AI አገልግሎት አልተገኘም. GROQ_API_KEY ወይም GEMINI_API_KEY አስገባ።")
         return services
+
 
 # =================== 🎨 የተሻሻለ የተጠቃሚ ግጽታ ===================
 
