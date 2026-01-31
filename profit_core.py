@@ -668,7 +668,6 @@ class ComprehensiveErrorHandler:
             return "🔴 ከፍተኛ ችግር አለ"
 
 # =================== 🔄 የተሻሻለ የAI ፌይልኦቨር ሲስተም ===================
-
 class EnhancedAIFailoverSystem:
     """ከፍተኛ ብልጠት ያለው AI ፌይልኦቨር ሲስተም"""
     
@@ -716,7 +715,6 @@ class EnhancedAIFailoverSystem:
         
         logger.info("🛡️ Enhanced AI Failover System Initialized")
 
-    
     async def generate_content(self, prompt: str, max_tokens: int = 3000, 
                              preferred_service: str = None, content_type: str = "general") -> str:
         if not preferred_service:
