@@ -670,7 +670,7 @@ class ComprehensiveErrorHandler:
 # =================== 🔄 የተሻሻለ የAI ፌይልኦቨር ሲስተም ===================
 
 class EnhancedAIFailoverSystem:
-    """Multilayer AI Execution Engine with INTERNAL MODEL ROTATION & SMART ROUTING"""
+    """ከፍተኛ ብልጠት ያለው AI ፌይልኦቨር ሲስተም"""
     
     def __init__(self, config: PremiumConfig):
         self.config = config
@@ -682,13 +682,18 @@ class EnhancedAIFailoverSystem:
         self.content_analyzer = ContentAnalyzer()
         self.model_tracker = ModelPerformanceTracker()
         
-        # 🛠 የተሻሻለ የሞዴል ዝርዝር (2026 Updated)
+        # 🚨 እዚህ ጋር ነው ስህተቱ የታረመው - እነዚህ መስመሮች መኖራቸውን አረጋግጥ
+        self.content_cache = {}
+        self.cache_ttl = 3600 
+        self.performance_history = defaultdict(list)
+        
+        # የተሻሻለ የሞዴል ዝርዝሮች (2026 Updated)
         self.model_details = {
             'groq': {
                 'models': [
-                    'llama-3.3-70b-versatile',  # አዲሱ እና ፈጣኑ
+                    'llama-3.3-70b-versatile',
                     'llama-3.1-70b-versatile',
-                    'llama-3.1-8b-instant',      # የድሮው 8b ተተኪ
+                    'llama-3.1-8b-instant',
                     'mixtral-8x7b-32768'
                 ],
                 'endpoint': 'https://api.groq.com/openai/v1/chat/completions',
@@ -698,28 +703,19 @@ class EnhancedAIFailoverSystem:
                 'models': [
                     'gemini-1.5-pro',
                     'gemini-1.5-flash',
-                    'gemini-2.0-flash-exp'      # አዲሱ የጌሚኒ ስሪት
+                    'gemini-2.0-flash-exp'
                 ],
-                'endpoint': 'https://generativelanguage.googleapis.com/v1/models', # v1beta ን ወደ v1 ቀይረነዋል
+                'endpoint': 'https://generativelanguage.googleapis.com/v1/models',
                 'timeout': 90
             },
             'openai': {
-                'models': ['gpt-4o', 'gpt-4-turbo', 'gpt-3.5-turbo'], # gpt-4o ተጨምሯል
-                'timeout': 60
-            },
-            'huggingface': {
-                'models': ['mistralai/Mistral-7B-Instruct-v0.2'],
-                'endpoint': 'https://api-inference.huggingface.co/models',
-                'timeout': 120
-            },
-            'cohere': {
-                'models': ['command'],
-                'endpoint': 'https://api.cohere.ai/v1/generate',
+                'models': ['gpt-4o', 'gpt-4-turbo', 'gpt-3.5-turbo'],
                 'timeout': 60
             }
         }
         
-        logger.info("🛡️ Ultimate AI Failover System Initialized")
+        logger.info("🛡️ Enhanced AI Failover System Initialized")
+
     
     async def generate_content(self, prompt: str, max_tokens: int = 3000, 
                              preferred_service: str = None, content_type: str = "general") -> str:
