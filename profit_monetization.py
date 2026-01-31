@@ -2030,6 +2030,12 @@ class UltraAffiliateManager:
             </div>
             """
         
+            def _inject_compliant_disclosure(self, content: str) -> str:
+        """Injects professional affiliate disclosure with regional compliance"""
+        additional_compliance = ""
+        cookie_notice = "" # አስፈላጊ ከሆነ እዚህ መሙላት ይቻላል
+        disclosure_text = getattr(self, 'disclosure_text', "We earn from qualifying purchases.")
+
         if self.compliance.get('gdpr_required'):
             additional_compliance = """
             <div style="margin-top: 8px; font-size: 11px; color: #9ca3af; padding-top: 6px; border-top: 1px solid #e5e7eb;">
@@ -2058,64 +2064,41 @@ class UltraAffiliateManager:
             <div style="position: absolute; bottom: 8px; right: 10px; font-size: 11px; 
                         color: #92400e; background: rgba(245, 158, 11, 0.15); 
                         padding: 2px 8px; border-radius: 12px;">
-                Compliant: {self.user_geo} Regulations
+                Compliant: {getattr(self, 'user_geo', 'Global')} Regulations
             </div>
         </div>
         """
         
         self.disclosure_injected = True
-    return (content or "") + disclosure_html
-    
+        return (content or "") + disclosure_html
+
+    def _inject_carbon_offset_option(self, content: str) -> str:
+        """Injects ethical carbon offset call-to-action"""
+        if not content:
+            return ""
+
+        offset_html = """
         <div style="background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%); 
                     border: 2px solid #22c55e; border-radius: 16px; padding: 22px; 
                     margin: 30px 0; position: relative; overflow: hidden;">
-            <div style="position: absolute; top: -20px; right: -20px; width: 80px; height: 80px; 
-                        background: rgba(34, 197, 94, 0.15); border-radius: 50%;"></div>
-            <div style="position: absolute; bottom: -15px; left: -15px; width: 60px; height: 60px; 
-                        background: rgba(34, 197, 94, 0.1); border-radius: 50%;"></div>
-            
-            <div style="position: relative; z-index: 2; display: flex; align-items: center; gap: 20px;">
+            <div style="position: z-index: 2; display: flex; align-items: center; gap: 20px;">
                 <div style="background: white; width: 60px; height: 60px; border-radius: 16px; 
                             display: flex; align-items: center; justify-content: center; 
                             box-shadow: 0 4px 12px rgba(0,0,0,0.08);">
                     <span style="font-size: 28px;">🌱</span>
                 </div>
                 <div style="flex: 1;">
-                    <h3 style="margin: 0 0 8px 0; color: #065f46; font-size: 20px;">
-                        Support Carbon-Neutral Hosting
-                    </h3>
+                    <h3 style="margin: 0 0 8px 0; color: #065f46; font-size: 20px;">Support Carbon-Neutral Hosting</h3>
                     <p style="margin: 0 0 15px 0; color: #047857; line-height: 1.6;">
-                        For every hosting plan purchased through our links, we contribute to verified 
-                        carbon offset projects. Your choice makes a difference.
+                        For every hosting plan purchased, we offset 15kg of CO₂.
                     </p>
-                    <div style="display: flex; gap: 12px; flex-wrap: wrap;">
-                        <span style="background: rgba(34, 197, 94, 0.2); color: #065f46; padding: 4px 12px; 
-                                    border-radius: 20px; font-size: 13px; font-weight: 500;">
-                            ♻️ 100% Renewable Energy
-                        </span>
-                        <span style="background: rgba(34, 197, 94, 0.2); color: #065f46; padding: 4px 12px; 
-                                    border-radius: 20px; font-size: 13px; font-weight: 500;">
-                            🌍 Verified Carbon Offset
-                        </span>
-                        <span style="background: rgba(34, 197, 94, 0.2); color: #065f46; padding: 4px 12px; 
-                                    border-radius: 20px; font-size: 13px; font-weight: 500;">
-                            📜 Transparency Report
-                        </span>
-                    </div>
-                </div>
-                <div style="text-align: center; min-width: 140px;">
-                    <div style="font-size: 13px; color: #065f46; margin-bottom: 8px; font-weight: 500;">
-                        Your Impact
-                    </div>
-                    <div style="background: white; color: #065f46; font-weight: bold; padding: 8px 15px; 
-                                border-radius: 20px; display: inline-block; box-shadow: 0 3px 10px rgba(0,0,0,0.08);">
-                        15kg CO₂ Offset
-                    </div>
                 </div>
             </div>
         </div>
         """
         return content + offset_html
+        
+        
     
     def _apply_ethical_post_processing(self, content: str) -> str:
         """Final ethical check and adjustment"""
