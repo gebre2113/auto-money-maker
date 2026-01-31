@@ -44,10 +44,12 @@ class SmartImportSystem:
             return None
     
     @staticmethod
+        @staticmethod
     def import_script_b():
         """Script B (Profit Master Mega-System) መጫን"""
         try:
-            # የፕሮፊት ማስተር ስርዓት            from profit_master_system import (
+            # የፕሮፊት ማስተር ስርዓት (ይህ መስመር ለብቻው መሆን አለበት)
+            from profit_master_system import (
                 UltimateProfitMasterSystem,
                 PremiumConfig,
                 AdvancedAIContentGenerator,
@@ -67,6 +69,11 @@ class SmartImportSystem:
                 'ProductionManager': ProductionManager,
                 'UserInterface': UserInterface
             }
+        except ImportError as e:
+            import logging
+            logging.error(f"❌ Script B import failed: {e}")
+            return None
+
         except ImportError as e:
             logging.error(f"❌ Script B import failed: {e}")
             return None
