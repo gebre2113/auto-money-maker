@@ -343,8 +343,14 @@ class PerformanceMonitor:
             }
         }
     
-    def print_report(self):        """የአፈፃፀም ሪፖርት ማተም"""
+    def print_report(self):
+        """የአፈፃፀም ሪፖርት ማተም"""
         report = self.get_performance_report()
+        
+        print("\n" + "="*70)
+        print("📈 PERFORMANCE REPORT")
+        print("="*70)
+        # የተቀረው የሪፖርት ኮድ እዚህ ይቀጥላል...
         
         print("\n" + "="*70)
         print("📈 PERFORMANCE REPORT")
