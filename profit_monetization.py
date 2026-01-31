@@ -2030,7 +2030,7 @@ class UltraAffiliateManager:
             </div>
             """
         
-            def _inject_compliant_disclosure(self, content: str) -> str:
+    def _inject_compliant_disclosure(self, content: str) -> str:
         """Injects professional affiliate disclosure with regional compliance"""
         additional_compliance = ""
         cookie_notice = "" # አስፈላጊ ከሆነ እዚህ መሙላት ይቻላል
