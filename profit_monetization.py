@@ -2065,9 +2065,7 @@ class UltraAffiliateManager:
         
         self.disclosure_injected = True
     return (content or "") + disclosure_html
-    def _inject_carbon_offset_option(self, content: str) -> str:
-        """Ethical carbon offset option for eco-conscious users"""
-        offset_html = """
+    
         <div style="background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%); 
                     border: 2px solid #22c55e; border-radius: 16px; padding: 22px; 
                     margin: 30px 0; position: relative; overflow: hidden;">
