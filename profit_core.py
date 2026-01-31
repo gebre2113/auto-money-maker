@@ -670,7 +670,7 @@ class ComprehensiveErrorHandler:
 # =================== 🔄 የተሻሻለ የAI ፌይልኦቨር ሲስተም ===================
 
 class EnhancedAIFailoverSystem:
-    """ከፍተኛ ብልጠት ያለው AI ፌይልኦቨር ሲስተም"""
+    """Multilayer AI Execution Engine with INTERNAL MODEL ROTATION & SMART ROUTING"""
     
     def __init__(self, config: PremiumConfig):
         self.config = config
@@ -681,18 +681,15 @@ class EnhancedAIFailoverSystem:
         self.monitor = AdvancedMonitoring()
         self.content_analyzer = ContentAnalyzer()
         self.model_tracker = ModelPerformanceTracker()
-        self.content_cache = {}
-        self.cache_ttl = 3600  # 1 ሰአት
-        self.performance_history = defaultdict(list)
         
-        # የተሻሻለ የሞዴል ዝርዝሮች
+        # 🛠 የተሻሻለ የሞዴል ዝርዝር (2026 Updated)
         self.model_details = {
             'groq': {
                 'models': [
+                    'llama-3.3-70b-versatile',  # አዲሱ እና ፈጣኑ
                     'llama-3.1-70b-versatile',
-                    'llama3-70b-8192', 
-                    'mixtral-8x7b-32768',
-                    'llama3-8b-8192'
+                    'llama-3.1-8b-instant',      # የድሮው 8b ተተኪ
+                    'mixtral-8x7b-32768'
                 ],
                 'endpoint': 'https://api.groq.com/openai/v1/chat/completions',
                 'timeout': 60
@@ -701,13 +698,13 @@ class EnhancedAIFailoverSystem:
                 'models': [
                     'gemini-1.5-pro',
                     'gemini-1.5-flash',
-                    'gemini-pro'
+                    'gemini-2.0-flash-exp'      # አዲሱ የጌሚኒ ስሪት
                 ],
-                'endpoint': 'https://generativelanguage.googleapis.com/v1beta/models',
+                'endpoint': 'https://generativelanguage.googleapis.com/v1/models', # v1beta ን ወደ v1 ቀይረነዋል
                 'timeout': 90
             },
             'openai': {
-                'models': ['gpt-4', 'gpt-3.5-turbo'],
+                'models': ['gpt-4o', 'gpt-4-turbo', 'gpt-3.5-turbo'], # gpt-4o ተጨምሯል
                 'timeout': 60
             },
             'huggingface': {
@@ -722,7 +719,7 @@ class EnhancedAIFailoverSystem:
             }
         }
         
-        logger.info("🛡️ Enhanced AI Failover System Initialized")
+        logger.info("🛡️ Ultimate AI Failover System Initialized")
     
     async def generate_content(self, prompt: str, max_tokens: int = 3000, 
                              preferred_service: str = None, content_type: str = "general") -> str:
