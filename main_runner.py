@@ -44,7 +44,6 @@ class SmartImportSystem:
             return None
     
     @staticmethod
-        @staticmethod
     def import_script_b():
         """Script B (Profit Master Mega-System) መጫን"""
         try:
