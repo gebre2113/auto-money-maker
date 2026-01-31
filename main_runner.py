@@ -193,8 +193,10 @@ class ProductionLogger:
         
         getattr(self.logger, level.lower())(log_msg)
         
-        # Also print to console for important stages
-        if level in ["INFO", "WARNING", "ERROR", "CRITICAL"]:            emoji = "✅" if level == "INFO" else "⚠️" if level == "WARNING" else "❌"
+        # ለአስፈላጊ ደረጃዎች ኮንሶል ላይ ማተም
+        if level in ["INFO", "WARNING", "ERROR", "CRITICAL"]:
+            # እዚህ ጋር ያሉት ክፍተቶች (Spaces) እኩል መሆናቸውን አረጋግጥ
+            emoji = "✅" if level == "INFO" else "⚠️" if level == "WARNING" else "❌"
             print(f"\n{emoji} STAGE {stage_num}: {stage_name}")
             print(f"   {message}")
             if details:
