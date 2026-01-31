@@ -548,7 +548,7 @@ class VideoAffiliateIntegrationEngine:
             }
         }
     
-        async def create_video_affiliate_campaign(self, topic: str, product: Dict, 
+    async def create_video_affiliate_campaign(self, topic: str, product: Dict, 
                                             country: str = 'US', 
                                             content_type: str = "tutorial") -> Dict:
         """PRODUCTION-GRADE VIDEO AFFILIATE CAMPAIGN CREATION"""
