@@ -2506,13 +2506,11 @@ class NeuroMarketingEngine:
         }
         
         # Get framing based on journey stage and intent
-        stage_framing = ethical_framing.get(journey_stage, ethical_framing['consideration'])
-        framing_html = stage_framing.get(user_intent, stage_framing.get('default', stage_framing['research']))
+        # 'consideration' ባይኖር እንኳን ስህተት እንዳይሰጥ .get() እንጠቀማለን
+        stage_framing = ethical_framing.get(journey_stage, ethical_framing.get('consideration', {}))
         
-        # Inject after first paragraph
-        if "</p>" in content:
-            return content.replace("</p>", f"</p>\n{framing_html}", 1)
-        return content + framing_html
+        # እዚህ ጋር ነው ስህተቱ የታረመው - ['research'] የሚለውን በ .get('research', '') ተክተነዋል
+        framing_html = stage_framing.get(user_intent, stage_framing.get('default', stage_framing.get('research', '')))
 
 
 class ABTestManager:
