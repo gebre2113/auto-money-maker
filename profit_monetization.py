@@ -548,13 +548,19 @@ class VideoAffiliateIntegrationEngine:
             }
         }
     
-    async def create_video_affiliate_campaign(self, topic: str, product: Dict, 
+        async def create_video_affiliate_campaign(self, topic: str, product: Dict, 
                                             country: str = 'US', 
                                             content_type: str = "tutorial") -> Dict:
         """PRODUCTION-GRADE VIDEO AFFILIATE CAMPAIGN CREATION"""
-        campaign_id = f"vid_aff_{hashlib.md5(f'{product.get('id', 'unknown')}_{time.time()}'.encode()).hexdigest()[:12]}"
+        # የጥቀስ ምልክቶቹን (Quotes) በማስተካከል ስህተቱን መፍታት
+        prod_id = product.get('id', 'unknown')
+        unique_seed = f"{prod_id}_{time.time()}"
+        campaign_hash = hashlib.md5(unique_seed.encode()).hexdigest()[:12]
+        campaign_id = f"vid_aff_{campaign_hash}"
         
         try:
+            # የቀረው ኮድህ እዚህ ይቀጥላል...
+
             logger.info(f"🎬 Creating video affiliate campaign for {product.get('name', 'Unknown Product')}")
             
             if self.enable_ethical_mode:
