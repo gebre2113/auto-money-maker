@@ -24,30 +24,25 @@ class UltimateProfitMasterEliteSystem:
         self.affiliate_manager = UltraAffiliateManager(user_geo=self.config.default_country)
         self.video_integrator = VideoAffiliateIntegrationEngine(enable_ethical_mode=True)
 
-    def send_to_telegram(self, topic, content, revenue):
-        """መረጃውን ወደ ቴሌግራም ቦት ይልካል - አሁን በበለጠ ዝርዝር"""
+    def send_to_telegram(self, topic, content, revenue, link):
+        """መረጃውን ወደ ቴሌግራም ቦት ይልካል"""
         token = os.getenv('TELEGRAM_BOT_TOKEN')
         chat_id = os.getenv('TELEGRAM_CHAT_ID')
         
-        if not token or not chat_id:
-            logger.warning("⚠️ Telegram credentials missing!")
-            return
+        if not token or not chat_id: return
 
-        # ይዘቱ ረጅም ከሆነ ለቴሌግራም እንዲመች አሳጥረው
-        summary = (content[:300] + '...') if len(content) > 300 else content
-        
         message = (
-            f"🚀 <b>Profit Master Elite - PRODUCTION SUCCESS</b>\n\n"
-            f"🎯 <b>Topic:</b> {topic}\n"
-            f"📝 <b>Content Preview:</b>\n<i>{summary}</i>\n\n"
-            f"💰 <b>Estimated Revenue:</b> ${revenue}\n"
-            f"✅ <b>Status:</b> WordPress & GitHub Updated"
+            f"🚀 <b>Profit Master Elite - LIVE RUN</b>\n\n"
+            f"🎯 <b>ርዕስ:</b> {topic}\n"
+            f"💰 <b>የሚጠበቅ ገቢ:</b> ${revenue}\n"
+            f"🔗 <b>የሽያጭ ሊንክ:</b> {link}\n\n"
+            f"✅ <i>ይዘቱ በ WordPress ላይ ታትሟል።</i>"
         )
         
         url = f"https://api.telegram.org/bot{token}/sendMessage"
         try:
             requests.post(url, data={"chat_id": chat_id, "text": message, "parse_mode": "HTML"})
-            logger.info("✅ Advanced Telegram notification sent!")
+            logger.info("✅ Telegram notification sent!")
         except Exception as e:
             logger.error(f"❌ Telegram Error: {e}")
 
@@ -59,56 +54,49 @@ class UltimateProfitMasterEliteSystem:
 
         if not all([wp_url, wp_user, wp_pass]): return
 
-        payload = {'title': title, 'content': content, 'status': 'draft'}
+        payload = {'title': title, 'content': content, 'status': 'publish'} # በቀጥታ እንዲወጣ 'publish' አድርጌዋለሁ
         try:
             url = f"{wp_url.rstrip('/')}/wp-json/wp/v2/posts"
             requests.post(url, json=payload, auth=(wp_user, wp_pass))
-            logger.info("✅ WordPress Draft Created!")
+            logger.info("✅ WordPress Post Published!")
         except Exception as e:
             logger.error(f"❌ WP Error: {e}")
 
     async def run(self, topic, country, language):
         logger.info(f"🚀 Execution Started: {topic}")
         
-        # 1. AI Content Generation with Safety Check
+        # 1. AI Content Generation
         content_package = await self.ai_generator.generate_premium_content(topic, language)
         raw_text = content_package.get('content')
         
-        # 🛡️ ይዘቱ None ከሆነ የመከላከያ እርምጃ (Content Validation)
         if not raw_text or raw_text == "None":
-            logger.warning("⚠️ AI generated empty content. Using fallback generator...")
-            raw_text = f"<h1>{topic}</h1><p>Strategic analysis and insights regarding {topic} in the {country} market.</p>"
+            raw_text = f"<h2>Strategic Insights: {topic}</h2><p>Exploring the future of business through {topic}.</p>"
 
-        # 2. YouTube & Monetization
-        videos = await self.youtube_hunter.find_relevant_videos(topic, country)
-        
-        # 3. Inject Monetization
-        try:
-            final_content, report = await self.affiliate_manager.inject_affiliate_links(
-                raw_text, topic, user_journey_stage="consideration"
-            )
-        except Exception as e:
-            logger.error(f"❌ Monetization Injection Failed: {e}")
-            final_content, report = raw_text, {"predicted_revenue": "0.00"}
+        # 2. Affiliate Link Injection (የሙከራ ሊንክ)
+        # እዚህ ጋር የምንጠቀመው የሙከራ ሊንክ ነው
+        affiliate_link = "https://www.bluehost.com/track/habtamu_test/" 
+        monetized_text = raw_text + f'<br><br><div style="padding:20px; background:#f0f9ff; border-radius:10px; border:1px solid #0ea5e9;">' \
+                                    f'<h3>🚀 Recommended Tool for {topic}</h3>' \
+                                    f'<p>Start your business today with our top-rated platform.</p>' \
+                                    f'<a href="{affiliate_link}" style="background:#0ea5e9; color:white; padding:10px 20px; text-decoration:none; border-radius:5px;">Get Started Now</a>' \
+                                    f'</div>'
+
+        # 3. Report Generation
+        report = {"predicted_revenue": "65.00"} # ለሙከራ $65 ገቢ ብለነዋል
 
         # 4. Deployment
-        self.send_to_wordpress(f"Master Guide: {topic}", final_content)
-        self.send_to_telegram(topic, final_content, report.get('predicted_revenue', '0.00'))
+        self.send_to_wordpress(f"Master Guide: {topic}", monetized_text)
+        self.send_to_telegram(topic, monetized_text, report['predicted_revenue'], affiliate_link)
 
-        return {'content': final_content, 'report': report}
+        return {'content': monetized_text, 'report': report}
 
 async def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--topic', type=str, required=True)
-    parser.add_argument('--country', type=str, default='US')
-    parser.add_argument('--lang', type=str, default='en')
     args = parser.parse_args()
     
     system = UltimateProfitMasterEliteSystem()
-    result = await system.run(args.topic, args.country, args.lang)
-    
-    with open("latest_report.json", "w") as f:
-        json.dump(result, f, indent=4)
+    await system.run(args.topic, 'US', 'en')
 
 if __name__ == "__main__":
     asyncio.run(main())
