@@ -806,7 +806,8 @@ class ProductionOrchestrator:
     
     async def _save_results(self, results: Dict):
         """ውጤቶችን ማስቀመጥ"""
-                try:
+        # 'try:' መስመር ከበላዩ ካለው ማብራሪያ ጋር እኩል መስመር ላይ መሆን አለበት
+        try:
             output_dir = Path('production_outputs')
             output_dir.mkdir(exist_ok=True)
             
@@ -827,7 +828,7 @@ class ProductionOrchestrator:
                 f.write(summary)
             
             self.logger.logger.info(f"✅ Summary saved to: {summary_file}")
-            
+
         except Exception as e:
             self.logger.log_error(e, "Saving results", "SaveResults")
     
