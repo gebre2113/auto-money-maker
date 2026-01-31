@@ -3,91 +3,81 @@ import asyncio
 import os
 import requests
 import logging
+import random
 from profit_core import PremiumConfig, AdvancedAIContentGenerator
 from profit_monetization import YouTubeIntelligenceHunterPro
 
 logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger("ScrollMaster")
+logger = logging.getLogger("ExtremeMaster")
 
-class UltimateVintageSystem:
+class ExtremeDiamondSystem:
     def __init__(self):
         self.config = PremiumConfig()
         self.ai_generator = AdvancedAIContentGenerator(self.config)
         self.yt_hunter = YouTubeIntelligenceHunterPro(self.config.__dict__)
 
     async def run(self, topic):
-        logger.info(f"📜 Creating the Great Scroll for: {topic}")
+        logger.info(f"🔥 Generating Extreme Content for: {topic}")
         
-        # 1. የቪዲዮ ፍለጋ (Smart Search - ርዕሱን ቀለል አድርጎ በመፈለግ)
-        video_html = ""
+        # 1. ቪዲዮ በግድ መጎተት (Advanced Video Puller)
+        video_id = "vjVfS9V-4uM" # Fallback video
         try:
-            search_query = topic.split(':')[0] # ርዕሱን አሳጥሮ መፈለግ
-            video_data = await self.yt_hunter.find_relevant_videos(search_query, 'US')
-            if video_data:
-                v_id = video_data[0]['video_id']
-                video_html = f'''
-                <div style="margin: 30px 0; text-align:center;">
-                    <iframe width="100%" height="550" src="https://www.youtube.com/embed/{v_id}" 
-                    frameborder="0" allowfullscreen 
-                    style="border: 10px solid #5d4037; border-radius:15px; box-shadow: 0 20px 40px rgba(0,0,0,0.5);"></iframe>
-                </div>'''
-        except Exception as e:
-            logger.warning(f"Video pull failed: {e}")
+            v_data = await self.yt_hunter.find_relevant_videos(topic, 'US')
+            if v_data: video_id = v_data[0]['video_id']
+        except: pass
 
-        # 2. AI ይዘት ማመንጨት (ረጅም ጽሁፍ)
-        prompt = f"Write a 1500-word premium business analysis about {topic}. Use storytelling, subheadings, and bullet points. Make it professional and extensive."
+        # 2. እጅግ ረጅም ጽሁፍ (3000-5000 ቃላት)
+        # ጽሁፉን በ 5 ክፍሎች እንከፍለዋለን (ለጥራት)
+        prompt = f"""
+        Act as a top business consultant. Write a 4000-word ultimate masterclass on {topic}.
+        Structure it with:
+        - A massive introduction
+        - 10 Detailed Chapters with Subheadings
+        - Case studies of major companies
+        - Future predictions (2026-2035)
+        - Actionable steps
+        Use professional, authoritative tone. Include placeholders like [IMAGE] for me to insert photos.
+        """
         content_package = await self.ai_generator.generate_premium_content(prompt, 'en')
-        text = content_package.get('content', "Writing the ancient scrolls...")
+        text = content_package.get('content', "Gathering deep insights...")
 
-        # 3. የጥንታዊ ጥቅልል መጽሐፍ (Full Screen Scroll) ዲዛይን
+        # 3. ምስሎችን በመሃል ማስገባት
+        random_img = "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?auto=format&fit=crop&w=800"
+        text = text.replace("[IMAGE]", f'<img src="{random_img}" style="width:100%; border-radius:10px; margin:20px 0;">')
+
+        # 4. የጥንታዊ ጥቅልል ዲዛይን (The Full Scroll)
         affiliate_link = "https://www.bluehost.com/track/habtamu_test/"
         
-        final_post = f'''
-        <div style="background-color: #2c1e12; padding: 40px 10px; font-family: 'Georgia', serif;">
-            <style>
-                .scroll-paper {{
-                    background: #f4e4bc;
-                    background-image: url('https://www.transparenttextures.com/patterns/papyros.png');
-                    max-width: 1100px;
-                    margin: 0 auto;
-                    padding: 80px 50px;
-                    border-left: 18px solid #3e2723;
-                    border-right: 18px solid #3e2723;
-                    box-shadow: 0 0 60px rgba(0,0,0,0.9);
-                    border-radius: 5px;
-                }}
-                .audio-btn {{
-                    background: #5d4037; color: #f4e4bc; padding: 20px;
-                    border-radius: 50px; text-align: center; cursor: pointer;
-                    margin-bottom: 30px; font-weight: bold; border: 2px solid #f4e4bc;
-                }}
-            </style>
-
-            <div class="scroll-paper">
-                <div class="audio-btn" onclick="startReading()">
-                    🔊 ሙሉውን ጽሁፍ በድምፅ ያዳምጡ (Play Full Narration)
+        final_html = f'''
+        <div style="background-color: #fdf6e3; padding: 50px 20px; font-family: 'Times New Roman', serif; border: 15px solid #3e2723; line-height: 1.8;">
+            
+            <div style="max-width: 1000px; margin: 0 auto; background: #fffdf5; padding: 40px; box-shadow: 0 0 30px rgba(0,0,0,0.2);">
+                <h1 style="text-align: center; font-size: 50px; color: #3e2723; border-bottom: 5px double #3e2723;">{topic}</h1>
+                
+                <div style="margin: 40px 0;">
+                    <iframe width="100%" height="550" src="https://www.youtube.com/embed/{video_id}" frameborder="0" allowfullscreen style="border: 10px solid #5d4037;"></iframe>
                 </div>
 
-                <h1 style="text-align: center; color: #3e2723; font-size: 45px; border-bottom: 5px double #3e2723; padding-bottom: 20px;">
-                    {topic}
-                </h1>
+                <div style="background: #3e2723; color: #f4e4bc; padding: 20px; text-align: center; border-radius: 10px; margin-bottom: 30px;">
+                    <button onclick="readFullContent()" style="background:#f4e4bc; border:none; padding:15px 30px; font-weight:bold; cursor:pointer;">🔊 ጀምር: ሙሉውን ጽሁፍ በድምፅ ያዳምጡ</button>
+                    <button onclick="window.speechSynthesis.cancel()" style="background:#ff4444; color:white; border:none; padding:15px 30px; margin-left:10px; cursor:pointer;">🛑 አቁም</button>
+                </div>
 
-                {video_html}
-
-                <div id="readable-content" style="font-size: 22px; color: #2c1e12; line-height: 2; text-align: justify;">
+                <div id="main-content" style="font-size: 22px; color: #2c1e12; text-align: justify;">
                     {text}
                 </div>
 
-                <div style="text-align: center; margin-top: 80px; border-top: 4px solid #3e2723; padding-top: 50px;">
-                    <a href="{affiliate_link}" target="_blank" style="font-size: 130px; text-decoration: none; display: inline-block;">💎</a>
-                    <h2 style="color: #b91c1c;">"አትንከው - ከነካኸው ግን ትልቅ ቅናሽ አግኝተሃል!"</h2>
+                <div style="text-align: center; margin-top: 100px; padding: 50px; background: #1a1a1a; border-radius: 20px;">
+                    <h2 style="color: #ffd700;">💎 ምስጢራዊው አልማዝ</h2>
+                    <p style="color: white;">ይህንን በመንካት የዛሬውን ትልቅ ቅናሽ ያግኙ።</p>
+                    <a href="{affiliate_link}" target="_blank" style="font-size: 150px; text-decoration: none; display: inline-block;">💎</a>
                 </div>
             </div>
 
             <script>
-                function startReading() {{
+                function readFullContent() {{
                     window.speechSynthesis.cancel();
-                    const text = document.getElementById('readable-content').innerText;
+                    const text = document.getElementById('main-content').innerText;
                     const utterance = new SpeechSynthesisUtterance(text);
                     utterance.lang = 'en-US';
                     utterance.rate = 0.9;
@@ -97,23 +87,16 @@ class UltimateVintageSystem:
         </div>
         '''
 
-        # 4. WordPress Publish (Fixing the payload double braces error)
+        # 5. WordPress መለጠፍ
         wp_url = os.getenv('WP_URL')
-        wp_user = os.getenv('WP_USERNAME')
-        wp_pass = os.getenv('WP_PASSWORD')
-        
-        payload = {
-            'title': f"✨ The Eternal Guide: {topic}",
-            'content': final_post,
-            'status': 'publish'
-        }
+        auth = (os.getenv('WP_USERNAME'), os.getenv('WP_PASSWORD'))
+        payload = {'title': f"The Ultimate Scroll: {topic}", 'content': final_html, 'status': 'publish'}
         
         try:
-            resp = requests.post(f"{wp_url.rstrip('/')}/wp-json/wp/v2/posts", json=payload, auth=(wp_user, wp_pass))
-            if resp.status_code in [200, 201]:
-                logger.info("✅ SUCCESS: The masterpiece is live on the site!")
+            requests.post(f"{wp_url.rstrip('/')}/wp-json/wp/v2/posts", json=payload, auth=auth)
+            logger.info("✅ Extreme Masterpiece Published!")
         except Exception as e:
-            logger.error(f"❌ Deployment failed: {e}")
+            logger.error(f"❌ Error: {e}")
 
 if __name__ == "__main__":
-    asyncio.run(UltimateVintageSystem().run("Artificial Intelligence in Business"))
+    asyncio.run(ExtremeDiamondSystem().run("Artificial Intelligence in Business"))
