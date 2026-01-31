@@ -2064,7 +2064,8 @@ class UltraAffiliateManager:
         """
         
         self.disclosure_injected = True
-        return content + disclosure_html
+return (content or "") + disclosure_html
+
     
     def _inject_carbon_offset_option(self, content: str) -> str:
         """Ethical carbon offset option for eco-conscious users"""
