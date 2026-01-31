@@ -702,9 +702,11 @@ class ProductionOrchestrator:
             results['errors'].append(str(e))
             self.monitor.end_stage('cultural_localization')
     
-    async def _stage_6_quality_assurance(self, results: Dict):
+        async def _stage_6_quality_assurance(self, results: Dict):
         """STAGE 6: Quality Assurance"""
-        self.monitor.start_stage('quality_assurance')        self.logger.log_stage(6, "Quality Assurance", "Final quality check")
+        # እነዚህ ሁለት መስመሮች የግድ መለየት አለባቸው
+        self.monitor.start_stage('quality_assurance')
+        self.logger.log_stage(6, "Quality Assurance", "Final quality check")
         
         try:
             # Get final quality score
@@ -723,7 +725,7 @@ class ProductionOrchestrator:
             results['stages_failed'].append('quality_assurance')
             results['errors'].append(str(e))
             self.monitor.end_stage('quality_assurance')
-    
+
     async def _stage_7_production_report(self, results: Dict):
         """STAGE 7: Production Report"""
         self.monitor.start_stage('production_report')
