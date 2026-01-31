@@ -645,7 +645,11 @@ class ProductionOrchestrator:
             results['content']['multimedia_enhancement'] = enhancement
             results['stages_completed'].append('multimedia_enhancement')
             
-            duration = self.monitor.end_stage('multimedia_enhancement')            assets_count = len(enhancement.get('enhancements', {}))
+            # --- እዚህ ጋር ነው መለያየት ያለባቸው ---
+            duration = self.monitor.end_stage('multimedia_enhancement')
+            assets_count = len(enhancement.get('enhancements', {}))
+            # ------------------------------------
+            
             self.logger.log_stage(4, "Multimedia Enhancement",
                                 f"Created {assets_count} multimedia assets",
                                 "INFO", f"Duration: {duration:.2f}s")
@@ -654,6 +658,12 @@ class ProductionOrchestrator:
                 'multimedia_assets': assets_count,
                 'enhancement_quality': enhancement.get('quality_score', 0)
             })
+            
+        except Exception as e:
+            self.logger.log_error(e, "Multimedia enhancement", "Stage 4")
+            results['stages_failed'].append('multimedia_enhancement')
+            results['errors'].append(str(e))
+            self.monitor.end_stage('multimedia_enhancement') 
             
         except Exception as e:
             self.logger.log_error(e, "Multimedia enhancement", "Stage 4")
