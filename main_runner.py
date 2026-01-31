@@ -398,7 +398,9 @@ class ProductionOrchestrator:
         """ሁሉንም ስርዓቶች መጀመር"""
         
         import_status = self.importer.get_import_status()
-        self.script_a_available = import_status['script_a_available']        self.script_b_available = import_status['script_b_available']
+        # እዚህ ጋር ለሁለት መስመር መከፈላቸውን አረጋግጥ
+        self.script_a_available = import_status['script_a_available']
+        self.script_b_available = import_status['script_b_available']
         
         self.logger.logger.info(f"System Status: Script A: {'✅' if self.script_a_available else '❌'}, "
                               f"Script B: {'✅' if self.script_b_available else '❌'}")
