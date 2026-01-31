@@ -702,7 +702,7 @@ class ProductionOrchestrator:
             results['errors'].append(str(e))
             self.monitor.end_stage('cultural_localization')
     
-        async def _stage_6_quality_assurance(self, results: Dict):
+    async def _stage_6_quality_assurance(self, results: Dict):
         """STAGE 6: Quality Assurance"""
         # እነዚህ ሁለት መስመሮች የግድ መለየት አለባቸው
         self.monitor.start_stage('quality_assurance')
