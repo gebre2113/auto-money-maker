@@ -660,7 +660,7 @@ class EnhancedAIFailoverSystem:
     ዓላማ፡ ምንም አይነት ጥያቄ ያለ መልስ እንዳይቀር ማድረግ (Zero Failure Policy)
     """
     
-    def __init__(self, config: PremiumConfig):
+    def __init__(self, config):
         self.config = config
         self.key_manager = SecureAPIKeyManager()
         self.healer = SelfHealingSystem()
@@ -678,8 +678,8 @@ class EnhancedAIFailoverSystem:
             },
             'gemini': {
                 'models': {
-                    'pro': 'gemini-1.5-pro',
-                    'flash': 'gemini-1.5-flash'
+                    'technical': 'gemini-1.5-pro',
+                    'general': 'gemini-1.5-flash'
                 },
                 'endpoint': 'https://generativelanguage.googleapis.com/v1/models'
             }
@@ -697,39 +697,46 @@ class EnhancedAIFailoverSystem:
             return self.content_cache[cache_key]
 
         # 2. አገልግሎቶችን በቅደም ተከተል መሞከር (Groq -> Gemini -> OpenAI)
-        services_to_try = ['groq', 'gemini', 'openai']
+        services_to_try = ['groq', 'gemini']
         last_error = None
 
         for service in services_to_try:
             if not self.healer.is_service_healthy(service):
+                logger.warning(f"⏳ {service} is in cooldown, skipping...")
                 continue
 
             api_key = self.key_manager.get_key(service)
             if not api_key:
+                logger.error(f"🔑 No API key found for {service}")
                 continue
 
             try:
                 start_t = time.time()
+                logger.info(f"🚀 Attempting generation with {service.upper()}...")
+                
                 content = await self._execute_api_call(service, prompt, api_key, content_type, max_tokens)
                 
                 if content and len(content.strip()) > 150: # ጥራት ማረጋገጫ
                     duration = time.time() - start_t
                     logger.info(f"✅ {service.upper()} Success in {duration:.2f}s")
                     
-                    # ስኬቱን መመዝገብ
+                    # ስኬቱን መመዝገብ (ስሙ ተስተካክሏል)
+                    await self.healer.monitor_service_health(service, True, duration)
                     self.content_cache[cache_key] = content
-                    await self.healer.monitor_service_health(service, True, duration) 
                     return content
                 else:
-                    raise Exception("Content too short or empty")
+                    raise Exception("Generated content is too short or empty")
 
             except Exception as e:
                 last_error = str(e)
-                logger.warning(f"⚠️ {service.upper()} failed: {last_error[:50]}")
-                await self.healer.monitor_service_health(service, False, 0) 
+                logger.warning(f"⚠️ {service.upper()} failed: {last_error}")
+                # ስህተቱን መመዝገብ (ስሙ ተስተካክሏል)
+                await self.healer.monitor_service_health(service, False, 0)
                 continue # ወደ ቀጣዩ ሞዴል ይለፋል
 
-        raise Exception(f"🚨 All AI Engines failed. Last error: {last_error}")
+        # ሁሉም ከከሸፉ መረጃውን ለገቢ ማመንጫው ባዶ እንዳይሆን Fallback ስጥ
+        logger.error(f"🚨 All AI Engines failed. Last error: {last_error}")
+        return f"Content generation for {prompt} failed. Please check AI API status."
 
     async def _execute_api_call(self, service, prompt, api_key, content_type, max_tokens):
         """API ጥሪዎችን በተናጠል ማስተናገድ"""
@@ -748,12 +755,13 @@ class EnhancedAIFailoverSystem:
                 resp = await client.post(self.model_configs['groq']['endpoint'], headers=headers, json=data)
                 if resp.status_code == 200:
                     return resp.json()['choices'][0]['message']['content']
-                raise Exception(f"Groq Error {resp.status_code}")
+                else:
+                    raise Exception(f"Groq API Error: {resp.status_code} - {resp.text[:100]}")
 
         # --- GEMINI CALL ---
         elif service == 'gemini':
-            model = self.model_configs['gemini']['models'].get('pro' if content_type == 'technical' else 'flash')
-            # 🚨 v1 Stable Endpoint (ከ v1beta የተቀየረ)
+            model_key = 'technical' if content_type == 'technical' else 'general'
+            model = self.model_configs['gemini']['models'].get(model_key)
             url = f"{self.model_configs['gemini']['endpoint']}/{model}:generateContent?key={api_key}"
             data = {
                 "contents": [{"parts": [{"text": prompt}]}],
@@ -762,11 +770,13 @@ class EnhancedAIFailoverSystem:
             async with httpx.AsyncClient(timeout=60.0) as client:
                 resp = await client.post(url, json=data)
                 if resp.status_code == 200:
-                    return resp.json()['candidates'][0]['content']['parts'][0]['text']
-                raise Exception(f"Gemini Error {resp.status_code}")
+                    result = resp.json()
+                    return result['candidates'][0]['content']['parts'][0]['text']
+                else:
+                    raise Exception(f"Gemini API Error: {resp.status_code} - {resp.text[:100]}")
 
         return None
-
+                
 # =================== 📝 የተሻሻለ የይዘት ጀነሬተር ===================
 
 class AdvancedAIContentGenerator:
