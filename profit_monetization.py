@@ -219,8 +219,8 @@ class YouTubeIntelligenceHunterPro:
         self._initialized = False
         
         logger.info(f"🚀 YouTube Intelligence Hunter v2.1 initialized")
-    
-   async def initialize(self):
+
+    async def initialize(self):
         """ስርዓት አሰራጭ"""
         if self._initialized:
             return
@@ -232,163 +232,109 @@ class YouTubeIntelligenceHunterPro:
         except Exception as e:
             logger.error(f"❌ System initialization failed: {e}")
             raise
-    
+
     async def __aenter__(self):
         """Async context manager support"""
         await self.initialize()
         return self
-    
+
     async def __aexit__(self, exc_type, exc_val, exc_tb):
         """Async context manager cleanup"""
         await self.cache.close()
-    
+
     def _load_premium_channels_db(self) -> Dict[str, List[Dict]]:
         """የምርጥ ቻናሎች መረጃ ቋት"""
         return {
-            'technology': [
-                {'id': 'UCBJycsmduvYEL83R_U4JriQ', 'name': 'Marques Brownlee', 'category': 'Tech Reviews', 'quality_score': 95, 'subscribers': 17600000},
-            ],
-            'education': [
-                {'id': 'UCsooa4yRKGN_zEE8iknghZA', 'name': 'TED-Ed', 'category': 'Educational', 'quality_score': 94, 'subscribers': 18200000},
-            ],
-            'ai_machine_learning': [
-                {'id': 'UCsvqVGtbbyHaMoe4srfvE6A', 'name': 'Two Minute Papers', 'category': 'AI Research', 'quality_score': 91, 'subscribers': 1900000},
-            ]
+            'technology': [{'id': 'UCBJycsmduvYEL83R_U4JriQ', 'name': 'Marques Brownlee'}],
+            'education': [{'id': 'UCsooa4yRKGN_zEE8iknghZA', 'name': 'TED-Ed'}],
+            'ai_machine_learning': [{'id': 'UCsvqVGtbbyHaMoe4srfvE6A', 'name': 'Two Minute Papers'}]
         }
-    
-    @retry(
-        stop=stop_after_attempt(3),
-        wait=wait_exponential(multiplier=1, min=4, max=10),
-        retry=retry_if_exception_type((aiohttp.ClientError, asyncio.TimeoutError, ValueError))
-    )
-    async def find_relevant_videos(self, topic: str, country: str = 'US', 
-                                 max_results: int = 5, use_cache: bool = True) -> List[Dict]:
+
+    @retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=4, max=10))
+    async def find_relevant_videos(self, topic: str, country: str = 'US', max_results: int = 5) -> List[Dict]:
         """ርዕሱን ተጠቅሞ ከፍተኛ ጥራት ያላቸው ቪዲዮዎችን ያገኛል"""
-        if not self._initialized:
-            await self.initialize()
+        if not self._initialized: await self.initialize()
         
         start_time = time.time()
         self.analytics['total_searches'] += 1
         
-        cache_key = f"search:{hashlib.md5(topic.encode()).hexdigest()}:{country}:{max_results}"
-        
-        if use_cache:
-            cached_result = await self.cache.get(cache_key)
-            if cached_result:
-                self.analytics['cache_hits'] += 1
-                cache_age = time.time() - cached_result.get('cached_at', 0)
-                if cache_age < 3600:
-                    logger.info(f"🎯 Cache hit ({cache_age:.0f}s old) for: {topic}")
-                    return cached_result['videos']
-                else:
-                    logger.info(f"🔄 Cache expired ({cache_age/3600:.1f}h old), refreshing: {topic}")
-        
         try:
+            # 1. መጀመሪያ ትክክለኛውን የ YouTube API ፍለጋ ማካሄድ
             videos = await self._smart_search_strategy(topic, country, max_results)
+            
+            # 2. ውጤት ካልተገኘ ወደ Fallback መሄድ
+            if not videos:
+                return await self._get_fallback_videos(topic, max_results)
+            
+            # 3. መረጃዎችን ማበልጸግ እና ደረጃ መስጠት
             enriched_videos = await self._enrich_videos_with_metadata(videos)
             sorted_videos = self._rank_videos_by_quality(enriched_videos)
             
-            result_data = {
-                'videos': [asdict(v) if isinstance(v, YouTubeVideo) else v for v in sorted_videos[:max_results]],
-                'cached_at': time.time(),
-                'query': topic,
-                'country': country,
-                'search_time': time.time() - start_time
-            }
-            
-            await self.cache.set(cache_key, result_data, ttl=7200)
             response_time = time.time() - start_time
-            self.analytics['avg_response_time'] = (
-                (self.analytics['avg_response_time'] * (self.analytics['total_searches'] - 1) + response_time) 
-                / self.analytics['total_searches']
-            )
-            
             logger.info(f"✅ Found {len(sorted_videos)} videos for '{topic}' in {response_time:.2f}s")
-            return [asdict(v) if isinstance(v, YouTubeVideo) else v for v in sorted_videos[:max_results]]
+            
+            return [asdict(v) for v in sorted_videos[:max_results]]
             
         except Exception as e:
             self.analytics['errors'] += 1
             logger.error(f"❌ Search failed for '{topic}': {e}")
             return await self._get_fallback_videos(topic, max_results)
-    
+
     async def _smart_search_strategy(self, topic: str, country: str, max_results: int) -> List[Dict]:
         """ትክክለኛ የዩቲዩብ API ፍለጋ ስልት"""
         api_key = self.api_keys['youtube_v3']
         if not api_key:
-            logger.error("❌ YouTube API Key is missing in Environment Variables!")
+            logger.error("❌ YouTube API Key missing!")
             return []
 
         url = "https://www.googleapis.com/youtube/v3/search"
         params = {
-            'q': f"{topic} review tutorial guide", # የፍለጋ ውጤቱን ለገቢ ማመንጫ እንዲመች ማሻሻል
+            'q': f"{topic} review tutorial",
             'part': 'snippet',
             'key': api_key,
             'maxResults': max_results,
             'type': 'video',
-            'order': 'relevance',
-            'regionCode': country,
-            'relevanceLanguage': 'en'
+            'regionCode': country
         }
 
-        try:
-            async with aiohttp.ClientSession() as session:
-                async with session.get(url, params=params) as resp:
-                    if resp.status == 200:
-                        data = await resp.json()
-                        self.analytics['api_calls'] += 1
-                        return data.get('items', [])
-                    elif resp.status == 403:
-                        logger.error("🚫 YouTube API Quota Exceeded!")
-                        return []
-                    else:
-                        logger.error(f"⚠️ YouTube API Error: {resp.status}")
-                        return []
-        except Exception as e:
-            logger.error(f"❌ Network error during YouTube search: {e}")
-            return []
+        async with aiohttp.ClientSession() as session:
+            async with session.get(url, params=params) as resp:
+                if resp.status == 200:
+                    data = await resp.json()
+                    return data.get('items', [])
+                return []
 
     async def _enrich_videos_with_metadata(self, videos: List[Dict]) -> List[YouTubeVideo]:
-        """የቪዲዮ መረጃዎችን ወደ YouTubeVideo Object ይቀይራል"""
+        """ቪዲዮዎችን ወደ ስርአቱ ፎርማት ይቀይራል"""
         enriched = []
         for v in videos:
             try:
-                # እያንዳንዱን የቪዲዮ ዳታ ወደ ስርአቱ ፎርማት መቀየር
-                video_id = v.get('id', {}).get('videoId')
-                if not video_id: continue
-                
-                # እዚህ ጋር ዳታውን እንደ YouTubeVideo ክላስ እንገነባዋለን
-                # ማሳሰቢያ፡ YouTubeVideo ክላስ ቀድሞ በፋይሉ ውስጥ መኖሩን እርግጠኛ ሁን
-                video_obj = YouTubeVideo(
-                    id=video_id,
+                vid_id = v.get('id', {}).get('videoId')
+                if not vid_id: continue
+                enriched.append(YouTubeVideo(
+                    id=vid_id,
                     title=v['snippet']['title'],
                     description=v['snippet']['description'],
                     thumbnail=v['snippet']['thumbnails']['high']['url'],
                     channel_id=v['snippet']['channelId'],
                     channel_title=v['snippet']['channelTitle'],
                     publish_date=v['snippet']['publishedAt']
-                )
-                enriched.append(video_obj)
-            except Exception as e:
-                logger.warning(f"Could not enrich video: {e}")
-                continue
+                ))
+            except: continue
         return enriched
 
+    def _rank_videos_by_quality(self, videos: List[YouTubeVideo]) -> List[YouTubeVideo]:
+        """ቪዲዮዎችን በጥራት ደረጃ ያስቀምጣል"""
+        return sorted(videos, key=lambda x: x.publish_date, reverse=True)
+
     async def _get_fallback_videos(self, topic: str, max_results: int) -> List[Dict]:
-        """API ሲከሽፍ አማራጭ ቪዲዮዎችን ማዘጋጀት (Safety Net)"""
+        """አስቸኳይ አማራጭ ቪዲዮዎች"""
         self.analytics['fallback_uses'] += 1
-        logger.info(f"🔄 Using emergency fallback videos for: {topic}")
-        
-        # ለጊዜው ባዶ ከመመለስ እነዚህን ዝግጁ ቪዲዮዎች ይጠቀማል
         return [{
-            'id': {'videoId': 'dQw4w9WgXcQ'},
-            'snippet': {
-                'title': f"Understanding {topic} - Complete Guide",
-                'description': f"A detailed breakdown of {topic} for business growth.",
-                'thumbnails': {'high': {'url': 'https://i.ytimg.com/vi/dQw4w9WgXcQ/hqdefault.jpg'}},
-                'channelId': 'fallback_channel',
-                'channelTitle': 'Profit Master Insights',
-                'publishedAt': '2026-01-01T00:00:00Z'
-            }
+            'id': 'dQw4w9WgXcQ',
+            'title': f"Guide to {topic}",
+            'description': "Automated professional overview.",
+            'thumbnail': "https://i.ytimg.com/vi/dQw4w9WgXcQ/hqdefault.jpg"
         }]
 
 
