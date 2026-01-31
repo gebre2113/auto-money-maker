@@ -2639,12 +2639,21 @@ class FraudDetectionEngine:
     
     def check_injection_pattern(self, content: str, injection_point: int) -> bool:
         """Check if injection pattern is suspicious"""
-        # Check for excessive affiliate links in close proximity
+        
+        # 1. ይዘቱ ባዶ መሆኑን መፈተሽ (የ NoneType ስህተት መከላከያ)
+        if content is None or not isinstance(content, str):
+            logger.error("❌ Content is None at check_injection_pattern")
+            return False
+
+        # 2. አሁን በሰላም መቁጠር ይቻላል
         affiliate_links_count = content.count('rel="nofollow sponsored"')
         
         if affiliate_links_count > 10:  # Too many affiliate links
             logger.warning("⚠️ Suspicious pattern detected: Too many affiliate links")
             return False
+            
+        return True
+
         
         # Check for link clustering
         content_before = content[:injection_point]
