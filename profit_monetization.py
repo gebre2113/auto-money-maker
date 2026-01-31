@@ -1452,8 +1452,20 @@ class UltraAffiliateManager:
     def _find_optimal_injection_point(self, content: str, content_analysis: Dict, position: int) -> int:
         """AI-powered optimal injection point selection"""
         
+        # 1. ይዘቱ ባዶ መሆኑን መፈተሽ (የስህተቱ መከላከያ)
+        if content is None or not isinstance(content, str):
+            logger.error("❌ Content is None or not a string at _find_optimal_injection_point")
+            return 0
+            
+        # 2. ይዘቱ በጣም አጭር ከሆነ መጀመሪያውኑ እንዲያስገባ ማድረግ
+        if '</p>' not in content:
+            return 0
+
         paragraphs = content.split('</p>')
         total_paragraphs = len(paragraphs)
+        
+        # ... የቀረው የሎጂክ ክፍል እዚህ ይቀጥላል ...
+
         
         if total_paragraphs < 3:
             return len(content) // 2
