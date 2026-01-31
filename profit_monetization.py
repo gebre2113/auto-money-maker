@@ -233,7 +233,7 @@ async def initialize(self):
             logger.error(f"❌ System initialization failed: {e}")
             raise
     
-    async def __aenter__(self):
+     async def __aenter__(self):
         """Async context manager support"""
         await self.initialize()
         return self
