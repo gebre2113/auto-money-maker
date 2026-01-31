@@ -1,1 +1,72 @@
+name: 🚀 Profit Master Elite - PRODUCTION RUN
 
+on:
+  workflow_dispatch:
+    inputs:
+      topic:
+        description: 'የይዘቱ ርዕስ (Content Topic)'
+        required: false
+        default: 'Artificial Intelligence in Business'
+  schedule:
+    - cron: '0 0 * * *' # በየቀኑ በጠዋት 12 ሰዓት በራሱ ይነሳል
+
+jobs:
+  run-profit-machine:
+    name: 🏭 Running The Elite Machine
+    runs-on: ubuntu-22.04
+    
+    services:
+      redis:
+        image: redis
+        ports:
+          - 6379:6379
+
+    steps:
+    - name: 📥 Checkout Repository
+      uses: actions/checkout@v4
+
+    - name: 🐍 Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.10'
+        cache: 'pip'
+
+    - name: 🎥 Install System Dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y ffmpeg chromium-browser
+
+    - name: 📦 Install Python Libraries
+      run: |
+        pip install groq google-generativeai moviepy==1.0.3 pandas requests beautifulsoup4
+        pip install python-dotenv redis aiohttp
+
+    - name: 🚀 Run & Deploy Profit Master
+      env:
+        # AI APIs
+        GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+        GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
+        
+        # WordPress Deployment
+        WP_URL: ${{ secrets.WP_URL }}
+        WP_USERNAME: ${{ secrets.WP_USERNAME }}
+        WP_PASSWORD: ${{ secrets.WP_PASSWORD }}
+        
+        # Telegram Deployment
+        TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+        TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        
+        REDIS_URL: redis://localhost:6379
+      run: |
+        echo "🔥 Starting Production Engine and Deploying to WP & Telegram..."
+        python main_runner.py --topic "${{ github.event.inputs.topic || 'Artificial Intelligence in Business' }}"
+
+    - name: 💾 Save Production Output
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: elite-production-results
+        path: |
+          *.json
+          *.html
