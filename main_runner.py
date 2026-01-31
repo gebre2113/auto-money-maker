@@ -955,29 +955,31 @@ async def main():
         "Social Media Monetization Techniques",
         "Custom Topic (Enter your own)"
     ]    
-    print("\n📚 Available Topics:")
+
+print("\n📚 Available Topics:")
     for i, t in enumerate(topics, 1):
         print(f"   {i}. {t}")
     
-    # ሰርቨሩ (GitHub) በራሱ እንዲመርጥ ለማድረግ
+    # ሰርቨር (GitHub) መሆኑን ቼክ ማድረጊያ
     import os
     is_github = os.getenv('GITHUB_ACTIONS') == 'true'
 
     if is_github:
-        print("\n🤖 GitHub Actions detected. Automatically selecting Topic 1...")
+        print("\n🤖 GitHub Actions detected. Automatically selecting Topic 1 for production...")
         choice = '1'
     else:
+        # በራስህ ኮምፒውተር ላይ ስታሄደው ብቻ ጥያቄ ይጠይቃል
         choice = input("\nSelect topic number (1-6): ").strip()
 
     # ምርጫውን የማረጋገጫ ሂደት
-    if choice == '6' and not is_github:
+    if not is_github and choice == '6':
         topic = input("Enter your custom topic: ").strip()
     elif choice.isdigit() and 1 <= int(choice) <= 5:
         topic = topics[int(choice) - 1]
     else:
-        # ምንም ካልተመረጠ የመጀመሪያውን ርዕስ ውሰድ
+    # በማንኛውም ምክንያት ምርጫ ከጠፋ የመጀመሪያውን ርዕስ ውሰድ
         topic = topics[0]
-        print(f"✅ Proceeding with: {topic}")
+        print(f"✅ Proceeding with default: {topic}")
 
     # Target countries
     countries_input = input("\nEnter target countries (comma-separated, default: US): ").strip()
