@@ -1,0 +1,52 @@
+name: 🧪 Profit Master Engine - INDIVIDUAL TEST
+
+on:
+  workflow_dispatch: # በእጅህ "Run" ስትለው ብቻ እንዲሰራ
+
+jobs:
+  test-engine:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 📥 Checkout Code
+        uses: actions/checkout@v4
+
+      - name: 🐍 Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: 📦 Install Dependencies
+        run: |
+          pip install groq google-generativeai python-dotenv pydantic==1.10.11 jinja2 requests
+
+      - name: 🔍 Step 1: Syntax & Import Check
+        run: |
+          echo "Checking for syntax errors in profit_master_system.py..."
+          python -m py_compile profit_master_system.py
+          echo "Attempting to import the class..."
+          python -c "from profit_master_system import ProfitMaster; print('✅ Import Successful!')"
+
+      - name: 🚀 Step 2: Functional Test (Content Generation)
+        env:
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
+        run: |
+          # ይሄ ትንሽ የፓይተን ኮድ ፋይሉን ብቻውን ያስነሳውና አንድ ጽሁፍ እንዲያመርት ያዘዋል
+          python -c "
+          import asyncio
+          from profit_master_system import ProfitMaster
+          
+          async def test():
+              engine = ProfitMaster()
+              print('🚀 Testing Content Generation...')
+              result = await engine.generate_content('Test Topic: Future of AI 2026')
+              if result and 'content' in result:
+                  print('✅ Generation Success!')
+                  print(f'📝 Words produced: {len(result[\'content\'].split())}')
+              else:
+                  print('❌ Generation Failed!')
+                  exit(1)
+          
+          asyncio.run(test())
+          "
