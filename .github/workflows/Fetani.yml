@@ -1,52 +1,66 @@
 name: 🧪 Profit Master Engine - INDIVIDUAL TEST
 
 on:
-  workflow_dispatch: # በእጅህ "Run" ስትለው ብቻ እንዲሰራ
+  workflow_dispatch: # በእጅህ Run ስትለው ብቻ እንዲሰራ
+  push:
+    paths:
+      - 'profit_master_system.py' # ይሄ ፋይል በተቀየረ ቁጥር ራሱ ይፈትሻል
 
 jobs:
-  test-engine:
+  individual-test:
     runs-on: ubuntu-latest
     
     steps:
       - name: 📥 Checkout Code
         uses: actions/checkout@v4
 
-      - name: 🐍 Setup Python
+      - name: 🐍 Setup Python 3.10
         uses: actions/setup-python@v5
         with:
           python-version: '3.10'
 
-      - name: 📦 Install Dependencies
+      - name: 📦 Install Essential Dependencies
         run: |
-          pip install groq google-generativeai python-dotenv pydantic==1.10.11 jinja2 requests
+          python -m pip install --upgrade pip
+          pip install groq google-generativeai python-dotenv pydantic==1.10.11 jinja2 requests textblob
 
-      - name: 🔍 Step 1: Syntax & Import Check
+      - name: 🔍 Step 1: Syntax Validation
+        id: syntax
         run: |
-          echo "Checking for syntax errors in profit_master_system.py..."
+          echo "🧐 ፋይሉን ለሰዋስው ስህተት እየመረመርኩ ነው..."
           python -m py_compile profit_master_system.py
-          echo "Attempting to import the class..."
-          python -c "from profit_master_system import ProfitMaster; print('✅ Import Successful!')"
+          echo "✅ ምንም አይነት የሰዋስው (Syntax) ስህተት አልተገኘም!"
 
-      - name: 🚀 Step 2: Functional Test (Content Generation)
+      - name: 🏗️ Step 2: Object Initialization Test
+        id: init
+        run: |
+          echo "🏗️ የ ProfitMaster ክላስን ለመጫን እየሞከርኩ ነው..."
+          python -c "from profit_master_system import ProfitMaster; pm = ProfitMaster(); print('✅ ክላሱ በትክክል ተጭኗል!')"
+
+      - name: 🚀 Step 3: Content Generation Logic Test
         env:
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
           GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
         run: |
-          # ይሄ ትንሽ የፓይተን ኮድ ፋይሉን ብቻውን ያስነሳውና አንድ ጽሁፍ እንዲያመርት ያዘዋል
+          echo "🚀 የ AI ማመንጫውን ለብቻው እየፈተሽኩ ነው..."
           python -c "
           import asyncio
-          from profit_master_system import ProfitMaster
-          
-          async def test():
-              engine = ProfitMaster()
-              print('🚀 Testing Content Generation...')
-              result = await engine.generate_content('Test Topic: Future of AI 2026')
-              if result and 'content' in result:
-                  print('✅ Generation Success!')
-                  print(f'📝 Words produced: {len(result[\'content\'].split())}')
-              else:
-                  print('❌ Generation Failed!')
-                  exit(1)
-          
-          asyncio.run(test())
+          import sys
+          try:
+              from profit_master_system import ProfitMaster
+              async def run_test():
+                  engine = ProfitMaster()
+                  # የሙከራ ርዕስ
+                  test_topic = 'Future of AI in Ethiopia 2026'
+                  print(f'📝 ሙከራ እየተደረገበት ያለው ርዕስ: {test_topic}')
+                  result = await engine.generate_content(test_topic)
+                  if result and ('content' in result or 'sections' in result):
+                      print('✅ ስኬት: የ AI ይዘት ማመንጫው በትክክል ሰርቷል!')
+                  else:
+                      print('❌ ስህተት: ይዘት አልተመረተም!')
+                      sys.exit(1)
+              asyncio.run(run_test())
+          except Exception as e:
+              print(f'❌ አልተሳካም: {str(e)}')
+              sys.exit(1)
           "
