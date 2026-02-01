@@ -2776,65 +2776,75 @@ class EnterpriseProductionOrchestrator:
                     }
             self.content_system = BasicContentSystem()
     
-    def _initialize_all_components(self):
-        YouTubeIntelligenceHunterPro = self.importer.get_module('YouTubeIntelligenceHunterPro')
-        if YouTubeIntelligenceHunterPro:
-            self.youtube_hunter = YouTubeIntelligenceHunterPro()
-            self.logger.info("✅ Enterprise YouTube Intelligence Hunter initialized")
-        
-        UltraAffiliateManager = self.importer.get_module('UltraAffiliateManager')
-        if UltraAffiliateManager:
-            self.affiliate_manager = UltraAffiliateManager(
-                user_geo="US",
-                user_segment="enterprise"
-            )
-            self.logger.info("✅ Enterprise Affiliate Manager initialized")
-        
-        UltimateProfitMasterSystem = self.importer.get_module('UltimateProfitMasterSystem')
-        if UltimateProfitMasterSystem:
-            self.content_system = UltimateProfitMasterSystem()
-            self.logger.info("✅ Enterprise Content System initialized")
-        
-        CulturalDepthGuardian = self.importer.get_enterprise_component('CulturalDepthGuardian')
-        if CulturalDepthGuardian:
-            self.cultural_guardian = CulturalDepthGuardian
-            self.logger.info("✅ Cultural Depth Guardian initialized")
-        
-        RevenueForecastEngine = self.importer.get_enterprise_component('RevenueForecastEngine')
-        if RevenueForecastEngine:
-            self.revenue_engine = RevenueForecastEngine
-            self.logger.info("✅ Revenue Forecast Engine initialized")
-        
-        EthicalComplianceGuardian = self.importer.get_enterprise_component('EthicalComplianceGuardian')
-        if EthicalComplianceGuardian:
-            self.compliance_guardian = EthicalComplianceGuardian
-            self.logger.info("✅ Ethical Compliance Guardian initialized")
-        
-        HumanLikenessEngine = self.importer.get_enterprise_component('HumanLikenessEngine')
-        if HumanLikenessEngine:
-            self.human_engine = HumanLikenessEngine
-            self.logger.info("✅ Human Likeness Engine initialized (95% AI Detection Reduction)")
-        
-        SmartImageEngine = self.importer.get_enterprise_component('SmartImageEngine')
-        if SmartImageEngine:
-            self.image_engine = SmartImageEngine
-            self.logger.info("✅ Smart Image Engine initialized (40% SEO Boost)")
-        
-        DynamicCTAEngine = self.importer.get_enterprise_component('DynamicCTAEngine')
-        if DynamicCTAEngine:
-            self.cta_engine = DynamicCTAEngine
-            self.logger.info("✅ Dynamic CTA Engine initialized (35% Revenue Increase)")
-        
-        SocialMediaManager = self.importer.get_enterprise_component('SocialMediaManager')
-        if SocialMediaManager:
-            self.social_manager = SocialMediaManager
-            self.logger.info("✅ Social Media Manager initialized")
-        
-        DashboardManager = self.importer.get_enterprise_component('DashboardManager')
-        if DashboardManager:
-            self.dashboard_manager = DashboardManager
-            self.logger.info("✅ Dashboard Manager initialized")
-    
+     def _initialize_all_components(self):
+        """
+        Enterprise componentsን በስርዓት ያስነሳል። 
+        ስህተቶችን ለመከላከል እያንዳንዱ Import መደረጉን ያረጋግጣል።
+        """
+        self.logger.info("🏢 Initializing Enterprise Components...")
+
+        try:
+            # 1. YouTube Intelligence Hunter
+            YouTubeIntelligenceHunterPro = self.importer.get_module('YouTubeIntelligenceHunterPro')
+            if YouTubeIntelligenceHunterPro:
+                # ሞጁሉ ክላስ ከሆነ instance ይፈጥራል፣ ካልሆነ ግን ያለውን ይወስዳል
+                self.youtube_hunter = YouTubeIntelligenceHunterPro() if callable(YouTubeIntelligenceHunterPro) else YouTubeIntelligenceHunterPro
+                self.logger.info("✅ Enterprise YouTube Intelligence Hunter initialized")
+            
+            # 2. Affiliate Manager
+            UltraAffiliateManager = self.importer.get_module('UltraAffiliateManager')
+            if UltraAffiliateManager:
+                if callable(UltraAffiliateManager):
+                    self.affiliate_manager = UltraAffiliateManager(user_geo="US", user_segment="enterprise")
+                else:
+                    self.affiliate_manager = UltraAffiliateManager
+                self.logger.info("✅ Enterprise Affiliate Manager initialized")
+            
+            # 3. Content System
+            UltimateProfitMasterSystem = self.importer.get_module('UltimateProfitMasterSystem')
+            if UltimateProfitMasterSystem:
+                self.content_system = UltimateProfitMasterSystem() if callable(UltimateProfitMasterSystem) else UltimateProfitMasterSystem
+                self.logger.info("✅ Enterprise Content System initialized")
+            
+            # --- Enterprise Components (Mocks/Engines) ---
+            
+            # 4. Cultural Guardian
+            self.cultural_guardian = self.importer.get_enterprise_component('CulturalDepthGuardian')
+            if self.cultural_guardian: self.logger.info("✅ Cultural Depth Guardian initialized")
+            
+            # 5. Revenue Engine
+            self.revenue_engine = self.importer.get_enterprise_component('RevenueForecastEngine')
+            if self.revenue_engine: self.logger.info("✅ Revenue Forecast Engine initialized")
+            
+            # 6. Ethical Compliance
+            self.compliance_guardian = self.importer.get_enterprise_component('EthicalComplianceGuardian')
+            if self.compliance_guardian: self.logger.info("✅ Ethical Compliance Guardian initialized")
+            
+            # 7. Human Likeness Engine
+            self.human_engine = self.importer.get_enterprise_component('HumanLikenessEngine')
+            if self.human_engine: self.logger.info("✅ Human Likeness Engine initialized (95% AI Detection Reduction)")
+            
+            # 8. Smart Image Engine
+            self.image_engine = self.importer.get_enterprise_component('SmartImageEngine')
+            if self.image_engine: self.logger.info("✅ Smart Image Engine initialized (40% SEO Boost)")
+            
+            # 9. Dynamic CTA Engine
+            self.cta_engine = self.importer.get_enterprise_component('DynamicCTAEngine')
+            if self.cta_engine: self.logger.info("✅ Dynamic CTA Engine initialized (35% Revenue Increase)")
+            
+            # 10. Social Media & Dashboard
+            self.social_manager = self.importer.get_enterprise_component('SocialMediaManager')
+            if self.social_manager: self.logger.info("✅ Social Media Manager initialized")
+            
+            self.dashboard_manager = self.importer.get_enterprise_component('DashboardManager')
+            if self.dashboard_manager: self.logger.info("✅ Dashboard Manager initialized")
+
+        except Exception as e:
+            self.logger.error(f"❌ Error during component initialization: {str(e)}")
+            # ስህተት ቢፈጠር ወደ መጠባበቂያ (Fallback) ሲስተም ይቀይራል
+            if hasattr(self, '_create_basic_fallback_system'):
+                self._create_basic_fallback_system()
+
     async def run_production_with_monitoring(self, topic: str, 
                                            markets: List[str] = None,
                                            content_type: str = "enterprise_guide") -> Dict:
