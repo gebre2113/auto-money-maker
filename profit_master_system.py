@@ -2251,7 +2251,6 @@ class PremiumMultimediaEnhancer:
                 'chapters': ['Introduction', 'Main Content', 'Conclusion'],
                 'quality': 'studio'
             }
-        content_id = content.get('id', 'default_id')
         
         return {
             'audio_id': f"audio_{content_id}",
