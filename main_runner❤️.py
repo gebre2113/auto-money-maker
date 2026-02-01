@@ -957,7 +957,7 @@ class UltimateProductionOrchestrator:
                 'versions_created': results.get('metrics', {}).get('localized_versions', 0)
             },
             'multimedia': {
-                'assets_created': results.get('metrics', {}).get('multimedia_assets', 0)
+            'assets_created': results.get('metrics', {}).get('multimedia_assets', 0)
             },
             'quality': {
                 'final_score': results.get('metrics', {}).get('final_quality_score', 0),
