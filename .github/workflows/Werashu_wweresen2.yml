@@ -1,14 +1,14 @@
-name: Profit Master Supreme - EXECUTE
+name: 🚀 Profit Master Supreme - EXECUTE open
 
 on:
   schedule:
     - cron: '0 */6 * * *'  # በየ 6 ሰዓቱ በራሱ ይሰራል።
-  workflow_dispatch:       # አንተ በፈለግክ ሰዓት "Run" ብለህ ማስጀመር ትችላለህ።
+  workflow_dispatch:       # በእጅህ "Run" ለማድረግ
     inputs:
       topic:
         description: 'የይዘት ርዕስ (Topic)'
         required: false
-        default: 'AI Revolution'
+        default: 'AI Revolution 2026'
       language:
         description: 'ቋንቋ (am/en)'
         required: false
@@ -23,77 +23,65 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
-      # 1. ያንተን ኮድ (main.py) ከ GitHub ያወርደዋል
       - name: "📥 Checkout Repository"
         uses: actions/checkout@v4
 
-      # 2. Python 3.12 ያዘጋጃል
       - name: "🐍 Setup Python 3.12"
         uses: actions/setup-python@v5
         with:
           python-version: '3.12'
           cache: 'pip'
 
-      # 3. ቪዲዮ ለመስራት የሚያስፈልገውን FFmpeg ይጭናል
       - name: "🔧 Install System Dependencies"
         run: |
           sudo apt-get update
           sudo apt-get install -y ffmpeg
 
-      # 4. ያንተ ስክሪፕት የሚፈልጋቸውን ሁሉንም ላይብረሪዎች ይጭናል
       - name: "📦 Install Python Libraries"
         run: |
-          pip install --upgrade pip
-          # ልክ እንደ requirements.txt የተስተካከለውን ጫን
+          python -m pip install --upgrade pip
           pip install \
             aiohttp httpx requests pandas numpy schedule \
             groq google-generativeai openai anthropic cohere \
             gtts moviepy>=2.0.0 pytube yt-dlp Pillow \
             beautifulsoup4 selenium tweepy \
-            sqlalchemy redis fastapi uvicorn \
-            nltk spacy textblob pydantic prometheus-client boto3 \
+            sqlalchemy redis fastapi uvicorn psutil \
+            nltk spacy textblob pydantic==1.10.11 prometheus-client boto3 \
             deep-translator transformers
-
-          # ቶርች (Torch) ለየብቻ (ቀላል እንዲሆን)
+          
           pip install torch --index-url https://download.pytorch.org/whl/cpu
-
-          # NLTK Data
           python -m textblob.download_corpora
           python -m nltk.downloader punkt stopwords wordnet
           python -m spacy download en_core_web_sm || true
 
-      # 5. ያንተን ትልቁን ስክሪፕት ያስኬዳል
       - name: "🤖 Execute Your Script (main.py)"
         env:
-          # እነዚህን ቁልፎች በ GitHub Settings -> Secrets ውስጥ ማስገባት አለብህ
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-          # ስክሪፕቱ ከ Inputs መረጃ እንዲቀበል ከፈለግክ
-          INPUT_TOPIC: ${{ github.event.inputs.topic || 'Future AI' }}
+          INPUT_TOPIC: ${{ github.event.inputs.topic || 'AI Revolution 2026' }}
           INPUT_LANGUAGE: ${{ github.event.inputs.language || 'am' }}
+          PYTHONUNBUFFERED: 1
         run: |
-          echo "🚀 Starting your Profit Master System..."
-          
-          # ስክሪፕትህ አለመኖሩን ማረጋገጫ (ለጥንቃቄ)
+          echo "🚀 Starting automated execution..."
           if [ -f "main.py" ]; then
-             # ስክሪፕቱን ማስኬድ
-             python main.py
+             # 'yes 1 |' ሲስተሙ ምርጫ ሲጠይቅ '1' ቁጥርን በራሱ እንዲያስገባ ያደርገዋል
+             yes 1 | python main.py
           else
-             echo "❌ Error: main.py ፋይል አልተገኘም! እባክዎ ፋይሉን ወደ ሪፖዚቶሪው ይጫኑ።"
+             echo "❌ Error: main.py not found!"
              exit 1
           fi
 
-      # 6. ውጤቱን (የተፈጠሩ ፋይሎችን) ያስቀምጣል
       - name: "💾 Upload Artifacts"
-        if: always()  # ስህተት ቢፈጠርም እንኳን ሎጎችን ለማየት ይረዳል
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: execution-results
           path: |
             profit_master.log
+            crash_report.log
             public/
             *.json
             *.html
