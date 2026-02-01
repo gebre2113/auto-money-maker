@@ -2875,14 +2875,28 @@ class EnterpriseProductionOrchestrator:
         }
         
         try:
-            # Run the production with error handling
+            # ጥንቃቄ የተሞላበት የኤክስኪዩሽን ዘዴ
             result = await EnhancedErrorHandler.safe_execute(
                 self.run_enterprise_production(topic, markets, content_type),
-                fallback_value={'status': 'failed', 'error': 'Production failed after retries'},
+                fallback_value={'status': 'failed', 'country_results': [], 'error': 'Production failed'},
                 max_retries=2,
                 retry_delay=5.0,
                 context="Enterprise Production"
             )
+            
+            # ስህተቱ የሚፈጠርበትን የ result አይነት እዚህ ጋር እናስተካክላለን
+            if not isinstance(result, dict):
+                self.logger.warning(f"⚠️ Expected dict but got {type(result)}. Converting...")
+                result = {'country_results': result if isinstance(result, list) else [], 'status': 'success'}
+
+            # አፈፃፀሙን መመዝገብ አቁም
+            performance_report = self.performance_monitor.stop()
+            
+            # አሁን በሰላም update ማድረግ ይቻላል
+            production_results.update(result)
+            production_results['performance_report'] = performance_report
+            production_results['system_status'] = self.memory_manager.get_system_status()
+
             
             # Stop performance monitoring
             performance_report = self.performance_monitor.stop()
