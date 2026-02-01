@@ -956,7 +956,7 @@ async def main():
         "Custom Topic (Enter your own)"
     ]    
 
-        topics = [
+    topics = [
         "AI-Powered Content Creation Strategies 2026",
         "Digital Marketing Trends for Ethiopian Businesses",
         "Passive Income Streams for Tech Professionals",
