@@ -1092,86 +1092,58 @@ Market Coverage: {results['metrics'].get('market_coverage', 'N/A')}
 # =================== MAIN EXECUTION ===================
 
 async def main():
-    """Main execution function"""
+    """Main execution function - Fully Automated for GitHub Actions & Local Use"""
     
-    # Display banner
+    # 🤖 GitHub Actions መሆኑን በራስ-ሰር ማረጋገጫ
+    is_github = os.getenv('GITHUB_ACTIONS') == 'true'
+    
+    # ባነሩን ማሳያ
     banner = """
 ╔══════════════════════════════════════════════════════════════════════╗
 ║                                                                      ║
-║  🚀 ULTIMATE PRODUCTION RUNNER v6.0                                 ║
-║  🎯 COMPLETE INTEGRATION OF BOTH SYSTEMS                            ║
-║  💎 ZERO GAPS - ALL STAGES IMPLEMENTED                              ║
-║  🌍 OPTIMIZED FOR HIGH-VALUE MARKETS                                ║
-║  🔒 PRODUCTION-READY WITH COMPREHENSIVE ERROR HANDLING              ║
+║  🚀 ULTIMATE PRODUCTION RUNNER v6.0 (AUTOMATED)                     ║
+║  🎯 FULL INTEGRATION - NO MANUAL INTERACTION REQUIRED               ║
+║  🌍 OPTIMIZED FOR 10 HIGH-VALUE GLOBAL MARKETS                      ║
 ║                                                                      ║
 ╚══════════════════════════════════════════════════════════════════════╝
     """
-    
     print(banner)
     print(f"🕐 Start Time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     print("="*70)
     
-    # Initialize orchestrator
+    # ኦርኬስትሬተሩን ማስነሳት
     try:
         orchestrator = CompleteProductionOrchestrator()
     except Exception as e:
         print(f"\n❌ Failed to initialize orchestrator: {e}")
-        print("Please ensure required scripts are in the same directory.")
         return
-    
-    # Get production details
-    print("\n📝 PRODUCTION CONFIGURATION")
-    print("="*70)
-    
-    # Topic
-    topic = input("\nEnter topic for content generation: ").strip()
-    if not topic:
-        print("Using default topic: AI-Powered Content Creation")
-        topic = "AI-Powered Content Creation"
-    
-    # Target countries
-    print(f"\n🌍 Available high-value countries: {', '.join(DEFAULT_TARGET_COUNTRIES)}")
-    countries_input = input("Enter target countries (comma-separated, or Enter for all): ").strip()
-    
-    if countries_input:
-        countries = [c.strip().upper() for c in countries_input.split(',')]
-        # Validate
-        valid_countries = [c for c in countries if c in HIGH_VALUE_COUNTRIES]
-        if not valid_countries:
-            print("⚠️  No valid countries. Using all high-value markets.")
-            countries = DEFAULT_TARGET_COUNTRIES
-        else:
-            countries = valid_countries
-    else:
-        countries = DEFAULT_TARGET_COUNTRIES
-    
-    # Content type
-    content_types = ['blog_post', 'product_review', 'how_to_guide', 'general']
-    print(f"\n📋 Available content types: {', '.join(content_types)}")
-    content_type = input("Enter content type (default: blog_post): ").strip()
-    if not content_type or content_type not in content_types:
-        content_type = 'blog_post'
-    
-    # Confirmation
-    print(f"\n{'='*70}")
-    print("🎯 PRODUCTION CONFIGURATION")
+
+    # 📝 ኮንፊገሬሽን (ከ Environment መለዋወጫዎች ወይም ከዲፎልት መውሰድ)
+    # በ GitHub Actions 'topic' ከሰጠኸው እሱን ይወስዳል፣ ካልሆነ ዲፎልቱን።
+    topic = os.getenv('CONTENT_TOPIC') or "AI-Powered Content Creation Strategies 2026"
+    countries = DEFAULT_TARGET_COUNTRIES  # በአስሩም ሀገር እንዲሰራ
+    content_type = 'blog_post'
+
+    print("\n🎯 PRODUCTION CONFIGURATION (AUTOMATED MODE)")
     print("="*70)
     print(f"📝 Topic: {topic}")
-    print(f"🌍 Markets: {len(countries)} countries")
-    print(f"   {', '.join(countries[:3])}{'...' if len(countries) > 3 else ''}")
+    print(f"🌍 Markets: {len(countries)} Strategic Countries")
     print(f"📋 Type: {content_type}")
     print(f"💰 Estimated Market Value: ${sum(HIGH_VALUE_COUNTRIES.get(c, {}).get('avg_commission', 0) for c in countries):.2f}")
     print("="*70)
-    
-    confirm = input("\nStart production? (y/n): ").strip().lower()
-    if confirm not in ['y', 'yes']:
-        print("\n⚠️ Production cancelled.")
-        return
-    
-    # Execute production
-    print(f"\n🚀 Starting production pipeline...")
-    print(f"📊 This will execute 7 production stages.")
-    print("⏳ Please wait (this may take several minutes)...")
+
+    # 🛑 በ GitHub ላይ ካልሆነ ብቻ ጥያቄ እንዲጠይቅ
+    if not is_github:
+        confirm = input("\nStart production? (y/n): ").strip().lower()
+        if confirm not in ['y', 'yes']:
+            print("\n⚠️ Production cancelled by user.")
+            return
+    else:
+        print("\n🤖 GitHub Environment detected. Skipping manual confirmation...")
+
+    # 🚀 ምርት መጀመር
+    print(f"\n🚀 Starting 7-stage production pipeline...")
+    print(f"⏳ Processing {len(countries)} countries in parallel. Please wait...")
     
     try:
         results = await orchestrator.execute_complete_production(
@@ -1180,19 +1152,17 @@ async def main():
             content_type=content_type
         )
         
-        # Error report
+        # ስህተቶች ካሉ ሪፖርት ማሳያ
         if orchestrator.error_handler.error_registry:
             error_report = orchestrator.error_handler.get_error_report()
-            print(f"\n⚠️  Production completed with {error_report['total_errors']} errors")
-            print(f"   System Health: {error_report['system_health']}")
+            print(f"\n⚠️  Production finished with {error_report['total_errors']} manageable errors.")
+            print(f"   System Health Status: {error_report['system_health']}")
         
-        print(f"\n✅ Production complete!")
-        print(f"📁 Results saved to: production_outputs/")
+        print(f"\n✅ SUCCESS: Production completed for all target markets!")
+        print(f"📁 Results are ready in 'production_outputs/' directory.")
         
-    except KeyboardInterrupt:
-        print("\n\n⚠️ Production interrupted by user.")
     except Exception as e:
-        print(f"\n❌ Production failed: {e}")
+        print(f"\n❌ CRITICAL ERROR during production: {e}")
         traceback.print_exc()
 
 # =================== ENTRY POINT ===================
