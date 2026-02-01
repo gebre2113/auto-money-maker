@@ -998,6 +998,9 @@ async def main():
         if not content_type or content_type not in content_types:
             content_type = 'blog_post'
     
+        # ከ summary በፊት ሀገራቱን መግለጽ አለብን
+    countries = ["Ethiopia", "United States", "Global"]
+
     # Summary
     print("\n" + "="*70)
     print("🎯 PRODUCTION CONFIGURATION")
@@ -1006,6 +1009,18 @@ async def main():
     print(f"🌍 Target Countries: {', '.join(countries)}")
     print(f"📋 Content Type: {content_type}")
     print("="*70)
+    
+    # GitHub Actions ከሆነ በቀጥታ እንዲቀጥል
+    if is_github:
+        confirm = 'y'
+    else:
+        confirm = input("\nStart production? (y/n): ").strip().lower()
+
+    if confirm not in ['y', 'yes', 'yep', 'yeah']:
+        print("\n⚠️ Production cancelled by user")
+        return
+
+    
     
     # Confirm - GitHub ላይ ከሆነ በራሱ 'yes' ይላል
     if is_github:
