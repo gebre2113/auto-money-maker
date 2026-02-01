@@ -2251,7 +2251,6 @@ class PremiumMultimediaEnhancer:
                 'chapters': ['Introduction', 'Main Content', 'Conclusion'],
                 'quality': 'studio'
             }
-                    # ደህንነቱ የተጠበቀ መለያ (ID) ማውጣት
         content_id = content.get('id', 'default_id')
         
         return {
