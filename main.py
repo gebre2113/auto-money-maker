@@ -4791,7 +4791,7 @@ def check_dependencies():
     for import_name, package_name in REQUIRED_PACKAGES:
         try:
             __import__(import_name)
-            print(f"✅ {package_name} ተገኝቷል")
+            # print(f"✅ {package_name} ተገኝቷል") # ሎግን ለመቀነስ ኮሜንት ተደርጓል
         except ImportError:
             missing_required.append(package_name)
             print(f"❌ {package_name} አልተገኘም")
@@ -4800,42 +4800,123 @@ def check_dependencies():
     for import_name, package_name in OPTIONAL_PACKAGES:
         try:
             __import__(import_name)
-            print(f"✅ {package_name} ተገኝቷል")
         except ImportError:
             missing_optional.append(package_name)
-            print(f"⚠️ {package_name} አልተገኘም (አማራጭ)")
     
     # ለNLTK ውሂብ ፈትሽ
     try:
         import nltk
         nltk.data.find('tokenizers/punkt')
         nltk.data.find('corpora/stopwords')
-        print("✅ NLTK ውሂብ ተገኝቷል")
     except LookupError:
         print("⚠️ NLTK ውሂብ አልተገኘም")
-        print("   ከመቀጠልዎ በፊት የሚከተሉትን ያስኬዱ:")
-        print("   python -c \"import nltk; nltk.download('punkt'); nltk.download('stopwords')\"")
+        print("   Auto-downloading NLTK data...")
+        try:
+            nltk.download('punkt', quiet=True)
+            nltk.download('stopwords', quiet=True)
+            print("✅ NLTK data downloaded.")
+        except:
+            pass
     
     # አስፈላጊ ሞጁሎች ካልተገኙ
     if missing_required:
         print(f"\n❌ አስፈላጊ ሞጁሎች አልተገኙም: {', '.join(missing_required)}")
         print("\n📦 ለመጫን የሚከተለውን ኮማንድ ይጠቀሙ:")
         print(f"   pip install {' '.join(missing_required)}")
-        
-        if missing_optional:
-            print(f"\n📦 አማራጭ ሞጁሎችንም ለመጫን:")
-            print(f"   pip install {' '.join(missing_optional)}")
-        
-        print("\n🔧 ከዚያ ፕሮግራሙን እንደገና ያስኬዱ")
         return False
     
-    print("\n✅ ሁሉም አስፈላጊ ሞጁሎች ተገኝተዋል!")
     return True
+
+# =================== 🛠️ የተሻሻለ የ10 ደቂቃ ስትራቴጂ (The 10-Minute Strategy) ===================
+
+async def run_10_minute_production_strategy(system):
+    """
+    🚀 የ10 ደቂቃ ስትራቴጂ፡ 
+    - 10 ከፍተኛ ሀገራት
+    - በመካከላቸው የ1 ደቂቃ እረፍት
+    - API Ban እንዳይደረግ እና Github Runner እንዳይጨናነቅ
+    """
+    
+    # የሀገራት ዝርዝር (ከኮድ ጋር ማዛመድ)
+    target_countries_map = [
+        ("US", "USA"), 
+        ("GB", "UK"), 
+        ("DE", "Germany"), 
+        ("CA", "Canada"), 
+        ("AU", "Australia"), 
+        ("NO", "Norway"), 
+        ("SE", "Sweden"), 
+        ("CH", "Switzerland"), 
+        ("FR", "France"),
+        ("JP", "Japan")
+    ]
+    
+    # ርዕሱን እዚህ መቀየር ትችላለህ
+    topic = "The Rise of AI Agents: How to Build Passive Income in 2025" 
+    
+    print("\n" + "="*80)
+    print(f"🚀 የ10 ሀገራት ምርት ተጀምሯል። (The 10-Minute Strategy)")
+    print(f"📝 ርዕስ: {topic}")
+    print(f"⏱️ ግምታዊ ጊዜ: ~10-12 ደቂቃ")
+    print("="*80)
+    
+    start_total_time = time.time()
+    
+    for index, (code, name) in enumerate(target_countries_map, 1):
+        country_start_time = time.time()
+        print(f"\n🌍 [{index}/10] አሁን ለ {name} ({code}) ይዘት እየተመረተ ነው...")
+        
+        try:
+            # 1. ለዚህች ሀገር ብቻ ይዘቱን አምርት (Targeted Production)
+            result = await system.full_production_pipeline(topic, target_countries=[code])
+            
+            # ውጤቱን ማረጋገጥ
+            if result and result.get('quality_report', {}).get('overall_score', 0) > 0:
+                print(f"   ✅ {name} ተሳክቷል! (Quality: {result['quality_report']['overall_score']}%)")
+                
+                # ፋይል ሴቭ ማድረግ
+                filename = save_to_file(result, 'json')
+                print(f"   💾 ተቀምጧል: {filename}")
+                
+                # HTML ሪፖርትም ሴቭ ማድረግ
+                save_to_file(result, 'html')
+            else:
+                print(f"   ⚠️ {name} ላይ ውጤቱ ባዶ ነው ወይም ችግር አጋጥሟል፣ ግን እንቀጥላለን።")
+
+        except Exception as e:
+            print(f"   ❌ ስህተት በ {name}: {e}")
+        
+        # የወሰደውን ጊዜ አስላ
+        duration = time.time() - country_start_time
+        print(f"   ⏱️ የወሰደው ጊዜ: {duration:.2f} ሰከንድ")
+        
+        # 2. የአንድ ደቂቃ እረፍት (ከመጨረሻዋ ሀገር በስተቀር)
+        if index < len(target_countries_map):
+            print(f"⏳ ቀጣዩ ሀገር ከመጀመሩ በፊት ለ60 ሰከንድ እረፍት (Cooling down)...")
+            
+            # Progress bar ለ 60 ሰከንድ
+            for i in range(60, 0, -1):
+                sys.stdout.write(f"\r   💤 እረፍት: {i} ሰከንድ ቀረው... ")
+                sys.stdout.flush()
+                await asyncio.sleep(1) # Async sleep ሲስተሙን አይዘጋውም
+            print("\r   🚀 እረፍት ተጠናቀቀ! ቀጣዩን እንጀምር...            ")
+            
+    total_duration = (time.time() - start_total_time) / 60
+    print("\n" + "="*80)
+    print(f"🎉 ጨርሰናል! አስሩንም ሀገራት በ {total_duration:.2f} ደቂቃ ውስጥ አጠናቅቄያለሁ!")
+    print("="*80)
+    
+    # 3. GitHub Actions ላይ ከሆነ በንጽህና መውጣት
+    if os.getenv('GITHUB_ACTIONS') == 'true':
+        print("🤖 GitHub Actions Environment Detected - Exiting cleanly.")
+        sys.exit(0)
+
+# =================== የተሻሻለ ዋና አፈፃፀም ፋይል (Main) ===================
 
 async def enhanced_main():
     """የተሻሻለ ዋና አፈፃፀም ፋይል"""
     
-    # ስርዓት ማስጀመሪያ ሰንደቅ ማሳየት
+    # ሰንደቅ ማሳየት
     UserInterface.display_banner()
     
     try:
@@ -4856,14 +4937,26 @@ async def enhanced_main():
         # የስርዓት ሁኔታ ማሳየት
         UserInterface.display_system_status(config, system)
         
-        # ዋና ዑደት
+        # ==========================================
+        # 🚀 AUTOMATION CHECK (GitHub Actions)
+        # ==========================================
+        # GitHub ላይ ከሆነ ወይም AUTO_RUN=true ከተባለ ቀጥታ ወደ 10 ደቂቃ ስትራቴጂ ይገባል
+        if os.getenv('GITHUB_ACTIONS') == 'true' or os.getenv('AUTO_RUN') == 'true':
+            print("\n🤖 Automation detected. Starting 10-Minute Strategy automatically...")
+            await run_10_minute_production_strategy(system)
+            return
+
+        # ==========================================
+        # 🎮 INTERACTIVE MENU (Local User)
+        # ==========================================
         while True:
             UserInterface.display_main_menu()
+            print("   🔟. የ10 ደቂቃ ስትራቴጂ (10 Countries Loop)") # አዲስ አማራጭ
             
             choice = UserInterface.get_user_input(
-                "📋 ምርጫዎን ያስገቡ (1-9)",
+                "📋 ምርጫዎን ያስገቡ (1-10)",
                 input_type=int,
-                options=list(range(1, 10))
+                options=list(range(1, 11))
             )
             
             if choice == 1:
@@ -4882,6 +4975,8 @@ async def enhanced_main():
                 UserInterface.display_system_status(config, system)
             elif choice == 8:
                 await high_value_countries_mode(system, config)
+            elif choice == 10: # አዲሱ ምርጫ
+                await run_10_minute_production_strategy(system)
             elif choice == 9:
                 print("\n👋 እንደገና ተገናኙ!")
                 break
