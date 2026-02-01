@@ -2776,7 +2776,7 @@ class EnterpriseProductionOrchestrator:
                     }
             self.content_system = BasicContentSystem()
     
-     def _initialize_all_components(self):
+    def _initialize_all_components(self):
         """
         Enterprise componentsን በስርዓት ያስነሳል። 
         ስህተቶችን ለመከላከል እያንዳንዱ Import መደረጉን ያረጋግጣል።
