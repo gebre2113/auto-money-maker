@@ -998,10 +998,10 @@ async def main():
         if not content_type or content_type not in content_types:
             content_type = 'blog_post'
     
-        # ከ summary በፊት ሀገራቱን መግለጽ አለብን
+            # 🌍 የሀገራት ዝርዝር መጀመሪያ መገለጽ አለበት
     countries = ["Ethiopia", "United States", "Global"]
 
-    # Summary
+    # 📊 Summary - ውቅሩን ለማሳየት
     print("\n" + "="*70)
     print("🎯 PRODUCTION CONFIGURATION")
     print("="*70)
@@ -1010,19 +1010,7 @@ async def main():
     print(f"📋 Content Type: {content_type}")
     print("="*70)
     
-    # GitHub Actions ከሆነ በቀጥታ እንዲቀጥል
-    if is_github:
-        confirm = 'y'
-    else:
-        confirm = input("\nStart production? (y/n): ").strip().lower()
-
-    if confirm not in ['y', 'yes', 'yep', 'yeah']:
-        print("\n⚠️ Production cancelled by user")
-        return
-
-    
-    
-    # Confirm - GitHub ላይ ከሆነ በራሱ 'yes' ይላል
+    # ✅ GitHub Actions ከሆነ በቀጥታ እንዲቀጥል፣ ካልሆነ ተጠቃሚውን ይጠይቃል
     if is_github:
         confirm = 'y'
     else:
@@ -1036,14 +1024,14 @@ async def main():
     print("⏳ This may take several minutes. Please wait...")
     
     try:
-        # Execute production
+        # ⚙️ ትክክለኛውን የምርት ሂደት እዚህ ጋር ያስነሳል
         results = await orchestrator.execute_production(
             topic=topic,
             target_countries=countries,
             content_type=content_type
         )
         
-        # Print performance report
+        # 📈 አፈፃፀሙን ሪፖርት ያደርጋል
         orchestrator.monitor.print_report()
         
 # =================== ፕሮግራሙን መጀመር ===================
