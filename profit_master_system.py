@@ -2251,15 +2251,18 @@ class PremiumMultimediaEnhancer:
                 'chapters': ['Introduction', 'Main Content', 'Conclusion'],
                 'quality': 'studio'
             }
-            return {
-                'audio_id': f"audio_{content['id']}",
-                'format': audio_config['format'],
-                'bitrate': audio_config['bitrate'],
-                'duration': f"{audio_features['duration_seconds']}s",
-                'chapters': audio_features['chapters'],
-                'download_url': f"/download/{content['id']}_audio.{audio_config['format']}",
-                'stream_url': f"/stream/{content['id']}_audio"
-            }
+                    # ደህንነቱ የተጠበቀ መለያ (ID) ማውጣት
+        content_id = content.get('id', 'default_id')
+        
+        return {
+            'audio_id': f"audio_{content_id}",
+            'format': audio_config.get('format', 'mp3'),
+            'bitrate': audio_config.get('bitrate', '128k'),
+            'duration': f"{audio_features.get('duration_seconds', 0)}s",
+            'chapters': audio_features.get('chapters', []),
+            'download_url': f"/download/{content_id}_audio.{audio_config.get('format', 'mp3')}",
+            'stream_url': f"/stream/{content_id}_audio"
+        }
         except Exception as e:
             logger.error(f"Audio generation error: {e}")
             return self._generate_fallback_audio(content)
