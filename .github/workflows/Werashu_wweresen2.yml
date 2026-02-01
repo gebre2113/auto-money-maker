@@ -1,9 +1,9 @@
-name: 🚀 Profit Master Supreme - EXECUTE open
+Name: 🚀 Profit Master Supreme - EXECUTE open
 
 on:
   schedule:
-    - cron: '0 */6 * * *'  # በየ 6 ሰዓቱ በራሱ ይሰራል።
-  workflow_dispatch:       # በእጅህ "Run" ለማድረግ
+    - cron: '0 */6 * * *'
+  workflow_dispatch:
     inputs:
       topic:
         description: 'የይዘት ርዕስ (Topic)'
@@ -50,11 +50,10 @@ jobs:
             deep-translator transformers
           
           pip install torch --index-url https://download.pytorch.org/whl/cpu
-          python -m textblob.download_corpora
-          python -m nltk.downloader punkt stopwords wordnet
+          python -m nltk.downloader brown punkt punkt_tab stopwords wordnet averaged_perceptron_tagger_eng conll2000 movie_reviews
           python -m spacy download en_core_web_sm || true
 
-      - name: "🤖 Execute Your Script (main.py)"
+      - name: "🤖 Execute Your Script"
         env:
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
@@ -66,11 +65,26 @@ jobs:
           PYTHONUNBUFFERED: 1
         run: |
           echo "🚀 Starting automated execution..."
-          if [ -f "main.py" ]; then
-             # 'yes 1 |' ሲስተሙ ምርጫ ሲጠይቅ '1' ቁጥርን በራሱ እንዲያስገባ ያደርገዋል
+          
+          # ፋይሉን በስማቸው ፈልጎ እንዲያስተካክልና እንዲያነሳ የሚያደርግ ሎጂክ
+          if [ -f "fixer.py" ] && [ -f "enterprise_production_runner.py" ]; then
+             echo "🔧 Running Fixer on enterprise_production_runner.py..."
+             echo "enterprise_production_runner.py" | python fixer.py
+             
+             # ከተስተካከለ በኋላ FIXED የሚለውን ፋይል ያስነሳል
+             if [ -f "enterprise_production_runner_FIXED.py" ]; then
+                echo "🚀 Running the FIXED Elite Machine..."
+                yes 1 | python enterprise_production_runner_FIXED.py
+             else
+                echo "⚠️ Fixer failed to create FIXED file, running original..."
+                yes 1 | python enterprise_production_runner.py
+             fi
+          elif [ -f "main.py" ]; then
+             echo "🚀 Running main.py..."
              yes 1 | python main.py
           else
-             echo "❌ Error: main.py not found!"
+             echo "❌ Error: Neither main.py nor enterprise_production_runner.py found!"
+             ls -R # ያሉትን ፋይሎች ዝርዝር በሎግ ላይ ያሳያል (ለመለየት ይረዳል)
              exit 1
           fi
 
@@ -80,9 +94,10 @@ jobs:
         with:
           name: execution-results
           path: |
+            enterprise_logs/
+            enterprise_outputs/
             profit_master.log
             crash_report.log
-            public/
             *.json
             *.html
           retention-days: 5
