@@ -1,4 +1,4 @@
-name: 🚀 Profit Master Elite - PRODUCTION RUN on
+name: 🚀 Profit Master Elite - PRODUCTION RUN
 
 on:
   workflow_dispatch:
@@ -8,7 +8,7 @@ on:
         required: false
         default: 'AI-Powered Content Creation Strategies 2026'
   schedule:
-    - cron: '0 0 * * *' # በየቀኑ በጠዋት 12 ሰዓት በራሱ ይነሳል
+    - cron: '0 0 * * *'
 
 jobs:
   run-profit-machine:
@@ -36,37 +36,30 @@ jobs:
         sudo apt-get update
         sudo apt-get install -y ffmpeg chromium-browser chromium-chromedriver
 
-    - name: 📦 Install Python Libraries
+    - name: 📦 Install Python Libraries (Hardcoded Fix)
       run: |
         python -m pip install --upgrade pip
-        # መጀመሪያ PyYAML እና ሌሎች ዋና ዋናዎቹን እንጫን
+        # ሁሉንም አስፈላጊ ጥቅሎች እዚህ ጋር በዝርዝር እንጭናለን - ፋይሉን ሳይሆን!
         pip install PyYAML groq google-generativeai moviepy==1.0.3 pandas requests beautifulsoup4
         pip install python-dotenv redis aioredis==2.0.1 aiohttp textblob pydantic==1.10.11 tenacity
-        # ከዚያ requirements_minimal.txt ውስጥ ያሉትን ቀሪዎች ይጭናል
-        if [ -f requirements_minimal.txt ]; then pip install -r requirements_minimal.txt; fi
+        pip install fastapi==0.104.0 uvicorn==0.24.0 httpx==0.25.0 openai==1.3.0 sqlalchemy==2.0.0
         # የቋንቋ ማቀነባበሪያ ዳታን መጫን
         python -m textblob.download_corpora
 
     - name: 🚀 Run & Deploy Profit Master
       env:
-        # AI APIs
         GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
         GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
-        
-        # WordPress Deployment
         WP_URL: ${{ secrets.WP_URL }}
         WP_USERNAME: ${{ secrets.WP_USERNAME }}
         WP_PASSWORD: ${{ secrets.WP_PASSWORD }}
-        
-        # Telegram Deployment
         TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
         TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-        
         REDIS_URL: redis://localhost:6379
       run: |
-        echo "🔥 Starting Production Engine and Deploying to WP & Telegram..."
-        # የ topic ምርጫውን ከ input ወይም ከ default ይወስዳል
+        echo "🔥 Starting Production Engine..."
+        # ርዕሱን ከ input ካልሆነ ደግሞ ከ default ይወስዳል
         python main_runner.py --topic "${{ github.event.inputs.topic || 'AI-Powered Content Creation Strategies 2026' }}"
 
     - name: 💾 Save Production Output
