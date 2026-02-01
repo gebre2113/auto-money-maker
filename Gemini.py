@@ -1,8 +1,3 @@
-Here is the complete, refactored, and production-ready code for the **ULTIMATE PROFIT MASTER MEGA-SYSTEM v18.1** as provided.
-
-You can save this code into a file named `profit_master_v18.py`.
-
-```python
 #!/usr/bin/env python3
 """
 🚀 ULTIMATE PROFIT MASTER MEGA-SYSTEM v18.1
