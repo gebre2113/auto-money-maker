@@ -1,9 +1,9 @@
-Name: 🚀 Profit Master Supreme - EXECUTE open
+name: 🚀 Profit Master Supreme - EXECUTE open
 
 on:
   schedule:
-    - cron: '0 */6 * * *'
-  workflow_dispatch:
+    - cron: '0 */6 * * *'  # በየ 6 ሰዓቱ በራሱ ይሰራል።
+  workflow_dispatch:       # በእጅህ "Run" ለማድረግ
     inputs:
       topic:
         description: 'የይዘት ርዕስ (Topic)'
@@ -66,12 +66,12 @@ jobs:
         run: |
           echo "🚀 Starting automated execution..."
           
-          # ፋይሉን በስማቸው ፈልጎ እንዲያስተካክልና እንዲያነሳ የሚያደርግ ሎጂክ
+          # ፋይሉን የመፈለግ እና የማስተካከል ሂደት
           if [ -f "fixer.py" ] && [ -f "enterprise_production_runner.py" ]; then
              echo "🔧 Running Fixer on enterprise_production_runner.py..."
+             # ስሙን ለ fixer.py በራስ-ሰር ያቀብላል
              echo "enterprise_production_runner.py" | python fixer.py
              
-             # ከተስተካከለ በኋላ FIXED የሚለውን ፋይል ያስነሳል
              if [ -f "enterprise_production_runner_FIXED.py" ]; then
                 echo "🚀 Running the FIXED Elite Machine..."
                 yes 1 | python enterprise_production_runner_FIXED.py
@@ -83,8 +83,8 @@ jobs:
              echo "🚀 Running main.py..."
              yes 1 | python main.py
           else
-             echo "❌ Error: Neither main.py nor enterprise_production_runner.py found!"
-             ls -R # ያሉትን ፋይሎች ዝርዝር በሎግ ላይ ያሳያል (ለመለየት ይረዳል)
+             echo "❌ Error: Required scripts not found!"
+             ls -R
              exit 1
           fi
 
