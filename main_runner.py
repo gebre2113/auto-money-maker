@@ -1629,7 +1629,7 @@ This enterprise guide provides a comprehensive framework for successfully implem
             
             return EnterpriseContentSystem
         
-    class EnterpriseImportSystem:
+class EnterpriseImportSystem:
     def __init__(self):
         # ስህተቱን ለመከላከል ወደ Dictionary ተቀይሯል
         self.modules = {}
