@@ -1245,8 +1245,7 @@ class EnterpriseImportSystem:
             ],
             'enterprise_grade': True
         }
-            
-        return EnterpriseYouTubeHunter
+    return EnterpriseYouTubeHunter
         
         elif class_name == 'UltraAffiliateManager':
             class EnterpriseAffiliateManager:
