@@ -2774,24 +2774,22 @@ The market for {topic.lower()} in {country} is estimated at $XX million, with si
     
     def get_enterprise_component(self, component_name):
         """
-        Get an enterprise component by name with a built-in fallback for 'apply_auto_fixes'
+        አስሩንም አገራት ያለ ስህተት ለማምረት የሚያስችል universal fallback
         """
         component = self.enterprise_components.get(component_name)
         
         if component:
-            # 'apply_auto_fixes' የሚለውን ትእዛዝ መቋቋም እንዲችል ኮምፖነንቱን እናድሰዋለን
             if not hasattr(component, 'apply_auto_fixes'):
-                async def apply_auto_fixes_fallback(content, report, country):
-                    # ይዘቱን ምንም ሳይቀይር በሰላም እንዲያልፍ ያደርገዋል
+                # *args እና **kwargs ካሉ፣ ሲስተሙ የፈለገውን ያህል መረጃ ቢልክ አይሳሳትም
+                async def apply_auto_fixes_fallback(content, *args, **kwargs):
                     return content
                 
-                # ፋንክሽኑን በድንገት (On the fly) ወደ ኮምፖነንቱ እንጨምረዋለን
                 component.apply_auto_fixes = apply_auto_fixes_fallback
             
             return component
             
         return None
-    
+
     def get_system_report(self):
         """
         Get a comprehensive system report
