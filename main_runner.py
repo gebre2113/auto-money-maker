@@ -1546,26 +1546,31 @@ class EnterpriseImportSystem:
 
         # 3. ለሌሎች በሙሉ የሚሆን Fallback
         class GeneralEnterpriseMock:
-            def __init__(self):
-                self.enterprise_grade = True
-                self.cultural_depth = 95
-            
-            async def __call__(self, *args, **kwargs): return 95
-            def __getattr__(self, name):
-                async def mock_func(*args, **kwargs):
-                    return 95 if name == 'get_depth' else (args[
-                if name == 'get_depth': return 95
-                if name == 'refine_and_expand': 
-                    async def expand_content(content, target_words):
-                        # Simple expansion logic for mock
-                        return content + "\n\n" + ("Expanded enterprise content section. " * 50)
-                    return expand_content
-                
-                async def mock_func(*args, **kwargs):
-                    return (args[0] if args else 95)
-                return mock_func
+           def __init__(self):
+               self.enterprise_grade = True
+               self.cultural_depth = 95
+    
+           async def __call__(self, *args, **kwargs): 
+               return 95
 
-        return GeneralEnterpriseMock()
+           def __getattr__(self, name):
+               # ስህተት የነበረበት ክፍል እዚህ ጋር ተስተካክሏል
+               if name == 'get_depth': 
+                   return 95
+            
+               if name == 'refine_and_expand': 
+                   async def expand_content(content, target_words):
+                       # Simple expansion logic for mock
+                       return content + "\n\n" + ("Expanded enterprise content section. " * 50)
+                   return expand_content
+        
+               # ለማንኛውም ሌላ ጥሪ (generic calls) የሚሆን mock ተግባር
+               async def generic_mock_func(*args, **kwargs):
+                   return (args[0] if args else 95)
+            
+               return generic_mock_func
+
+       return GeneralEnterpriseMock()
     
     def _create_core_mocks(self):
         """Create basic mock systems for core modules"""
