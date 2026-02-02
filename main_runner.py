@@ -1642,7 +1642,20 @@ class EnterpriseImportSystem:
         Enterprise Mock ኢንስታንስ ይፈጥራል - 
         አሁን በቀጥታ Object (instance) ነው የሚመልሰው።
         """
-    class EnterpriseMock:
+class EnterpriseImportSystem:
+    def __init__(self):
+        # ስህተቱን ለመከላከል ወደ Dictionary ተቀይሯል
+        self.modules = {}
+        self.enterprise_components = {}
+        self._create_core_mocks()
+        self._create_profit_mocks()
+
+    def _create_enterprise_mock(self, class_name):
+        """
+        Enterprise Mock ኢንስታንስ ይፈጥራል - 
+        አሁን በቀጥታ Object (instance) ነው የሚመልሰው።
+        """
+        class EnterpriseMock:
             def __init__(self):
                 self.enterprise_grade = True
                 self.name = f"Enterprise{class_name}"
