@@ -1,4 +1,3 @@
-```python
 #!/usr/bin/env python3
 """
 🚀 ULTIMATE ENTERPRISE PRODUCTION RUNNER v8.2 - SMART ENHANCEMENTS EDITION
