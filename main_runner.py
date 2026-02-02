@@ -1554,10 +1554,6 @@ class EnterpriseImportSystem:
             def __getattr__(self, name):
                 async def mock_func(*args, **kwargs):
                     return 95 if name == 'get_depth' else (args[
-
-
-
-```python
                 if name == 'get_depth': return 95
                 if name == 'refine_and_expand': 
                     async def expand_content(content, target_words):
