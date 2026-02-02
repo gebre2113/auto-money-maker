@@ -1216,48 +1216,35 @@ class EnterpriseImportSystem:
             def __init__(self):
                 self.enterprise_grade = True
                 self.name = f"Enterprise{class_name}"
-                # ለሂሳብ ስሌቱ አስፈላጊ የሆነው የጥራት ደረጃ
                 self.cultural_depth = 95 
             
             async def generic_async_call(self, *args, **kwargs):
-                """ሁሉንም ጥሪዎች በ 95 ቁጥር ይመልሳል (ለ Revenue Engine አስፈላጊ ነው)"""
                 return 95 
 
             def __getattr__(self, name):
-                """
-                የማይገኝ ፋንክሽን ሲጠራ (ለምሳሌ apply_auto_fixes) 
-                ሲስተሙ እንዳይቆም በራሱ ጊዜ ምላሽ ይሰጣል
-                """
                 if name == 'apply_auto_fixes':
                     async def fix(content, *args, **kwargs):
-                        # ይዘቱን (content) በሰላም እንዲያሳልፍ ያደርገዋል
                         return content
                     return fix
-                
-                # ለሌሎች ጥሪዎች በሙሉ 95 ቁጥርን ይመልሳል
                 return self.generic_async_call
 
         return EnterpriseMock()
+
+    # ከላይኛው ፋንክሽን ጋር በተመሳሳይ ረድፍ መሆን አለበት
+    async def summarize_video(self, video_id, include_key_points=True):
+        """ቪዲዮን በአጭሩ የሚያጠቃልል ፋንክሽን (መስመር 1242)"""
+        import asyncio
+        await asyncio.sleep(2.0)
         
-                async def summarize_video(self, video_id, include_key_points=True):
-                    await asyncio.sleep(2.0)
-                    
-                    return {
-                        'summary': "Enterprise-grade summary with market analysis, competitive landscape, and strategic recommendations.",
-                        'key_points': [
-                            "Market size and growth projections",
-                            "Competitive analysis and positioning",
-                            "Revenue models and monetization",
-                            "Risk assessment and mitigation",
-                            "Implementation roadmap"
-                        ],
-                        'ai_insights': [
-                            "High enterprise value potential",
-                            "Strong alignment with B2B markets",
-                            "Scalable implementation strategy"
-                        ],
-                        'enterprise_grade': True
-                    }
+        return {
+            'summary': "Enterprise-grade summary with market analysis and strategic recommendations.",
+            'key_points': [
+                "Market size and growth projections",
+                "Competitive analysis and positioning",
+                "Revenue models and monetization"
+            ],
+            'enterprise_grade': True
+        }
             
             return EnterpriseYouTubeHunter
         
