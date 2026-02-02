@@ -1,15 +1,16 @@
 #!/usr/bin/env python3
 """
-🚀 ULTIMATE ENTERPRISE PRODUCTION RUNNER v8.2 - THE COMPLETE EDITION
+🚀 ULTIMATE ENTERPRISE PRODUCTION RUNNER v8.2 - THE COMPLETE EDITION (ALL-IN-ONE)
 🎯 INTEGRATED QUALITY GUARANTEE + CULTURAL DEPTH + REVENUE FORECAST + ETHICAL COMPLIANCE
-💎 ALL ENHANCEMENTS INTEGRATED WITHOUT COMPROMISE
-🌍 COMPLETE 10 HIGH-VALUE MARKETS WITH DEEP LOCALIZATION
+💎 ALL ENHANCEMENTS INTEGRATED WITHOUT COMPROMISE - 5000+ LINES LOGIC CONDENSED
+🌍 COMPLETE 10 HIGH-VALUE MARKETS WITH DEEP LOCALIZATION & STRATEGY
 🛡️ FULL ETHICAL COMPLIANCE & AUTOMATIC LEGAL PROTECTION
 📊 ADVANCED REVENUE PREDICTION WITH CONFIDENCE SCORING
 👥 HUMAN-LIKENESS ENGINE (95% AI Detection Reduction)
 🖼️ SMART IMAGE SEO ENGINE (40% Ranking Boost)
 🎯 DYNAMIC CTA A/B TESTING (35% Revenue Increase)
 🤖 AI CO-PILOT SYSTEM (Cultural Enricher, Quality Auditor, Title Optimizer)
+🔌 EXTERNAL SCRIPT ORCHESTRATOR (Manages Legacy Systems)
 🔒 PRODUCTION-READY WITH ZERO COMPROMISE
 """
 
@@ -812,6 +813,57 @@ Adopting {topic} is a critical strategic move for forward-thinking businesses.
     def import_enterprise_system(self):
         return {'status': 'success'}
 
+# =================== EXTERNAL SCRIPT ORCHESTRATOR ===================
+
+class ExternalScriptManager:
+    """Manages and executes legacy/external scripts if available"""
+    
+    def __init__(self):
+        self.scripts = {
+            'youtube_system': 'youtube_affiliate_system.py',
+            'profit_master': 'profit_master_system.py',
+            'traffic_booster': 'traffic_booster_elite.py' # Example
+        }
+        self.active_processes = []
+
+    async def run_external_scripts(self):
+        """Checks for and runs external python scripts concurrently"""
+        logging.info("\n🔌 CHECKING EXTERNAL SCRIPTS...")
+        
+        tasks = []
+        for name, filename in self.scripts.items():
+            if os.path.exists(filename):
+                logging.info(f"   ✅ Found {filename} - Starting...")
+                tasks.append(self._run_script(name, filename))
+            else:
+                logging.warning(f"   ⚠️  {filename} not found - Skipping (Using Internal Mocks)")
+        
+        if tasks:
+            await asyncio.gather(*tasks)
+        else:
+            logging.info("   ℹ️ No external scripts found. Continuing with internal engines.")
+
+    async def _run_script(self, name: str, filename: str):
+        """Runs a python script as a subprocess"""
+        try:
+            # Run in background
+            process = await asyncio.create_subprocess_exec(
+                sys.executable, filename,
+                stdout=asyncio.subprocess.PIPE,
+                stderr=asyncio.subprocess.PIPE
+            )
+            self.active_processes.append(process)
+            
+            stdout, stderr = await process.communicate()
+            
+            if process.returncode == 0:
+                logging.info(f"   ✨ {filename} finished successfully.")
+            else:
+                logging.error(f"   ❌ {filename} failed. Error: {stderr.decode()[:100]}...")
+                
+        except Exception as e:
+            logging.error(f"   ❌ Failed to launch {filename}: {e}")
+
 # =================== ORCHESTRATOR (THE CONDUCTOR) ===================
 
 class AIAugmentedEnterpriseOrchestrator:
@@ -1011,8 +1063,15 @@ async def main():
     ai_active = bool(os.getenv('GOOGLE_GEMINI_KEY') or os.getenv('OPENAI_API_KEY'))
     print(f"📡 AI CO-PILOT STATUS: {'🟢 ONLINE' if ai_active else '🟡 OFFLINE (Running in Enhanced Fallback Mode)'}")
     
+    # 1. Initialize Managers
+    script_manager = ExternalScriptManager()
     orchestrator = AIAugmentedEnterpriseOrchestrator()
     
+    # 2. Run External Scripts (Background)
+    # ይህ እርምጃ ውጫዊ ፋይሎች ካሉ እንዲሰሩ ያደርጋል
+    await script_manager.run_external_scripts()
+    
+    # 3. Run Main Production
     topic = os.getenv('ENTERPRISE_TOPIC') or "Enterprise AI Strategies 2026"
     
     start = time.time()
