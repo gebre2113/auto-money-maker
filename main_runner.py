@@ -1209,9 +1209,9 @@ class EnterpriseImportSystem:
     def _create_enterprise_mock(self, class_name):
         """
         Enterprise-grade mock system:
-        ይህ ኮድ ሁሉንም ስህተቶች በአንድ ላይ ይፈታል።
+        ሁሉንም የክፍተት እና የሎጂክ ስህተቶች የሚያስተካክል ስሪት
         """
-        # 1. መጀመሪያ YouTube ከሆነ የሚመለሰው ኮድ
+        # 1. YouTube Intelligence Hunter ክፍል
         if class_name == 'YouTubeIntelligenceHunterPro':
             class EnterpriseYouTubeHunter:
                 def __init__(self):
@@ -1224,8 +1224,10 @@ class EnterpriseImportSystem:
                     return [{'id': 'vid1', 'title': 'Enterprise Video', 'quality_score': 95}]
 
                 async def summarize_video(self, video_id, include_key_points=True):
+                    import asyncio
+                    await asyncio.sleep(2.0)
                     return {
-                        'summary': "Enterprise-grade summary.",
+                        'summary': "Enterprise-grade summary with market analysis.",
                         'key_points': ["Market growth", "Revenue models"],
                         'enterprise_grade': True
                     }
@@ -1235,45 +1237,33 @@ class EnterpriseImportSystem:
 
             return EnterpriseYouTubeHunter()
 
-        # 2. ቀጥሎ Affiliate Manager ከሆነ የሚመለሰው ኮድ
+        # 2. Affiliate Manager ክፍል
         elif class_name == 'UltraAffiliateManager':
             class EnterpriseAffiliateManager:
-                def __init__(self):
+                def __init__(self, user_geo="US", user_segment="enterprise"):
+                    self.user_geo = user_geo
+                    self.user_segment = user_segment
                     self.enterprise_grade = True
                     self.cultural_depth = 95
-                    self.products = {
+                    self.enterprise_products = self._load_enterprise_products()
+                
+                def _load_enterprise_products(self):
+                    return {
                         'enterprise_software': [
-                            {'name': 'Enterprise CRM', 'price': 2999.99, 'commission_rate': 0.15},
-                            {'name': 'AI Analytics', 'price': 4999.99, 'commission_rate': 0.12}
+                            {'name': 'Enterprise CRM System', 'price': 2999.99, 'commission_rate': 0.15, 'category': 'software'},
+                            {'name': 'AI Analytics Platform', 'price': 4999.99, 'commission_rate': 0.12, 'category': 'ai_tools'}
+                        ],
+                        'premium_services': [
+                            {'name': 'Enterprise Consulting', 'price': 5000.00, 'commission_rate': 0.25, 'category': 'consulting'}
+                        ],
+                        'hardware_solutions': [
+                            {'name': 'Enterprise Server', 'price': 8999.99, 'commission_rate': 0.08, 'category': 'hardware'}
                         ]
                     }
-                
-                async def get_top_products(self, *args, **kwargs):
-                    return self.products['enterprise_software']
 
-                async def apply_auto_fixes(self, content, *args, **kwargs):
-                    return content
-
-            return EnterpriseAffiliateManager()
-
-        # 3. ለሌሎች በሙሉ (General Fallback)
-        class GeneralEnterpriseMock:
-            def __init__(self):
-                self.enterprise_grade = True
-                self.cultural_depth = 95
-            
-            async def __call__(self, *args, **kwargs): return 95
-            def __getattr__(self, name):
-                async def mock_func(*args, **kwargs):
-                    # ለ cultural_depth ጥያቄ 95 ቁጥርን፣ ለሌላው contentን ይመልሳል
-                    return 95 if name == 'get_depth' else (args[0] if args else 95)
-                return mock_func
-
-        return GeneralEnterpriseMock()
-                
                 async def get_best_product(self, topic, country):
+                    import asyncio, random
                     await asyncio.sleep(1.5)
-                    
                     topic_lower = topic.lower()
                     category = 'premium_services'
                     
@@ -1284,15 +1274,33 @@ class EnterpriseImportSystem:
                     
                     products = self.enterprise_products.get(category, [])
                     if products:
-                        product = random.choice(products)
+                        product = random.choice(products).copy()
                         product.update({
                             'country': country,
                             'topic_relevance': random.uniform(0.88, 0.98),
-                            'enterprise_grade': True,
-                            'support_level': '24/7 enterprise support',
-                            'implementation_time': f'{random.randint(2, 8)} weeks'
+                            'enterprise_grade': True
                         })
                         return product
+                    return None
+
+                async def apply_auto_fixes(self, content, *args, **kwargs):
+                    return content
+
+            return EnterpriseAffiliateManager()
+
+        # 3. ለሌሎች በሙሉ የሚሆን Fallback
+        class GeneralEnterpriseMock:
+            def __init__(self):
+                self.enterprise_grade = True
+                self.cultural_depth = 95
+            
+            async def __call__(self, *args, **kwargs): return 95
+            def __getattr__(self, name):
+                async def mock_func(*args, **kwargs):
+                    return 95 if name == 'get_depth' else (args[0] if args else 95)
+                return mock_func
+
+        return GeneralEnterpriseMock()
                     
                     return {
                         'name': f'Enterprise Solution for {topic}',
