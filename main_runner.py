@@ -742,70 +742,56 @@ class AICulturalEnricher:
         if self.session:
             await self.session.close()
 
+from guardian import UltimateQualityGuardian  # አዲሱን ፋይል እናመጣለን
+
 class AIQualityAuditor:
-    """AI Content Reviewer & Auditor"""
+    """AI Content Reviewer & Auditor - Powered by Guardian Pro v3.0"""
     
     def __init__(self, api_key: Optional[str] = None):
-        self.enabled = bool(api_key)
+        self.enabled = True # አዲሱ Guardian ኦፍላይን ስለሚሰራ ሁሌም Enabled ነው
+        # አዲሱን ሞጁል እዚህ ጋር እናስጀምራለን
+        self.guardian = UltimateQualityGuardian()
     
     async def audit_content(self, content: str, country: str) -> Dict:
-        """ይዘቱን ገምግሞ ውጤት እና አስተያየት ይሰጣል"""
-        
-        if not self.enabled:
-            # AI ከሌለ መሠረታዊ ግምገማ ይመልሳል
-            return {
-                'score': 85,
-                'suggestions': ['Manual check recommended (AI inactive)'],
-                'passed': True
-            }
+        """ይዘቱን በ 4-ንብርብር ትንተና ገምግሞ ውጤት እና አስተያየት ይሰጣል"""
         
         try:
-            # እዚህ ጋር ይዘቱን ወደ AI ልኮ ማስገምገም ነው
-            # (ለአሁን የማሳያ ኮድ/Simulation ነው)
-            await asyncio.sleep(0.5)
+            # 1. አዲሱን የጥራት ፈታሪ በመጠቀም ትንተናውን እናካሂዳለን
+            # አሲንክሮነስ እንዲሆን በ thread ውስጥ ማስኬድ ይቻላል (አማራጭ ነው)
+            analysis = self.guardian.analyze_content(content)
             
-            # በዘፈቀደ የሚሰጥ ውጤት (ለማሳያ)
-            audit_score = random.randint(88, 98)
-            
+            # 2. ሀገር-ተኮር ምክሮችን ከአዲሱ ትንተና ጋር እናቀናጃለን
             country_specific_suggestions = {
-                'US': [
-                    "Consider adding more data-driven case studies",
-                    "Include ROI calculations for better impact",
-                    "Add references to major US companies"
-                ],
-                'ET': [
-                    "Include more local Ethiopian business examples",
-                    "Add Amharic phrases for better localization",
-                    "Reference Ethiopian market statistics"
-                ],
-                'JP': [
-                    "Add more details on implementation processes",
-                    "Include references to Japanese quality standards",
-                    "Consider cultural nuances in communication"
-                ]
+                'US': ["Consider adding more data-driven case studies", "Include ROI calculations"],
+                'ET': ["Include more local Ethiopian business examples", "Add Amharic phrases"],
+                'JP': ["Add more details on implementation processes", "Cultural nuances check"]
             }
             
-            suggestions = country_specific_suggestions.get(country, [
-                f"Consider adding more {country}-specific case studies",
-                "Ensure the tone matches local business etiquette",
-                "Check consistency in terminology"
-            ])
+            # አዲሶቹን እና የቆዩትን ምክሮች ማዋሃድ
+            all_suggestions = analysis['recommendations'] + country_specific_suggestions.get(country, [])
             
+            # 3. ውጤቱን ወደ ድሮው ፎርማት መልሰን እናስተካክላለን (ሌሎች ክፍሎች እንዳይበላሹ)
             return {
-                'score': audit_score,
-                'suggestions': suggestions,
-                'passed': audit_score > 80,
-                'ai_audit_performed': True
+                'score': analysis['final_score'],
+                'suggestions': all_suggestions[:5], # ምርጥ 5ቱን ብቻ እንወስዳለን
+                'passed': analysis['is_publishable'],
+                'ai_audit_performed': True,
+                'details': {
+                    'readability': analysis['statistics']['readability_level'],
+                    'risk': f"{analysis['statistics']['risk_percentage']}%",
+                    'quality_level': analysis['quality_level']
+                }
             }
             
         except Exception as e:
-            logging.warning(f"⚠️ AI Audit Error: {e}")
+            logging.warning(f"⚠️ AI Audit Error (Guardian): {e}")
             return {
                 'score': 80,
-                'suggestions': ['Audit failed, check logs'],
+                'suggestions': ['Audit failed, fallback active'],
                 'passed': True,
                 'ai_audit_performed': False
             }
+
 
 class AITitleOptimizer:
     """AI SEO Title Generator"""
