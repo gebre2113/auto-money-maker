@@ -1629,27 +1629,47 @@ This enterprise guide provides a comprehensive framework for successfully implem
             
             return EnterpriseContentSystem
         
-        class EnterpriseMock:
-            def __init__(self, *args, **kwargs):
+        class EnterpriseImportSystem:
+    def __init__(self):
+        # ስህተቱን ለመከላከል ወደ Dictionary ተቀይሯል
+        self.modules = {}
+        self.enterprise_components = {}
+        self._create_core_mocks()
+        self._create_profit_mocks()
+
+    def _create_enterprise_mock(self, class_name):
+        """
+        Enterprise Mock ኢንስታንስ ይፈጥራል - 
+        አሁን በቀጥታ Object (instance) ነው የሚመልሰው።
+        """
+    class EnterpriseMock:
+            def __init__(self):
                 self.enterprise_grade = True
                 self.name = f"Enterprise{class_name}"
+                self.status = "Active"
             
             def __getattr__(self, name):
-                return lambda *args, **kwargs: None
-        
-        return EnterpriseMock
-    
+                # ማንኛውም ያልተፈጠረ ፋንክሽን ቢጠራ ዝም ብሎ እንዲያልፍ ያደርጋል
+                async def async_fallback(*args, **kwargs): return None
+                def sync_fallback(*args, **kwargs): return None
+                return async_fallback
+
+        # እዚህ ጋር () በመጨመር ክላሱን ወደ Object/Instance ቀየርነው
+        return EnterpriseMock()
+
     def _create_core_mocks(self):
+        # አሁን እያንዳንዱ ሞጁል ተፈጥሮ (Initialized) ነው የሚቀመጠው
         self.modules['YouTubeIntelligenceHunterPro'] = self._create_enterprise_mock('YouTubeIntelligenceHunterPro')
         self.modules['UltraAffiliateManager'] = self._create_enterprise_mock('UltraAffiliateManager')
         self.modules['UltimateProfitMasterSystem'] = self._create_enterprise_mock('UltimateProfitMasterSystem')
-    
+
     def _create_profit_mocks(self):
         self.modules['UltimateProfitMasterSystem'] = self._create_enterprise_mock('UltimateProfitMasterSystem')
-    
+
     def get_module(self, module_name):
+        # Dictionary ስለሆነ .get() አሁን በትክክል ይሰራል
         return self.modules.get(module_name)
-    
+
     def get_enterprise_component(self, component_name):
         return self.enterprise_components.get(component_name)
 
