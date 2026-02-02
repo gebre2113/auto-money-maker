@@ -2826,5 +2826,3 @@ if __name__ == "__main__":
     except Exception as e:
         print(f"\n💥 Fatal error: {e}")
         traceback.print_exc()
-
-```
