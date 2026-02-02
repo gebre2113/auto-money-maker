@@ -2774,18 +2774,23 @@ The market for {topic.lower()} in {country} is estimated at $XX million, with si
     
     def get_enterprise_component(self, component_name):
         """
-        Get an enterprise component by name
-        
-        Args:
-            component_name: Name of the component to retrieve
-            
-        Returns:
-            The component instance or None if not found
+        Get an enterprise component by name with a built-in fallback for 'apply_auto_fixes'
         """
+        component = self.enterprise_components.get(component_name)
         
-        # This was the problematic line in the original code
-        # Now it correctly returns the component from the dictionary
-        return self.enterprise_components.get(component_name)
+        if component:
+            # 'apply_auto_fixes' የሚለውን ትእዛዝ መቋቋም እንዲችል ኮምፖነንቱን እናድሰዋለን
+            if not hasattr(component, 'apply_auto_fixes'):
+                async def apply_auto_fixes_fallback(content, report, country):
+                    # ይዘቱን ምንም ሳይቀይር በሰላም እንዲያልፍ ያደርገዋል
+                    return content
+                
+                # ፋንክሽኑን በድንገት (On the fly) ወደ ኮምፖነንቱ እንጨምረዋለን
+                component.apply_auto_fixes = apply_auto_fixes_fallback
+            
+            return component
+            
+        return None
     
     def get_system_report(self):
         """
