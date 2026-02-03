@@ -4305,7 +4305,7 @@ async def main():
     print
 
 
-print(f"🔄 Error retry logic with fallbacks ENABLED")
+    print(f"🔄 Error retry logic with fallbacks ENABLED")
     print(f"🤖 AI enhancements: {'✅ ACTIVE' if any([ai_cultural_key, ai_audit_key, ai_title_key]) else '⚠️ LIMITED (Fallback Mode)'}")
     
     try:
