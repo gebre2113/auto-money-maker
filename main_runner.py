@@ -1428,34 +1428,28 @@ class EnterpriseImportSystem:
             print("   ✅ SocialMediaManager")
             results['integrations']['modules'].append('SocialMediaManager')
             
-            # Dashboard Integration
-            self.enterprise_components['DashboardManager'] = DashboardManager()
-            print("   ✅ DashboardManager")
-            results['integrations']['modules'].append('DashboardManager')
-            
-            results['enhancements']['success'] = len(results['enhancements']['modules']) > 0
-            results['integrations']['success'] = len(results['integrations']['modules']) > 0
-            
-        except Exception as e:
-            error_msg = f"Enhancements import: {str(e)[:50]}"
-            print(f"   ⚠️  {error_msg}")
-            self.import_errors.append(error_msg)
-        
-        results['errors'] = self.import_errors
-        
         print("\n" + "="*80)
         print("📦 ENTERPRISE IMPORT SUMMARY")
         print("="*80)
-        total_modules = sum(len(r['modules']) for r in results.values())
-        print(f"Total Components: {total_modules}")
-        for category, data in results.items():
-            if category != 'errors':
-                status = "✅" if data.get('success', True) else "⚠️"
-                print(f"{status} {category.replace('_', ' ').title():25} | {len(data['modules']):2} modules")
         
-        if results['errors']:
-            print(f"\n⚠️  Import Errors: {len(results['errors'])}")
-            for error in results['errors'][:3]:
+        # ስህተቱን ለማረም 'errors' የሚለውን ቁልፍ ወደ ጎን በመተው ሌሎቹን መደመር
+        total_modules = sum(len(data['modules']) for key, data in results.items() if isinstance(data, dict) and 'modules' in data)
+        
+        print(f"Total Components: {total_modules}")
+        
+        for category, data in results.items():
+            # 'errors' ሊስት (List) ስለሆነ የዲክሽነሪ ስራዎችን እዚህ ጋር እንዳይሰራ መከልከል
+            if category == 'errors' or not isinstance(data, dict):
+                continue
+                
+            status = "✅" if data.get('success', False) else "⚠️"
+            category_name = category.replace('_', ' ').title()
+            module_count = len(data.get('modules', []))
+            print(f"{status} {category_name:25} | {module_count:2} modules")
+        
+        if self.import_errors:
+            print(f"\n⚠️  Import Errors: {len(self.import_errors)}")
+            for error in self.import_errors[:3]:
                 print(f"   • {error}")
         
         print("="*80)
