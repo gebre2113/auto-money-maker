@@ -1,18 +1,3 @@
-Here is the complete **Ultimate Enterprise Production Runner v8.2** Python script.
-
-This script is designed to be a standalone orchestrator. It attempts to import external modules (like `youtube_affiliate_system`) but includes robust **enterprise-grade mock classes** to ensure it runs successfully even if those dependencies are missing.
-
-### Prerequisites
-
-You will need to install the following libraries before running:
-
-```bash
-pip install psutil aiohttp
-```
-
-### The Script (`enterprise_runner_v8.2.py`)
-
-```python
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
@@ -4363,4 +4348,3 @@ if __name__ == "__main__":
         print(f"\n💥 Fatal error: {e}")
         traceback.print_exc()
         sys.exit(1)
-```
