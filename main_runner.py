@@ -1428,7 +1428,7 @@ class EnterpriseImportSystem:
             print("   ✅ SocialMediaManager")
             results['integrations']['modules'].append('SocialMediaManager')
             
-        print("\n" + "="*80)
+            print("\n" + "="*80)
         print("📦 ENTERPRISE IMPORT SUMMARY")
         print("="*80)
         
