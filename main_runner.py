@@ -935,6 +935,628 @@ class HumanLikenessEngine:
             tips.append("💡 የተለያዩ የአስተያየት ምልክቶች እና የሰው ልጅ ያልተሟሉ ነገሮች ያክሉ")
         return tips
 
+# =================== የማይበገር MULTI-MODEL AI PROVIDER ===================
+
+class UnstoppableAIProvider:
+    """Unstoppable AI Multi-Model System with Automatic Failover"""
+    
+    def __init__(self):
+        self.keys = {
+            'gemini': os.getenv('AI_CULTURAL_API_KEY'),
+            'groq': os.getenv('GROQ_API_KEY'),
+            'hf': os.getenv('HUGGINGFACE_API_KEY'),
+            'openai': os.getenv('OPENAI_API_KEY')  # Add OpenAI support
+        }
+        self.session = None
+        self.performance_log = []
+        
+    async def process_task(self, prompt: str, task_type: str = "refinement") -> str:
+        """በተከታታይ ሞዴሎችን የመሞከር ሎጂክ"""
+        
+        self.performance_log = []
+        start_time = time.time()
+        
+        # 1. የማረጋገጫ ቅደም ተከተል
+        available_models = []
+        
+        if self.keys['gemini']:
+            available_models.append(('gemini', 'Gemini Pro (Google)'))
+        if self.keys['openai']:
+            available_models.append(('openai', 'GPT-4 (OpenAI)'))
+        if self.keys['groq']:
+            available_models.append(('groq', 'Llama 3 (Groq)'))
+        if self.keys['hf']:
+            available_models.append(('hf', 'Mistral (Hugging Face)'))
+        
+        if not available_models:
+            self.performance_log.append("⚠️ No AI models available, using local fallback")
+            return self._local_rule_based_fallback(prompt)
+        
+        # 2. በቅደም ተከተል መሞከር
+        for model_key, model_name in available_models:
+            try:
+                result = await self._call_model(model_key, prompt, task_type)
+                elapsed = time.time() - start_time
+                
+                self.performance_log.append(
+                    f"✅ {model_name} succeeded in {elapsed:.1f}s"
+                )
+                
+                # የመረጃ መግቢያ
+                log_entry = {
+                    'timestamp': datetime.now().isoformat(),
+                    'model': model_key,
+                    'model_name': model_name,
+                    'task_type': task_type,
+                    'success': True,
+                    'response_time': elapsed,
+                    'fallback_order': available_models.index((model_key, model_name)) + 1
+                }
+                self._log_ai_usage(log_entry)
+                
+                return result
+                
+            except Exception as e:
+                elapsed = time.time() - start_time
+                error_msg = str(e)[:100]
+                
+                self.performance_log.append(
+                    f"⚠️ {model_name} failed after {elapsed:.1f}s: {error_msg}"
+                )
+                
+                # የስህተት መግቢያ
+                log_entry = {
+                    'timestamp': datetime.now().isoformat(),
+                    'model': model_key,
+                    'model_name': model_name,
+                    'task_type': task_type,
+                    'success': False,
+                    'error': error_msg,
+                    'response_time': elapsed,
+                    'fallback_order': available_models.index((model_key, model_name)) + 1
+                }
+                self._log_ai_usage(log_entry)
+                
+                continue  # ወደ ቀጣዩ ሞዴል ይሂዱ
+        
+        # 3. ሁሉም ካልሰሩ
+        self.performance_log.append("❌ All AI models failed, using enterprise fallback")
+        return self._enterprise_fallback_with_rules(prompt, task_type)
+    
+    async def _call_model(self, model_key: str, prompt: str, task_type: str) -> str:
+        """የተለያዩ ሞዴሎችን ለመጠራት አገላለጽ"""
+        
+        if model_key == 'gemini':
+            return await self._call_gemini_advanced(prompt, task_type)
+        elif model_key == 'openai':
+            return await self._call_openai(prompt, task_type)
+        elif model_key == 'groq':
+            return await self._call_groq_llama3(prompt, task_type)
+        elif model_key == 'hf':
+            return await self._call_huggingface(prompt, task_type)
+        else:
+            raise ValueError(f"Unknown model: {model_key}")
+    
+    async def _call_gemini_advanced(self, prompt: str, task_type: str) -> str:
+        """ተሻሽሎ የGemini ጥሪ"""
+        try:
+            import google.generativeai as genai
+            
+            genai.configure(api_key=self.keys['gemini'])
+            
+            model = genai.GenerativeModel('gemini-pro')
+            
+            system_prompt = self._get_system_prompt(task_type)
+            full_prompt = f"{system_prompt}\n\nUser Content to Refine:\n{prompt}"
+            
+            response = await asyncio.to_thread(
+                model.generate_content,
+                full_prompt,
+                generation_config={
+                    "temperature": 0.7,
+                    "top_p": 0.9,
+                    "top_k": 40,
+                    "max_output_tokens": 4000,
+                }
+            )
+            
+            return response.text
+            
+        except Exception as e:
+            raise Exception(f"Gemini API Error: {str(e)[:50]}")
+    
+    async def _call_openai(self, prompt: str, task_type: str) -> str:
+        """OpenAI GPT-4 ጥሪ"""
+        try:
+            import openai
+            
+            openai.api_key = self.keys['openai']
+            
+            system_prompt = self._get_system_prompt(task_type)
+            
+            response = await openai.ChatCompletion.acreate(
+                model="gpt-4",
+                messages=[
+                    {"role": "system", "content": system_prompt},
+                    {"role": "user", "content": f"Refine this content:\n{prompt}"}
+                ],
+                temperature=0.7,
+                max_tokens=4000
+            )
+            
+            return response.choices[0].message.content
+            
+        except Exception as e:
+            raise Exception(f"OpenAI API Error: {str(e)[:50]}")
+    
+    async def _call_groq_llama3(self, prompt: str, task_type: str) -> str:
+        """Groq + Llama 3 ጥሪ"""
+        try:
+            from groq import Groq
+            
+            client = Groq(api_key=self.keys['groq'])
+            
+            system_prompt = self._get_system_prompt(task_type)
+            
+            response = client.chat.completions.create(
+                model="llama3-70b-8192",
+                messages=[
+                    {"role": "system", "content": system_prompt},
+                    {"role": "user", "content": f"Refine this content:\n{prompt}"}
+                ],
+                temperature=0.7,
+                max_tokens=4000
+            )
+            
+            return response.choices[0].message.content
+            
+        except Exception as e:
+            raise Exception(f"Groq API Error: {str(e)[:50]}")
+    
+    async def _call_huggingface(self, prompt: str, task_type: str) -> str:
+        """Hugging Face Inference API"""
+        try:
+            import requests
+            
+            API_URL = "https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.1"
+            headers = {"Authorization": f"Bearer {self.keys['hf']}"}
+            
+            system_prompt = self._get_system_prompt(task_type)
+            full_prompt = f"{system_prompt}\n\nContent to refine:\n{prompt}"
+            
+            response = requests.post(
+                API_URL,
+                headers=headers,
+                json={"inputs": full_prompt, "parameters": {"max_length": 4000}}
+            )
+            
+            if response.status_code == 200:
+                result = response.json()
+                return result[0]['generated_text']
+            else:
+                raise Exception(f"HF API Error: {response.status_code}")
+                
+        except Exception as e:
+            raise Exception(f"Hugging Face Error: {str(e)[:50]}")
+    
+    def _get_system_prompt(self, task_type: str) -> str:
+        """ለሥራው አይነት ተገቢውን አዋጭ አዘጋጅ"""
+        
+        prompts = {
+            'refinement': """
+            You are an enterprise content refinement expert. Your task is to enhance and polish the provided content while:
+            1. Maintaining the original meaning and key points
+            2. Improving flow, clarity, and engagement
+            3. Adding professional tone and enterprise-level language
+            4. Ensuring cultural appropriateness for international audiences
+            5. Adding subtle human-like elements (personal anecdotes, expert quotes)
+            
+            Do NOT rewrite from scratch. Only refine and enhance what's provided.
+            """,
+            
+            'title_optimization': """
+            You are an SEO and marketing expert specializing in title optimization.
+            Create 5 compelling, click-worthy titles for the given content that:
+            1. Include primary keywords naturally
+            2. Spark curiosity and interest
+            3. Are under 60 characters
+            4. Use power words and emotional triggers
+            5. Are appropriate for the target country's culture
+            """,
+            
+            'cultural_enrichment': """
+            You are a cultural localization expert. Add culturally relevant phrases and references to the content for the specified country.
+            Focus on:
+            1. Local business practices and etiquette
+            2. Cultural metaphors and expressions
+            3. Local success stories or examples
+            4. Appropriate tone and communication style
+            5. Regional market insights
+            """
+        }
+        
+        return prompts.get(task_type, prompts['refinement'])
+    
+    def _enterprise_fallback_with_rules(self, content: str, task_type: str) -> str:
+        """APIዎች በማይሰሩበት ጊዜ የሚሰራ የኢንተርፕራይዝ ማሻሻያ"""
+        
+        if task_type == 'refinement':
+            # መሰረታዊ ማሻሻያ ህጎች
+            enhanced = content
+            
+            # የርዕስ ማሻሻያ
+            if enhanced.startswith('#'):
+                lines = enhanced.split('\n', 1)
+                title = lines[0]
+                if len(title.split()) < 5:
+                    enhanced = f"# {title.strip('# ')}: Comprehensive Enterprise Guide\n{lines[1] if len(lines) > 1 else ''}"
+            
+            # የአባባል ማሻሻያ
+            enhanced = enhanced.replace('\n\n', '\n\n**Enterprise Insight:** ', 1)
+            
+            # የመጨረሻ ማጠቃለያ ማከል
+            if '## Conclusion' not in enhanced:
+                enhanced += "\n\n## Conclusion\nThis comprehensive guide provides enterprise-grade strategies and insights for immediate implementation."
+            
+            return enhanced
+            
+        elif task_type == 'title_optimization':
+            # መሰረታዊ ርዕሶች
+            return json.dumps([
+                "Enterprise Implementation Guide",
+                "Complete Strategy Roadmap",
+                "Professional Business Guide",
+                "Step-by-Step Implementation",
+                "Expert Analysis and Insights"
+            ])
+        
+        return content + "\n\n[Enhanced by Enterprise Fallback System]"
+    
+    def _local_rule_based_fallback(self, content: str) -> str:
+        """የበለጠ ቀላል አማራጭ"""
+        return content + "\n\n[Optimized by Local Enterprise Rules]"
+    
+    def _log_ai_usage(self, log_entry: Dict):
+        """የAI አጠቃቀምን ለመመዝገብ"""
+        log_dir = Path('ai_usage_logs')
+        log_dir.mkdir(exist_ok=True)
+        
+        log_file = log_dir / f"ai_usage_{datetime.now().strftime('%Y%m%d')}.json"
+        
+        try:
+            if log_file.exists():
+                with open(log_file, 'r', encoding='utf-8') as f:
+                    logs = json.load(f)
+            else:
+                logs = []
+            
+            logs.append(log_entry)
+            
+            with open(log_file, 'w', encoding='utf-8') as f:
+                json.dump(logs, f, indent=2)
+                
+        except Exception as e:
+            print(f"⚠️ Failed to log AI usage: {e}")
+    
+    def get_performance_report(self) -> Dict:
+        """የአፈፃፀም ሪፖርት"""
+        return {
+            'total_attempts': len(self.performance_log),
+            'successful_models': sum(1 for log in self.performance_log if '✅' in log),
+            'failed_models': sum(1 for log in self.performance_log if '⚠️' in log),
+            'log_entries': self.performance_log,
+            'available_keys': {k: bool(v) for k, v in self.keys.items()}
+        }
+    
+    async def close(self):
+        """መረብ ግንኙነትን ይዝጋ"""
+        if self.session:
+            await self.session.close()
+
+# =================== ENHANCED IMPORT DETECTOR ===================
+
+class EnhancedImportDetector:
+    """የሞጁሎችን መኖር እና ሁኔታ የሚያረጋግጥ"""
+    
+    def __init__(self):
+        self.modules_status = {}
+        self.detection_log = []
+        
+        # የሚፈለጉ ሞጁሎች
+        self.required_modules = {
+            'youtube_intelligence': {
+                'files': ['youtube_affiliate_system.py', 'youtube_system.py', 'youtube_research.py'],
+                'classes': ['YouTubeIntelligenceHunterPro', 'YouTubeResearchSystem', 'VideoIntelligenceEngine'],
+                'priority': 1
+            },
+            'affiliate_manager': {
+                'files': ['youtube_affiliate_system.py', 'affiliate_system.py', 'profit_master_system.py'],
+                'classes': ['UltraAffiliateManager', 'AffiliateMasterSystem', 'ProductResearchEngine'],
+                'priority': 2
+            },
+            'content_generator': {
+                'files': ['profit_master_system.py', 'content_system.py', 'ai_writer.py'],
+                'classes': ['UltimateProfitMasterSystem', 'AdvancedAIContentGenerator', 'EnterpriseContentEngine'],
+                'priority': 3
+            },
+            'ai_enhancer': {
+                'files': ['enhancement_system.py', 'ai_refiner.py'],
+                'classes': ['AIEnhancementSystem', 'ContentRefiner'],
+                'priority': 4
+            }
+        }
+    
+    def detect_all_modules(self) -> Dict:
+        """ሁሉንም ሞጁሎች ፈልጎ ሁኔታቸውን ይመልሳል"""
+        
+        print("\n" + "="*70)
+        print("🔍 ENHANCED MODULE DETECTION SYSTEM")
+        print("="*70)
+        
+        for module_name, config in self.required_modules.items():
+            status = self._detect_single_module(module_name, config)
+            self.modules_status[module_name] = status
+            
+            # የማሳያ ሎጂክ
+            emoji = "✅" if status['found'] else "❌"
+            print(f"{emoji} {module_name.upper():20} | ", end="")
+            
+            if status['found']:
+                print(f"{status['class_name']} (from {status['file_name']})")
+            else:
+                print(f"Not found - {len(config['files'])} files checked")
+        
+        print("-" * 70)
+        
+        # ማጠቃለያ
+        found_count = sum(1 for status in self.modules_status.values() if status['found'])
+        total_count = len(self.required_modules)
+        
+        print(f"📊 SUMMARY: {found_count}/{total_count} modules found")
+        
+        if found_count == total_count:
+            print("🎉 ALL SYSTEMS GO: Full enterprise capability available")
+        elif found_count >= total_count * 0.7:
+            print("⚠️ PARTIAL SYSTEM: Some modules missing, using enhanced mocks")
+        else:
+            print("🚨 LIMITED SYSTEM: Using comprehensive fallback system")
+        
+        print("="*70)
+        
+        return self.modules_status
+    
+    def _detect_single_module(self, module_name: str, config: Dict) -> Dict:
+        """አንድ ሞጁል መኖሩን ያረጋግጣል"""
+        
+        for file_name in config['files']:
+            file_path = Path(file_name)
+            
+            if file_path.exists():
+                try:
+                    # ፋይሉን import ለማድረግ ሞክር
+                    module_spec = importlib.util.spec_from_file_location(
+                        file_name.replace('.py', ''), 
+                        file_path
+                    )
+                    
+                    if module_spec:
+                        module = importlib.util.module_from_spec(module_spec)
+                        
+                        try:
+                            module_spec.loader.exec_module(module)
+                            
+                            # ክላሶችን ፈልግ
+                            for class_name in config['classes']:
+                                if hasattr(module, class_name):
+                                    self.detection_log.append(
+                                        f"Found {class_name} in {file_name}"
+                                    )
+                                    
+                                    return {
+                                        'found': True,
+                                        'file_name': file_name,
+                                        'class_name': class_name,
+                                        'module': module,
+                                        'class': getattr(module, class_name),
+                                        'priority': config['priority']
+                                    }
+                                    
+                        except Exception as e:
+                            continue
+                            
+                except Exception as e:
+                    continue
+        
+        # ካልተገኘ
+        self.detection_log.append(f"Module {module_name} not found")
+        
+        return {
+            'found': False,
+            'file_name': None,
+            'class_name': None,
+            'module': None,
+            'class': None,
+            'priority': config['priority']
+        }
+    
+    def create_smart_mocks(self) -> Dict:
+        """የሚጠፉ ሞጁሎችን በማስተካከል የሚተኩ"""
+        
+        mocks = {}
+        
+        for module_name, status in self.modules_status.items():
+            if not status['found']:
+                mock_class = self._create_enhanced_mock(module_name)
+                mocks[module_name] = mock_class
+                
+                self.detection_log.append(
+                    f"Created enhanced mock for {module_name}"
+                )
+        
+        return mocks
+    
+    def _create_enhanced_mock(self, module_name: str):
+        """ለሚጠፉ ሞጁሎች የሚተኩ የማሳያ ክፍሎች"""
+        
+        if module_name == 'content_generator':
+            class EnhancedContentGenerator:
+                def __init__(self):
+                    self.enterprise_mode = True
+                    self.mock_level = "enhanced"
+                    self.capabilities = ["deep_research", "cultural_adaptation", "revenue_optimization"]
+                
+                async def generate_deep_content(self, topic, country, video_research=None, affiliate_product=None):
+                    # የማሳያ ኮንቴንት ፍጠር
+                    title = f"Enterprise Guide: {topic} in {country}"
+                    
+                    content = f"""# {title}
+
+## Executive Summary
+This comprehensive enterprise guide provides in-depth analysis and implementation strategies for {topic} in the {country} market.
+
+## Market Analysis
+The {country} market presents unique opportunities for {topic}. Recent economic indicators suggest a growth rate of 15-20% annually in this sector.
+
+## Implementation Strategy
+1. **Phase 1**: Market entry and localization
+2. **Phase 2**: Scaling and optimization
+3. **Phase 3**: Enterprise integration and automation
+
+## Revenue Projections
+Based on current market data, implementing {topic} in {country} could yield:
+- Initial ROI: 40-60% within 6 months
+- Annual revenue potential: $250,000+
+- Market penetration: 15-25% within 2 years
+
+## Risk Management
+Key risks and mitigation strategies:
+- Regulatory compliance: Partner with local legal experts
+- Cultural adaptation: Hire local consultants
+- Technology integration: Use modular, scalable systems
+
+## Conclusion
+{topic} represents a significant opportunity in {country}. With proper planning and execution, businesses can achieve substantial growth and market leadership.
+
+*Generated by Enhanced Enterprise Mock System*"""
+                    
+                    return {
+                        'content': content,
+                        'word_count': len(content.split()),
+                        'quality_score': 85 + random.randint(0, 10),
+                        'enterprise_grade': True,
+                        'mock_generated': True,
+                        'modules_used': ['enhanced_mock'],
+                        'generation_time': datetime.now().isoformat()
+                    }
+                
+                async def refine_and_expand(self, content, target_words=3000):
+                    current_words = len(content.split())
+                    
+                    if current_words >= target_words:
+                        return content
+                    
+                    # ጽሑፉን ማራዘም
+                    expansions = [
+                        "\n\n## 📊 Data-Driven Insights\nIndustry data suggests that proper implementation can increase efficiency by 35-50%.",
+                        "\n\n## 🔧 Technical Implementation\nA step-by-step technical implementation guide for enterprise systems.",
+                        "\n\n## 💼 Business Integration\nHow to integrate this solution with existing business processes and systems.",
+                        "\n\n## 🌍 Global Best Practices\nLessons from successful implementations in other markets.",
+                        "\n\n## 🚀 Future Trends\nEmerging trends and technologies that will shape this sector in the coming years."
+                    ]
+                    
+                    expanded = content
+                    while len(expanded.split()) < target_words and expansions:
+                        expanded += expansions.pop(0)
+                    
+                    return expanded
+            
+            return EnhancedContentGenerator()
+        
+        elif module_name == 'youtube_intelligence':
+            class EnhancedYouTubeHunter:
+                def __init__(self):
+                    self.enterprise_mode = True
+                
+                async def find_relevant_videos(self, topic, country, max_results=7):
+                    # የማሳያ የቪድዮ መረጃ
+                    videos = []
+                    for i in range(min(max_results, 5)):
+                        videos.append({
+                            'id': f'vid_{country}_{i}',
+                            'title': f'Enterprise {topic} in {country} - Case Study {i+1}',
+                            'channel': f'{country} Business Insights',
+                            'views': random.randint(10000, 500000),
+                            'duration': f'{random.randint(5, 25)}:00',
+                            'published_date': (datetime.now() - timedelta(days=random.randint(1, 365))).strftime('%Y-%m-%d'),
+                            'engagement_rate': random.uniform(0.05, 0.15),
+                            'relevance_score': random.uniform(0.7, 0.95),
+                            'enterprise_grade': True
+                        })
+                    
+                    return videos
+                
+                async def summarize_video(self, video_id, include_key_points=True):
+                    return {
+                        'summary': f"Comprehensive enterprise analysis with market insights and implementation strategies.",
+                        'key_points': [
+                            "Market entry strategies",
+                            "Revenue optimization techniques",
+                            "Risk management approaches",
+                            "Local partnership opportunities"
+                        ],
+                        'enterprise_insights': [
+                            "High growth potential identified",
+                            "Competitive landscape analysis included",
+                            "Regulatory considerations addressed"
+                        ],
+                        'summary_quality': random.randint(85, 95)
+                    }
+            
+            return EnhancedYouTubeHunter()
+        
+        # ለሌሎቹም ተመሳሳይ የማሳያ ክፍሎች...
+        class GenericEnterpriseMock:
+            def __init__(self):
+                self.enterprise_mode = True
+                self.mock_level = "enhanced"
+            
+            async def __call__(self, *args, **kwargs):
+                return {"status": "mock_executed", "enterprise_grade": True}
+        
+        return GenericEnterpriseMock()
+    
+    def get_detection_summary(self) -> str:
+        """የመገኘት ማጠቃለያ"""
+        summary_lines = []
+        
+        summary_lines.append("\n" + "="*70)
+        summary_lines.append("📋 ENHANCED MODULE DETECTION SUMMARY")
+        summary_lines.append("="*70)
+        
+        for module_name, status in self.modules_status.items():
+            icon = "✅" if status['found'] else "❌"
+            status_text = f"{status['class_name']}" if status['found'] else "MOCK (Enhanced)"
+            summary_lines.append(f"{icon} {module_name:25} | {status_text}")
+        
+        summary_lines.append("-" * 70)
+        
+        # ስታቲስቲክስ
+        found = sum(1 for s in self.modules_status.values() if s['found'])
+        total = len(self.modules_status)
+        percentage = (found / total) * 100
+        
+        summary_lines.append(f"📊 Detection Rate: {found}/{total} ({percentage:.1f}%)")
+        
+        if percentage == 100:
+            summary_lines.append("🎉 STATUS: FULL ENTERPRISE CAPABILITY")
+        elif percentage >= 70:
+            summary_lines.append("⚠️ STATUS: PARTIAL WITH ENHANCED MOCKS")
+        else:
+            summary_lines.append("🚨 STATUS: LIMITED - USING COMPREHENSIVE FALLBACK")
+        
+        summary_lines.append("="*70)
+        
+        return "\n".join(summary_lines)
 # =================== SMART IMAGE & ALT-TEXT INTEGRATION ===================
 
 class SmartImageEngine:
