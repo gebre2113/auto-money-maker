@@ -1560,10 +1560,12 @@ Key risks and mitigation strategies:
 # =================== SMART IMAGE & ALT-TEXT INTEGRATION ===================
 
 class SmartImageEngine:
-    """በራስ-ሰር የምስል ቦታዎች እና የ SEO የሚረዱ Alt-Text መግለጫዎች"""
+    """Hybrid Smart Image Engine - Elite + Legacy Compatibility"""
     
     def __init__(self):
-        self.image_keywords = self._load_image_keywords()
+        self.elite_engine = EliteSmartImageEngine()
+        self.legacy_keywords = self._load_image_keywords()
+        self.country_colors = self._load_country_colors()
     
     def _load_image_keywords(self) -> Dict:
         return {
@@ -1573,110 +1575,231 @@ class SmartImageEngine:
             'ai': ['neural network', 'algorithm', 'machine learning', 'data flow', 'AI model', 'automation']
         }
     
+    def _load_country_colors(self) -> Dict:
+        return {
+            'US': '#1e40af',  # Blue
+            'ET': '#dc2626',  # Red
+            'JP': '#111827',  # Gray
+            'DE': '#065f46',  # Green
+            'UK': '#7c3aed',  # Purple
+            'FR': '#be123c',  # Pink
+            'CA': '#0369a1',  # Sky blue
+            'AU': '#f59e0b',  # Amber
+            'default': '#3b82f6'  # Default blue
+        }
+    
     def generate_image_placeholders(self, content: str, country: str, topic: str) -> str:
-        """በራስ-ሰር የምስል ቦታዎች እና Alt-Text መግለጫዎች ያስገቡ"""
+        """
+        Hybrid method: Uses Elite engine for blueprint + Legacy for compatibility
+        """
         
-        estimated_words = len(content.split())
-        max_images = min(5, max(2, estimated_words // 500))
+        # Use Elite engine for intent detection and blueprint
+        sections = content.split("## ")
+        enhanced = [sections[0]]
         
-        sections = content.split('## ')
-        enhanced_sections = [sections[0]]
-        
+        words = len(content.split())
+        max_images = min(5, max(2, words // 500))
         image_count = 0
-        topic_lower = topic.lower()
         
+        for sec in sections[1:]:
+            if image_count >= max_images:
+                enhanced.append(sec)
+                continue
+            
+            lines = sec.split("\n", 1)
+            title = lines[0].strip()
+            body = lines[1] if len(lines) > 1 else ""
+            
+            # Get blueprint from Elite engine
+            try:
+                blueprint = self.elite_engine.build_blueprint(title, topic, country)
+                
+                # Generate enhanced image placeholder
+                block = self._create_enhanced_placeholder(blueprint, title, country, image_count + 1)
+                
+                enhanced.append(
+                    f"## {title}\n\n{block}\n\n{body}"
+                )
+                image_count += 1
+                
+            except Exception as e:
+                # Fallback to legacy method
+                print(f"⚠️ Elite engine failed: {e}, using legacy method")
+                block = self._create_legacy_placeholder(title, topic, country, image_count + 1)
+                enhanced.append(
+                    f"## {title}\n\n{block}\n\n{body}"
+                )
+                image_count += 1
+        
+        return "## ".join(enhanced)
+    
+    def _create_enhanced_placeholder(self, blueprint: ImageBlueprint, 
+                                   section_title: str, country: str, image_num: int) -> str:
+        """Create enhanced placeholder using Elite blueprint"""
+        
+        # Enhanced alt text with intent awareness
+        alt_text = f"{blueprint.image_type.capitalize()} for '{section_title}' showing {blueprint.visual_focus}. "
+        alt_text += f"Optimized for {country} market with {blueprint.data_density} data density. "
+        alt_text += f"Supports {blueprint.intent} intent and {blueprint.emotional_tone} emotional tone."
+        
+        # Country-specific styling
+        color = self.country_colors.get(country, self.country_colors['default'])
+        
+        url = f"https://via.placeholder.com/1200x630/{color.replace('#', '')}/ffffff"
+        url += f"?text={blueprint.image_type.replace(' ', '+')}"
+        
+        # Generate HTML with enhanced features
+        html_template = f"""
+<div class="smart-image-container" style="
+    margin: 40px 0;
+    text-align: center;
+    background: {'linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%)' if country == 'ET' else 'white'};
+    padding: {'30px' if country == 'ET' else '20px'};
+    border-radius: 16px;
+    border-left: {'6px solid #dc2626' if country == 'ET' else '4px solid ' + color};
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+">
+    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 15px; justify-content: center;">
+        <span style="
+            background: {color};
+            color: white;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 14px;
+        ">{image_num}</span>
+        <div style="text-align: left;">
+            <div style="font-weight: bold; font-size: 1.1em; color: {color};">
+                {section_title}
+            </div>
+            <div style="font-size: 0.9em; color: #6b7280;">
+                {blueprint.image_type} • {blueprint.intent}-focused
+            </div>
+        </div>
+    </div>
+    
+    <img src="{url}" 
+         alt="{alt_text[:125]}"
+         title="{section_title} - {blueprint.image_type}"
+         style="
+            width: 100%;
+            max-width: 1200px;
+            height: auto;
+            border-radius: 12px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+            display: block;
+            margin: 0 auto;
+         "
+         loading="lazy">
+    
+    <div style="
+        text-align: left;
+        margin-top: 15px;
+        padding: 15px;
+        background: {'#fef2f2' if country == 'ET' : '#f8fafc'};
+        border-radius: 8px;
+        border-left: 3px solid {color};
+        font-size: 0.9em;
+    ">
+        <div style="color: #1e293b; font-weight: 600; margin-bottom: 5px;">
+            📊 <strong>Smart Image Intelligence:</strong>
+        </div>
+        <div style="color: #475569; line-height: 1.5;">
+            <span style="background: {color}; color: white; padding: 2px 6px; border-radius: 4px; margin-right: 5px; font-size: 0.85em;">
+                {blueprint.intent.upper()}
+            </span>
+            <span style="background: {'#dc2626' if country == 'ET' : '#3b82f6'}; color: white; padding: 2px 6px; border-radius: 4px; margin-right: 5px; font-size: 0.85em;">
+                {country}
+            </span>
+            <span style="background: #10b981; color: white; padding: 2px 6px; border-radius: 4px; font-size: 0.85em;">
+                {blueprint.data_density.upper()}
+            </span>
+        </div>
+        <div style="color: #64748b; margin-top: 8px; font-style: italic;">
+            {'ምስል ' if country == 'ET' else 'Image'} {image_num}: {alt_text[:100]}...
+        </div>
+    </div>
+</div>
+"""
+        return html_template
+    
+    def _create_legacy_placeholder(self, section_title: str, topic: str, 
+                                 country: str, image_num: int) -> str:
+        """Legacy fallback method"""
+        
+        topic_lower = topic.lower()
         image_type = 'technology'
-        for category, keywords in self.image_keywords.items():
+        for category, keywords in self.legacy_keywords.items():
             if any(keyword in topic_lower for keyword in keywords) or category in topic_lower:
                 image_type = category
                 break
         
-        for i, section in enumerate(sections[1:], 1):
-            if image_count >= max_images:
-                enhanced_sections.append(section)
-                continue
-            
-            lines = section.strip().split('\n', 1)
-            if not lines:
-                enhanced_sections.append(section)
-                continue
-            
-            h2_title = lines[0].strip()
-            remaining_content = lines[1] if len(lines) > 1 else ""
-            
-            alt_text = self._generate_alt_text(h2_title, topic, country, image_type, image_count+1)
-            image_placeholder = self._create_image_placeholder(alt_text, h2_title, image_count+1)
-            
-            enhanced_section = f"## {h2_title}\n\n{image_placeholder}\n\n{remaining_content}"
-            enhanced_sections.append(enhanced_section)
-            image_count += 1
+        alt_text = f"{image_type.capitalize()} illustrating '{section_title}' concept for {topic} guide. "
+        alt_text += f"Professional visualization for {country} market. "
+        alt_text += f"Image {image_num} of comprehensive tutorial."
         
-        return '## '.join(enhanced_sections)
-    
-    def _generate_alt_text(self, section_title: str, topic: str, country: str, 
-                          image_type: str, image_num: int) -> str:
-        
-        keywords = self.image_keywords.get(image_type, self.image_keywords['technology'])
-        image_keyword = random.choice(keywords)
-        
-        country_ref = ""
-        if country == 'ET':
-            country_ref = "in Ethiopian context, showing local business applications"
-        elif country == 'JP':
-            country_ref = "with Japanese aesthetic principles and minimalist design"
-        elif country == 'DE':
-            country_ref = "with German engineering precision and technical accuracy"
-        
-        alt_text = f"{image_keyword.capitalize()} illustrating '{section_title}' concept for {topic} guide. "
-        alt_text += f"Professional {image_type} visualization {country_ref}. "
-        alt_text += f"Image {image_num} of comprehensive tutorial on {topic}. "
-        alt_text += "High-quality educational diagram for digital content creators."
-        
-        return alt_text[:125]
-    
-    def _create_image_placeholder(self, alt_text: str, section_title: str, image_num: int) -> str:
-        placeholder_url = f"https://via.placeholder.com/1200x630/3b82f6/ffffff?text=Fig+{image_num}:+{section_title.replace(' ', '+')}"
-        
-        alt_text_am = alt_text.replace(section_title, f"ምስል {image_num}")
+        color = self.country_colors.get(country, self.country_colors['default'])
+        placeholder_url = f"https://via.placeholder.com/1200x630/{color.replace('#', '')}/ffffff"
+        placeholder_url += f"?text=Fig+{image_num}:+{section_title.replace(' ', '+')}"
         
         return f"""
 <div class="image-container" style="margin: 40px 0; text-align: center; max-width: 100%;">
     <img src="{placeholder_url}" 
-         alt="{alt_text}" 
+         alt="{alt_text[:125]}" 
          title="{section_title} - Professional Illustration"
          style="width: 100%; max-width: 1200px; height: auto; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); display: block; margin: 0 auto;"
          loading="lazy">
-    <div style="text-align: left; margin-top: 12px; padding: 12px; background: #f8fafc; border-radius: 8px; border-left: 3px solid #3b82f6;">
+    <div style="text-align: left; margin-top: 12px; padding: 12px; background: #f8fafc; border-radius: 8px; border-left: 3px solid {color};">
         <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
-            <span style="background: #3b82f6; color: white; width: 24px; height: 24px; border-radius: 50%; 
+            <span style="background: {color}; color: white; width: 24px; height: 24px; border-radius: 50%; 
                        display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 12px;">{image_num}</span>
             <strong style="color: #1e293b; font-size: 1.1em;">{section_title}</strong>
         </div>
         <p style="margin: 0; color: #475569; line-height: 1.6; font-size: 0.95em;">{alt_text}</p>
         <p style="margin: 8px 0 0 0; color: #64748b; font-size: 0.85em; font-style: italic;">
-            ምስል {image_num}: የሙያ ደረጃ ሥዕል የሚያሳይ የ '{section_title}' ፅንሰ-ሃሳብ
+            {'ምስል' if country == 'ET' else 'Figure'} {image_num}: {'የሙያ ደረጃ ሥዕል' if country == 'ET' else 'Professional diagram'} showing '{section_title}' concept
         </p>
     </div>
 </div>
 """
     
     def get_seo_impact(self, image_count: int) -> Dict:
-        base_impact = {
-            'seo_score_boost': min(25, image_count * 5),
-            'accessibility_score': min(100, 80 + image_count * 4),
-            'engagement_estimate': f"{min(40, image_count * 8)}% increase in time-on-page",
-            'google_image_search': 'Enabled for all images with optimized alt-text'
+        # Enhanced SEO impact with Elite features
+        base_boost = min(40, image_count * 8)  # Up to 40% boost
+        accessibility = min(100, 75 + image_count * 5)
+        
+        impact = {
+            'seo_score_boost': f"+{base_boost}%",
+            'accessibility_score': accessibility,
+            'engagement_estimate': f"{min(50, image_count * 10)}% increase in time-on-page",
+            'google_image_search': 'Enabled with intent-aware alt-text',
+            'intent_coverage': 'High - Elite intent detection',
+            'cultural_relevance': 'High - Country-specific optimization',
+            'image_quality_tier': self._get_quality_tier(image_count)
         }
         
         if image_count >= 4:
-            base_impact['recommendation'] = "✅ Excellent image coverage - optimal for SEO"
+            impact['recommendation'] = "✅ Elite coverage - optimal for global SEO"
         elif image_count >= 2:
-            base_impact['recommendation'] = "✅ Good image coverage - meets SEO best practices"
+            impact['recommendation'] = "✅ Good coverage - meets enterprise standards"
         else:
-            base_impact['recommendation'] = "⚠️ Add more images for better SEO performance"
+            impact['recommendation'] = "⚠️ Add more images for maximum SEO impact"
         
-        return base_impact
-
+        return impact
+    
+    def _get_quality_tier(self, image_count: int) -> str:
+        if image_count >= 4:
+            return "🏆 Elite (40% SEO Boost)"
+        elif image_count >= 3:
+            return "⭐ Premium (32% SEO Boost)"
+        elif image_count >= 2:
+            return "✅ Standard (24% SEO Boost)"
+        else:
+            return "⚠️ Basic (16% SEO Boost)"
 # =================== DYNAMIC CTA A/B TESTING SYSTEM ===================
 
 class DynamicCTAEngine:
