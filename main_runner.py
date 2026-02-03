@@ -1583,7 +1583,7 @@ def _create_core_mocks(self):
         self.modules['YouTubeIntelligenceHunterPro'] = self._create_enterprise_mock('YouTubeIntelligenceHunterPro')
         self.modules['UltraAffiliateManager'] = self._create_enterprise_mock('UltraAffiliateManager')
         
-    def _create_profit_mocks(self):
+def _create_profit_mocks(self):
         """Create profit master mock systems"""
         class MockProfitSystem:
             def __init__(self):
