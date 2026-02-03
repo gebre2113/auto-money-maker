@@ -1601,11 +1601,11 @@ def _create_profit_mocks(self):
         
         self.modules['UltimateProfitMasterSystem'] = MockProfitSystem()
     
-    def get_module(self, module_name):
+def get_module(self, module_name):
         """Get a module by name"""
         return self.modules.get(module_name)
     
-    def get_enterprise_component(self, component_name):
+def get_enterprise_component(self, component_name):
         """Get an enterprise component by name"""
         return self.enterprise_components.get(component_name)
 
