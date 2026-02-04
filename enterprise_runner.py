@@ -5380,9 +5380,9 @@ reliable operation even in large-scale production environments.
             print(f"   Average Cultural Depth: {stats['avg_cultural_depth']:.1f}%")
             print("="*100)
 
-# =================== MAIN EXECUTION ===================
+# =================== ENTRY POINT ===================
 
-async def main():
+async def main_execution():
     """Main execution function - Complete Enterprise Pipeline"""
     
     is_github = os.getenv('GITHUB_ACTIONS') == 'true'
@@ -5420,6 +5420,130 @@ async def main():
     if ai_cultural_key: ai_status.append("🤖 Cultural Enricher: ✅ Active")
     else: ai_status.append("🤖 Cultural Enricher: ⚠️ Fallback Mode")
     
+    if ai_audit_key: ai_status.append("🤖 Quality Auditor: ✅ Active")
+    else: ai_status.append("🤖 Quality Auditor: ⚠️ Fallback Mode")
+    
+    if ai_title_key: ai_status.append("🤖 Title Optimizer: ✅ Active")
+    else: ai_status.append("🤖 Title Optimizer: ⚠️ Fallback Mode")
+    
+    if is_github:
+        print("🌐 Running in GitHub Actions Environment")
+        print("🤖 AI API Status:")
+        for status in ai_status:
+            print(f"   {status}")
+        print("="*100)
+    
+    try:
+        # Initialize orchestrator
+        orchestrator = EnterpriseProductionOrchestrator()
+        
+        # Get topic from environment or use default
+        production_topic = os.getenv('ENTERPRISE_TOPIC', 'Enterprise AI Implementation Strategies 2026')
+        
+        print(f"📝 Production Topic: {production_topic}")
+        
+        # Run production with monitoring
+        production_results = await orchestrator.run_production_with_monitoring(
+            topic=production_topic,
+            markets=['US', 'GB', 'CA', 'AU', 'DE', 'FR', 'JP', 'CH', 'NO', 'SE', 'ET'],
+            content_type="enterprise_guide"
+        )
+        
+        # Print summary
+        print("\n" + "="*100)
+        print("🎉 ENTERPRISE PRODUCTION COMPLETED SUCCESSFULLY!")
+        print("="*100)
+        
+        metrics = production_results.get('overall_metrics', {})
+        
+        print(f"📊 Results Summary:")
+        print(f"   • Countries Processed: {metrics.get('completed_countries', 0)}/{metrics.get('total_countries', 0)}")
+        print(f"   • Total Words: {metrics.get('total_words', 0):,}")
+        print(f"   • Average Quality: {metrics.get('avg_quality', 0)}%")
+        print(f"   • Revenue Forecast: ${metrics.get('estimated_revenue', 0):,.2f}/month")
+        print(f"   • Duration: {production_results.get('total_duration', 0)/60:.1f} minutes")
+        
+        print(f"\n📁 Outputs saved to: enterprise_outputs/")
+        print(f"💾 Safety backups: production_backups/")
+        print(f"🔧 Performance logs: enterprise_logs/")
+        
+        # Save final results
+        output_dir = Path('enterprise_outputs')
+        output_dir.mkdir(exist_ok=True)
+        
+        final_file = output_dir / f"FINAL_RESULTS_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
+        with open(final_file, 'w', encoding='utf-8') as f:
+            json.dump(production_results, f, indent=2, ensure_ascii=False)
+        
+        print(f"\n💾 Final results saved to: {final_file}")
+        
+        # Generate success artifact for GitHub Actions
+        if is_github:
+            artifact_dir = Path('github_artifacts')
+            artifact_dir.mkdir(exist_ok=True)
+            
+            with open(artifact_dir / 'production_status.json', 'w') as f:
+                json.dump({
+                    'status': 'success',
+                    'timestamp': datetime.now().isoformat(),
+                    'topic': production_topic,
+                    'countries_processed': metrics.get('completed_countries', 0),
+                    'total_words': metrics.get('total_words', 0),
+                    'avg_quality': metrics.get('avg_quality', 0),
+                    'revenue_forecast': metrics.get('estimated_revenue', 0)
+                }, f, indent=2)
+            
+            print(f"\n📦 GitHub artifact created: github_artifacts/production_status.json")
+        
+        print("\n" + "="*100)
+        print("🚀 ENTERPRISE PRODUCTION RUNNER v8.2 - MISSION ACCOMPLISHED!")
+        print("="*100)
+        
+        return production_results
+        
+    except KeyboardInterrupt:
+        print("\n⚠️ Production interrupted by user")
+        return {'status': 'interrupted', 'timestamp': datetime.now().isoformat()}
+        
+    except Exception as e:
+        print(f"\n❌ Production failed: {str(e)}")
+        traceback.print_exc()
+        
+        # Save error information
+        error_dir = Path('production_errors')
+        error_dir.mkdir(exist_ok=True)
+        
+        error_file = error_dir / f"ERROR_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
+        with open(error_file, 'w', encoding='utf-8') as f:
+            json.dump({
+                'error': str(e),
+                'traceback': traceback.format_exc(),
+                'timestamp': datetime.now().isoformat(),
+                'topic': os.getenv('ENTERPRISE_TOPIC', 'Unknown')
+            }, f, indent=2)
+        
+        return {'status': 'failed', 'error': str(e), 'error_file': str(error_file)}
+
+if __name__ == "__main__":
+    try:
+        # Run the async main function
+        results = asyncio.run(main_execution())
+        
+        # Exit with appropriate code
+        if results.get('status') == 'success':
+            sys.exit(0)
+        elif results.get('status') == 'interrupted':
+            sys.exit(130)  # Standard exit code for SIGINT
+        else:
+            sys.exit(1)  # Error exit code
+            
+    except KeyboardInterrupt:
+        print("\n⚠️ Script interrupted by user")
+        sys.exit(130)
+    except Exception as e:
+        print(f"\n❌ Fatal error in main execution: {e}")
+        traceback.print_exc()
+        sys.exit(1)
     if ai_audit_key: ai_status.append("🤖 Quality Auditor: ✅ Active")
     else: ai_status.append("🤖 Quality Auditor: ⚠️ Fallback Mode")
     
