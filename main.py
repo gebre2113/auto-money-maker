@@ -6,7 +6,6 @@
 # =================== አስፈላጊ ግንኙነቶች ===================
 import asyncio
 import aiohttp
-import aioredis
 import json
 import time
 import hashlib
@@ -23,6 +22,7 @@ from pydantic import BaseModel, Field, validator
 from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type
 from dataclasses import dataclass, asdict
 from urllib.parse import urlparse
+from redis import asyncio as aioredis
 
 # ሎገር ማስተካከያ
 logging.basicConfig(level=logging.INFO)
