@@ -1,0 +1,98 @@
+name: 🚀 Profit Master Elite - PRODUCTION RUN yes
+
+on:
+  workflow_dispatch:
+    inputs:
+      topic:
+        description: 'የይዘቱ ርዕስ (Content Topic)'
+        required: false
+        default: 'AI-Powered Content Creation Strategies 2026'
+  schedule:
+    - cron: '0 0 * * *' # በየቀኑ እኩለ ሌሊት ይጀምራል
+
+permissions:
+  contents: write
+
+jobs:
+  run-profit-machine:
+    name: 🏭 Running The Elite Machine
+    runs-on: ubuntu-latest
+    
+    # የ Redis ሰርቨር እዚህ ይነሳል
+    services:
+      redis:
+        image: redis
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+    - name: 📥 Checkout Repository
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: 🐍 Set up Python 3.12
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+        cache: 'pip'
+
+    - name: 🎥 Install System Dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y ffmpeg chromium-browser chromium-chromedriver
+
+    - name: 📦 Install Python Libraries
+      run: |
+        python -m pip install --upgrade pip
+        # aioredisን አጥፍተን ዘመናዊውን redis እና pydantic እንጭናለን
+        pip install psutil aiohttp python-dotenv PyYAML groq google-generativeai \
+                    "moviepy>=2.0.0" pandas requests beautifulsoup4 jinja2 \
+                    "googletrans==3.1.0a0" textblob "pydantic>=2.0" tenacity \
+                    fastapi uvicorn httpx openai sqlalchemy redis
+        python -m textblob.download_corpora
+
+    - name: 🚀 Run & Deploy Profit Master
+      env:
+        GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+        GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
+        WP_URL: ${{ secrets.WP_URL }}
+        WP_USERNAME: ${{ secrets.WP_USERNAME }}
+        WP_PASSWORD: ${{ secrets.WP_PASSWORD }}
+        TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+        TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        REDIS_URL: redis://localhost:6379
+        PYTHONPATH: .
+      run: |
+        echo "🔥 Starting Production Engine (Elite Mode)..."
+        # --topic መኖሩን እና main_runner.py ፋይልህ መኖሩን አረጋግጥ
+        python main_runner.py --topic "${{ github.event.inputs.topic || 'AI-Powered Content Creation Strategies 2026' }}"
+
+    - name: 📤 Deploy Results to GitHub Dashboard
+      if: always()
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action Bot"
+        git add premium_outputs/ production_outputs/ logs/ premium_logs/ || echo "ምንም አዲስ ፋይል የለም"
+        if git diff --quiet && git diff --staged --quiet; then
+          echo "No changes to commit"
+        else
+          git commit -m "🚀 Automated Production Sync: ${{ github.run_id }} [skip ci]"
+          git push origin main
+        fi
+
+    - name: 💾 Archive Artifacts (Backup)
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: elite-production-full-package
+        path: |
+          premium_outputs/
+          *.html
+          *.json
