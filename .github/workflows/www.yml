@@ -48,7 +48,7 @@ jobs:
         pip install psutil aiohttp aioredis==2.0.1 python-dotenv
         pip install PyYAML groq google-generativeai moviepy==1.0.3 pandas requests beautifulsoup4 jinja2 googletrans==3.1.0a0
         pip install textblob pydantic==1.10.11 tenacity
-        pip install fastapi==0.104.0 uvicorn==0.24.0 httpx==0.25.0 openai==1.3.0 sqlalchemy==2.0.0 aioredis
+        pip install fastapi==0.104.0 uvicorn==0.24.0 httpx==0.25.0 openai==1.3.0 sqlalchemy==2.0.0 redis
         python -m textblob.download_corpora
 
     - name: 🚀 Run & Deploy Profit Master
