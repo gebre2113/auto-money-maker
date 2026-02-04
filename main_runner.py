@@ -1560,7 +1560,7 @@ Key risks and mitigation strategies:
 
 # =================== ELITE SMART IMAGE ENGINE (PRODUCTION FIXED) ===================
 
-class EliteSmartImageEngine:
+class SmartImageEngine:
     """
     🏆 ELITE SMART IMAGE ENGINE v3.1 - PRODUCTION FIXED
     የ10 ከፍተኛ አገራት ለምርት ዝግጁ ሲስተም
