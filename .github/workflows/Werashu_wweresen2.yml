@@ -1,9 +1,9 @@
-Name: 🚀 Profit Master Supreme - EXECUTE open
+name: 🚀 Profit Master Supreme - EXECUTE open
 
 on:
   schedule:
-    - cron: '0 */6 * * *'  # በየ 6 ሰዓቱ በራሱ ይሰራል።
-  workflow_dispatch:       # በእጅህ "Run" ለማድረግ
+    - cron: '0 */6 * * *'
+  workflow_dispatch:
     inputs:
       topic:
         description: 'የይዘት ርዕስ (Topic)'
@@ -40,11 +40,10 @@ jobs:
       - name: "📦 Install Python Libraries"
         run: |
           python -m pip install --upgrade pip
-          # pydantic>=2.0 እና tenacity እዚህ ጋር ተጨምረዋል
           pip install \
             aiohttp httpx requests pandas numpy schedule \
             groq google-generativeai openai anthropic cohere \
-            gtts moviepy>=2.0.0 pytube yt-dlp Pillow \
+            gtts "moviepy>=2.0.0" yt-dlp Pillow \
             beautifulsoup4 selenium tweepy \
             sqlalchemy redis fastapi uvicorn psutil \
             nltk spacy textblob "pydantic>=2.0" tenacity prometheus-client boto3 \
