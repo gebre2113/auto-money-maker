@@ -36,7 +36,7 @@ from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Dict, List, Optional, Any, Tuple, Union
 import textwrap
-
+from smart_image_engine import SmartImageEngine
 # Suppress warnings
 warnings.filterwarnings('ignore')
 
