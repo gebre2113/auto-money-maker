@@ -1,7 +1,7 @@
 name: 🚀 Profit Master Elite - ULTIMATE PRODUCTION ON
 
 on:
-  # 1. በእጅ ማስጀመር (ርዕስ መስጠት ይቻላል)
+  # 1. በእጅ ማስጀመር
   workflow_dispatch:
     inputs:
       topic:
@@ -13,7 +13,7 @@ on:
   schedule:
     - cron: '0 6 * * *'
 
-# 🔐 ቦቱ ወደ ሪፖህ ፋይል መጻፍ እንዲችል ፈቃድ
+# 🔐 ፈቃዶች
 permissions:
   contents: write
   actions: read
@@ -22,93 +22,87 @@ jobs:
   run-enterprise-engine:
     name: 🏭 Run Enterprise Engine
     runs-on: ubuntu-latest
-    timeout-minutes: 60 # ከ1 ሰዓት በላይ ከፈጀ በግድ ያቆመዋል (ገንዘብ/Time ለመቆጠብ)
+    timeout-minutes: 60
 
     steps:
     # 1. ኮዱን ማውረድ
     - name: 📥 Checkout Repository
       uses: actions/checkout@v4
       with:
-        fetch-depth: 0 # ሙሉ የ Git ታሪክ ያስፈልገናል (ለ Push)
+        fetch-depth: 0
 
     # 2. ፓይተን ማዘጋጀት
     - name: 🐍 Set up Python 3.10
       uses: actions/setup-python@v5
       with:
         python-version: '3.10'
-        cache: 'pip' # የላይብረሪ ቅጂ (Cache) ይጠቀማል (ለፍጥነት)
+        cache: 'pip'
 
-    # 3. የሲስተም ሶፍትዌሮች (ለ Video/Audio)
+    # 3. የሲስተም ሶፍትዌሮች
     - name: 🎥 Install System Tools
       run: |
         sudo apt-get update
         sudo apt-get install -y ffmpeg
 
-    # 4. ፓይተን ላይብረሪዎች (ሁሉንም አስፈላጊ ነገሮች የያዘ)
+    # 4. ፓይተን ላይብረሪዎች (tenacity እና ሌሎች የተሟሉ)
     - name: 📦 Install Dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install requests psutil python-dotenv pyyaml
+        # Core & Robustness
+        pip install tenacity requests psutil python-dotenv pyyaml aiohttp asyncio
+        # AI Engines
         pip install google-generativeai groq openai
+        # Content Processing
         pip install beautifulsoup4 pandas jinja2 lxml
+        # Publishing & Integration
         pip install python-wordpress-xmlrpc
-        # ለተጨማሪ ጥንቃቄ
-        pip install aiohttp asyncio
+        # Requirements.txt ካለ እሱንም ይጨምር
+        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
     # 5. ስራውን ማስጀመር (The Main Engine)
     - name: 🚀 Execute Enterprise Runner
       env:
-        # AI API Keys
         GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
         GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-        OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }} # ካለህ
+        OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         AI_CULTURAL_API_KEY: ${{ secrets.AI_CULTURAL_API_KEY }}
         AI_AUDIT_API_KEY: ${{ secrets.AI_AUDIT_API_KEY }}
         AI_TITLE_API_KEY: ${{ secrets.AI_TITLE_API_KEY }}
-        
-        # Social Media & Web
         WP_URL: ${{ secrets.WP_URL }}
         WP_USERNAME: ${{ secrets.WP_USERNAME }}
         WP_PASSWORD: ${{ secrets.WP_PASSWORD }}
         TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
         TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-        
-        # Topic Input (ከላይ ከተሰጠው ወይም Default)
         ENTERPRISE_TOPIC: ${{ github.event.inputs.topic || 'Enterprise AI Implementation Strategies 2026' }}
-        
-        # System
         PYTHONPATH: .
       run: |
         echo "🔥 Starting Production Engine for topic: $ENTERPRISE_TOPIC"
-        # ስክሪፕቱ ስህተት ቢፈጥርም ሂደቱ እንዳይቋረጥ (set +e)
         set +e 
         python enterprise_runner.py
         exit_code=$?
         if [ $exit_code -ne 0 ]; then
-          echo "⚠️ Script finished with warnings or errors (Code: $exit_code)"
-          # ስክሪፕቱ ቢወድቅም Artifacts እንዲሰበሰብ እዚህ ጋር አንወጣም
+          echo "⚠️ Script finished with warnings (Code: $exit_code)"
         else
           echo "✅ Script finished successfully"
         fi
 
-    # 6. ውጤቱን ወደ GitHub መልሶ መጫን (Commit & Push)
+    # 6. ውጤቱን ወደ GitHub መልሶ መጫን
     - name: 📤 Commit & Push Results
-      if: always() # ስክሪፕቱ ቢበላሽም የተሰራውን ይጫን
+      if: always()
       run: |
         git config --local user.email "action@github.com"
         git config --local user.name "Enterprise Bot 🤖"
         
-        # አዳዲስ ፎልደሮችን ጨምር
+        # አስፈላጊ የሆኑ ፎልደሮች መኖራቸውን አረጋግጥ
+        mkdir -p enterprise_outputs production_backups enterprise_logs ai_usage_logs
+        
         git add enterprise_outputs/ production_backups/ enterprise_logs/ ai_usage_logs/ || true
         
-        # ለውጥ ካለ እይ
         if git diff --staged --quiet; then
           echo "🚫 No changes to commit."
         else
           echo "✅ Changes detected. Committing..."
-          git commit -m "🚀 Enterprise Output: ${{ github.event.inputs.topic || 'Daily Run' }} [${{ github.run_id }}]"
-          
-          # ግጭት እንዳይፈጠር መጀመሪያ ሳብ (Rebase), ከዛ ጫን (Push)
+          git commit -m "🚀 Enterprise Output: [${{ github.run_id }}]"
           git pull --rebase origin main
           git push origin main
         fi
