@@ -1,115 +1,129 @@
-name: 🚀 Profit Master Elite - PRODUCTION RUN & DISTRIBUTE ON
+name: 🚀 Profit Master Elite - ULTIMATE PRODUCTION
 
 on:
+  # 1. በእጅ ማስጀመር (ርዕስ መስጠት ይቻላል)
   workflow_dispatch:
     inputs:
       topic:
-        description: 'የይዘቱ ርዕስ (Content Topic)'
+        description: 'Target Topic (e.g., Enterprise AI 2026)'
         required: false
         default: 'Enterprise AI Implementation Strategies 2026'
+      
+  # 2. በየቀኑ ጠዋት 12:00 (6:00 UTC) በራስ ሰር ይነሳል
   schedule:
-    - cron: '0 6 * * *' # በየቀኑ ጠዋት 12:00 (6:00 UTC) ይነሳል
+    - cron: '0 6 * * *'
 
+# 🔐 ቦቱ ወደ ሪፖህ ፋይል መጻፍ እንዲችል ፈቃድ
 permissions:
-  contents: write # ለ Git Push የግድ አስፈላጊ ነው
+  contents: write
+  actions: read
 
 jobs:
-  run-profit-machine:
-    name: 🏭 Run, Publish & Notify
+  run-enterprise-engine:
+    name: 🏭 Run Enterprise Engine
     runs-on: ubuntu-latest
-    
-    services:
-      redis:
-        image: redis
-        ports:
-          - 6379:6379
+    timeout-minutes: 60 # ከ1 ሰዓት በላይ ከፈጀ በግድ ያቆመዋል (ገንዘብ/Time ለመቆጠብ)
 
     steps:
+    # 1. ኮዱን ማውረድ
     - name: 📥 Checkout Repository
       uses: actions/checkout@v4
       with:
-        fetch-depth: 0 
+        fetch-depth: 0 # ሙሉ የ Git ታሪክ ያስፈልገናል (ለ Push)
 
-    - name: 🐍 Set up Python
+    # 2. ፓይተን ማዘጋጀት
+    - name: 🐍 Set up Python 3.10
       uses: actions/setup-python@v5
       with:
         python-version: '3.10'
-        cache: 'pip'
+        cache: 'pip' # የላይብረሪ ቅጂ (Cache) ይጠቀማል (ለፍጥነት)
 
-    - name: 🎥 Install System Dependencies
+    # 3. የሲስተም ሶፍትዌሮች (ለ Video/Audio)
+    - name: 🎥 Install System Tools
       run: |
         sudo apt-get update
         sudo apt-get install -y ffmpeg
 
-    - name: 📦 Install Python Libraries
+    # 4. ፓይተን ላይብረሪዎች (ሁሉንም አስፈላጊ ነገሮች የያዘ)
+    - name: 📦 Install Dependencies
       run: |
         python -m pip install --upgrade pip
-        # ለ WordPress እና Telegram ወሳኝ የሆኑት እዚህ ተጨምረዋል
-        pip install requests psutil python-dotenv pyyaml 
-        pip install google-generativeai groq
-        pip install beautifulsoup4 pandas jinja2
-        # WordPress ለመላክ (REST API የምንጠቀም ከሆነ requests በቂ ነው፣ ግን ይህንንም እንጨምር)
+        pip install requests psutil python-dotenv pyyaml
+        pip install google-generativeai groq openai
+        pip install beautifulsoup4 pandas jinja2 lxml
         pip install python-wordpress-xmlrpc
+        # ለተጨማሪ ጥንቃቄ
+        pip install aiohttp asyncio
 
-    - name: 🚀 Run Enterprise Engine
+    # 5. ስራውን ማስጀመር (The Main Engine)
+    - name: 🚀 Execute Enterprise Runner
       env:
-        # AI Keys
+        # AI API Keys
         GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
         GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }} # ካለህ
         AI_CULTURAL_API_KEY: ${{ secrets.AI_CULTURAL_API_KEY }}
+        AI_AUDIT_API_KEY: ${{ secrets.AI_AUDIT_API_KEY }}
+        AI_TITLE_API_KEY: ${{ secrets.AI_TITLE_API_KEY }}
         
-        # Social Media & Web Keys (ለፓይተን ስክሪፕቱ እንዲደርስ)
+        # Social Media & Web
         WP_URL: ${{ secrets.WP_URL }}
         WP_USERNAME: ${{ secrets.WP_USERNAME }}
         WP_PASSWORD: ${{ secrets.WP_PASSWORD }}
         TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
         TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         
-        # System Config
+        # Topic Input (ከላይ ከተሰጠው ወይም Default)
+        ENTERPRISE_TOPIC: ${{ github.event.inputs.topic || 'Enterprise AI Implementation Strategies 2026' }}
+        
+        # System
         PYTHONPATH: .
       run: |
-        echo "🔥 Starting Enterprise Production..."
-        # ስክሪፕትህ 'enterprise_runner.py' ወይም 'main_runner.py' መሆኑን አረጋግጥ
+        echo "🔥 Starting Production Engine for topic: $ENTERPRISE_TOPIC"
+        # ስክሪፕቱ ስህተት ቢፈጥርም ሂደቱ እንዳይቋረጥ (set +e)
+        set +e 
         python enterprise_runner.py
-
-    - name: 📤 Deploy to GitHub Dashboard (Commit & Push)
-      if: success() # ስክሪፕቱ ከሰራ ብቻ ነው የሚገፋው
-      run: |
-        git config --local user.email "bot@auto-money-maker.com"
-        git config --local user.name "Profit Master Bot"
-        
-        # አዳዲስ ፋይሎችን ጨምር (enterprise_outputs ፎልደርን ጨምሮ)
-        git add enterprise_outputs/ production_backups/ ai_usage_logs/ || true
-        
-        # ለውጥ ካለ ብቻ Commit አድርግ
-        if git diff --staged --quiet; then
-          echo "Changes detected, pushing to repo..."
-          git commit -m "🚀 Auto-Publish: New Content & Reports [${{ github.run_id }}]"
-          git pull --rebase origin main # ግጭት እንዳይፈጠር መጀመሪያ ሳብ
-          git push origin main
+        exit_code=$?
+        if [ $exit_code -ne 0 ]; then
+          echo "⚠️ Script finished with warnings or errors (Code: $exit_code)"
+          # ስክሪፕቱ ቢወድቅም Artifacts እንዲሰበሰብ እዚህ ጋር አንወጣም
         else
-          echo "No changes to commit."
+          echo "✅ Script finished successfully"
         fi
 
-    - name: 📱 Send Telegram Notification (Backup Action)
-      # ፓይተን ስክሪፕቱ በራሱ ካልላከ፣ ይህ እንደ ሁለተኛ አማራጭ ይሠራል
-      if: always()
-      uses: appleboy/telegram-action@master
-      with:
-        to: ${{ secrets.TELEGRAM_CHAT_ID }}
-        token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-        message: |
-          ✅ GitHub Action Completed!
+    # 6. ውጤቱን ወደ GitHub መልሶ መጫን (Commit & Push)
+    - name: 📤 Commit & Push Results
+      if: always() # ስክሪፕቱ ቢበላሽም የተሰራውን ይጫን
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "Enterprise Bot 🤖"
+        
+        # አዳዲስ ፎልደሮችን ጨምር
+        git add enterprise_outputs/ production_backups/ enterprise_logs/ ai_usage_logs/ || true
+        
+        # ለውጥ ካለ እይ
+        if git diff --staged --quiet; then
+          echo "🚫 No changes to commit."
+        else
+          echo "✅ Changes detected. Committing..."
+          git commit -m "🚀 Enterprise Output: ${{ github.event.inputs.topic || 'Daily Run' }} [${{ github.run_id }}]"
           
-          Status: ${{ job.status }}
-          Topic: ${{ github.event.inputs.topic }}
-          Check repo for new files.
+          # ግጭት እንዳይፈጠር መጀመሪያ ሳብ (Rebase), ከዛ ጫን (Push)
+          git pull --rebase origin main
+          git push origin main
+        fi
 
-    - name: 💾 Upload Artifacts (Downloadable Zip)
+    # 7. ፋይሎቹን ለዳውሎድ ማዘጋጀት (Artifacts)
+    - name: 💾 Upload Artifacts (Zip)
       if: always()
       uses: actions/upload-artifact@v4
       with:
-        name: enterprise-results
+        name: enterprise-production-results
+        retention-days: 90
         path: |
           enterprise_outputs/
           enterprise_logs/
+          production_backups/
+          *.html
+          *.json
+          *.md
