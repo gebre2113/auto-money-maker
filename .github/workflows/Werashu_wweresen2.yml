@@ -47,7 +47,7 @@ jobs:
             beautifulsoup4 selenium tweepy \
             sqlalchemy redis fastapi uvicorn psutil \
             nltk spacy textblob pydantic==1.10.11 prometheus-client boto3 \
-            deep-translator transformers
+            deep-translator transformers aioredis
           
           pip install torch --index-url https://download.pytorch.org/whl/cpu
           python -m nltk.downloader brown punkt punkt_tab stopwords wordnet averaged_perceptron_tagger_eng conll2000 movie_reviews
