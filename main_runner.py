@@ -37,7 +37,8 @@ from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Dict, List, Optional, Any, Tuple, Union
 import textwrap
-
+import requests  # ይህ ለ Telegram እና WordPress የግድ ያስፈልጋል
+import base64    # ይህ ለ WordPress የይለፍ ቃል (Auth) ያስፈልጋል
 # Suppress warnings
 warnings.filterwarnings('ignore')
 
