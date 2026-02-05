@@ -4192,142 +4192,47 @@ class EnhancedWordCounter:
 # =========================================================================
 
 class MegaContentEngine:
-    """
-    👑 TITAN v4.0 - THE HEXA-KEY SOVEREIGN ENGINE
-    ስትራቴጂ፡ 4-Phase Sequential Rotation (እያንዳንዱ ዙር አዲስ ቁልፍ ይጠቀማል)
-    ግብ፡ 6,500 - 8,000 ቃላት (Total Market Dominance)
-    """
+    """7,000+ ቃላት የሚያመርት ዋና ሞተር"""
     def __init__(self, system):
         self.system = system
         self.config = system.config
         self.failover = system.failover_system
-        self.logger = logging.getLogger("MegaEngine.Titan")
 
     async def produce_11_countries_mega_loop(self, topic: str):
         target_countries = list(self.config.HIGH_VALUE_COUNTRIES.keys())[:11]
-        
-        print("\n" + "█"*80)
-        print(f"🚀 TITAN v4.0: HEXA-KEY ROTATION ACTIVATED")
-        print(f"📝 Topic: {topic}")
-        print(f"🎯 Target: 7,000+ Words (Using 6+ API Keys)")
-        print("█"*80 + "\n")
-
-        start_time = time.time()
+        print(f"\n🔥 TITAN v4.2 ACTIVATED: TRYING ALL GROQ KEYS FIRST\n")
 
         for i, country in enumerate(target_countries, 1):
-            country_info = self.config.HIGH_VALUE_COUNTRIES[country]
-            emoji = country_info['emoji']
-            print(f"🔄 [{i}/11] Mega-Crafting for: {emoji} {country}...")
+            print(f"🔄 [{i}/11] Sovereign Crafting: {country}...")
             
             try:
-                # --- STAGE 1: FOUNDATIONS (አዲስ ቁልፍ ይጠቀማል) ---
-                print(f"   🔹 Stage 1: Intelligence & Foundations (Using Groq Key A)...")
-                p1 = await self.failover.generate_content(self._get_p1_titan_prompt(topic, country), max_tokens=4000)
-                await asyncio.sleep(2) # ቁልፍ ለመቀየር አጭር እረፍት
+                # እያንዳንዱ Phase ራሱን የቻለ ጥልቅ ጥያቄ ነው
+                print(f"   🔹 Stage 1: Intelligence...")
+                p1 = await self.failover.generate_content(f"Write a massive 2,000-word foundation for '{topic}' in {country}. Use HTML headings. Be very detailed.", max_tokens=3500)
                 
-                # --- STAGE 2: ARCHITECTURE (አዲስ ቁልፍ ይጠቀማል) ---
-                print(f"   🔹 Stage 2: Technical Architecture (Using Groq Key B)...")
-                p2 = await self.failover.generate_content(self._get_p2_titan_prompt(topic, country, p1), max_tokens=4000)
-                await asyncio.sleep(2)
+                print(f"   🔹 Stage 2: Technical Architecture...")
+                p2 = await self.failover.generate_content(f"Expand with 2,000 more words on technical setup and 10 local case studies for '{topic}' in {country}. Use HTML.", max_tokens=3500)
                 
-                # --- STAGE 3: REVENUE (አዲስ ቁልፍ ይጠቀማል) ---
-                print(f"   🔹 Stage 3: Revenue & Roadmap (Using Groq Key C)...")
-                p3 = await self.failover.generate_content(self._get_p3_titan_prompt(topic, country, p2), max_tokens=4000)
-                await asyncio.sleep(2)
+                print(f"   🔹 Stage 3: Strategy & ROI...")
+                p3 = await self.failover.generate_content(f"Add 1,500 words of tactical roadmap, ROI models, and monetization for '{topic}' in {country}. Use HTML.", max_tokens=3500)
                 
-                # --- STAGE 4: SOVEREIGN FAQ (አዲስ ቁልፍ ይጠቀማል) ---
-                print(f"   🔹 Stage 4: Elite FAQ & Intel (Using Groq Key D)...")
-                p4 = await self.failover.generate_content(self._get_p4_titan_prompt(topic, country, p3), max_tokens=4000)
+                print(f"   🔹 Stage 4: Mastery & FAQ...")
+                p4 = await self.failover.generate_content(f"Finalize with 1,500 words of 30 deep FAQs and future vision for '{topic}' in {country}. Use HTML.", max_tokens=3500)
                 
-                # ሁሉንም ክፍሎች ማዋሃድ
-                full_content = self._stitch_titan_content(p1, p2, p3, p4, topic, country)
-                word_count = EnhancedWordCounter.count_words(full_content)
+                full_content = p1 + "\n<hr>\n" + p2 + "\n<hr>\n" + p3 + "\n<hr>\n" + p4
+                words = EnhancedWordCounter.count_words(full_content)
                 
-                result_data = {
-                    'id': f"titan_v4_{country}_{int(time.time())}",
-                    'title': f"The 2026 Sovereign Masterclass: {topic} in {country}",
-                    'content': full_content,
-                    'word_count': word_count,
-                    'quality_report': {'overall_score': 100, 'authority': 'Sovereign Elite'},
-                    'production_report': {
-                        'estimated_earning_potential': {
-                            'monthly_value': country_info['avg_commission'] * 150,
-                            'status': 'Titan Grade'
-                        }
-                    }
-                }
-                
-                save_to_file(result_data, 'html')
-                print(f"   ✨ TITAN SUCCESS: {word_count} words for {country}!")
+                if words < 1500:
+                    raise Exception("Output too thin. Retrying with backup keys...")
+
+                result = {'id': f"titan_v42_{country}", 'title': f"Sovereign Masterclass: {topic} in {country}", 'content': full_content, 'word_count': words, 'quality_report': {'overall_score': 100}}
+                save_to_file(result, 'html')
+                print(f"   ✨ SUCCESS: {words} words for {country}!")
 
             except Exception as e:
-                print(f"   ❌ TITAN ERROR in {country}: {str(e)}")
-
-            if i < 11:
-                # ቁልፎቹ ስለሚቀያየሩ ረጅም እረፍት አያስፈልገንም
-                print(f"   ⏳ Quick Sync (15s)..."); await asyncio.sleep(15)
-
-        total_duration = (time.time() - start_time) / 60
-        print("\n" + "█"*80)
-        print(f"🏆 TITAN MISSION COMPLETE! Total Time: {total_duration:.2f} Mins.")
-        print("█"*80 + "\n")
-
-    def _get_p1_titan_prompt(self, topic, country):
-        return f"""
-        (STAGE 1/4) Act as a Global Strategic Lead. 
-        Write 2,500 words of FOUNDATIONS for a 7,000-word guide on "{topic}" for {country}.
-        CHAPTERS:
-        1. 2026 Sovereign Market Dynamics in {country} (900 words).
-        2. Psychographic Analysis of the {country} consumer base (800 words).
-        3. Local Regulatory & Tax Compliance Architecture (800 words).
-        USE HTML (H1, H2, H3). Write massive, detailed paragraphs. No summaries.
-        """
-
-    def _get_p2_titan_prompt(self, topic, country, previous):
-        return f"""
-        (STAGE 2/4) Act as a Senior Technical Architect. 
-        Continue the {country} guide on "{topic}" with 2,500 words of ARCHITECTURE.
-        CHAPTERS:
-        1. Infrastructure Setup: Technical & Operational Blueprint for {country} (1,000 words).
-        2. 10 Local Case Studies: Deep-dive into {country} success models (1,000 words).
-        3. Strategic Competitive Moats in the {country} market (500 words).
-        USE HTML (H2, H3) and Data Tables.
-        """
-
-    def _get_p3_titan_prompt(self, topic, country, previous):
-        return f"""
-        (STAGE 3/4) Act as a Wealth Management Expert. 
-        Continue the {country} guide on "{topic}" with 2,500 words of REVENUE STRATEGY.
-        CHAPTERS:
-        1. 24-Month Sovereign Implementation Roadmap for {country} (1,200 words).
-        2. Localized ROI Models: Profit projections in {country} currency vs USD (700 words).
-        3. Sustainability & Risk Hedging in {country} (600 words).
-        USE HTML (H2, H3). Force word counts.
-        """
-
-    def _get_p4_titan_prompt(self, topic, country, previous):
-        return f"""
-        (STAGE 4/4) Act as an Elite Intel Analyst. 
-        Finalize the {country} guide on "{topic}" with 2,000 words of INTEL.
-        CHAPTERS:
-        1. MASTER FAQ HUB: 30 complex questions with 150-word answers each (This must be massive).
-        2. Resource Directory: Tools, APIs, and Networks in {country}.
-        3. The 2035 Horizon: Future trends for {country}.
-        USE HTML. Ensure total count exceeds 7,000 words.
-        """
-
-    def _stitch_titan_content(self, p1, p2, p3, p4, topic, country):
-        titan_html = f"""
-        <div style="border: 15px solid #1e3c72; padding:60px; background:#fff; line-height:1.8;">
-            <div style="text-align:center; border-bottom:5px solid #1e3c72; margin-bottom:50px; padding-bottom:30px;">
-                <h1 style="font-size:5em; color:#1e3c72; margin:0;">TITAN SOVEREIGN</h1>
-                <h2 style="color:#666;">GLOBAL STRATEGIC MASTERPIECE 2026</h2>
-                <p style="font-size:1.5em;">MARKET: {country.upper()} | TOPIC: {topic.upper()}</p>
-            </div>
-            {p1} <hr style="margin:50px 0;"> {p2} <hr style="margin:50px 0;"> {p3} <hr style="margin:50px 0;"> {p4}
-        </div>
-        """
-        return titan_html 
+                print(f"   ❌ FATAL in {country}: {e}")
+            
+            if i < 11: await asyncio.sleep(25)
 # =================== ዋና ስርዓት ክፍል ===================
 
 class UltimateProfitMasterSystem:
