@@ -1043,71 +1043,152 @@ class ComprehensiveErrorHandler:
             return "🔴 ከፍተኛ ችግር አለ"
 
 # =================== 🔄 የተሻሻለ የAI ፌይልኦቨር ሲስተም ===================
+# =================== 🔄 እጅግ የላቀ የAI ፌይልኦቨር ሲስተም v18.3 (Titan Edition) ===================
 class EnhancedAIFailoverSystem:
+    """
+    💎 TITAN AI FAILOVER & SELF-HEALING SYSTEM
+    ዓላማ፡ ዜሮ ውድቀት (Zero Failure) እና 4,000+ ቃላት በእያንዳንዱ ዙር ማረጋገጥ።
+    """
+    
     def __init__(self, config):
         self.config = config
         self.key_manager = SecureAPIKeyManager()
         self.healer = SelfHealingSystem()
         self.monitor = AdvancedMonitoring()
+        
+        # 🚀 የሞዴሎች ዝርዝር (Sovereign Edition Updated)
         self.model_configs = {
             'groq': {
                 'models': ['llama-3.3-70b-versatile', 'mixtral-8x7b-32768', 'llama-3.1-8b-instant'],
                 'endpoint': 'https://api.groq.com/openai/v1/chat/completions'
             },
             'gemini': {
-                'models': ['gemini-1.5-flash', 'gemini-1.5-pro'],
-                'endpoint': 'https://generativelanguage.googleapis.com/v1/models' # v1 endpoint is more stable
+                'models': ['gemini-1.5-pro', 'gemini-1.5-flash'],
+                'endpoint': 'https://generativelanguage.googleapis.com/v1beta/models'
+            },
+            'openai': {
+                'models': ['gpt-4o', 'gpt-4o-mini'],
+                'endpoint': 'https://api.openai.com/v1/chat/completions'
             }
         }
+        
         self.content_cache = {}
         self.performance_stats = defaultdict(lambda: {'success': 0, 'fail': 0, 'total_time': 0})
+        logger.info("🛡️ Elite Titan Failover System Initialized & Locked")
 
     async def generate_content(self, prompt: str, content_type: str = "general", max_tokens: int = 4000) -> str:
-        services_to_try = ['groq', 'gemini']
+        """ዋናው ይዘት ማመንጫ ፈንክሽን - ራስን የሚፈውስ እና የማይበገር"""
+        
+        # 1. 🔍 Smart Cache Check
+        cache_key = hashlib.md5(f"{prompt[:500]}".encode()).hexdigest()
+        if cache_key in self.content_cache:
+            return self.content_cache[cache_key]['content']
+        
+        # 2. 🚦 አገልግሎቶችን በቅደም ተከተል መሞከር (Groq -> Gemini -> OpenAI)
+        services_to_try = ['groq', 'gemini', 'openai']
         last_error = None
 
         for service in services_to_try:
-            if not self.healer.is_service_healthy(service): continue
+            if not self.healer.is_service_healthy(service):
+                continue
+
             api_key = self.key_manager.get_key(service)
             if not api_key: continue
 
-            # በእያንዳንዱ አገልግሎት ውስጥ ያሉትን ሞዴሎች በሙሉ መሞከር (Model Rotation)
-            models = self.model_configs[service]['models']
-            for model in models:
+            # በእያንዳንዱ ሰርቪስ ውስጥ ያሉትን ሞዴሎች ማሽከርከር (Model Rotation)
+            models_to_rotate = self.model_configs[service]['models']
+            
+            for model in models_to_rotate:
                 try:
                     start_t = time.time()
+                    logger.info(f"🚀 [{service.upper()}] Attempting with model: {model}")
+                    
                     content = await self._execute_api_call(service, model, prompt, api_key, max_tokens)
-                    if content and len(content.strip()) > 500:
+                    
+                    if content and len(content.strip()) > 400:
                         duration = time.time() - start_t
                         self.performance_stats[service]['success'] += 1
                         await self.healer.monitor_service_health(service, True, duration)
+                        
+                        # Cache the success
+                        self.content_cache[cache_key] = {'content': content, 'timestamp': time.time()}
                         return content
+                    else:
+                        raise Exception("Content too short or low quality")
+
                 except Exception as e:
                     last_error = str(e)
-                    if "429" in last_error: # Rate Limit ከሆነ ለ5 ሰከንድ አርፎ ወደ ቀጣዩ ሞዴል ይሄዳል
-                        await asyncio.sleep(5)
+                    if "429" in last_error: # Rate limit ካለ ትንሽ ቆይቶ ወደ ቀጣዩ ሞዴል
+                        logger.warning(f"⚠️ {service.upper()} {model} hit Rate Limit. Rotating...")
+                        await asyncio.sleep(8)
                         continue
-            
+                    elif "400" in last_error: # Bad prompt ካለ
+                        logger.warning(f"⚠️ {service.upper()} 400 Bad Request. Refining context...")
+                        continue
+                    else:
+                        logger.error(f"❌ {service.upper()} {model} failed: {last_error}")
+                        break # ወደ ቀጣዩ ሰርቪስ ይለፋል
+
+            # አገልግሎቱ ሙሉ በሙሉ ካልሰራ
             await self.healer.monitor_service_health(service, False, 0)
+
+        # 🚨 ሁሉም ሲከሽፉ
+        logger.error(f"🚨 CRITICAL FAILURE: All engines exhausted. Last: {last_error}")
         return self._generate_fallback_content(prompt)
 
     async def _execute_api_call(self, service, model, prompt, api_key, max_tokens):
-        async with httpx.AsyncClient(timeout=120.0) as client:
+        """API ጥሪዎችን በከፍተኛ ጥንቃቄ ማስተናገድ"""
+        async with httpx.AsyncClient(timeout=130.0) as client:
+            # --- GROQ ---
             if service == 'groq':
                 headers = {"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"}
-                data = {"model": model, "messages": [{"role": "user", "content": prompt}], "temperature": 0.8, "max_tokens": max_tokens}
+                data = {
+                    "model": model,
+                    "messages": [{"role": "user", "content": prompt}],
+                    "temperature": 0.8,
+                    "max_tokens": max_tokens
+                }
                 resp = await client.post(self.model_configs['groq']['endpoint'], headers=headers, json=data)
-            elif service == 'gemini':
-                # የ Gemini endpoint አጻጻፍ ለ v1 ተስተካክሏል
-                url = f"{self.model_configs['gemini']['endpoint']}/{model}:generateContent?key={api_key}"
-                data = {"contents": [{"parts": [{"text": prompt}]}], "generationConfig": {"maxOutputTokens": max_tokens, "temperature": 0.8}}
-                resp = await client.post(url, json=data)
             
-            if resp.status_code == 200:
-                if service == 'groq': return resp.json()['choices'][0]['message']['content']
-                return resp.json()['candidates'][0]['content']['parts'][0]['text']
-            raise Exception(f"{service} Error: {resp.status_code}")
+            # --- GEMINI (v1beta for better stability) ---
+            elif service == 'gemini':
+                url = f"{self.model_configs['gemini']['endpoint']}/{model}:generateContent?key={api_key}"
+                data = {
+                    "contents": [{"parts": [{"text": prompt}]}],
+                    "generationConfig": {"temperature": 0.8, "maxOutputTokens": max_tokens}
+                }
+                resp = await client.post(url, json=data)
 
+            # --- OPENAI ---
+            elif service == 'openai':
+                headers = {"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"}
+                data = {
+                    "model": model,
+                    "messages": [{"role": "user", "content": prompt}],
+                    "max_tokens": max_tokens
+                }
+                resp = await client.post(self.model_configs['openai']['endpoint'], headers=headers, json=data)
+
+            if resp.status_code == 200:
+                if service == 'groq' or service == 'openai':
+                    return resp.json()['choices'][0]['message']['content']
+                else: # Gemini
+                    return resp.json()['candidates'][0]['content']['parts'][0]['text']
+            
+            raise Exception(f"API Error {resp.status_code}: {resp.text[:100]}")
+
+    def _generate_fallback_content(self, prompt: str) -> str:
+        """ይህ ፈንክሽን ስህተቱን ይፈታዋል (The AttributeError Fix)"""
+        return f"""
+        <div style='padding:20px; border:2px solid red; background:#fff1f1;'>
+            <h3>⚠️ Content Regeneration Required</h3>
+            <p>Our Titan AI engines are currently refreshing. The guide for '{prompt[:40]}...' will be updated in the next cycle.</p>
+        </div>
+        """
+    
+    def get_performance_report(self) -> Dict:
+        """የአፈፃፀም ሪፖርት"""
+        return {s.upper(): f"{st['success']} Success / {st['fail']} Fail" for s, st in self.performance_stats.items()}
 # =================== 📝 የተሻሻለ የይዘት ጀነሬተር ===================
 
 class ProductionContentGenerator:
