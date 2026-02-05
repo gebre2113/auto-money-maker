@@ -1043,19 +1043,6 @@ class ComprehensiveErrorHandler:
             return "🔴 ከፍተኛ ችግር አለ"
 
 # =================== 🔄 የተሻሻለ የAI ፌይልኦቨር ሲስተም ===================
-import hashlib
-import time
-import logging
-import random
-import httpx
-from collections import defaultdict
-from typing import Dict
-
-logger = logging.getLogger("ProfitMaster")
-
-class ComprehensiveErrorHandler:
-    def handle(self):
-        return "🔴 ከፍተኛ ችግር አለ"
 
 # =================== 🔄 የተሻሻለ የAI ፌይልኦቨር ሲስተም ===================
 class EnhancedAIFailoverSystem:
