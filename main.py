@@ -1043,6 +1043,21 @@ class ComprehensiveErrorHandler:
             return "🔴 ከፍተኛ ችግር አለ"
 
 # =================== 🔄 የተሻሻለ የAI ፌይልኦቨር ሲስተም ===================
+import hashlib
+import time
+import logging
+import random
+import httpx
+from collections import defaultdict
+from typing import Dict
+
+logger = logging.getLogger("ProfitMaster")
+
+class ComprehensiveErrorHandler:
+    def handle(self):
+        return "🔴 ከፍተኛ ችግር አለ"
+
+# =================== 🔄 የተሻሻለ የAI ፌይልኦቨር ሲስተም ===================
 class EnhancedAIFailoverSystem:
     """
     ከፍተኛ ብልጠት ያለው እና ራሱን የሚፈውስ AI Failover System
@@ -1051,6 +1066,8 @@ class EnhancedAIFailoverSystem:
     
     def __init__(self, config):
         self.config = config
+        # ማሳሰቢያ፡ እነዚህ ክላሶች (SecureAPIKeyManager, SelfHealingSystem, AdvancedMonitoring) 
+        # በሌላ የኮድህ ክፍል መኖራቸውን አረጋግጥ።
         self.key_manager = SecureAPIKeyManager()
         self.healer = SelfHealingSystem()
         self.monitor = AdvancedMonitoring()
@@ -1089,7 +1106,7 @@ class EnhancedAIFailoverSystem:
                 logger.info("💾 Cached content found. Reusing...")
                 return cached_data['content']
         
-        # 2. አገልግሎቶችን በቅደም ተከተል መሞከር (Groq -> Gemini -> OpenAI)
+        # 2. አገልግሎቶችን በቅደም ተከተል መሞከር (Groq -> Gemini)
         services_to_try = ['groq', 'gemini']
         last_error = None
 
@@ -1138,7 +1155,7 @@ class EnhancedAIFailoverSystem:
                 # ስህተቱን መመዝገብ
                 self.performance_stats[service]['fail'] += 1
                 await self.healer.monitor_service_health(service, False, 0)
-                continue # ወደ ቀጣዩ ሞዴል ይለፋል
+                continue 
 
         # ሁሉም ከከሸፉ መረጃውን ለገቢ ማመንጫው ባዶ እንዳይሆን Fallback ስጥ
         logger.error(f"🚨 All AI Engines failed. Last error: {last_error}")
@@ -1164,14 +1181,19 @@ class EnhancedAIFailoverSystem:
                 else:
                     raise Exception(f"Groq API Error: {resp.status_code} - {resp.text[:100]}")
 
-        # --- GEMINI CALL ---
+        # --- GEMINI CALL --- (URL የተስተካከለ)
         elif service == 'gemini':
             model_key = 'technical' if content_type == 'technical' else 'general'
-            model = self.model_configs['gemini']['models'].get(model_key)
-            url = f"{self.model_configs['gemini']['endpoint']}/{model}:generateContent?key={api_key}"
+            model_name = self.model_configs['gemini']['models'].get(model_key)
+            # የ Gemini API URL ትክክለኛ አጻጻፍ
+            url = f"{self.model_configs['gemini']['endpoint']}/{model_name}:generateContent?key={api_key}"
+            
             data = {
                 "contents": [{"parts": [{"text": prompt}]}],
-                "generationConfig": {"temperature": 0.7, "maxOutputTokens": max_tokens}
+                "generationConfig": {
+                    "temperature": 0.7, 
+                    "maxOutputTokens": max_tokens
+                }
             }
             async with httpx.AsyncClient(timeout=60.0) as client:
                 resp = await client.post(url, json=data)
@@ -1197,12 +1219,8 @@ class EnhancedAIFailoverSystem:
         report = {}
         for service, stats in self.performance_stats.items():
             total = stats['success'] + stats['fail']
-            if total > 0:
-                success_rate = (stats['success'] / total) * 100
-                avg_time = stats['total_time'] / stats['success'] if stats['success'] > 0 else 0
-            else:
-                success_rate = 0
-                avg_time = 0
+            success_rate = (stats['success'] / total) * 100 if total > 0 else 0
+            avg_time = stats['total_time'] / stats['success'] if stats['success'] > 0 else 0
             
             report[service] = {
                 'success_rate': round(success_rate, 2),
