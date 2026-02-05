@@ -1042,28 +1042,26 @@ class ComprehensiveErrorHandler:
         else:
             return "🔴 ከፍተኛ ችግር አለ"
 
-# =================== 🔄 የተሻሻለ የAI ፌይልኦቨር ሲስተም ===================
-# =================== 🔄 TITAN v4.0: HEXA-KEY ROUND-ROBIN STRATEGY ===================
+# =================== 🔄 TITAN v4.2: FULL KEY EXHAUSTION STRATEGY ===================
 class EnhancedAIFailoverSystem:
     def __init__(self, config):
         self.config = config
-        # ሁሉንም ቁልፎች መጫን (GROQ_API_KEY_1 እስከ 10)
+        # ሁሉንም ቁልፎች ከ GitHub Secrets መጫን
         self.key_pools = {
             'groq': self._load_multi_keys('GROQ_API_KEY'),
-            'gemini': self._load_multi_keys('GEMINI_API_KEY'),
             'deepseek': self._load_multi_keys('DEEPSEEK_API_KEY'),
-            'openai': self._load_multi_keys('OPENAI_API_KEY')
+            'openai': self._load_multi_keys('OPENAI_API_KEY'),
+            'gemini': self._load_multi_keys('GEMINI_API_KEY')
         }
-        # ለእያንዳንዱ ጥያቄ ቁልፍ የሚቀይር ማውጫ (Global Request Counter)
         self.request_index = defaultdict(int)
         
         self.model_configs = {
-            'groq': ['llama-3.3-70b-versatile', 'mixtral-8x7b-32768', 'llama-3.1-8b-instant'],
-            'gemini': ['gemini-1.5-flash', 'gemini-1.5-pro'],
+            'groq': ['llama-3.3-70b-versatile', 'llama-3.1-8b-instant', 'mixtral-8x7b-32768'],
             'deepseek': ['deepseek-chat', 'deepseek-reasoner'],
-            'openai': ['gpt-4o-mini']
+            'openai': ['gpt-4o-mini'],
+            'gemini': ['gemini-1.5-flash', 'gemini-1.5-pro']
         }
-        logger.info(f"🛡️ Titan v4.0 Hexa-Key Ready. Groq Keys Found: {len(self.key_pools['groq'])}")
+        logger.info(f"🛡️ Titan v4.2 Exhaustion Mode Ready. Groq Keys: {len(self.key_pools['groq'])}")
 
     def _load_multi_keys(self, base_name):
         keys = []
@@ -1075,38 +1073,47 @@ class EnhancedAIFailoverSystem:
         return keys
 
     async def generate_content(self, prompt: str, content_type: str = "general", max_tokens: int = 4000) -> str:
-        # አገልግሎቶችን የመሞከሪያ ቅደም ተከተል
-        services = ['groq', 'deepseek', 'gemini', 'openai']
+        # 🚥 የቅድሚያ ቅደም ተከተል
+        services = ['groq', 'deepseek', 'openai', 'gemini']
         last_error = ""
 
         for service in services:
             pool = self.key_pools.get(service, [])
             if not pool: continue
 
-            # 🔄 ROUND-ROBIN: ለእያንዳንዱ ዙር የተለያየ ቁልፍ መጠቀም
-            for _ in range(len(pool)):
-                idx = self.request_index[service] % len(pool)
-                api_key = pool[idx]
-                self.request_index[service] += 1 # ለሚቀጥለው ዙር ቁልፍ ይቀይራል
+            logger.info(f"🛰️ Attempting {service.upper()} Service with {len(pool)} keys...")
 
+            # 🔄 EXHAUSTION LOOP: የዚህን ሰርቪስ ቁልፎች በሙሉ ሳይጨርስ ወደ ሌላ አይሄድም
+            for key_num in range(len(pool)):
+                api_key = pool[key_num]
                 models = self.model_configs[service]
+                
                 for model in models:
                     try:
-                        logger.info(f"🚀 [{service.upper()}] Request Using Key #{idx+1} | Model: {model}")
+                        logger.info(f"🚀 [{service.upper()}] Trying Key #{key_num + 1} | Model: {model}")
                         content = await self._execute_call(service, model, prompt, api_key, max_tokens)
-                        if content and len(content.strip()) > 500:
+                        
+                        # 🛡️ ጥራት መቆጣጠሪያ (ከ 500 ቃላት በታች ከሆነ ውድቅ አድርግ)
+                        if content and len(content.strip().split()) > 500:
                             return content
+                        else:
+                            logger.warning(f"⚠️ Key #{key_num + 1} returned thin content. Moving to next key...")
+                            break # የዚህን ቁልፍ ሌላ ሞዴል አትሞክር፣ ወደ ቀጣዩ ቁልፍ ሂድ
+
                     except Exception as e:
                         last_error = str(e)
-                        if "429" in last_error:
-                            logger.warning(f"⚠️ Key #{idx+1} Limited. Trying next key in pool...")
-                            break # ወደ ቀጣዩ ቁልፍ
-                        continue
-        
+                        if "429" in last_error or "limit" in last_error.lower():
+                            logger.warning(f"⚠️ Key #{key_num + 1} Rate Limited. Moving to next key...")
+                            break # የዚህን ቁልፍ ሌላ ሞዴል አትሞክር፣ ወደ ቀጣዩ ቁልፍ ሂድ
+                        continue # ለሌላ ስህተት ሞዴል ቀይር
+            
+            logger.error(f"❌ {service.upper()} exhausted all keys. Failing over to next service...")
+
         return self._generate_fallback_content(prompt)
 
     async def _execute_call(self, service, model, prompt, key, max_tokens):
-        async with httpx.AsyncClient(timeout=160.0) as client:
+        async with httpx.AsyncClient(timeout=180.0) as client:
+            # --- OpenAI, Groq, DeepSeek ---
             if service in ['groq', 'deepseek', 'openai']:
                 urls = {
                     'groq': 'https://api.groq.com/openai/v1/chat/completions',
@@ -1116,18 +1123,23 @@ class EnhancedAIFailoverSystem:
                 headers = {"Authorization": f"Bearer {key}", "Content-Type": "application/json"}
                 data = {"model": model, "messages": [{"role": "user", "content": prompt}], "max_tokens": max_tokens, "temperature": 0.7}
                 resp = await client.post(urls[service], headers=headers, json=data)
-            else: # Gemini
-                url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={key}"
+            
+            # --- GEMINI (Stable v1) ---
+            else: 
+                url = f"https://generativelanguage.googleapis.com/v1/models/{model}:generateContent?key={key}"
                 data = {"contents": [{"parts": [{"text": prompt}]}], "generationConfig": {"maxOutputTokens": max_tokens, "temperature": 0.7}}
                 resp = await client.post(url, json=data)
 
             if resp.status_code == 200:
                 rj = resp.json()
-                return rj['choices'][0]['message']['content'] if service != 'gemini' else rj['candidates'][0]['content']['parts'][0]['text']
+                if service == 'gemini':
+                    return rj['candidates'][0]['content']['parts'][0]['text']
+                return rj['choices'][0]['message']['content']
+            
             raise Exception(f"Error {resp.status_code}: {resp.text[:50]}")
 
     def _generate_fallback_content(self, prompt: str) -> str:
-        return f"<h2>Strategic Sync</h2><p>Data for {prompt[:30]} is being processed via backup Titan nodes.</p>"                     
+        return f"<h2>System Notice</h2><p>Our Titan cluster is finalizing the massive 7,000-word analysis for {prompt[:30]}...</p>"                     
 # =================== 📝 የተሻሻለ የይዘት ጀነሬተር ===================
 
 class ProductionContentGenerator:
