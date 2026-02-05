@@ -4350,7 +4350,8 @@ class UltimateProfitMasterSystem:
             self.self_optimizer = SelfOptimizingEngine()
         except:
             self.self_optimizer = None
-        
+        # በ __init__ መጨረሻ ላይ ይህን ጨምር፡
+self.mega_engine = MegaContentEngine(self)
         logger.info("🚀 Ultimate Profit Master System v18.1 Initialized")
         
     async def full_production_pipeline(self, topic: str, target_countries: List[str] = None) -> Dict:
