@@ -75,11 +75,24 @@ jobs:
              exit 1
           fi
 
-      - name: "💾 Commit & Push Results"
+      - name: "💾 Commit & Push Results (Bulletproof Version)"
         if: always()
         run: |
           git config --local user.email "actions@github.com"
           git config --local user.name "GitHub Action"
+          
+          # ፋይሎችን ለመጨመር
           git add outputs/ logs/ || true
-          git commit -m "🚀 Mega Content Update [3500+ words per country]" || echo "No changes to commit"
-          git push
+          
+          # ለውጥ መኖሩን ማረጋገጥ
+          if git diff --quiet && git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "🚀 Mega Content Update [Sovereign Grade: 5000+ words]"
+            
+            # ስህተት እንዳይፈጠር መጀመሪያ የቅርብ ጊዜውን ለውጥ ይስባል (Pull with Rebase)
+            git pull --rebase origin main
+            
+            # ከዚያም ይገፋዋል (Push)
+            git push origin main
+          fi
