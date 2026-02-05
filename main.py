@@ -1043,216 +1043,70 @@ class ComprehensiveErrorHandler:
             return "🔴 ከፍተኛ ችግር አለ"
 
 # =================== 🔄 የተሻሻለ የAI ፌይልኦቨር ሲስተም ===================
-# =================== 🔄 የተሻሻለ እና እጅግ የላቀ የAI ፌይልኦቨር ሲስተም v18.2 ===================
 class EnhancedAIFailoverSystem:
-    """
-    💎 ULTIMATE AI FAILOVER & RECOVERY SYSTEM (Enterprise Grade)
-    ዓላማ፡ ዜሮ ውድቀት (Zero Failure) እና ከፍተኛ ጥራት ያለው ይዘት ማረጋገጥ።
-    """
-    
     def __init__(self, config):
         self.config = config
         self.key_manager = SecureAPIKeyManager()
         self.healer = SelfHealingSystem()
         self.monitor = AdvancedMonitoring()
-        
-        # 🚀 የሞዴሎች ማዕከላዊ ዝርዝር (2026 Sovereign Edition Updated)
         self.model_configs = {
             'groq': {
-                'models': {
-                    'technical': 'llama-3.3-70b-versatile',
-                    'creative': 'mixtral-8x7b-32768',
-                    'general': 'llama-3.1-8b-instant'
-                },
+                'models': ['llama-3.3-70b-versatile', 'mixtral-8x7b-32768', 'llama-3.1-8b-instant'],
                 'endpoint': 'https://api.groq.com/openai/v1/chat/completions'
             },
             'gemini': {
-                'models': {
-                    'technical': 'gemini-1.5-pro',
-                    'general': 'gemini-1.5-flash'
-                },
-                'endpoint': 'https://generativelanguage.googleapis.com/v1beta/models'
-            },
-            'openai': {
-                'models': {
-                    'technical': 'gpt-4o',
-                    'creative': 'gpt-4o-mini',
-                    'general': 'gpt-4o-mini'
-                },
-                'endpoint': 'https://api.openai.com/v1/chat/completions'
+                'models': ['gemini-1.5-flash', 'gemini-1.5-pro'],
+                'endpoint': 'https://generativelanguage.googleapis.com/v1/models' # v1 endpoint is more stable
             }
         }
-        
         self.content_cache = {}
-        self.performance_stats = defaultdict(lambda: {
-            'success': 0, 'fail': 0, 'total_time': 0, 'tokens_used': 0, 'last_used': 0
-        })
-        logger.info("🛡️ Elite AI Failover System v18.2 Initialized & Locked")
+        self.performance_stats = defaultdict(lambda: {'success': 0, 'fail': 0, 'total_time': 0})
 
     async def generate_content(self, prompt: str, content_type: str = "general", max_tokens: int = 4000) -> str:
-        """ዋናው ይዘት ማመንጫ ፈንክሽን - በከፍተኛ ጥንቃቄ የተገነባ"""
-        
-        # 1. 🔍 Smart Cache ፍተሻ
-        cache_key = hashlib.md5(f"{prompt[:500]}{content_type}".encode()).hexdigest()
-        if cache_key in self.content_cache:
-            cached_data = self.content_cache[cache_key]
-            if time.time() - cached_data.get('timestamp', 0) < 7200: # 2 ሰዓት Cache
-                logger.info(f"💾 Elite Cache Hit: Reusing optimized content for {content_type}")
-                return cached_data['content']
-        
-        # 2. 🚦 አገልግሎቶችን በቅደም ተከተል የመሞከር ስትራቴጂ
-        # ቅደም ተከተል፡ Groq (ፈጣን) -> Gemini (ጥልቅ) -> OpenAI (ትክክለኛ)
-        services_to_try = ['groq', 'gemini', 'openai']
+        services_to_try = ['groq', 'gemini']
         last_error = None
 
         for service in services_to_try:
-            if not self.healer.is_service_healthy(service):
-                logger.warning(f"⏳ {service.upper()} is in self-healing cooldown, skipping...")
-                continue
-
+            if not self.healer.is_service_healthy(service): continue
             api_key = self.key_manager.get_key(service)
-            if not api_key:
-                continue
+            if not api_key: continue
 
-            # 🛠️ Exponential Backoff Retry Logic
-            for attempt in range(2): 
+            # በእያንዳንዱ አገልግሎት ውስጥ ያሉትን ሞዴሎች በሙሉ መሞከር (Model Rotation)
+            models = self.model_configs[service]['models']
+            for model in models:
                 try:
                     start_t = time.time()
-                    logger.info(f"🚀 [{service.upper()}] Attempt {attempt + 1}: Generating {content_type} content...")
-                    
-                    content = await self._execute_api_call(service, prompt, api_key, content_type, max_tokens)
-                    
-                    if content and len(content.strip()) > 200:
+                    content = await self._execute_api_call(service, model, prompt, api_key, max_tokens)
+                    if content and len(content.strip()) > 500:
                         duration = time.time() - start_t
-                        logger.info(f"✅ {service.upper()} Success in {duration:.2f}s")
-                        
-                        # 📊 ስኬቱን እና አፈፃፀሙን መመዝገብ
-                        self._update_stats(service, True, duration, len(content.split()))
+                        self.performance_stats[service]['success'] += 1
                         await self.healer.monitor_service_health(service, True, duration)
-                        
-                        # 💾 ማህደረ ትውስታ ላይ ማስቀመጥ (ወደፊት ለተመሳሳይ ጥያቄ)
-                        self.content_cache[cache_key] = {
-                            'content': content,
-                            'timestamp': time.time(),
-                            'service': service,
-                            'duration': duration
-                        }
                         return content
-                    else:
-                        raise Exception("Generated content quality/length below threshold")
-
                 except Exception as e:
                     last_error = str(e)
-                    # 429 Error (Rate Limit) ከሆነ ትንሽ ቆይቶ እንዲሞክር
-                    if "429" in last_error:
-                        wait_time = (attempt + 1) * 5
-                        logger.warning(f"⚠️ {service.upper()} Rate Limit hit. Backing off for {wait_time}s...")
-                        await asyncio.sleep(wait_time)
-                    else:
-                        break # ለሌሎች ስህተቶች ወደ ቀጣዩ አገልግሎት ይለፋል
-
-            # በየአገልግሎቱ ውድቀት ሪፖርት ማድረግ
-            self._update_stats(service, False, 0, 0)
+                    if "429" in last_error: # Rate Limit ከሆነ ለ5 ሰከንድ አርፎ ወደ ቀጣዩ ሞዴል ይሄዳል
+                        await asyncio.sleep(5)
+                        continue
+            
             await self.healer.monitor_service_health(service, False, 0)
-
-        # 🚨 ሁሉም ሲከሽፉ - ዘመናዊ Fallback
-        logger.error(f"🚨 CRITICAL: All AI Engines exhausted. Last Error: {last_error}")
         return self._generate_fallback_content(prompt)
 
-    async def _execute_api_call(self, service, prompt, api_key, content_type, max_tokens):
-        """API ጥሪዎችን በተናጠል እና በጥራት ማስተናገድ"""
-        
-        async with httpx.AsyncClient(timeout=120.0, follow_redirects=True) as client:
-            # --- GROQ CALL (High Speed) ---
+    async def _execute_api_call(self, service, model, prompt, api_key, max_tokens):
+        async with httpx.AsyncClient(timeout=120.0) as client:
             if service == 'groq':
-                model = self.model_configs['groq']['models'].get(content_type, 'llama-3.1-8b-instant')
                 headers = {"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"}
-                data = {
-                    "model": model,
-                    "messages": [
-                        {"role": "system", "content": "You are a professional content creator. Write detailed, high-quality, and SEO-optimized content."},
-                        {"role": "user", "content": prompt}
-                    ],
-                    "temperature": 0.8,
-                    "max_tokens": max_tokens
-                }
+                data = {"model": model, "messages": [{"role": "user", "content": prompt}], "temperature": 0.8, "max_tokens": max_tokens}
                 resp = await client.post(self.model_configs['groq']['endpoint'], headers=headers, json=data)
-                if resp.status_code == 200:
-                    return resp.json()['choices'][0]['message']['content']
-
-            # --- GEMINI CALL (Deep Context) ---
             elif service == 'gemini':
-                model_key = 'technical' if content_type == 'technical' else 'general'
-                model_name = self.model_configs['gemini']['models'].get(model_key)
-                url = f"{self.model_configs['gemini']['endpoint']}/{model_name}:generateContent?key={api_key}"
-                data = {
-                    "contents": [{"parts": [{"text": prompt}]}],
-                    "generationConfig": {
-                        "temperature": 0.7, 
-                        "maxOutputTokens": max_tokens,
-                        "topP": 0.95,
-                        "topK": 40
-                    }
-                }
+                # የ Gemini endpoint አጻጻፍ ለ v1 ተስተካክሏል
+                url = f"{self.model_configs['gemini']['endpoint']}/{model}:generateContent?key={api_key}"
+                data = {"contents": [{"parts": [{"text": prompt}]}], "generationConfig": {"maxOutputTokens": max_tokens, "temperature": 0.8}}
                 resp = await client.post(url, json=data)
-                if resp.status_code == 200:
-                    return resp.json()['candidates'][0]['content']['parts'][0]['text']
-
-            # --- OPENAI CALL (Precision) ---
-            elif service == 'openai':
-                model = self.model_configs['openai']['models'].get(content_type, 'gpt-4o-mini')
-                headers = {"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"}
-                data = {
-                    "model": model,
-                    "messages": [{"role": "user", "content": prompt}],
-                    "max_tokens": max_tokens,
-                    "temperature": 0.7
-                }
-                resp = await client.post(self.model_configs['openai']['endpoint'], headers=headers, json=data)
-                if resp.status_code == 200:
-                    return resp.json()['choices'][0]['message']['content']
-
-            raise Exception(f"{service.upper()} API Error: {resp.status_code} - {resp.text[:150]}")
-
-    def _update_stats(self, service, success, duration, tokens):
-        """የአፈፃፀም መረጃዎችን ማዘመን"""
-        stats = self.performance_stats[service]
-        if success:
-            stats['success'] += 1
-            stats['total_time'] += duration
-            stats['tokens_used'] += tokens
-        else:
-            stats['fail'] += 1
-        stats['last_used'] = time.time()
-
-    def _generate_fallback_content(self, prompt: str) -> str:
-        """ይዘት ማመንጨት ሙሉ በሙሉ ሲከሽፍ የሚሰጥ ምላሽ"""
-        return f"""
-        <div class='error-notice'>
-            <h2>⚠️ መረጃውን ማመንጨት አልተቻለም</h2>
-            <p>ስለ <b>{prompt[:50]}...</b> ጥልቅ መረጃ ለማመንጨት ስንሞክር የቴክኒክ ችግር አጋጥሞናል።</p>
-            <p>እባክዎ ከጥቂት ደቂቃዎች በኋላ እንደገና ይሞክሩ። ሲስተሙ ራሱን በራሱ እየፈወሰ ነው።</p>
-        </div>
-        """
-    
-    def get_performance_report(self) -> Dict:
-        """የአፈፃፀም ሪፖርት - በከፍተኛ ግልጽነት"""
-        report = {}
-        for service, stats in self.performance_stats.items():
-            total = stats['success'] + stats['fail']
-            if total > 0:
-                success_rate = (stats['success'] / total) * 100
-                avg_time = stats['total_time'] / stats['success'] if stats['success'] > 0 else 0
-                
-                report[service.upper()] = {
-                    'Status': '🟢 ACTIVE' if self.healer.is_service_healthy(service) else '🔴 HEALING',
-                    'SuccessRate': f"{success_rate:.1f}%",
-                    'TotalRequests': total,
-                    'AvgResponseTime': f"{avg_time:.2f}s",
-                    'EstimatedTokens': stats['tokens_used'],
-                    'LastActivity': datetime.fromtimestamp(stats['last_used']).strftime('%H:%M:%S')
-                }
-        return report
+            
+            if resp.status_code == 200:
+                if service == 'groq': return resp.json()['choices'][0]['message']['content']
+                return resp.json()['candidates'][0]['content']['parts'][0]['text']
+            raise Exception(f"{service} Error: {resp.status_code}")
 
 # =================== 📝 የተሻሻለ የይዘት ጀነሬተር ===================
 
