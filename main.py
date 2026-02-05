@@ -4181,22 +4181,23 @@ class EnhancedWordCounter:
 
 class MegaContentEngine:
     """
-    👑 SOVEREIGN CROWN EDITION (v3.4)
-    ስትራቴጂ፡ Quad-Phase Recursive Expansion (Pillar -> Arch -> Revenue -> Sovereign)
-    ግብ፡ 6,000+ ቃላት (Total Market Dominance)
+    👑 TITAN v4.0 - THE HEXA-KEY SOVEREIGN ENGINE
+    ስትራቴጂ፡ 4-Phase Sequential Rotation (እያንዳንዱ ዙር አዲስ ቁልፍ ይጠቀማል)
+    ግብ፡ 6,500 - 8,000 ቃላት (Total Market Dominance)
     """
     def __init__(self, system):
         self.system = system
         self.config = system.config
         self.failover = system.failover_system
-        self.logger = logging.getLogger("MegaEngine.Sovereign")
+        self.logger = logging.getLogger("MegaEngine.Titan")
 
     async def produce_11_countries_mega_loop(self, topic: str):
         target_countries = list(self.config.HIGH_VALUE_COUNTRIES.keys())[:11]
         
         print("\n" + "█"*80)
-        print(f"👑 SOVEREIGN PRODUCTION STARTING: TARGETING 6,000+ WORDS")
+        print(f"🚀 TITAN v4.0: HEXA-KEY ROTATION ACTIVATED")
         print(f"📝 Topic: {topic}")
+        print(f"🎯 Target: 7,000+ Words (Using 6+ API Keys)")
         print("█"*80 + "\n")
 
         start_time = time.time()
@@ -4204,122 +4205,117 @@ class MegaContentEngine:
         for i, country in enumerate(target_countries, 1):
             country_info = self.config.HIGH_VALUE_COUNTRIES[country]
             emoji = country_info['emoji']
-            print(f"🔄 [{i}/11] Sovereign Crafting for: {emoji} {country}...")
+            print(f"🔄 [{i}/11] Mega-Crafting for: {emoji} {country}...")
             
             try:
-                # --- STAGE 1: FOUNDATIONS (2,200+ words) ---
-                print(f"   🔹 Stage 1: Intelligence & Market Psychographics...")
-                p1 = await self.failover.generate_content(self._get_p1_crown_prompt(topic, country, country_info), max_tokens=4000)
-                await asyncio.sleep(random.uniform(4, 6))
+                # --- STAGE 1: FOUNDATIONS (አዲስ ቁልፍ ይጠቀማል) ---
+                print(f"   🔹 Stage 1: Intelligence & Foundations (Using Groq Key A)...")
+                p1 = await self.failover.generate_content(self._get_p1_titan_prompt(topic, country), max_tokens=4000)
+                await asyncio.sleep(2) # ቁልፍ ለመቀየር አጭር እረፍት
                 
-                # --- STAGE 2: ARCHITECTURE (2,200+ words) ---
-                print(f"   🔹 Stage 2: Technical Architecture & Global Benchmarking...")
-                p2 = await self.failover.generate_content(self._get_p2_crown_prompt(topic, country, p1), max_tokens=4000)
-                await asyncio.sleep(random.uniform(4, 6))
+                # --- STAGE 2: ARCHITECTURE (አዲስ ቁልፍ ይጠቀማል) ---
+                print(f"   🔹 Stage 2: Technical Architecture (Using Groq Key B)...")
+                p2 = await self.failover.generate_content(self._get_p2_titan_prompt(topic, country, p1), max_tokens=4000)
+                await asyncio.sleep(2)
                 
-                # --- STAGE 3: REVENUE (2,200+ words) ---
-                print(f"   🔹 Stage 3: Revenue Engineering & Elite FAQ...")
-                p3 = await self.failover.generate_content(self._get_p3_crown_prompt(topic, country, p2), max_tokens=4000)
+                # --- STAGE 3: REVENUE (አዲስ ቁልፍ ይጠቀማል) ---
+                print(f"   🔹 Stage 3: Revenue & Roadmap (Using Groq Key C)...")
+                p3 = await self.failover.generate_content(self._get_p3_titan_prompt(topic, country, p2), max_tokens=4000)
+                await asyncio.sleep(2)
                 
-                # የመጀመሪያ ድምር ፍተሻ
-                temp_content = p1 + p2 + p3
-                word_count = EnhancedWordCounter.count_words(temp_content)
-
-                # --- STAGE 4: SOVEREIGN EXPANSION (ከ 5,000 በታች ከሆነ ብቻ) ---
-                if word_count < 5000:
-                    print(f"   🔹 Stage 4: Word count at {word_count}. Triggering Sovereign Expansion...")
-                    p4 = await self.failover.generate_content(self._get_p4_crown_prompt(topic, country, temp_content), max_tokens=4000)
-                    full_content = self._stitch_sovereign_content(p1, p2, p3, p4, topic, country)
-                else:
-                    full_content = self._stitch_sovereign_content(p1, p2, p3, "", topic, country)
+                # --- STAGE 4: SOVEREIGN FAQ (አዲስ ቁልፍ ይጠቀማል) ---
+                print(f"   🔹 Stage 4: Elite FAQ & Intel (Using Groq Key D)...")
+                p4 = await self.failover.generate_content(self._get_p4_titan_prompt(topic, country, p3), max_tokens=4000)
                 
-                final_word_count = EnhancedWordCounter.count_words(full_content)
+                # ሁሉንም ክፍሎች ማዋሃድ
+                full_content = self._stitch_titan_content(p1, p2, p3, p4, topic, country)
+                word_count = EnhancedWordCounter.count_words(full_content)
                 
                 result_data = {
-                    'id': f"sovereign_{country}_{int(time.time())}",
+                    'id': f"titan_v4_{country}_{int(time.time())}",
                     'title': f"The 2026 Sovereign Masterclass: {topic} in {country}",
                     'content': full_content,
-                    'word_count': final_word_count,
-                    'quality_report': {'overall_score': 100, 'market_authority': 'Global Elite'},
+                    'word_count': word_count,
+                    'quality_report': {'overall_score': 100, 'authority': 'Sovereign Elite'},
                     'production_report': {
                         'estimated_earning_potential': {
-                            'monthly_value': country_info['avg_commission'] * 120,
-                            'status': 'Sovereign Grade'
+                            'monthly_value': country_info['avg_commission'] * 150,
+                            'status': 'Titan Grade'
                         }
                     }
                 }
                 
                 save_to_file(result_data, 'html')
-                print(f"   ✨ SOVEREIGN SUCCESS: {final_word_count} words for {country}!")
+                print(f"   ✨ TITAN SUCCESS: {word_count} words for {country}!")
 
             except Exception as e:
-                print(f"   ❌ ERROR in {country}: {str(e)}")
+                print(f"   ❌ TITAN ERROR in {country}: {str(e)}")
 
             if i < 11:
-                wait_time = random.uniform(30, 45)
-                print(f"   ⏳ Cool-off ({int(wait_time)}s)..."); await asyncio.sleep(wait_time)
+                # ቁልፎቹ ስለሚቀያየሩ ረጅም እረፍት አያስፈልገንም
+                print(f"   ⏳ Quick Sync (15s)..."); await asyncio.sleep(15)
 
         total_duration = (time.time() - start_time) / 60
         print("\n" + "█"*80)
-        print(f"👑 MISSION COMPLETE! Total Time: {total_duration:.2f} Mins.")
+        print(f"🏆 TITAN MISSION COMPLETE! Total Time: {total_duration:.2f} Mins.")
         print("█"*80 + "\n")
 
-    def _get_p1_crown_prompt(self, topic, country, info):
+    def _get_p1_titan_prompt(self, topic, country):
         return f"""
-        (SOVEREIGN STAGE 1/4) Senior Industry Consultant Role.
-        Write 2,500 words of STRATEGIC FOUNDATIONS for a massive 6,000-word guide on "{topic}" for {country}.
+        (STAGE 1/4) Act as a Global Strategic Lead. 
+        Write 2,500 words of FOUNDATIONS for a 7,000-word guide on "{topic}" for {country}.
         CHAPTERS:
-        1. 2026 Macro-Economic Shift in {country}: Exhaustive Analysis (900 words).
-        2. Psychographic Deep-Dive: The hidden pain points of {country} users (800 words).
-        3. Regulatory & Sovereign Compliance: Every law, tax, and clause in {country} (800 words).
-        FORMAT: Use H1, H2, H3. Be extremely verbose. No summaries.
+        1. 2026 Sovereign Market Dynamics in {country} (900 words).
+        2. Psychographic Analysis of the {country} consumer base (800 words).
+        3. Local Regulatory & Tax Compliance Architecture (800 words).
+        USE HTML (H1, H2, H3). Write massive, detailed paragraphs. No summaries.
         """
 
-    def _get_p2_crown_prompt(self, topic, country, previous):
+    def _get_p2_titan_prompt(self, topic, country, previous):
         return f"""
-        (SOVEREIGN STAGE 2/4) Technical Architect Role.
-        Continue the {country} guide about "{topic}" with 2,500 words of ARCHITECTURAL content.
+        (STAGE 2/4) Act as a Senior Technical Architect. 
+        Continue the {country} guide on "{topic}" with 2,500 words of ARCHITECTURE.
         CHAPTERS:
-        1. Technical Ecosystem Setup: From Zero to Global Authority in {country} (1,000 words).
-        2. 10 Hyper-Local Case Studies: Success/Failure models in {country} (1,000 words).
-        3. Competitive Moats: How to outpace local {country} rivals (500 words).
-        FORMAT: Use HTML Data Tables and H2, H3. Extreme detail only.
+        1. Infrastructure Setup: Technical & Operational Blueprint for {country} (1,000 words).
+        2. 10 Local Case Studies: Deep-dive into {country} success models (1,000 words).
+        3. Strategic Competitive Moats in the {country} market (500 words).
+        USE HTML (H2, H3) and Data Tables.
         """
 
-    def _get_p3_crown_prompt(self, topic, country, previous):
+    def _get_p3_titan_prompt(self, topic, country, previous):
         return f"""
-        (SOVEREIGN STAGE 3/4) Wealth Strategy Expert Role.
-        Continue the {country} masterclass about "{topic}" with 2,500 words of REVENUE content.
+        (STAGE 3/4) Act as a Wealth Management Expert. 
+        Continue the {country} guide on "{topic}" with 2,500 words of REVENUE STRATEGY.
         CHAPTERS:
-        1. The 24-Month Sovereign Roadmap: Detailed weekly tasks for {country} (1,000 words).
-        2. Revenue Modeling: ROI in {country} currency vs USD (500 words).
-        3. ELITE INTEL FAQ: 25 complex questions with 150-word answers each (Forcing Word Count).
-        FORMAT: Force word counts. Exhaustive answers.
+        1. 24-Month Sovereign Implementation Roadmap for {country} (1,200 words).
+        2. Localized ROI Models: Profit projections in {country} currency vs USD (700 words).
+        3. Sustainability & Risk Hedging in {country} (600 words).
+        USE HTML (H2, H3). Force word counts.
         """
 
-    def _get_p4_crown_prompt(self, topic, country, previous):
+    def _get_p4_titan_prompt(self, topic, country, previous):
         return f"""
-        (SOVEREIGN STAGE 4/4) Final Sovereign Polishing.
-        The current guide for {country} is incomplete. Add 2,000 words of ADJUNCT content.
+        (STAGE 4/4) Act as an Elite Intel Analyst. 
+        Finalize the {country} guide on "{topic}" with 2,000 words of INTEL.
         CHAPTERS:
-        1. Advanced Troubleshooting & Edge Cases in {country}.
-        2. Resource Directory: Tools, Communities, and APIs for {country}.
-        3. The 2035 Vision: Long-term strategic evolution.
-        Write as much as possible to ensure the total guide exceeds 6,000 words.
+        1. MASTER FAQ HUB: 30 complex questions with 150-word answers each (This must be massive).
+        2. Resource Directory: Tools, APIs, and Networks in {country}.
+        3. The 2035 Horizon: Future trends for {country}.
+        USE HTML. Ensure total count exceeds 7,000 words.
         """
 
-    def _stitch_sovereign_content(self, p1, p2, p3, p4, topic, country):
-        crown_html = f"""
-        <div style="border: 10px double #1e3c72; padding:50px; background:#fff; font-family:'Georgia', serif;">
-            <div style="text-align:center; border-bottom:3px solid #1e3c72; margin-bottom:40px; padding-bottom:20px;">
-                <h1 style="font-size:4em; color:#1e3c72; margin:0;">👑 SOVEREIGN CROWN</h1>
-                <h3 style="letter-spacing:5px; color:#666;">2026 STRATEGIC MASTERCLASS</h3>
-                <p>TARGET MARKET: {country.upper()} | TOPIC: {topic.upper()}</p>
+    def _stitch_titan_content(self, p1, p2, p3, p4, topic, country):
+        titan_html = f"""
+        <div style="border: 15px solid #1e3c72; padding:60px; background:#fff; line-height:1.8;">
+            <div style="text-align:center; border-bottom:5px solid #1e3c72; margin-bottom:50px; padding-bottom:30px;">
+                <h1 style="font-size:5em; color:#1e3c72; margin:0;">TITAN SOVEREIGN</h1>
+                <h2 style="color:#666;">GLOBAL STRATEGIC MASTERPIECE 2026</h2>
+                <p style="font-size:1.5em;">MARKET: {country.upper()} | TOPIC: {topic.upper()}</p>
             </div>
-            {p1} <hr> {p2} <hr> {p3} {" <hr> " + p4 if p4 else ""}
+            {p1} <hr style="margin:50px 0;"> {p2} <hr style="margin:50px 0;"> {p3} <hr style="margin:50px 0;"> {p4}
         </div>
         """
-        return crown_html
+        return titan_html 
 # =================== ዋና ስርዓት ክፍል ===================
 
 class UltimateProfitMasterSystem:
