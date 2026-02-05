@@ -4326,7 +4326,14 @@ class UltimateProfitMasterSystem:
     
     def __init__(self, config: PremiumConfig = None):
         self.config = config or PremiumConfig()
+        
+        # 🛡️ 1. መጀመሪያ የ AI Failover Systemን እንፈጥራለን (ስህተቱን የሚፈታው ወሳኝ መስመር)
+        self.failover_system = EnhancedAIFailoverSystem(self.config)
+        
+        # 2. የይዘት ማመንጫውን እንፈጥራለን
         self.content_generator = ProductionContentGenerator(self.config)
+        
+        # 3. ሌሎች ዋና ዋና ክፍሎች
         self.cultural_engine = CulturalAnthropologistEngine(self.config)
         self.hyper_localizer = HyperLocalizedContentProducer(self.cultural_engine)
         self.multimedia_enhancer = PremiumMultimediaEnhancer()
@@ -4338,7 +4345,7 @@ class UltimateProfitMasterSystem:
         self.production_manager = ProductionManager(self.config)
         self.error_handler = ComprehensiveErrorHandler()
         
-        # Initialize components that may fail gracefully
+        # 4. አማራጭ ክፍሎች (Dashboard, Optimizer)
         try:
             import pandas as pd
             self.dashboard = RealTimeDashboard()
@@ -4351,10 +4358,12 @@ class UltimateProfitMasterSystem:
         except:
             self.self_optimizer = None
             
-        # በትክክለኛው አሰላለፍ (4 Spaces ገባ ብሎ)
+        # 🚀 5. በመጨረሻ ሜጋ-ሞተሩን እናስጀምራለን (አሁን failover_systemን ያገኘዋል)
+        # አሰላለፉ 4 Spaces መሆኑን አረጋግጫለሁ
         self.mega_engine = MegaContentEngine(self)
+        
         logger.info("🚀 Ultimate Profit Master System v18.1 Initialized")
-
+        
     async def full_production_pipeline(self, topic: str, target_countries: List[str] = None) -> Dict:
         """ሙሉ የምርት ፈረቃ"""
         start_time = time.time()
