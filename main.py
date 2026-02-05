@@ -4346,14 +4346,15 @@ class UltimateProfitMasterSystem:
             self.dashboard = None
             print("⚠️ Pandas not installed, dashboard disabled")
         
-        try:
+                try:
             self.self_optimizer = SelfOptimizingEngine()
         except:
             self.self_optimizer = None
-        # በ __init__ መጨረሻ ላይ ይህን ጨምር፡
-self.mega_engine = MegaContentEngine(self)
+            
+        # በትክክለኛው አሰላለፍ (4 Spaces ገባ ብሎ)
+        self.mega_engine = MegaContentEngine(self)
         logger.info("🚀 Ultimate Profit Master System v18.1 Initialized")
-        
+
     async def full_production_pipeline(self, topic: str, target_countries: List[str] = None) -> Dict:
         """ሙሉ የምርት ፈረቃ"""
         start_time = time.time()
