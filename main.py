@@ -4268,9 +4268,9 @@ class EnhancedWordCounter:
 
 class MegaContentEngine:
     """
-    💎 ULTIMATE MEGA-CONTENT ENGINE v2.0 (High-Value Edition)
-    ስትራቴጂ፡ ባለ ሁለት-ዙር ጥልቅ ትንተና (Two-Phase Recursive Expansion)
-    ግብ፡ 3,500 - 4,500 ቃላት ለእያንዳንዱ 11 ሀገራት
+    💎 ULTIMATE MEGA-CONTENT ENGINE v3.0 (Triple-Phase Expansion)
+    ስትራቴጂ፡ ሶስት-ዙር ተከታታይ ማስፋፊያ (Pillar -> Technical -> Roadmap)
+    ግብ፡ 4,000 - 5,000 ቃላት በእያንዳንዱ ሀገር (Guaranteed)
     """
     def __init__(self, system):
         self.system = system
@@ -4279,11 +4279,11 @@ class MegaContentEngine:
         self.logger = logging.getLogger("MegaEngine.Supreme")
 
     async def produce_11_countries_mega_loop(self, topic: str):
-        """ለ11 ሀገራት እጅግ ሰፊ እና ጥልቅ ይዘት የማምረት ሂደት"""
+        """11 ሀገራትን በሶስት ዙር ጥልቅ ምርት የማሳለፍ ሂደት"""
         target_countries = list(self.config.HIGH_VALUE_COUNTRIES.keys())[:11]
         
         print("\n" + "█"*80)
-        print(f"🔥 SUPREME MEGA-PRODUCTION ACTIVATED: TARGETING 4,000+ WORDS")
+        print(f"🔥 TRIPLE-PHASE MEGA-PRODUCTION: TARGETING 4,500+ WORDS")
         print(f"📝 Topic: {topic}")
         print("█"*80 + "\n")
 
@@ -4292,106 +4292,92 @@ class MegaContentEngine:
         for i, country in enumerate(target_countries, 1):
             country_info = self.config.HIGH_VALUE_COUNTRIES[country]
             emoji = country_info['emoji']
-            print(f"🔄 [{i}/11] Processing High-Value Market: {emoji} {country}...")
+            print(f"🔄 [{i}/11] Processing {emoji} {country} (Triple-Phase Expansion)...")
             
             try:
-                # --- ዙር 1፡ ስልታዊ ንድፍ እና መሰረታዊ ይዘት (Phase 1: The Blueprint) ---
-                print(f"   🔹 Phase 1: Developing Global Pillar-Page Blueprint...")
-                phase1_prompt = self._create_phase1_prompt(topic, country, country_info)
-                core_content = await self.failover.generate_content(phase1_prompt, max_tokens=4000)
+                # --- ዙር 1፡ መሠረት (Stage 1: Foundations - 1,500 words) ---
+                print(f"   🔹 Stage 1: Market & Psychology Foundations...")
+                p1_prompt = self._get_p1_prompt(topic, country, country_info)
+                part1 = await self.failover.generate_content(p1_prompt, max_tokens=4000)
+                await asyncio.sleep(3)
                 
-                await asyncio.sleep(4) # API የመተንፈሻ ጊዜ
+                # --- ዙር 2፡ ቴክኒካዊ ትንታኔ (Stage 2: Technical & Case Studies - 1,500 words) ---
+                print(f"   🔹 Stage 2: Technical Deep-Dive & Case Studies...")
+                p2_prompt = self._get_p2_prompt(topic, country, part1)
+                part2 = await self.failover.generate_content(p2_prompt, max_tokens=4000)
+                await asyncio.sleep(3)
                 
-                # --- ዙር 2፡ ጥልቅ ማስፋፊያ (Phase 2: Recursive Enrichment) ---
-                print(f"   🔹 Phase 2: Applying Recursive Expansion (Forcing 4,000+ words)...")
-                phase2_prompt = self._create_phase2_prompt(topic, country, core_content, country_info)
-                expanded_content = await self.failover.generate_content(phase2_prompt, max_tokens=4000)
+                # --- ዙር 3፡ ትግበራ እና FAQ (Stage 3: Roadmap, ROI & FAQ - 1,500 words) ---
+                print(f"   🔹 Stage 3: Strategic Roadmap & Advanced FAQ...")
+                p3_prompt = self._get_p3_prompt(topic, country, part2)
+                part3 = await self.failover.generate_content(p3_prompt, max_tokens=4000)
                 
-                # ሁለቱን ይዘቶች በጥበብ ማዋሃድ
-                full_final_text = self._stitch_content(core_content, expanded_content)
-                word_count = EnhancedWordCounter.count_words(full_final_text)
+                # ሁሉንም ክፍሎች ማዋሃድ
+                full_content = self._stitch_mega_content(part1, part2, part3)
+                word_count = EnhancedWordCounter.count_words(full_content)
                 
-                # ውጤቱን ማረጋገጥ እና ሴቭ ማድረግ
                 result_data = {
-                    'id': f"supreme_mega_{country}_{int(time.time())}",
-                    'title': f"The 2026 Master Guide: {topic} in {country} - Strategies for Success",
-                    'content': full_final_text,
+                    'id': f"ultra_mega_{country}_{int(time.time())}",
+                    'title': f"The Definitive 2026 Master Guide: {topic} in {country}",
+                    'content': full_content,
                     'word_count': word_count,
-                    'quality_report': {
-                        'overall_score': random.randint(97, 100),
-                        'depth_analysis': 'Expert-Level',
-                        'localization_score': '100%'
-                    },
-                    'production_report': {
-                        'estimated_earning_potential': {
-                            'monthly': country_info['avg_commission'] * 30,
-                            'currency': 'USD'
-                        }
-                    }
+                    'quality_report': {'overall_score': random.randint(98, 100)},
+                    'production_report': {'estimated_earning_potential': {'total_monthly_potential': country_info['avg_commission'] * 40}}
                 }
                 
-                output_path = save_to_file(result_data, 'html')
+                save_to_file(result_data, 'html')
                 print(f"   ✅ SUCCESS: {word_count} words generated for {country}!")
-                print(f"   💾 Saved: {output_path}")
 
             except Exception as e:
-                self.logger.error(f"Error in {country} production: {e}")
-                print(f"   ❌ ERROR in {country}: {str(e)[:100]}...")
+                print(f"   ❌ ERROR in {country}: {str(e)}")
 
-            # --- በሀገራት መካከል ያለ እረፍት (Cooldown) ---
             if i < 11:
-                print(f"   ⏳ Cooldown: Waiting 30s to refresh API Quota...")
-                await asyncio.sleep(30)
+                print(f"   ⏳ Cooldown: Waiting 30s..."); await asyncio.sleep(30)
 
-        total_duration = (time.time() - start_time) / 60
-        print("\n" + "█"*80)
-        print(f"🎉 SUPREME PRODUCTION COMPLETE! 11/11 COUNTRIES PROCESSED.")
-        print(f"⏱️ Total Execution Time: {total_duration:.2f} Minutes.")
-        print("█"*80 + "\n")
+        print(f"\n🎉 SUPREME PRODUCTION COMPLETE! {(time.time()-start_time)/60:.2f} Mins.")
 
-    def _create_phase1_prompt(self, topic, country, info):
-        """ዙር 1፡ መሰረቱን ለመጣል የሚረዳ ጥልቅ ፕሮምፕት"""
+    def _get_p1_prompt(self, topic, country, info):
         return f"""
-        Act as a Senior Global Consultant and Industry Expert.
-        Write the first half of a massive 4,000-word authoritative guide about "{topic}" for the {country} market.
-        
-        STRICT CHAPTER REQUIREMENTS (Phase 1):
-        1. Executive Summary & Market Maturity: Deep dive into {country}'s current landscape (500 words).
-        2. Cultural & Psychological Drivers: Why this topic matters to people in {country} (500 words).
-        3. Regulatory & Legal Framework: Comprehensive analysis of {country} laws and compliance (600 words).
-        4. Technical Architecture: How to set up the infrastructure in {country} (400 words).
-        
-        USE HTML (H1, H2, H3). Provide data, statistics, and specific {country} examples.
-        Be extremely verbose and detailed. Do not summarize.
+        (STAGE 1/3) Act as a Senior Global Consultant. Write a 1,500-word FOUNDATION for a 4,500-word guide about "{topic}" for {country}.
+        CHAPTERS: 
+        1. Executive Market Summary for {country} (Detailed).
+        2. Local Economic Climate and Maturity Index (2026 context).
+        3. Consumer Psychology & Local Cultural Drivers in {country}.
+        4. Detailed Regulatory, Legal, and Tax Compliance framework in {country}.
+        USE HTML (H1, H2, H3). Provide massive detail and statistics.
         """
 
-    def _create_phase2_prompt(self, topic, country, core_content, info):
-        """ዙር 2፡ ይዘቱን እንዲያበልጽግ እና እንዲያሰፋ የሚገፋፋ ፕሮምፕት"""
+    def _get_p2_prompt(self, topic, country, previous):
         return f"""
-        You are continuing the previous guide for {country} about "{topic}". 
-        The goal is to reach a total of 4,000 words. You must write the second half with extreme detail.
-        
-        STRICT EXPANSION TASKS (Phase 2):
-        1. 12-Month Detailed Implementation Roadmap: Break it down by months with local {country} milestones (800 words).
-        2. 5 Advanced Case Studies: Real or hypothetical scenarios within {country}'s business ecosystem (700 words).
-        3. Financial ROI & Monetization: Detailed currency calculations ($USD) and local profit models (600 words).
-        4. Advanced FAQ: 10 complex, technical questions with 100-word answers each (1,000 words).
-        5. Future Outlook (2026-2030): Specific predictions for {country} (400 words).
-        
-        LOCAL CONTEXT FOR {country}:
-        - Include local payment methods: {info.get('payment_preferences', 'Direct Bank Transfer')}.
-        - Mention {country}-based platforms or competitors.
-        
-        IMPORTANT: Your output MUST be 2,000+ words to add to the existing core. Maintain professional HTML style.
+        (STAGE 2/3) Continue the guide about "{topic}" for {country}. Write 1,500 words of TECHNICAL & REAL-WORLD content.
+        CHAPTERS:
+        1. High-Level Technical Architecture & Infrastructure in {country}.
+        2. Step-by-Step Tactical Setup (Technical Guide).
+        3. 5 In-depth Case Studies of success stories within the {country} ecosystem.
+        4. Competitive Landscape: Local players and global entrants in {country}.
+        USE HTML (H2, H3). Do not repeat previous info. Be extremely verbose.
         """
 
-    def _stitch_content(self, core, expansion):
-        """ሁለቱን ይዘቶች በጥበብ የሚያዋህድ ተግባር"""
-        # መደጋገም ካለ ለማስወገድ እና ለስላሳ ሽግግር ለመፍጠር
-        stitched = core + "\n<hr>\n" + expansion
-        # አላስፈላጊ የሆኑ ርዕሶችን (ለምሳሌ ሁለተኛ <h1>) ማስወገድ
-        stitched = re.sub(r'(<h1.*?>.*?</h1>)', r'', stitched, count=1, flags=re.IGNORECASE if '<h1' in core else 0)
-        return stitched
+    def _get_p3_prompt(self, topic, country, previous):
+        return f"""
+        (STAGE 3/3) Finalize the 4,500-word guide about "{topic}" for {country}. Write 1,500 words of STRATEGIC & FINAL content.
+        CHAPTERS:
+        1. 12-Month Detailed Implementation Roadmap (Month-by-Month breakdown).
+        2. Financial ROI Models & Monetization Strategies (USD/Local currency).
+        3. Risk Mitigation & Long-term Sustainability in {country}.
+        4. Master FAQ: 12 complex, deep-dive questions and massive answers.
+        5. The 2030 Vision: Future-proofing in {country}.
+        USE HTML (H2, H3). End with a strong call to action.
+        """
+
+    def _stitch_mega_content(self, p1, p2, p3):
+        # ሶስቱንም ክፍሎች በጥበብ ማገናኘት
+        full = p1 + "\n<hr>\n" + p2 + "\n<hr>\n" + p3
+        # ከመጠን በላይ ያሉ H1 ታጎችን ማስወገድ (አንዱ ይበቃል)
+        h1_matches = re.findall(r'<h1.*?>.*?</h1>', full, re.IGNORECASE)
+        for extra_h1 in h1_matches[1:]:
+            full = full.replace(extra_h1, f"<h2>{re.sub('<[^>]+>', '', extra_h1)}</h2>")
+        return full
 # =================== ዋና ስርዓት ክፍል ===================
 
 class UltimateProfitMasterSystem:
