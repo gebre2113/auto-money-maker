@@ -4251,6 +4251,18 @@ async def high_value_countries_mode(system, config: PremiumConfig):
     """የከፍተኛ ገቢ የሚሰጡ ሀገራት ሞድ"""
     UserInterface.display_high_value_countries(config)
 # =========================================================================
+class EnhancedWordCounter:
+    """የቃላት ብዛትን በጥራት የሚቆጥር ክፍል"""
+    @staticmethod
+    def count_words(text: str) -> int:
+        if not text:
+            return 0
+        # HTML ታጎችን አውጥቶ ቃላትን ብቻ መቁጠር
+        clean_text = re.sub(r'<[^>]+>', '', text)
+        words = re.findall(r'\b\w+\b', clean_text)
+        return len(words)
+
+# =========================================================================
 # 🚀 MEGA CONTENT ENGINE - 3,500+ WORDS TWO-PHASE STRATEGY
 # =========================================================================
 
