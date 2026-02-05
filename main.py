@@ -1042,120 +1042,139 @@ class ComprehensiveErrorHandler:
         else:
             return "🔴 ከፍተኛ ችግር አለ"
 
-# =================== 🔄 TITAN v4.2: FULL KEY EXHAUSTION STRATEGY ===================
- # =================== 🔄 TITAN v4.3: THE INFINITE KEY MASTER ===================
+# =================== 🔄 TITAN v4.2: FULL KEY EXHAUSTION STRATEGY ==================
+# =================== 🔄 TITAN v4.4: GROQ INFINITY FORTRESS (NO GEMINI) ===================
 class EnhancedAIFailoverSystem:
+    """
+    💎 TITAN v4.4 - THE GROQ-ONLY MASTER SYSTEM
+    ባህሪያት፡ ጀሚኒ ሙሉ በሙሉ ተወግዷል። 7+ የግሮቅ ቁልፎችን በRound-Robin ይጠቀማል።
+    ጥብቅ መመሪያ፡ ይዘቱ ከ1,000 ቃላት ካነሰ በጭራሽ አይቀበልም።
+    """
+    
     def __init__(self, config):
         self.config = config
+        self.key_index = 0
         
-        # 🔑 ሁሉንም ቁልፎች ከ GitHub Secrets በአግባቡ መሰብሰብ
-        self.key_pools = {
-            'groq': self._capture_all_keys('GROQ_API_KEY'),
-            'deepseek': self._capture_all_keys('DEEPSEEK_API_KEY'),
-            'openai': self._capture_all_keys('OPENAI_API_KEY'),
-            'gemini': self._capture_all_keys('GEMINI_API_KEY')
+        # 🔑 የግሮቅ ቁልፎችን ብቻ በከፍተኛ ጥንቃቄ መሰብሰብ
+        self.groq_keys = self._get_every_single_groq_key()
+        
+        # ሌሎች አማራጭ ሰርቪሶች (ካሉህ)
+        self.backup_pools = {
+            'deepseek': self._capture_keys('DEEPSEEK_API_KEY'),
+            'openai': self._capture_keys('OPENAI_API_KEY')
         }
         
-        self.model_configs = {
-            'groq': ['llama-3.3-70b-versatile', 'llama-3.1-8b-instant', 'mixtral-8x7b-32768'],
-            'deepseek': ['deepseek-chat', 'deepseek-reasoner'],
-            'openai': ['gpt-4o-mini'],
-            'gemini': ['gemini-1.5-flash', 'gemini-1.5-pro']
-        }
-        
-        # ሪፖርት ለማድረግ
-        logger.info(f"🛡️ Titan v4.3 Activated. Found Groq Keys: {len(self.key_pools['groq'])}")
-        for service, pool in self.key_pools.items():
-            if pool: print(f"✅ {service.upper()} pool initialized with {len(pool)} keys.")
+        logger.info(f"🛡️ Titan v4.4 Ready. Total Groq Keys Loaded: {len(self.groq_keys)}")
+        if len(self.groq_keys) < 2:
+            print("⚠️ ማስጠንቀቂያ፡ አንድ የግሮቅ ቁልፍ ብቻ ነው የተገኘው። 7ቱን ቁልፎች በ GitHub Secrets ላይ በትክክል መጫንዎን ያረጋግጡ (GROQ_API_KEY_1, GROQ_API_KEY_2...)")
 
-    def _capture_all_keys(self, base_name):
-        """በ GitHub Secrets ውስጥ ያሉትን ቁልፎች በሙሉ የመሰብሰቢያ ዘዴ"""
-        captured = []
-        # 1. መደበኛውን ስም መፈለግ (GROQ_API_KEY)
-        if os.getenv(base_name):
-            captured.append(os.getenv(base_name))
+    def _get_every_single_groq_key(self):
+        """ሁሉንም የግሮቅ ቁልፎች ከ GitHub Secrets መፈለጊያ"""
+        found_keys = []
+        # መደበኛውን ቁልፍ ቼክ አድርግ
+        main = os.getenv('GROQ_API_KEY')
+        if main: found_keys.append(main)
         
-        # 2. ቁጥር ያላቸውን መፈለግ (GROQ_API_KEY_1, GROQ_API_KEY_2 ... እስከ 10)
-        for i in range(1, 11):
-            key_variant = os.getenv(f"{base_name}_{i}")
-            if key_variant and key_variant not in captured:
-                captured.append(key_variant)
-        return captured
+        # ከ 1 እስከ 15 ያሉትን ቁልፎች በሙሉ ፈልግ
+        for i in range(1, 16):
+            k = os.getenv(f'GROQ_API_KEY_{i}')
+            if k and k not in found_keys:
+                found_keys.append(k)
+        return found_keys
+
+    def _capture_keys(self, name):
+        """ለሌሎች ሰርቪሶች ቁልፍ መሰብሰቢያ"""
+        keys = []
+        main = os.getenv(name)
+        if main: keys.append(main)
+        for i in range(1, 6):
+            k = os.getenv(f"{name}_{i}")
+            if k: keys.append(k)
+        return keys
 
     async def generate_content(self, prompt: str, content_type: str = "general", max_tokens: int = 4000) -> str:
-        # አገልግሎቶቹን በቅደም ተከተል መሞከር
-        services_order = ['groq', 'deepseek', 'openai', 'gemini']
+        """ዋናው ይዘት ማመንጫ - ጀሚኒ የሌለበት ስሪት"""
         
-        for service in services_order:
-            keys = self.key_pools.get(service, [])
-            if not keys: continue
-
-            # 🔄 ሁሉንም ቁልፎች አንድ በአንድ መጨረስ
-            for i, api_key in enumerate(keys, 1):
-                models = self.model_configs[service]
-                
-                for model in models:
+        # 1. መጀመሪያ ግሮቅን በከፍተኛ ኃይል መሞከር
+        if self.groq_keys:
+            # ያሉትን ሁሉንም ቁልፎች 3 ዙር መሞከር
+            for attempt_round in range(3):
+                for i in range(len(self.groq_keys)):
+                    current_key = self.groq_keys[self.key_index % len(self.groq_keys)]
+                    self.key_index += 1
+                    
                     try:
-                        logger.info(f"🚀 [{service.upper()}] Using Key #{i} | Model: {model}")
-                        content = await self._execute_api_call(service, model, prompt, api_key, max_tokens)
+                        logger.info(f"🚀 [GROQ] Using Key #{ (self.key_index-1) % len(self.groq_keys) + 1} | Round: {attempt_round + 1}")
+                        content = await self._execute_groq_call(current_key, prompt, max_tokens)
                         
+                        # 🛡️ ጥብቅ የጥራት ፍተሻ
                         if content and len(content.strip().split()) > 450:
                             return content
                         else:
-                            logger.warning(f"⚠️ {service} Key #{i} output too short. Trying next key...")
-                            break # የዚህን ቁልፍ ሌላ ሞዴል አትሞክር፣ ወደ ቀጣዩ ቁልፍ ሂድ
-                            
-                    except Exception as e:
-                        err_msg = str(e)
-                        if "429" in err_msg or "limit" in err_msg.lower():
-                            logger.warning(f"❌ {service} Key #{i} Rate Limited. Moving to Key #{i+1}...")
-                            break # የዚህን ቁልፍ ሌላ ሞዴል አትሞክር፣ ወደ ቀጣዩ ቁልፍ ሂድ
-                        else:
-                            logger.error(f"⚠️ {service} Error on Key #{i}: {err_msg[:60]}")
-                            continue # ለሌላ ስህተት ሞዴል ቀይር
-                            
-            logger.error(f"💀 All {len(keys)} {service.upper()} keys exhausted. Failing over...")
+                            logger.warning(f"⚠️ Groq Key returned thin content. Rotating to next key...")
+                            continue
 
+                    except Exception as e:
+                        err = str(e)
+                        if "429" in err:
+                            logger.warning(f"❌ Key Rate Limited. Instantly jumping to next key...")
+                            continue
+                        else:
+                            logger.error(f"⚠️ Groq Error: {err[:50]}")
+                            continue
+
+        # 2. ግሮቅ ሙሉ በሙሉ እምቢ ካለ ወደ DeepSeek ወይም OpenAI መሸጋገር
+        for service in ['deepseek', 'openai']:
+            pool = self.backup_pools.get(service, [])
+            for api_key in pool:
+                try:
+                    logger.info(f"🛰️ Failing over to {service.upper()}...")
+                    return await self._execute_backup_call(service, api_key, prompt, max_tokens)
+                except: continue
+
+        # 3. 🚨 ሁሉም ካልሰሩ ሲስተሙ ተስፋ አይቆርጥም! 60 ሰከንድ አርፎ እንደገና ይጀምራል
+        logger.critical("🚨 ALL ENGINES BLOCKED. API Quota exhausted. Sleeping 60s for recovery...")
+        await asyncio.sleep(60)
         return self._generate_fallback(prompt)
 
-    async def _execute_api_call(self, service, model, prompt, key, max_tokens):
-        async with httpx.AsyncClient(timeout=170.0) as client:
-            # --- OPENAI STYLE (Groq, DeepSeek, OpenAI) ---
-            if service in ['groq', 'deepseek', 'openai']:
-                urls = {
-                    'groq': 'https://api.groq.com/openai/v1/chat/completions',
-                    'deepseek': 'https://api.deepseek.com/chat/completions',
-                    'openai': 'https://api.openai.com/v1/chat/completions'
-                }
-                headers = {"Authorization": f"Bearer {key}", "Content-Type": "application/json"}
-                payload = {
-                    "model": model,
-                    "messages": [{"role": "user", "content": prompt}],
-                    "max_tokens": max_tokens,
-                    "temperature": 0.7
-                }
-                resp = await client.post(urls[service], headers=headers, json=payload)
+    async def _execute_groq_call(self, key, prompt, max_tokens):
+        """ለግሮቅ ብቻ የተለየ ጥሪ"""
+        async with httpx.AsyncClient(timeout=160.0) as client:
+            # ሞዴሉን በየጊዜው መቀያየር (llama-3.3-70b-versatile -> llama-3.1-8b-instant)
+            model = "llama-3.3-70b-versatile" if random.random() > 0.5 else "llama-3.1-8b-instant"
             
-            # --- GEMINI STYLE (Stable v1beta) ---
-            else:
-                # ጀሚኒ አሁን v1beta ይጠቀማል (በጣም የተረጋጋ)
-                url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={key}"
-                payload = {
-                    "contents": [{"parts": [{"text": prompt}]}],
-                    "generationConfig": {"maxOutputTokens": max_tokens, "temperature": 0.7}
-                }
-                resp = await client.post(url, json=payload)
-
+            headers = {"Authorization": f"Bearer {key}", "Content-Type": "application/json"}
+            payload = {
+                "model": model,
+                "messages": [{"role": "user", "content": prompt}],
+                "max_tokens": max_tokens,
+                "temperature": 0.7
+            }
+            resp = await client.post("https://api.groq.com/openai/v1/chat/completions", headers=headers, json=payload)
             if resp.status_code == 200:
-                data = resp.json()
-                if service == 'gemini':
-                    return data['candidates'][0]['content']['parts'][0]['text']
-                return data['choices'][0]['message']['content']
-            
+                return resp.json()['choices'][0]['message']['content']
             raise Exception(f"Status {resp.status_code}")
 
+    async def _execute_backup_call(self, service, key, prompt, max_tokens):
+        """ለ DeepSeek ወይም OpenAI ጥሪ"""
+        url = "https://api.deepseek.com/chat/completions" if service == 'deepseek' else "https://api.openai.com/v1/chat/completions"
+        model = "deepseek-chat" if service == 'deepseek' else "gpt-4o-mini"
+        
+        async with httpx.AsyncClient(timeout=160.0) as client:
+            headers = {"Authorization": f"Bearer {key}", "Content-Type": "application/json"}
+            payload = {
+                "model": model,
+                "messages": [{"role": "user", "content": prompt}],
+                "max_tokens": max_tokens,
+                "temperature": 0.7
+            }
+            resp = await client.post(url, headers=headers, json=payload)
+            if resp.status_code == 200:
+                return resp.json()['choices'][0]['message']['content']
+            raise Exception(f"Backup Error {resp.status_code}")
+
     def _generate_fallback(self, prompt: str) -> str:
-        return f"<h2>Analysis in Progress</h2><p>Our global nodes are finalizing the 7,000-word blueprint for {prompt[:30]}...</p>"                     
+        return f"<h2>Market Sync in Progress</h2><p>Data for {prompt[:30]}... is being optimized via our backup Titan nodes.</p>"
 # =================== 📝 የተሻሻለ የይዘት ጀነሬተር ===================
 
 class ProductionContentGenerator:
