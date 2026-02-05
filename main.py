@@ -4268,9 +4268,9 @@ class EnhancedWordCounter:
 
 class MegaContentEngine:
     """
-    💎 ULTIMATE MEGA-CONTENT ENGINE v3.0 (Triple-Phase Expansion)
-    ስትራቴጂ፡ ሶስት-ዙር ተከታታይ ማስፋፊያ (Pillar -> Technical -> Roadmap)
-    ግብ፡ 4,000 - 5,000 ቃላት በእያንዳንዱ ሀገር (Guaranteed)
+    💎 ULTIMATE MEGA-CONTENT ENGINE v3.1 (Elite Supreme Edition)
+    ስትራቴጂ፡ ሶስት-ዙር ጥልቀት (Recursive Triple-Phase Expansion)
+    ግብ፡ 4,000 - 5,500 ቃላት ለእያንዳንዱ 11 ሀገራት (Guaranteed Depth)
     """
     def __init__(self, system):
         self.system = system
@@ -4279,11 +4279,11 @@ class MegaContentEngine:
         self.logger = logging.getLogger("MegaEngine.Supreme")
 
     async def produce_11_countries_mega_loop(self, topic: str):
-        """11 ሀገራትን በሶስት ዙር ጥልቅ ምርት የማሳለፍ ሂደት"""
+        """11 ሀገራትን እጅግ ሰፊ በሆነ የሶስት-ዙር ጥልቅ ምርት የማሳለፍ ሂደት"""
         target_countries = list(self.config.HIGH_VALUE_COUNTRIES.keys())[:11]
         
         print("\n" + "█"*80)
-        print(f"🔥 TRIPLE-PHASE MEGA-PRODUCTION: TARGETING 4,500+ WORDS")
+        print(f"🔥 ELITE MEGA-PRODUCTION: TARGETING 4,500+ WORDS PER COUNTRY")
         print(f"📝 Topic: {topic}")
         print("█"*80 + "\n")
 
@@ -4292,37 +4292,43 @@ class MegaContentEngine:
         for i, country in enumerate(target_countries, 1):
             country_info = self.config.HIGH_VALUE_COUNTRIES[country]
             emoji = country_info['emoji']
-            print(f"🔄 [{i}/11] Processing {emoji} {country} (Triple-Phase Expansion)...")
+            print(f"🔄 [{i}/11] Processing {emoji} {country} (Triple-Phase Elite Mode)...")
             
             try:
-                # --- ዙር 1፡ መሠረት (Stage 1: Foundations - 1,500 words) ---
-                print(f"   🔹 Stage 1: Market & Psychology Foundations...")
+                # --- ዙር 1፡ መሠረት (Stage 1: Foundational Pillar - 1,800 words) ---
+                print(f"   🔹 Stage 1: Market Analysis & Cultural Foundations...")
                 p1_prompt = self._get_p1_prompt(topic, country, country_info)
                 part1 = await self.failover.generate_content(p1_prompt, max_tokens=4000)
-                await asyncio.sleep(3)
+                await asyncio.sleep(4)
                 
-                # --- ዙር 2፡ ቴክኒካዊ ትንታኔ (Stage 2: Technical & Case Studies - 1,500 words) ---
-                print(f"   🔹 Stage 2: Technical Deep-Dive & Case Studies...")
+                # --- ዙር 2፡ ቴክኒካዊ እና ተግባራዊ (Stage 2: Operational & Case Studies - 1,800 words) ---
+                print(f"   🔹 Stage 2: Technical Deep-Dive & Advanced Case Studies...")
                 p2_prompt = self._get_p2_prompt(topic, country, part1)
                 part2 = await self.failover.generate_content(p2_prompt, max_tokens=4000)
-                await asyncio.sleep(3)
+                await asyncio.sleep(4)
                 
-                # --- ዙር 3፡ ትግበራ እና FAQ (Stage 3: Roadmap, ROI & FAQ - 1,500 words) ---
-                print(f"   🔹 Stage 3: Strategic Roadmap & Advanced FAQ...")
+                # --- ዙር 3፡ ስትራቴጂካዊ ፍፃሜ (Stage 3: 12-Month Roadmap & Master FAQ - 1,800 words) ---
+                print(f"   🔹 Stage 3: Strategic Execution Roadmap & Mega FAQ...")
                 p3_prompt = self._get_p3_prompt(topic, country, part2)
                 part3 = await self.failover.generate_content(p3_prompt, max_tokens=4000)
                 
-                # ሁሉንም ክፍሎች ማዋሃድ
-                full_content = self._stitch_mega_content(part1, part2, part3)
+                # ሁሉንም ክፍሎች በጥበብ ማዋሃድ እና ማውጫ መጨመር
+                full_content = self._stitch_mega_content(part1, part2, part3, topic, country)
                 word_count = EnhancedWordCounter.count_words(full_content)
                 
                 result_data = {
-                    'id': f"ultra_mega_{country}_{int(time.time())}",
-                    'title': f"The Definitive 2026 Master Guide: {topic} in {country}",
+                    'id': f"elite_mega_{country}_{int(time.time())}",
+                    'title': f"The Ultimate 2026 Master Guide: {topic} in {country}",
                     'content': full_content,
                     'word_count': word_count,
                     'quality_report': {'overall_score': random.randint(98, 100)},
-                    'production_report': {'estimated_earning_potential': {'total_monthly_potential': country_info['avg_commission'] * 40}}
+                    'production_report': {
+                        'estimated_earning_potential': {
+                            'monthly': country_info['avg_commission'] * 50,
+                            'total_monthly_potential': country_info['avg_commission'] * 50,
+                            'currency': 'USD'
+                        }
+                    }
                 }
                 
                 save_to_file(result_data, 'html')
@@ -4334,50 +4340,83 @@ class MegaContentEngine:
             if i < 11:
                 print(f"   ⏳ Cooldown: Waiting 30s..."); await asyncio.sleep(30)
 
-        print(f"\n🎉 SUPREME PRODUCTION COMPLETE! {(time.time()-start_time)/60:.2f} Mins.")
+        print(f"\n🎉 ELITE PRODUCTION COMPLETE! Total Time: {(time.time()-start_time)/60:.2f} Mins.")
 
     def _get_p1_prompt(self, topic, country, info):
         return f"""
-        (STAGE 1/3) Act as a Senior Global Consultant. Write a 1,500-word FOUNDATION for a 4,500-word guide about "{topic}" for {country}.
-        CHAPTERS: 
-        1. Executive Market Summary for {country} (Detailed).
-        2. Local Economic Climate and Maturity Index (2026 context).
-        3. Consumer Psychology & Local Cultural Drivers in {country}.
-        4. Detailed Regulatory, Legal, and Tax Compliance framework in {country}.
-        USE HTML (H1, H2, H3). Provide massive detail and statistics.
+        (STAGE 1/3) You are a World-Class Industry Analyst. Write a 1,800-word FOUNDATIONAL PILLAR for a 5,000-word guide about "{topic}" for {country}.
+        
+        STRICT CHAPTERS: 
+        1. Executive Market Maturity & 2026 Forecast for {country} (Extremely Detailed).
+        2. Psychographic Profiling: Decoding {country}'s Audience Needs (Deep Analysis).
+        3. Regulatory, Legal & Tax Compliance in {country} (Detailed clauses and laws).
+        4. Macro-Economic Impact of {topic} on {country}'s digital future.
+        
+        REQUIREMENTS:
+        - Use HTML (H1, H2, H3). 
+        - DO NOT Summarize. Write long, detailed, data-heavy paragraphs.
+        - Add 'Strategic Insight' boxes using HTML div styles.
         """
 
     def _get_p2_prompt(self, topic, country, previous):
         return f"""
-        (STAGE 2/3) Continue the guide about "{topic}" for {country}. Write 1,500 words of TECHNICAL & REAL-WORLD content.
-        CHAPTERS:
-        1. High-Level Technical Architecture & Infrastructure in {country}.
-        2. Step-by-Step Tactical Setup (Technical Guide).
-        3. 5 In-depth Case Studies of success stories within the {country} ecosystem.
-        4. Competitive Landscape: Local players and global entrants in {country}.
-        USE HTML (H2, H3). Do not repeat previous info. Be extremely verbose.
+        (STAGE 2/3) You are a Senior Implementation Partner. Write 1,800 words of TECHNICAL & OPERATIONAL content for the {country} guide about "{topic}".
+        
+        STRICT CHAPTERS:
+        1. Technical Infrastructure & Ecosystem Setup in {country} (Step-by-Step).
+        2. Operational Challenges & Local Solutions specific to the {country} business environment.
+        3. 5 Massive Real-World Case Studies (Successful implementation in {country} or similar markets).
+        4. Competitive Positioning: Local vs Global strategies in {country}.
+        
+        REQUIREMENTS:
+        - Use HTML (H2, H3). 
+        - Provide extreme technical depth.
+        - Include 'Expert Implementation Tip' callouts.
+        - Minimum 450 words per chapter.
         """
 
     def _get_p3_prompt(self, topic, country, previous):
         return f"""
-        (STAGE 3/3) Finalize the 4,500-word guide about "{topic}" for {country}. Write 1,500 words of STRATEGIC & FINAL content.
-        CHAPTERS:
-        1. 12-Month Detailed Implementation Roadmap (Month-by-Month breakdown).
-        2. Financial ROI Models & Monetization Strategies (USD/Local currency).
-        3. Risk Mitigation & Long-term Sustainability in {country}.
-        4. Master FAQ: 12 complex, deep-dive questions and massive answers.
-        5. The 2030 Vision: Future-proofing in {country}.
-        USE HTML (H2, H3). End with a strong call to action.
+        (STAGE 3/3) You are a Strategic Wealth Architect. Finalize the 5,000-word guide about "{topic}" for {country} with 1,800 words of EXECUTION content.
+        
+        STRICT CHAPTERS:
+        1. The Elite 12-Month Mastery Roadmap (Broken down into detailed monthly milestones for {country}).
+        2. Monetization Architecture & ROI Modeling (Based on {country}'s currency and purchasing power).
+        3. Sustainability & Risk Hedging in the {country} market.
+        4. MASTER FAQ: 12 high-level technical questions with 150-word answers each (Forcing Word Count).
+        5. 2030 Vision: How {topic} will redefine {country}'s industry.
+        
+        REQUIREMENTS:
+        - Use HTML (H2, H3). 
+        - End with a 'Call to Action' for high-value consulting.
+        - Ensure total word count is exhaustive.
         """
 
-    def _stitch_mega_content(self, p1, p2, p3):
-        # ሶስቱንም ክፍሎች በጥበብ ማገናኘት
+    def _stitch_mega_content(self, p1, p2, p3, topic, country):
+        """ሶስቱንም ክፍሎች በጥበብ ማገናኘት እና ማውጫ መጨመር"""
+        toc = f"""
+        <div style="background:#f4f4f4; padding:20px; border-radius:10px; margin-bottom:30px;">
+            <h2>📊 Strategic Table of Contents: {topic}</h2>
+            <ul>
+                <li>Market Foundations & Forecast ({country})</li>
+                <li>Psychographic & Cultural Analysis</li>
+                <li>Regulatory & Legal Compliance</li>
+                <li>Technical Infrastructure & Setup</li>
+                <li>Real-World Case Studies & Benchmarks</li>
+                <li>12-Month Execution Roadmap</li>
+                <li>ROI Modeling & Financial Strategy</li>
+                <li>Advanced Troubleshooting & FAQ</li>
+            </ul>
+        </div>
+        """
+        
         full = p1 + "\n<hr>\n" + p2 + "\n<hr>\n" + p3
-        # ከመጠን በላይ ያሉ H1 ታጎችን ማስወገድ (አንዱ ይበቃል)
+        # አላስፈላጊ H1 ታጎችን ማስወገድ
         h1_matches = re.findall(r'<h1.*?>.*?</h1>', full, re.IGNORECASE)
         for extra_h1 in h1_matches[1:]:
             full = full.replace(extra_h1, f"<h2>{re.sub('<[^>]+>', '', extra_h1)}</h2>")
-        return full
+            
+        return toc + full
 # =================== ዋና ስርዓት ክፍል ===================
 
 class UltimateProfitMasterSystem:
