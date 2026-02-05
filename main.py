@@ -1043,116 +1043,106 @@ class ComprehensiveErrorHandler:
             return "🔴 ከፍተኛ ችግር አለ"
 
 # =================== 🔄 የተሻሻለ የAI ፌይልኦቨር ሲስተም ===================
-# =================== 🔄 እጅግ የላቀ የAI ፌይልኦቨር ሲስተም v18.3 (Titan Edition) ===================
-# =================== 🔄 እጅግ የላቀ የAI ፌይልኦቨር ሲስተም v18.4 (Titan Unbreakable) ===================
+# =================== 🔄 TITAN v3.8: INFINITY KEY ROTATION & DEEPSEEK ===================
 class EnhancedAIFailoverSystem:
     """
-    💎 TITAN v3.7 - THE UNBREAKABLE FAILOVER SYSTEM
-    ዓላማ፡ የትኛውም API ቢዘጋ ይዘቱ 6,000+ ቃላት መሆኑን ማረጋገጥ።
+    💎 TITAN v3.8 - THE INFINITY POOL
+    ባህሪያት፡ የቁልፍ ሽክርክሪት (Key Rotation) + DeepSeek + Gemini Fix
     """
     
     def __init__(self, config):
         self.config = config
-        self.key_manager = SecureAPIKeyManager()
         self.healer = SelfHealingSystem()
-        self.monitor = AdvancedMonitoring()
         
-        # 🚀 የሞዴሎች ዝርዝር (2026 Sovereign Edition - Highly Stable)
+        # 🗝️ የቁልፍ ማከማቻ (Multi-Key Pool)
+        self.key_pools = {
+            'groq': self._load_multi_keys('GROQ_API_KEY'),
+            'gemini': self._load_multi_keys('GEMINI_API_KEY'),
+            'deepseek': self._load_multi_keys('DEEPSEEK_API_KEY'),
+            'openai': self._load_multi_keys('OPENAI_API_KEY')
+        }
+        
+        # የቁልፍ መጠቆሚያ (Current Key Index)
+        self.current_key_index = defaultdict(int)
+        
         self.model_configs = {
-            'groq': {
-                'models': ['llama-3.3-70b-versatile', 'llama-3.1-8b-instant', 'mixtral-8x7b-32768'],
-                'endpoint': 'https://api.groq.com/openai/v1/chat/completions'
-            },
-            'gemini': {
-                'models': ['gemini-1.5-pro', 'gemini-1.5-flash'],
-                'endpoint': 'https://generativelanguage.googleapis.com/v1/models' # Fixed to v1
-            },
-            'openai': {
-                'models': ['gpt-4o', 'gpt-4o-mini'],
-                'endpoint': 'https://api.openai.com/v1/chat/completions'
-            }
+            'groq': {'models': ['llama-3.3-70b-versatile', 'llama-3.1-8b-instant', 'mixtral-8x7b-32768'], 'url': 'https://api.groq.com/openai/v1/chat/completions'},
+            'deepseek': {'models': ['deepseek-chat', 'deepseek-reasoner'], 'url': 'https://api.deepseek.com/chat/completions'},
+            'gemini': {'models': ['gemini-1.5-pro', 'gemini-1.5-flash'], 'url': 'https://generativelanguage.googleapis.com/v1beta/models'},
+            'openai': {'models': ['gpt-4o', 'gpt-4o-mini'], 'url': 'https://api.openai.com/v1/chat/completions'}
         }
         
         self.content_cache = {}
-        self.performance_stats = defaultdict(lambda: {'success': 0, 'fail': 0, 'total_time': 0})
-        logger.info("🛡️ Elite Titan Unbreakable System Initialized")
+        logger.info(f"🛡️ Titan v3.8 Initialized. Groq Keys: {len(self.key_pools['groq'])}")
+
+    def _load_multi_keys(self, base_name):
+        """ከ GitHub Secrets ብዙ ቁልፎችን መጫኛ (KEY_1, KEY_2...)"""
+        keys = []
+        # መጀመሪያ ዋናውን ቁልፍ ይፈትሻል
+        main_key = os.getenv(base_name)
+        if main_key: keys.append(main_key)
+        
+        # ከዚያም ቁጥር ያላቸውን (KEY_1 እስከ KEY_10) ይፈትሻል
+        for i in range(1, 11):
+            key = os.getenv(f"{base_name}_{i}")
+            if key and key not in keys: keys.append(key)
+        return keys
+
+    def _get_next_key(self, service):
+        """ቁልፍ ሲዘጋ ወደ ቀጣዩ መቀየሪያ"""
+        pool = self.key_pools.get(service, [])
+        if not pool: return None
+        idx = self.current_key_index[service] % len(pool)
+        self.current_key_index[service] += 1
+        return pool[idx]
 
     async def generate_content(self, prompt: str, content_type: str = "general", max_tokens: int = 4000) -> str:
-        """ዋናው ይዘት ማመንጫ ፈንክሽን - 100% Reliability"""
-        
-        cache_key = hashlib.md5(f"{prompt[:500]}".encode()).hexdigest()
-        if cache_key in self.content_cache:
-            return self.content_cache[cache_key]['content']
-        
-        # አገልግሎቶችን በቅደም ተከተል መሞከር (Groq -> Gemini -> OpenAI)
-        services_to_try = ['groq', 'gemini', 'openai']
+        # አገልግሎቶችን የመሞከሪያ ቅደም ተከተል (አሁን DeepSeek ገብቷል)
+        services_to_try = ['groq', 'deepseek', 'gemini', 'openai']
         last_error = ""
 
         for service in services_to_try:
-            if not self.healer.is_service_healthy(service):
-                continue
-
-            api_key = self.key_manager.get_key(service)
-            if not api_key: continue
-
-            models = self.model_configs[service]['models']
-            for model in models:
+            if not self.key_pools[service]: continue
+            
+            # ለእያንዳንዱ አገልግሎት 3 ጊዜ መሞከር (በተለያዩ ቁልፎች)
+            for attempt in range(len(self.key_pools[service])):
+                api_key = self._get_next_key(service)
+                model = self.model_configs[service]['models'][0] # ዋናውን ሞዴል መምረጥ
+                
                 try:
-                    start_t = time.time()
-                    logger.info(f"🚀 [{service.upper()}] Routing to: {model}...")
-                    
+                    logger.info(f"🚀 [{service.upper()}] Using Key {self.current_key_index[service]} with {model}...")
                     content = await self._execute_api_call(service, model, prompt, api_key, max_tokens)
                     
-                    if content and len(content.strip()) > 300:
-                        duration = time.time() - start_t
-                        self.performance_stats[service]['success'] += 1
-                        await self.healer.monitor_service_health(service, True, duration)
-                        self.content_cache[cache_key] = {'content': content, 'timestamp': time.time()}
+                    if content and len(content.strip()) > 400:
                         return content
-                    else:
-                        raise Exception("Insufficient content length")
-
                 except Exception as e:
                     last_error = str(e)
-                    if "429" in last_error:
-                        # Adaptive Backoff: Rate limit ሲመጣ ሰፋ ያለ እረፍት
-                        wait = 12 if service == 'groq' else 5
-                        logger.warning(f"⚠️ {service.upper()} Rate Limit. Sleeping {wait}s and rotating...")
-                        await asyncio.sleep(wait)
-                        continue
-                    elif "400" in last_error:
-                        logger.warning(f"⚠️ {service.upper()} 400 Error. Reducing token pressure...")
-                        max_tokens = int(max_tokens * 0.8) # ቶከኑን ቀንሶ ይሞክራል
-                        continue
+                    if "429" in last_error or "Rate limit" in last_error:
+                        logger.warning(f"⚠️ {service.upper()} Key {self.current_key_index[service]} Limited. Switching to next key...")
+                        await asyncio.sleep(2) # ቁልፍ ለመቀየር ትንሽ እረፍት
+                        continue 
                     else:
-                        logger.error(f"❌ {service.upper()} {model} failed: {last_error[:100]}")
-                        break # ወደ ቀጣዩ ሰርቪስ ይለፋል
-
-            await self.healer.monitor_service_health(service, False, 0)
-
-        logger.error(f"🚨 ALL ENGINES EXHAUSTED. Last Error: {last_error}")
+                        logger.error(f"❌ {service.upper()} Error: {last_error[:50]}")
+                        break # ወደ ቀጣዩ አገልግሎት ይለፋል
+        
         return self._generate_fallback_content(prompt)
 
     async def _execute_api_call(self, service, model, prompt, api_key, max_tokens):
-        """API ጥሪዎችን በከፍተኛ ጥንቃቄ ማስተናገድ"""
-        async with httpx.AsyncClient(timeout=140.0, follow_redirects=True) as client:
-            
-            # --- GROQ & OPENAI (Same Structure) ---
-            if service in ['groq', 'openai']:
-                url = self.model_configs[service]['endpoint']
+        async with httpx.AsyncClient(timeout=150.0) as client:
+            # --- OPENAI / GROQ / DEEPSEEK (Standard OpenAI Format) ---
+            if service in ['openai', 'groq', 'deepseek']:
+                url = self.model_configs[service]['url']
                 headers = {"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"}
                 data = {
                     "model": model,
                     "messages": [{"role": "user", "content": prompt}],
-                    "temperature": 0.7,
-                    "max_tokens": max_tokens
+                    "temperature": 0.7, "max_tokens": max_tokens
                 }
                 resp = await client.post(url, headers=headers, json=data)
             
-            # --- GEMINI (Corrected Format) ---
+            # --- GEMINI (Fixed URL) ---
             elif service == 'gemini':
-                # Gemini አጠራር፡ models/gemini-1.5-pro:generateContent
-                url = f"{self.model_configs['gemini']['endpoint']}/{model}:generateContent?key={api_key}"
+                url = f"{self.model_configs['gemini']['url']}/{model}:generateContent?key={api_key}"
                 data = {
                     "contents": [{"parts": [{"text": prompt}]}],
                     "generationConfig": {"temperature": 0.7, "maxOutputTokens": max_tokens}
@@ -1161,26 +1151,15 @@ class EnhancedAIFailoverSystem:
 
             if resp.status_code == 200:
                 res_json = resp.json()
-                if service in ['groq', 'openai']:
-                    return res_json['choices'][0]['message']['content']
-                return res_json['candidates'][0]['content']['parts'][0]['text']
+                if service == 'gemini':
+                    return res_json['candidates'][0]['content']['parts'][0]['text']
+                return res_json['choices'][0]['message']['content']
             
-            raise Exception(f"API Error {resp.status_code}: {resp.text[:150]}")
+            raise Exception(f"Status {resp.status_code}: {resp.text[:100]}")
 
     def _generate_fallback_content(self, prompt: str) -> str:
-        """ውድቀት ሲያጋጥም የሚሰጥ ጥራት ያለው ምላሽ"""
-        return f"""
-        <div style='padding:30px; border:3px solid #1e3c72; border-radius:15px; background:#f0f7ff;'>
-            <h2 style='color:#1e3c72;'>💎 Strategic Intelligence Update</h2>
-            <p>Our Titan AI cluster for <b>{prompt[:30]}...</b> is currently performing a deep-sync operation. 
-            The full 6,000-word sovereign guide will be populated in the next automated cycle (6 hours).</p>
-            <p><i>Status: Self-Healing in progress.</i></p>
-        </div>
-        """
-    
-    def get_performance_report(self) -> Dict:
-        return {s.upper(): f"{st['success']} OK" for s, st in self.performance_stats.items()}
-
+        return f"<h2>Content Sync in Progress</h2><p>The strategic analysis for {prompt[:30]} is being refined by our global AI network.</p>"
+                    
 # =================== 📝 የተሻሻለ የይዘት ጀነሬተር ===================
 
 class ProductionContentGenerator:
