@@ -4268,21 +4268,21 @@ class EnhancedWordCounter:
 
 class MegaContentEngine:
     """
-    💎 ULTIMATE MEGA-CONTENT ENGINE v3.3 (The Diamond Edition)
-    ስትራቴጂ፡ Semantic SEO Integration + Visual Content Mapping
-    ግብ፡ 5,000 - 6,500 ቃላት (Unmatched Authority & Quality)
+    👑 SOVEREIGN CROWN EDITION (v3.4)
+    ስትራቴጂ፡ Quad-Phase Recursive Expansion (Pillar -> Arch -> Revenue -> Sovereign)
+    ግብ፡ 6,000+ ቃላት (Total Market Dominance)
     """
     def __init__(self, system):
         self.system = system
         self.config = system.config
         self.failover = system.failover_system
-        self.logger = logging.getLogger("MegaEngine.Diamond")
+        self.logger = logging.getLogger("MegaEngine.Sovereign")
 
     async def produce_11_countries_mega_loop(self, topic: str):
         target_countries = list(self.config.HIGH_VALUE_COUNTRIES.keys())[:11]
         
         print("\n" + "█"*80)
-        print(f"💎 DIAMOND-GRADE PRODUCTION: TARGETING 5,500+ WORDS PER COUNTRY")
+        print(f"👑 SOVEREIGN PRODUCTION STARTING: TARGETING 6,000+ WORDS")
         print(f"📝 Topic: {topic}")
         print("█"*80 + "\n")
 
@@ -4291,115 +4291,122 @@ class MegaContentEngine:
         for i, country in enumerate(target_countries, 1):
             country_info = self.config.HIGH_VALUE_COUNTRIES[country]
             emoji = country_info['emoji']
-            print(f"🔄 [{i}/11] Diamond Polishing for: {emoji} {country}...")
+            print(f"🔄 [{i}/11] Sovereign Crafting for: {emoji} {country}...")
             
             try:
-                # --- STAGE 1: SEMANTIC FOUNDATIONS (2,000+ words) ---
-                print(f"   🔹 Stage 1: Semantic Intelligence & Psychographics...")
-                p1_prompt = self._get_p1_diamond_prompt(topic, country, country_info)
-                part1 = await self.failover.generate_content(p1_prompt, max_tokens=4000)
-                await asyncio.sleep(4)
+                # --- STAGE 1: FOUNDATIONS (2,200+ words) ---
+                print(f"   🔹 Stage 1: Intelligence & Market Psychographics...")
+                p1 = await self.failover.generate_content(self._get_p1_crown_prompt(topic, country, country_info), max_tokens=4000)
+                await asyncio.sleep(random.uniform(4, 6))
                 
-                # --- STAGE 2: ARCHITECTURAL DEEP-DIVE (2,000+ words) ---
-                print(f"   🔹 Stage 2: System Architecture & Hyper-Local Benchmarking...")
-                p2_prompt = self._get_p2_diamond_prompt(topic, country, part1)
-                part2 = await self.failover.generate_content(p2_prompt, max_tokens=4000)
-                await asyncio.sleep(4)
+                # --- STAGE 2: ARCHITECTURE (2,200+ words) ---
+                print(f"   🔹 Stage 2: Technical Architecture & Global Benchmarking...")
+                p2 = await self.failover.generate_content(self._get_p2_crown_prompt(topic, country, p1), max_tokens=4000)
+                await asyncio.sleep(random.uniform(4, 6))
                 
-                # --- STAGE 3: MONETIZATION & DIAMOND FAQ (2,000+ words) ---
-                print(f"   🔹 Stage 3: Revenue Engineering & 20-Question Elite FAQ...")
-                p3_prompt = self._get_p3_diamond_prompt(topic, country, part2)
-                part3 = await self.failover.generate_content(p3_prompt, max_tokens=4000)
+                # --- STAGE 3: REVENUE (2,200+ words) ---
+                print(f"   🔹 Stage 3: Revenue Engineering & Elite FAQ...")
+                p3 = await self.failover.generate_content(self._get_p3_crown_prompt(topic, country, p2), max_tokens=4000)
                 
-                # የይዘት ስፌት (Diamond Stitching)
-                full_content = self._stitch_diamond_content(part1, part2, part3, topic, country)
-                word_count = EnhancedWordCounter.count_words(full_content)
+                # የመጀመሪያ ድምር ፍተሻ
+                temp_content = p1 + p2 + p3
+                word_count = EnhancedWordCounter.count_words(temp_content)
+
+                # --- STAGE 4: SOVEREIGN EXPANSION (ከ 5,000 በታች ከሆነ ብቻ) ---
+                if word_count < 5000:
+                    print(f"   🔹 Stage 4: Word count at {word_count}. Triggering Sovereign Expansion...")
+                    p4 = await self.failover.generate_content(self._get_p4_crown_prompt(topic, country, temp_content), max_tokens=4000)
+                    full_content = self._stitch_sovereign_content(p1, p2, p3, p4, topic, country)
+                else:
+                    full_content = self._stitch_sovereign_content(p1, p2, p3, "", topic, country)
+                
+                final_word_count = EnhancedWordCounter.count_words(full_content)
                 
                 result_data = {
-                    'id': f"diamond_mega_{country}_{int(time.time())}",
-                    'title': f"The 2026 Sovereign Masterclass: {topic} in {country} (Diamond Authority)",
+                    'id': f"sovereign_{country}_{int(time.time())}",
+                    'title': f"The 2026 Sovereign Masterclass: {topic} in {country}",
                     'content': full_content,
-                    'word_count': word_count,
-                    'quality_report': {'overall_score': 100, 'seo_semantic_score': 'Excellent'},
+                    'word_count': final_word_count,
+                    'quality_report': {'overall_score': 100, 'market_authority': 'Global Elite'},
                     'production_report': {
                         'estimated_earning_potential': {
-                            'high_ticket_value': country_info['avg_commission'] * 100,
-                            'status': 'Top 1% Content'
+                            'monthly_value': country_info['avg_commission'] * 120,
+                            'status': 'Sovereign Grade'
                         }
                     }
                 }
                 
                 save_to_file(result_data, 'html')
-                print(f"   ✨ DIAMOND SUCCESS: {word_count} words for {country}!")
+                print(f"   ✨ SOVEREIGN SUCCESS: {final_word_count} words for {country}!")
 
             except Exception as e:
-                print(f"   ❌ DIAMOND ERROR in {country}: {str(e)}")
+                print(f"   ❌ ERROR in {country}: {str(e)}")
 
             if i < 11:
-                print(f"   ⏳ API Cool-off (30s)..."); await asyncio.sleep(30)
+                wait_time = random.uniform(30, 45)
+                print(f"   ⏳ Cool-off ({int(wait_time)}s)..."); await asyncio.sleep(wait_time)
 
         total_duration = (time.time() - start_time) / 60
         print("\n" + "█"*80)
-        print(f"🏆 DIAMOND PRODUCTION COMPLETE! Total Time: {total_duration:.2f} Mins.")
+        print(f"👑 MISSION COMPLETE! Total Time: {total_duration:.2f} Mins.")
         print("█"*80 + "\n")
 
-    def _get_p1_diamond_prompt(self, topic, country, info):
+    def _get_p1_crown_prompt(self, topic, country, info):
         return f"""
-        (DIAMOND STAGE 1/3) You are the Lead Strategist at a Global Fortune 500 Consulting Firm.
-        Write a 2,200-word SEMANTIC PILLAR about "{topic}" for the {country} market.
-        
-        REQUIRED SECTIONS:
-        1. 2026 Strategic Market Intelligence: Deep analysis of {country}'s economic shift (800 words).
-        2. Semantic Keyword Ecosystem: Natural integration of related LSI keywords for {topic} in {country}.
-        3. Psychological Audience Mapping: Cultural triggers and pain points of {country} professionals (700 words).
-        4. Global-Local Regulatory Blueprint: Exhaustive compliance requirements for {country} (700 words).
-        
-        TONE: Elite, Data-Rich, Academic yet Actionable. Use H1, H2, H3 tags.
+        (SOVEREIGN STAGE 1/4) Senior Industry Consultant Role.
+        Write 2,500 words of STRATEGIC FOUNDATIONS for a massive 6,000-word guide on "{topic}" for {country}.
+        CHAPTERS:
+        1. 2026 Macro-Economic Shift in {country}: Exhaustive Analysis (900 words).
+        2. Psychographic Deep-Dive: The hidden pain points of {country} users (800 words).
+        3. Regulatory & Sovereign Compliance: Every law, tax, and clause in {country} (800 words).
+        FORMAT: Use H1, H2, H3. Be extremely verbose. No summaries.
         """
 
-    def _get_p2_diamond_prompt(self, topic, country, previous):
+    def _get_p2_crown_prompt(self, topic, country, previous):
         return f"""
-        (DIAMOND STAGE 2/3) You are a Senior Technical Architect and ROI Consultant. 
-        Continue the {country} guide about "{topic}" with 2,200 words of ARCHITECTURAL content.
-        
-        REQUIRED SECTIONS:
-        1. Comprehensive Infrastructure Setup: Hardware, Software, and Human Resource requirements in {country} (800 words).
-        2. Visual Content Map: Descriptions of where to place infographics and charts for maximum engagement.
-        3. 7 Hyper-Localized Case Studies: Massive breakdowns of success and failure in the {country} ecosystem (900 words).
-        4. Operational Risk Analysis: Mitigating local {country} challenges (500 words).
-        
-        FORMAT: Use H2, H3, and HTML Data Tables. Be extremely detailed.
+        (SOVEREIGN STAGE 2/4) Technical Architect Role.
+        Continue the {country} guide about "{topic}" with 2,500 words of ARCHITECTURAL content.
+        CHAPTERS:
+        1. Technical Ecosystem Setup: From Zero to Global Authority in {country} (1,000 words).
+        2. 10 Hyper-Local Case Studies: Success/Failure models in {country} (1,000 words).
+        3. Competitive Moats: How to outpace local {country} rivals (500 words).
+        FORMAT: Use HTML Data Tables and H2, H3. Extreme detail only.
         """
 
-    def _get_p3_diamond_prompt(self, topic, country, previous):
+    def _get_p3_crown_prompt(self, topic, country, previous):
         return f"""
-        (DIAMOND STAGE 3/3) You are a Wealth Management Expert.
-        Finalize the {country} masterclass about "{topic}" with 2,200 words of REVENUE ENGINEERING.
-        
-        REQUIRED SECTIONS:
-        1. The 12-Month Sovereign Roadmap: Detailed, task-heavy monthly guide for {country} (900 words).
-        2. Revenue Optimization Models: ROI calculations using {country}'s currency vs USD (700 words).
-        3. ELITE FAQ HUB: 20 technical, deep-dive questions with 150-word answers each (This must be massive).
-        4. Future Convergence (2026-2035): How {topic} will evolve in {country}.
-        
-        IMPORTANT: Total output MUST be exhaustive. Force word counts to exceed 6,000 words if possible.
+        (SOVEREIGN STAGE 3/4) Wealth Strategy Expert Role.
+        Continue the {country} masterclass about "{topic}" with 2,500 words of REVENUE content.
+        CHAPTERS:
+        1. The 24-Month Sovereign Roadmap: Detailed weekly tasks for {country} (1,000 words).
+        2. Revenue Modeling: ROI in {country} currency vs USD (500 words).
+        3. ELITE INTEL FAQ: 25 complex questions with 150-word answers each (Forcing Word Count).
+        FORMAT: Force word counts. Exhaustive answers.
         """
 
-    def _stitch_diamond_content(self, p1, p2, p3, topic, country):
-        diamond_header = f"""
-        <div style="background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); color:white; padding:40px; border-radius:15px; margin-bottom:40px; text-align:center; box-shadow: 0 10px 30px rgba(0,0,0,0.2);">
-            <h1 style="font-size:3em; margin-bottom:10px;">💎 DIAMOND MASTERCLASS</h1>
-            <h2 style="opacity:0.9;">{topic.upper()}</h2>
-            <p style="font-size:1.2em;">Exclusive Strategic Blueprint for the {country} Market (2026 Edition)</p>
+    def _get_p4_crown_prompt(self, topic, country, previous):
+        return f"""
+        (SOVEREIGN STAGE 4/4) Final Sovereign Polishing.
+        The current guide for {country} is incomplete. Add 2,000 words of ADJUNCT content.
+        CHAPTERS:
+        1. Advanced Troubleshooting & Edge Cases in {country}.
+        2. Resource Directory: Tools, Communities, and APIs for {country}.
+        3. The 2035 Vision: Long-term strategic evolution.
+        Write as much as possible to ensure the total guide exceeds 6,000 words.
+        """
+
+    def _stitch_sovereign_content(self, p1, p2, p3, p4, topic, country):
+        crown_html = f"""
+        <div style="border: 10px double #1e3c72; padding:50px; background:#fff; font-family:'Georgia', serif;">
+            <div style="text-align:center; border-bottom:3px solid #1e3c72; margin-bottom:40px; padding-bottom:20px;">
+                <h1 style="font-size:4em; color:#1e3c72; margin:0;">👑 SOVEREIGN CROWN</h1>
+                <h3 style="letter-spacing:5px; color:#666;">2026 STRATEGIC MASTERCLASS</h3>
+                <p>TARGET MARKET: {country.upper()} | TOPIC: {topic.upper()}</p>
+            </div>
+            {p1} <hr> {p2} <hr> {p3} {" <hr> " + p4 if p4 else ""}
         </div>
         """
-        
-        full = p1 + "\n<hr style='border: 2px solid #1e3c72; margin: 60px 0;'>\n" + p2 + "\n<hr style='border: 2px solid #1e3c72; margin: 60px 0;'>\n" + p3
-        h1_matches = re.findall(r'<h1.*?>.*?</h1>', full, re.IGNORECASE)
-        for extra_h1 in h1_matches:
-            full = full.replace(extra_h1, f"<h2 style='color:#1e3c72; font-size:2em; border-bottom:2px solid #eee;'>{re.sub('<[^>]+>', '', extra_h1)}</h2>")
-            
-        return diamond_header + full
+        return crown_html
 # =================== ዋና ስርዓት ክፍል ===================
 
 class UltimateProfitMasterSystem:
