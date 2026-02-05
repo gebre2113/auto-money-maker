@@ -1043,8 +1043,6 @@ class ComprehensiveErrorHandler:
             return "🔴 ከፍተኛ ችግር አለ"
 
 # =================== 🔄 የተሻሻለ የAI ፌይልኦቨር ሲስተም ===================
-
-# =================== 🔄 የተሻሻለ የAI ፌይልኦቨር ሲስተም ===================
 class EnhancedAIFailoverSystem:
     """
     ከፍተኛ ብልጠት ያለው እና ራሱን የሚፈውስ AI Failover System
@@ -1053,8 +1051,6 @@ class EnhancedAIFailoverSystem:
     
     def __init__(self, config):
         self.config = config
-        # ማሳሰቢያ፡ እነዚህ ክላሶች (SecureAPIKeyManager, SelfHealingSystem, AdvancedMonitoring) 
-        # በሌላ የኮድህ ክፍል መኖራቸውን አረጋግጥ።
         self.key_manager = SecureAPIKeyManager()
         self.healer = SelfHealingSystem()
         self.monitor = AdvancedMonitoring()
@@ -1074,7 +1070,8 @@ class EnhancedAIFailoverSystem:
                     'technical': 'gemini-1.5-pro',
                     'general': 'gemini-1.5-flash'
                 },
-                'endpoint': 'https://generativelanguage.googleapis.com/v1/models'
+                # ማስተካከያ፡ v1 ወደ v1beta ተቀይሯል (ለአዲሶቹ ሞዴሎች ይበልጥ አስተማማኝ ነው)
+                'endpoint': 'https://generativelanguage.googleapis.com/v1beta/models'
             }
         }
         self.content_cache = {}
@@ -1084,16 +1081,15 @@ class EnhancedAIFailoverSystem:
     async def generate_content(self, prompt: str, content_type: str = "general", max_tokens: int = 4000) -> str:
         """ዋናው ይዘት ማመንጫ ፈንክሽን"""
         
-        # 1. መጀመሪያ Cache ፍተሻ (ጊዜ ለመቆጠብ)
+        # 1. መጀመሪያ Cache ፍተሻ
         cache_key = hashlib.md5(f"{prompt[:200]}".encode()).hexdigest()
         if cache_key in self.content_cache:
             cached_data = self.content_cache[cache_key]
-            # የcache ዕድሜ ፍተሻ (ከ1 ሰዓት በላይ ካለፈ አዲስ ያመንጭ)
             if time.time() - cached_data.get('timestamp', 0) < 3600:
                 logger.info("💾 Cached content found. Reusing...")
                 return cached_data['content']
         
-        # 2. አገልግሎቶችን በቅደም ተከተል መሞከር (Groq -> Gemini)
+        # 2. አገልግሎቶችን በቅደም ተከተል መሞከር
         services_to_try = ['groq', 'gemini']
         last_error = None
 
@@ -1113,17 +1109,15 @@ class EnhancedAIFailoverSystem:
                 
                 content = await self._execute_api_call(service, prompt, api_key, content_type, max_tokens)
                 
-                if content and len(content.strip()) > 150: # ጥራት ማረጋገጫ
+                if content and len(content.strip()) > 150:
                     duration = time.time() - start_t
                     logger.info(f"✅ {service.upper()} Success in {duration:.2f}s")
                     
-                    # ስኬቱን መመዝገብ
                     self.performance_stats[service]['success'] += 1
                     self.performance_stats[service]['total_time'] += duration
                     
                     await self.healer.monitor_service_health(service, True, duration)
                     
-                    # ማህደረ ትውስታ ላይ ማስቀመጥ
                     self.content_cache[cache_key] = {
                         'content': content,
                         'timestamp': time.time(),
@@ -1138,13 +1132,10 @@ class EnhancedAIFailoverSystem:
             except Exception as e:
                 last_error = str(e)
                 logger.warning(f"⚠️ {service.upper()} failed: {last_error}")
-                
-                # ስህተቱን መመዝገብ
                 self.performance_stats[service]['fail'] += 1
                 await self.healer.monitor_service_health(service, False, 0)
-                continue 
+                continue
 
-        # ሁሉም ከከሸፉ መረጃውን ለገቢ ማመንጫው ባዶ እንዳይሆን Fallback ስጥ
         logger.error(f"🚨 All AI Engines failed. Last error: {last_error}")
         return self._generate_fallback_content(prompt)
 
@@ -1153,10 +1144,10 @@ class EnhancedAIFailoverSystem:
         
         # --- GROQ CALL ---
         if service == 'groq':
-            model = self.model_configs['groq']['models'].get(content_type, 'llama-3.1-8b-instant')
+            model_name = self.model_configs['groq']['models'].get(content_type, 'llama-3.1-8b-instant')
             headers = {"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"}
             data = {
-                "model": model,
+                "model": model_name,
                 "messages": [{"role": "user", "content": prompt}],
                 "temperature": 0.7,
                 "max_tokens": max_tokens
@@ -1168,11 +1159,11 @@ class EnhancedAIFailoverSystem:
                 else:
                     raise Exception(f"Groq API Error: {resp.status_code} - {resp.text[:100]}")
 
-        # --- GEMINI CALL --- (URL የተስተካከለ)
+        # --- GEMINI CALL ---
         elif service == 'gemini':
             model_key = 'technical' if content_type == 'technical' else 'general'
             model_name = self.model_configs['gemini']['models'].get(model_key)
-            # የ Gemini API URL ትክክለኛ አጻጻፍ
+            # ማስተካከያ፡ የ URL አወቃቀሩ ለ v1beta እንዲስማማ ተደርጓል
             url = f"{self.model_configs['gemini']['endpoint']}/{model_name}:generateContent?key={api_key}"
             
             data = {
@@ -1186,6 +1177,7 @@ class EnhancedAIFailoverSystem:
                 resp = await client.post(url, json=data)
                 if resp.status_code == 200:
                     result = resp.json()
+                    # Gemini ውጤቱን የሚመልስበትን መንገድ ማረጋገጥ
                     return result['candidates'][0]['content']['parts'][0]['text']
                 else:
                     raise Exception(f"Gemini API Error: {resp.status_code} - {resp.text[:100]}")
@@ -1214,10 +1206,8 @@ class EnhancedAIFailoverSystem:
                 'total_requests': total,
                 'successful': stats['success'],
                 'failed': stats['fail'],
-                'average_time': round(avg_time, 2),
-                'cache_hits': len([v for v in self.content_cache.values() if v.get('service') == service])
+                'average_time': round(avg_time, 2)
             }
-        
         return report
 
 # =================== 📝 የተሻሻለ የይዘት ጀነሬተር ===================
