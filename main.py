@@ -5015,7 +5015,7 @@ async def enhanced_main():
         
         # 🚀 አዲሱን የሜጋ ኢንጂን እዚህ ጋር እናነሳዋለን (Initialisation)
         # ማሳሰቢያ፡ MegaContentEngine የሚለው ክላስ ከላይ በፋይሉ ውስጥ መኖሩን ያረጋግጡ
-        from mega_engine_logic import MegaContentEngine # ወይም ክላሱ ባለበት ቦታ
+        
         system.mega_engine = MegaContentEngine(system)
         
         # የስርዓት ሁኔታ ማሳየት
