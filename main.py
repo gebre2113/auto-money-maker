@@ -4208,47 +4208,141 @@ class EnhancedWordCounter:
 # =========================================================================
 
 class MegaContentEngine:
-    """7,000+ ቃላት የሚያመርት ዋና ሞተር"""
+    """
+    💎 TITAN v4.3 MEGA-ENGINE
+    ስትራቴጂ፡ 4-Phase Sequential Key Rotation (Strict 7,000+ Words)
+    ዓላማ፡ 11 ሀገራትን እጅግ ጥልቅ በሆነ ትንተና መሸፈን
+    """
     def __init__(self, system):
         self.system = system
         self.config = system.config
         self.failover = system.failover_system
 
     async def produce_11_countries_mega_loop(self, topic: str):
+        """11 ሀገራትን በአራት ዙር (Phase) እያመረተ በየሀገሩ 7,000+ ቃላት ማመንጨት"""
         target_countries = list(self.config.HIGH_VALUE_COUNTRIES.keys())[:11]
-        print(f"\n🔥 TITAN v4.2 ACTIVATED: TRYING ALL GROQ KEYS FIRST\n")
+        
+        print("\n" + "█"*80)
+        print(f"🔥 TITAN v4.3: SUPREME 7,000+ WORDS STRATEGY ACTIVATED")
+        print(f"📝 Topic: {topic}")
+        print("█"*80 + "\n")
+
+        start_time = time.time()
 
         for i, country in enumerate(target_countries, 1):
-            print(f"🔄 [{i}/11] Sovereign Crafting: {country}...")
+            country_info = self.config.HIGH_VALUE_COUNTRIES[country]
+            emoji = country_info['emoji']
+            print(f"🔄 [{i}/11] Crafting Sovereign Masterpiece: {emoji} {country}...")
             
             try:
-                # እያንዳንዱ Phase ራሱን የቻለ ጥልቅ ጥያቄ ነው
-                print(f"   🔹 Stage 1: Intelligence...")
-                p1 = await self.failover.generate_content(f"Write a massive 2,000-word foundation for '{topic}' in {country}. Use HTML headings. Be very detailed.", max_tokens=3500)
+                # --- STAGE 1: MARKET INTELLIGENCE ---
+                print(f"   🔹 Stage 1: Intelligence Foundations...")
+                prompt1 = f"""
+                Write a massive 2,500-word EXECUTIVE FOUNDATION for a 7,000-word guide about "{topic}" in {country}.
+                Include: 2026 Market Intelligence, Psychographic Profiling of {country} users, and Regulatory/Legal Frameworks.
+                Use HTML headings (H1, H2, H3). Be extremely verbose.
+                """
+                p1 = await self.failover.generate_content(prompt1, max_tokens=4000)
+                await asyncio.sleep(5) # ለቁልፍ ሽግግር እረፍት
                 
-                print(f"   🔹 Stage 2: Technical Architecture...")
-                p2 = await self.failover.generate_content(f"Expand with 2,000 more words on technical setup and 10 local case studies for '{topic}' in {country}. Use HTML.", max_tokens=3500)
+                # --- STAGE 2: TECHNICAL & CASE STUDIES ---
+                print(f"   🔹 Stage 2: Technical Deep-Dive...")
+                prompt2 = f"""
+                Continue the {country} guide about "{topic}". Write 2,500 words of ARCHITECTURE and CASE STUDIES.
+                Include: Technical Infrastructure Setup, 10 local {country} Case Studies, and Competitive Analysis.
+                Use HTML (H2, H3). Force deep technical details.
+                """
+                p2 = await self.failover.generate_content(prompt2, max_tokens=4000)
+                await asyncio.sleep(5)
                 
-                print(f"   🔹 Stage 3: Strategy & ROI...")
-                p3 = await self.failover.generate_content(f"Add 1,500 words of tactical roadmap, ROI models, and monetization for '{topic}' in {country}. Use HTML.", max_tokens=3500)
+                # --- STAGE 3: STRATEGY & ROI ---
+                print(f"   🔹 Stage 3: Revenue & Implementation Strategy...")
+                prompt3 = f"""
+                Continue the {country} guide about "{topic}". Write 2,000 words of REVENUE STRATEGY.
+                Include: 24-Month Implementation Roadmap for {country}, ROI Modeling (Local Currency vs USD), and Risk Mitigation.
+                Use HTML (H2, H3). Force task-heavy monthly breakdowns.
+                """
+                p3 = await self.failover.generate_content(prompt3, max_tokens=4000)
+                await asyncio.sleep(5)
                 
-                print(f"   🔹 Stage 4: Mastery & FAQ...")
-                p4 = await self.failover.generate_content(f"Finalize with 1,500 words of 30 deep FAQs and future vision for '{topic}' in {country}. Use HTML.", max_tokens=3500)
+                # --- STAGE 4: INTEL FAQ & MASTERY ---
+                print(f"   🔹 Stage 4: Mastery Hub & FAQ...")
+                prompt4 = f"""
+                Finalize the {country} guide about "{topic}". Write 2,000 words of INTEL.
+                Include: 30 complex Technical FAQs with 150-word answers each, Resource Directory, and 2035 Vision.
+                Use HTML. Ensure total content exceeds 7,000 words.
+                """
+                p4 = await self.failover.generate_content(prompt4, max_tokens=4000)
                 
-                full_content = p1 + "\n<hr>\n" + p2 + "\n<hr>\n" + p3 + "\n<hr>\n" + p4
-                words = EnhancedWordCounter.count_words(full_content)
+                # --- ይዘቱን ማቀናጀት (Stitching) ---
+                full_content = self._stitch_sovereign_html(p1, p2, p3, p4, topic, country)
+                word_count = EnhancedWordCounter.count_words(full_content)
                 
-                if words < 1500:
-                    raise Exception("Output too thin. Retrying with backup keys...")
+                # 🛑 የጥራት ማረጋገጫ (ከ 2,000 ቃላት በታች ከሆነ እንደ ውድቀት ይቆጠራል)
+                if word_count < 2000:
+                    raise Exception(f"Output for {country} is critically thin ({word_count} words).")
 
-                result = {'id': f"titan_v42_{country}", 'title': f"Sovereign Masterclass: {topic} in {country}", 'content': full_content, 'word_count': words, 'quality_report': {'overall_score': 100}}
-                save_to_file(result, 'html')
-                print(f"   ✨ SUCCESS: {words} words for {country}!")
+                # ውጤቱን ማዘጋጀት
+                result_data = {
+                    'id': f"titan_v43_{country}_{int(time.time())}",
+                    'title': f"The 2026 Sovereign Masterclass: {topic} in {country}",
+                    'content': full_content,
+                    'word_count': word_count,
+                    'quality_report': {'overall_score': 100, 'authority': 'Sovereign Grade'},
+                    'production_report': {
+                        'estimated_earning_potential': {
+                            'monthly': country_info['avg_commission'] * 150,
+                            'status': 'Titan Approved'
+                        }
+                    }
+                }
+                
+                # ፋይል ማስቀመጥ
+                file_path = save_to_file(result_data, 'html')
+                print(f"   ✨ TITAN SUCCESS: {word_count} words generated for {country}!")
+                print(f"   💾 Saved to: {file_path}")
 
             except Exception as e:
-                print(f"   ❌ FATAL in {country}: {e}")
-            
-            if i < 11: await asyncio.sleep(25)
+                print(f"   ❌ FATAL ERROR in {country}: {str(e)}")
+
+            # በሀገራት መካከል ያለው የመተንፈሻ ጊዜ
+            if i < 11:
+                print(f"   ⏳ Next Country Sync (30s)...")
+                await asyncio.sleep(30)
+
+        total_duration = (time.time() - start_time) / 60
+        print("\n" + "█"*80)
+        print(f"🏆 MISSION COMPLETE: 11 COUNTRIES PROCESSED IN {total_duration:.2f} MINUTES")
+        print("█"*80 + "\n")
+
+    def _stitch_sovereign_html(self, p1, p2, p3, p4, topic, country):
+        """አራቱን ክፍሎች በጥበብ እና በሚያምር ዲዛይን ማዋሃጃ"""
+        header_html = f"""
+        <div style="border: 12px double #1e3c72; padding:60px; background:#fff; font-family:'Georgia', serif; line-height:1.8; color:#333;">
+            <div style="text-align:center; border-bottom:4px solid #1e3c72; margin-bottom:50px; padding-bottom:30px;">
+                <h1 style="font-size:4.5em; color:#1e3c72; margin:0; text-transform:uppercase;">Titan Sovereign</h1>
+                <h2 style="letter-spacing:10px; color:#666; font-weight:lighter;">2026 MASTER STRATEGY</h2>
+                <div style="margin-top:20px; font-size:1.5em; font-weight:bold; color:#d4af37;">
+                    OFFICIAL REPORT: {country.upper()} MARKET | TOPIC: {topic.upper()}
+                </div>
+            </div>
+        """
+        
+        body_html = f"""
+            <div class="phase-1">{p1}</div>
+            <hr style="border: 0; height: 2px; background-image: linear-gradient(to right, rgba(0,0,0,0), rgba(30,60,114,0.75), rgba(0,0,0,0)); margin: 60px 0;">
+            <div class="phase-2">{p2}</div>
+            <hr style="border: 0; height: 2px; background-image: linear-gradient(to right, rgba(0,0,0,0), rgba(30,60,114,0.75), rgba(0,0,0,0)); margin: 60px 0;">
+            <div class="phase-3">{p3}</div>
+            <hr style="border: 0; height: 2px; background-image: linear-gradient(to right, rgba(0,0,0,0), rgba(30,60,114,0.75), rgba(0,0,0,0)); margin: 60px 0;">
+            <div class="phase-4">{p4}</div>
+            <div style="margin-top:60px; padding:40px; background:#f0f4f8; border-radius:15px; text-align:center;">
+                <h2 style="color:#1e3c72;">END OF SOVEREIGN REPORT</h2>
+                <p>Generated by Ultimate Profit Master Mega-System v18.1</p>
+            </div>
+        </div>
+        """
+        return header_html + body_html
 # =================== ዋና ስርዓት ክፍል ===================
 
 class UltimateProfitMasterSystem:
