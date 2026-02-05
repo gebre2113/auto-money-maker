@@ -4982,7 +4982,7 @@ async def run_10_minute_production_strategy(system):
 # =================== የተሻሻለ ዋና አፈፃፀም ፋይል (Main) ===================
 
 async def enhanced_main():
-    """የተሻሻለ ዋና አፈፃፀም ፋይል"""
+    """የተሻሻለ ዋና አፈፃፀም ፋይል - Mega Production (Choice 10) ተካቷል"""
     
     # ሰንደቅ ማሳየት
     UserInterface.display_banner()
@@ -5002,16 +5002,21 @@ async def enhanced_main():
         # ስርዓት ማስጀመር
         system = UltimateProfitMasterSystem(config)
         
+        # 🚀 አዲሱን የሜጋ ኢንጂን እዚህ ጋር እናነሳዋለን (Initialisation)
+        # ማሳሰቢያ፡ MegaContentEngine የሚለው ክላስ ከላይ በፋይሉ ውስጥ መኖሩን ያረጋግጡ
+        from mega_engine_logic import MegaContentEngine # ወይም ክላሱ ባለበት ቦታ
+        system.mega_engine = MegaContentEngine(system)
+        
         # የስርዓት ሁኔታ ማሳየት
         UserInterface.display_system_status(config, system)
         
         # ==========================================
         # 🚀 AUTOMATION CHECK (GitHub Actions)
         # ==========================================
-        # GitHub ላይ ከሆነ ወይም AUTO_RUN=true ከተባለ ቀጥታ ወደ 10 ደቂቃ ስትራቴጂ ይገባል
         if os.getenv('GITHUB_ACTIONS') == 'true' or os.getenv('AUTO_RUN') == 'true':
-            print("\n🤖 Automation detected. Starting 10-Minute Strategy automatically...")
-            await run_10_minute_production_strategy(system)
+            print("\n🤖 Automation detected. Starting Mega-Production automatically...")
+            default_topic = "AI-Driven Digital Wealth and Global Automation 2026"
+            await system.mega_engine.produce_11_countries_mega_loop(default_topic)
             return
 
         # ==========================================
@@ -5019,7 +5024,7 @@ async def enhanced_main():
         # ==========================================
         while True:
             UserInterface.display_main_menu()
-            print("   🔟. የ10 ደቂቃ ስትራቴጂ (10 Countries Loop)") # አዲስ አማራጭ
+            # ማሳሰቢያ፡ display_main_menu() ውስጥ ቁጥር 10 እንዲታይ አስቀድመው አስተካክለው ከሆነ እዚህም ይታያል
             
             choice = UserInterface.get_user_input(
                 "📋 ምርጫዎን ያስገቡ (1-10)",
@@ -5043,18 +5048,29 @@ async def enhanced_main():
                 UserInterface.display_system_status(config, system)
             elif choice == 8:
                 await high_value_countries_mode(system, config)
-            elif choice == 10: # አዲሱ ምርጫ
-                await run_10_minute_production_strategy(system)
+            
+            # 🔥 አዲሱ የ3,500+ ቃላት ሜጋ ምርት ምርጫ
+            elif choice == 10:
+                print("\n" + "═"*60)
+                print("💎 የሜጋ ምርት ተርሚናል (3,500+ ቃላት በሁለት ዙር)")
+                print("═"*60)
+                mega_topic = input("\n📝 የምርት ርዕሱን ያስገቡ (ለምሳሌ፡ 'AI Agency Business'): ").strip()
+                if not mega_topic:
+                    mega_topic = "Strategic Wealth Building with AI and Global Automation"
+                
+                # የሜጋ ምርቱን ማስጀመር
+                await system.mega_engine.produce_11_countries_mega_loop(mega_topic)
+                
             elif choice == 9:
-                print("\n👋 እንደገና ተገናኙ!")
+                print("\n👋 እንደገና ተገናኙ! መልካም ቀን።")
                 break
             else:
                 print("❌ ትክክል ያልሆነ ምርጫ። እባክዎ እንደገና ይሞክሩ።")
     
     except KeyboardInterrupt:
-        print("\n\n⚠️ በተጠቃሚ ተቋርጧል")
+        print("\n\n⚠️ በተጠቃሚ ተቋርጧል (KeyboardInterrupt)")
     except Exception as e:
-        print(f"\n❌ ያልተጠበቀ ስህተት: {e}")
+        print(f"\n❌ ያልተጠበቀ ስህተት ተፈጥሯል: {e}")
         import traceback
         traceback.print_exc()
         logger.error(f"ዋና አፈፃፀም ስህተት: {e}", exc_info=True)
