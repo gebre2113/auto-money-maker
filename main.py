@@ -4346,7 +4346,7 @@ class UltimateProfitMasterSystem:
             self.dashboard = None
             print("⚠️ Pandas not installed, dashboard disabled")
         
-                try:
+        try:
             self.self_optimizer = SelfOptimizingEngine()
         except:
             self.self_optimizer = None
