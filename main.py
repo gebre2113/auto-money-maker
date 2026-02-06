@@ -4198,15 +4198,13 @@ class EnhancedWordCounter:
 
 class MegaContentEngine:
     """
-    💎 TITAN v8.0 "THE SINGULARITY" (ULTIMATE MERGED EDITION)
+    💎 TITAN v8.1 "THE SINGULARITY" (BUG FIX EDITION)
     
-    THE FINAL ARCHITECTURE:
-    1. Robust Action Key Loader (Fixes GitHub Actions Issues)
-    2. 7-Key Groq Rotation (Zero Downtime / No Payment Errors)
-    3. Quantum Volume Prompts (Targets 10,000 Words)
-    4. Context-Aware Memory (Prevents Redundancy)
-    5. Full SEO & Visual Integration (v5.1 Features)
-    6. Bilingual Summaries (ET, JP, DE, FR)
+    CRITICAL FIXES:
+    1. Fixed 'Content too short' loop in Phase 0
+    2. Dynamic minimum length requirements per phase
+    3. Robust Action Key Loader
+    4. 10,000 Words Architecture
     """
     
     def __init__(self, system):
@@ -4265,7 +4263,7 @@ class MegaContentEngine:
         target_countries = list(self.config.HIGH_VALUE_COUNTRIES.keys())[:11]
         
         print("\n" + "█"*80)
-        print(f"🚀 TITAN v8.0 'THE SINGULARITY' ACTIVATED")
+        print(f"🚀 TITAN v8.1 'THE SINGULARITY' ACTIVATED")
         print(f"🎯 TARGET: 10,000 WORDS | INTEGRATION: FULL | STATUS: OMNIPOTENT")
         print("█"*80 + "\n")
 
@@ -4276,6 +4274,7 @@ class MegaContentEngine:
             
             try:
                 # --- STAGE 0: SHIELDED DISCOVERY ---
+                # min_length=10 ensures short titles don't trigger errors
                 print(f"🔄 [{i}/11] Phase 0: Shielded Discovery for {emoji} {country}...")
                 discovered_topic = await self._discover_topic_groq(topic, country)
                 print(f"🎯 Target Locked: '{discovered_topic}'")
@@ -4284,30 +4283,31 @@ class MegaContentEngine:
                 self.context_memory = f"Start of guide for {country}."
                 
                 # --- QUANTUM PHASES (Sequential Generation) ---
+                # min_length=1000 ensures we get MASSIVE content
                 
                 # Phase 1: Foundations
-                print(f"   🔹 Phase 1: Macro-Foundations (2.5k words)...")
-                p1 = await self._generate_with_groq_rotation(self._prompt_p1(discovered_topic, country), 3000)
+                print(f"   🔹 Phase 1: Macro-Foundations (Target: 2.5k words)...")
+                p1 = await self._generate_with_groq_rotation(self._prompt_p1(discovered_topic, country), 3500, min_length=1000)
                 self._update_context(p1)
                 
                 # Phase 2: Tech Architecture
-                print(f"   🔹 Phase 2: Tech Architecture (2.0k words)...")
-                p2 = await self._generate_with_groq_rotation(self._prompt_p2(discovered_topic, country), 2500)
+                print(f"   🔹 Phase 2: Tech Architecture (Target: 2.0k words)...")
+                p2 = await self._generate_with_groq_rotation(self._prompt_p2(discovered_topic, country), 3000, min_length=1000)
                 self._update_context(p2)
                 
                 # Phase 3: Real World Proof
-                print(f"   🔹 Phase 3: Case Studies (2.0k words)...")
-                p3 = await self._generate_with_groq_rotation(self._prompt_p3(discovered_topic, country), 2500)
+                print(f"   🔹 Phase 3: Case Studies (Target: 2.0k words)...")
+                p3 = await self._generate_with_groq_rotation(self._prompt_p3(discovered_topic, country), 3000, min_length=1000)
                 self._update_context(p3)
                 
                 # Phase 4: Wealth Engineering
-                print(f"   🔹 Phase 4: Wealth & ROI (2.0k words)...")
-                p4 = await self._generate_with_groq_rotation(self._prompt_p4(discovered_topic, country), 2500)
+                print(f"   🔹 Phase 4: Wealth & ROI (Target: 2.0k words)...")
+                p4 = await self._generate_with_groq_rotation(self._prompt_p4(discovered_topic, country), 3000, min_length=1000)
                 self._update_context(p4)
                 
                 # Phase 5: Oracle Mastery
-                print(f"   🔹 Phase 5: Mastery & Bilingual FAQ (1.5k words)...")
-                p5 = await self._generate_with_groq_rotation(self._prompt_p5(discovered_topic, country), 2500)
+                print(f"   🔹 Phase 5: Mastery & Bilingual FAQ (Target: 1.5k words)...")
+                p5 = await self._generate_with_groq_rotation(self._prompt_p5(discovered_topic, country), 3000, min_length=800)
 
                 # --- STITCHING & POLISH ---
                 print(f"   ✨ Stitching, SEO Injection & Visual Polish...")
@@ -4348,7 +4348,7 @@ class MegaContentEngine:
 
     # ================= CORE: ROBUST GROQ ROTATION =================
     
-    async def _generate_with_groq_rotation(self, prompt: str, max_tokens: int) -> str:
+    async def _generate_with_groq_rotation(self, prompt: str, max_tokens: int, min_length: int = 100) -> str:
         """Iterates through keys. Handles 429/500 errors. Never fails silently."""
         attempts = 0
         max_attempts = len(self.groq_keys) * 3
@@ -4356,7 +4356,7 @@ class MegaContentEngine:
         while attempts < max_attempts:
             api_key = self.groq_keys[self.current_key_index]
             try:
-                async with httpx.AsyncClient(timeout=180.0) as client:
+                async with httpx.AsyncClient(timeout=120.0) as client:
                     response = await client.post(
                         "https://api.groq.com/openai/v1/chat/completions",
                         headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"},
@@ -4370,7 +4370,16 @@ class MegaContentEngine:
                     
                     if response.status_code == 200:
                         content = response.json()['choices'][0]['message']['content']
-                        if len(content) < 200: raise Exception("Content too short")
+                        
+                        # DYNAMIC LENGTH CHECK
+                        if len(content) < min_length:
+                            print(f"     ⚠️ Content too short ({len(content)} < {min_length}). Retrying...")
+                            # Don't rotate key, just retry maybe? Or rotate if model is being lazy.
+                            # Rotating key might get a fresh context.
+                            self._rotate_key() 
+                            attempts += 1
+                            continue
+                            
                         return content
                     
                     elif response.status_code == 429:
@@ -4401,9 +4410,12 @@ class MegaContentEngine:
     # ================= PROMPT ENGINEERING (QUANTUM) =================
 
     async def _discover_topic_groq(self, base, country):
-        prompt = f"Identify the #1 most profitable business/tech trend in {country} for 2026 related to '{base}'. Return ONLY the title."
-        try: return await self._generate_with_groq_rotation(prompt, 150)
-        except: return f"Strategic AI Implementation in {country}"
+        prompt = f"Identify the #1 most profitable business/tech trend in {country} for 2026 related to '{base}'. Return ONLY the title (max 10 words)."
+        try: 
+            # Low min_length for title discovery
+            return await self._generate_with_groq_rotation(prompt, 200, min_length=10)
+        except: 
+            return f"Strategic AI Implementation in {country}"
 
     def _get_context_instruction(self):
         return f"""
