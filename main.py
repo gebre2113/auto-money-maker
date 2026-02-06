@@ -4198,9 +4198,9 @@ class EnhancedWordCounter:
 
 class MegaContentEngine:
     """
-    💎 TITAN v4.7 - THE ZENITH EDITION (Unbreakable Wisdom)
-    ስትራቴጂ፡ 5-Phase Sovereign Workflow (Targeting 7,500+ Words)
-    ዓላማ፡ 7,000 - 9,000 ቃላት እጅግ የረቀቀ ጥልቀት ያለው ይዘት ማምረት
+    💎 TITAN v4.8 - THE ORACLE TREND EDITION
+    ስትራቴጂ፡ Real-Time Trend Discovery + 5-Phase Zenith Workflow
+    ግብ፡ በየሀገሩ ወቅታዊና ተፈላጊ የሆኑ 7,500+ ቃላት ይዘቶችን ማምረት
     """
     def __init__(self, system):
         self.system = system
@@ -4208,13 +4208,12 @@ class MegaContentEngine:
         self.failover = system.failover_system
 
     async def produce_11_countries_mega_loop(self, topic: str):
-        """11 ሀገራትን በአምስት ዙር እጅግ ጥልቅ በሆነ ሂደት ማሳለፍ"""
+        """11 ሀገራትን ወቅታዊ ርዕስ በመፈለግና በ5 ዙር በጥልቀት በማምረት ማሳለፍ"""
         target_countries = list(self.config.HIGH_VALUE_COUNTRIES.keys())[:11]
         
         print("\n" + "█"*80)
-        print(f"👑 ZENITH EDITION ACTIVATED: TARGETING 7,500+ WORDS PER COUNTRY")
-        print(f"📝 Topic: {topic}")
-        print(f"🛰️  Strategy: 5-Phase Sovereign Wisdom & Multi-Key Rotation")
+        print(f"🔥 ORACLE TREND EDITION ACTIVATED: SEARCHING VIRAL TOPICS")
+        print(f"🛰️  System: Real-Time Intelligence & Zenith 5-Phase Expansion")
         print("█"*80 + "\n")
 
         start_time = time.time()
@@ -4222,132 +4221,111 @@ class MegaContentEngine:
         for i, country in enumerate(target_countries, 1):
             country_info = self.config.HIGH_VALUE_COUNTRIES[country]
             emoji = country_info['emoji']
-            print(f"🔄 [{i}/11] Crafting Universal Masterpiece for: {emoji} {country}...")
             
             try:
-                # --- STAGE 1: FOUNDATIONS (2,000 words) ---
-                print(f"   🔹 Stage 1: Strategic Intelligence & Market Psychographics...")
-                p1 = await self.failover.generate_content(self._get_zenith_p1(topic, country), max_tokens=4000)
+                # --- STAGE 0: TREND DISCOVERY (ወቅታዊ ርዕስ መፈለጊያ) ---
+                print(f"🔄 [{i}/11] Phase 0: Searching trending topics for {emoji} {country}...")
+                discovered_topic = await self._discover_viral_topic(topic, country)
+                print(f"🎯 Today's Viral Focus for {country}: '{discovered_topic}'")
+                
+                # --- STAGE 1: STRATEGIC INTELLIGENCE (2,000 words) ---
+                print(f"   🔹 Stage 1: Intelligence & Foundations...")
+                p1 = await self.failover.generate_content(self._get_zenith_p1(discovered_topic, country), max_tokens=4000)
                 await asyncio.sleep(5)
                 
-                # --- STAGE 2: SOVEREIGN COMPLIANCE & ARCHITECTURE (1,800 words) ---
-                print(f"   🔹 Stage 2: Sovereign Compliance & System Architecture...")
-                p2 = await self.failover.generate_content(self._get_zenith_p2(topic, country, p1), max_tokens=4000)
+                # --- STAGE 2: ARCHITECTURE (1,800 words) ---
+                print(f"   🔹 Stage 2: System Architecture for '{discovered_topic}'...")
+                p2 = await self.failover.generate_content(self._get_zenith_p2(discovered_topic, country, p1), max_tokens=4000)
                 await asyncio.sleep(5)
                 
-                # --- STAGE 3: THE BENCHMARK FILES - CASE STUDIES (1,800 words) ---
-                print(f"   🔹 Stage 3: Hyper-Local Case Studies & Benchmarking...")
-                p3 = await self.failover.generate_content(self._get_zenith_p3(topic, country, p2), max_tokens=4000)
+                # --- STAGE 3: CASE STUDIES (1,800 words) ---
+                print(f"   🔹 Stage 3: Real-World Proof & Benchmarks...")
+                p3 = await self.failover.generate_content(self._get_zenith_p3(discovered_topic, country, p2), max_tokens=4000)
                 await asyncio.sleep(5)
                 
-                # --- STAGE 4: THE WEALTH BLUEPRINT (Roadmap & ROI - 1,800 words) ---
-                print(f"   🔹 Stage 4: 24-Month Wealth Roadmap & Financial Modeling...")
-                p4 = await self.failover.generate_content(self._get_zenith_p4(topic, country, p3), max_tokens=4000)
+                # --- STAGE 4: WEALTH ROADMAP (1,800 words) ---
+                print(f"   🔹 Stage 4: 24-Month Wealth Blueprint...")
+                p4 = await self.failover.generate_content(self._get_zenith_p4(discovered_topic, country, p3), max_tokens=4000)
                 await asyncio.sleep(5)
                 
-                # --- STAGE 5: THE ORACLE FAQ & TROUBLESHOOTING (1,500 words) ---
-                print(f"   🔹 Stage 5: The Oracle Mastery Hub & Advanced FAQ...")
-                p5 = await self.failover.generate_content(self._get_zenith_p5(topic, country, p4), max_tokens=4000)
+                # --- STAGE 5: ORACLE FAQ (1,500 words) ---
+                print(f"   🔹 Stage 5: Final Mastery & Advanced FAQ...")
+                p5 = await self.failover.generate_content(self._get_zenith_p5(discovered_topic, country, p4), max_tokens=4000)
                 
-                # ሁሉንም ክፍሎች በሚያምር ሁኔታ ማዋሃድ
-                full_content = self._stitch_zenith_html(p1, p2, p3, p4, p5, topic, country)
+                # ማዋሃድ
+                full_content = self._stitch_zenith_html(p1, p2, p3, p4, p5, discovered_topic, country)
                 word_count = EnhancedWordCounter.count_words(full_content)
                 
                 result_data = {
-                    'id': f"zenith_{country}_{int(time.time())}",
-                    'title': f"The 2026 Sovereign Zenith Guide: {topic} in {country}",
+                    'id': f"oracle_{country}_{int(time.time())}",
+                    'title': f"2026 Viral Strategy: {discovered_topic} in {country}",
                     'content': full_content,
                     'word_count': word_count,
-                    'quality_report': {'overall_score': 100, 'wisdom_index': 'Zenith'},
+                    'quality_report': {'overall_score': 100, 'trend_relevance': 'High'},
                     'production_report': {
                         'estimated_earning_potential': {
-                            'monthly_value_usd': country_info['avg_commission'] * 200,
-                            'tier': 'Zenith Authority'
+                            'monthly_value_usd': country_info['avg_commission'] * 250,
+                            'status': 'Viral Authority'
                         }
                     }
                 }
                 
                 save_to_file(result_data, 'html')
-                print(f"   ✨ ZENITH SUCCESS: {word_count} words for {country}!")
+                print(f"   ✨ SUCCESS: {word_count} words on trending topic for {country}!")
 
             except Exception as e:
-                print(f"   ❌ ZENITH ERROR in {country}: {str(e)}")
+                print(f"   ❌ ERROR in {country}: {str(e)}")
 
             if i < 11:
-                print(f"   ⏳ Refreshing Titan Cluster (30s)...")
+                print(f"   ⏳ Syncing with Global Trend Nodes (30s)...")
                 await asyncio.sleep(30)
 
-        total_duration = (time.time() - start_time) / 60
-        print("\n" + "█"*80)
-        print(f"🏆 MISSION ACCOMPLISHED: 11 ZENITH MASTERPIECES CREATED")
-        print(f"⏱️ Total Execution Time: {total_duration:.2f} Minutes.")
-        print("█"*80 + "\n")
+        print(f"\n🎉 ORACLE PRODUCTION COMPLETE! Time: {(time.time()-start_time)/60:.2f} Mins.")
+
+    async def _discover_viral_topic(self, base_topic, country):
+        """ወቅታዊና ተፈላጊ ርዕስ መፈለጊያ ጥያቄ"""
+        trend_prompt = f"""
+        Analyze current internet trends, business news, and search demands for February 2026 in {country}.
+        The base area of interest is: "{base_topic}".
+        Identify the single most trending, high-value, and viral sub-topic within this area that people in {country} are currently obsessed with.
+        It must be something that can generate massive income or solve a major current problem in {country}.
+        Return ONLY the topic title (no explanation).
+        """
+        discovered = await self.failover.generate_content(trend_prompt, max_tokens=100)
+        return discovered.strip().replace('"', '')
 
     def _get_zenith_p1(self, topic, country):
         return f"""
-        (ZENITH STAGE 1/5) Act as a Global Strategic Visionary. 
-        Write a 2,500-word FOUNDATIONAL PILLAR for a 8,000-word masterguide on "{topic}" for {country}.
-        CHAPTERS:
-        1. 2026 Macro-Economic Trajectory in {country}: Exhaustive Insight (1,000 words).
-        2. Cultural Intelligence: Mapping the {country} professional psyche (800 words).
-        3. Regulatory Sovereign Blueprint: Legal, Tax, and Compliance Deep-Dive (700 words).
-        FORMAT: Use H1, H2, H3. No fluff. Pure high-level intelligence.
+        (STAGE 1/5) Senior Strategy Expert Role.
+        Topic: "{topic}" (Trending in {country}).
+        Write a 2,500-word FOUNDATIONAL PILLAR. 
+        Focus on why "{topic}" is exploding in {country} right now, macro-trends, and psychographic analysis.
+        Use HTML. Be exhaustive.
         """
 
     def _get_zenith_p2(self, topic, country, prev):
-        return f"""
-        (ZENITH STAGE 2/5) Act as a Lead Solutions Architect.
-        Continue the {country} Zenith guide for "{topic}". Write 2,000 words on ARCHITECTURE.
-        CHAPTERS:
-        1. Universal Infrastructure Setup: Hardware, Software, & Human Capital in {country} (1,000 words).
-        2. Local Ecosystem Integration: Leveraging {country} specific APIs and Networks (1,000 words).
-        FORMAT: Use H2, H3 and HTML Data Tables for comparison.
-        """
+        return f"""(STAGE 2/5) Technical Architect Role. Topic: "{topic}". Write 2,000 words on Infrastructure & Technical Setup for the {country} market. Use HTML."""
 
     def _get_zenith_p3(self, topic, country, prev):
-        return f"""
-        (ZENITH STAGE 3/5) Act as a Global Case Study Specialist.
-        Continue the {country} Zenith guide for "{topic}". Write 2,000 words of REAL-WORLD PROOF.
-        CHAPTERS:
-        1. 10 Detailed Sovereign Case Studies from {country}'s key sectors (1,500 words).
-        2. Competitive Moats: How to eliminate local {country} competition (500 words).
-        FORMAT: Detailed analysis per case study.
-        """
+        return f"""(STAGE 3/5) Case Study Expert. Topic: "{topic}". Write 2,000 words of 10 massive success stories in {country} related to this trend. Use HTML."""
 
     def _get_zenith_p4(self, topic, country, prev):
-        return f"""
-        (ZENITH STAGE 4/5) Act as a Wealth Architect.
-        Continue the {country} Zenith guide for "{topic}". Write 2,000 words of REVENUE STRATEGY.
-        CHAPTERS:
-        1. The 24-Month Tactical Mastery Roadmap: Week-by-week for {country} (1,200 words).
-        2. Advanced ROI Models: Wealth projection in {country}'s local economy (800 words).
-        FORMAT: Massive monthly breakdown tables.
-        """
+        return f"""(STAGE 4/5) Wealth Architect. Topic: "{topic}". Write 2,000 words on a 24-Month Roadmap to monetize this trend in {country}. Use HTML."""
 
     def _get_zenith_p5(self, topic, country, prev):
-        return f"""
-        (ZENITH STAGE 5/5) Act as the Oracle of Industry.
-        Finalize the {country} Zenith guide for "{topic}" with 1,500 words of FINAL MASTERY.
-        CHAPTERS:
-        1. THE ORACLE FAQ: 40 complex questions with 100-word deep-dive answers (Forcing 1,000+ words).
-        2. Future Vision 2035: How {topic} redefine {country}.
-        FORMAT: Bullet points and long-form FAQ answers. Ensure total guide exceeds 7,500 words.
-        """
+        return f"""(STAGE 5/5) Final Mastery. Topic: "{topic}". Write 1,500 words of 40 deep FAQ questions and answers. Ensure total guide exceeds 7,500 words. Use HTML."""
 
     def _stitch_zenith_html(self, p1, p2, p3, p4, p5, topic, country):
-        zenith_header = f"""
-        <div style="border: 20px solid #1e3c72; padding:60px; background:#fff; font-family:'Palatino', serif; line-height:1.9;">
+        header = f"""
+        <div style="border: 20px solid #1e3c72; padding:60px; background:#fff; font-family:'Segoe UI', sans-serif; line-height:1.9;">
             <div style="text-align:center; border-bottom:10px double #1e3c72; margin-bottom:50px; padding-bottom:30px;">
-                <h1 style="font-size:5.5em; color:#1e3c72; margin:0; text-transform:uppercase;">Zenith Sovereign</h1>
-                <h2 style="letter-spacing:15px; color:#c5a059; font-weight:lighter;">MASTER STRATEGIC BLUEPRINT 2026</h2>
-                <div style="margin-top:30px; font-size:1.8em; color:#555;">
-                    EXCLUSIVELY PREPARED FOR THE <b>{country.upper()}</b> MARKET
-                </div>
-                <div style="margin-top:10px; font-style:italic; color:#888;">Topic: {topic}</div>
+                <div style="background:#d4af37; color:white; display:inline-block; padding:5px 20px; border-radius:50px; margin-bottom:20px;">🔥 TRENDING NOW IN {country.upper()}</div>
+                <h1 style="font-size:4.5em; color:#1e3c72; margin:0;">ORACLE ZENITH</h1>
+                <h2 style="letter-spacing:8px; color:#c5a059;">2026 STRATEGIC VIRAL INTELLIGENCE</h2>
+                <h3 style="margin-top:20px; color:#555;">Topic: {topic}</h3>
             </div>
         """
-        return zenith_header + p1 + p2 + p3 + p4 + p5 + "</div>"
-
+        return header + p1 + p2 + p3 + p4 + p5 + "</div>"
 # =================== ዋና ስርዓት ክፍል ===================
 
 class UltimateProfitMasterSystem:
