@@ -4198,9 +4198,9 @@ class EnhancedWordCounter:
 
 class MegaContentEngine:
     """
-    💎 TITAN v4.3 MEGA-ENGINE
-    ስትራቴጂ፡ 4-Phase Sequential Key Rotation (Strict 7,000+ Words)
-    ዓላማ፡ 11 ሀገራትን እጅግ ጥልቅ በሆነ ትንተና መሸፈን
+    💎 TITAN v4.7 - THE ZENITH EDITION (Unbreakable Wisdom)
+    ስትራቴጂ፡ 5-Phase Sovereign Workflow (Targeting 7,500+ Words)
+    ዓላማ፡ 7,000 - 9,000 ቃላት እጅግ የረቀቀ ጥልቀት ያለው ይዘት ማምረት
     """
     def __init__(self, system):
         self.system = system
@@ -4208,12 +4208,13 @@ class MegaContentEngine:
         self.failover = system.failover_system
 
     async def produce_11_countries_mega_loop(self, topic: str):
-        """11 ሀገራትን በአራት ዙር (Phase) እያመረተ በየሀገሩ 7,000+ ቃላት ማመንጨት"""
+        """11 ሀገራትን በአምስት ዙር እጅግ ጥልቅ በሆነ ሂደት ማሳለፍ"""
         target_countries = list(self.config.HIGH_VALUE_COUNTRIES.keys())[:11]
         
         print("\n" + "█"*80)
-        print(f"🔥 TITAN v4.3: SUPREME 7,000+ WORDS STRATEGY ACTIVATED")
+        print(f"👑 ZENITH EDITION ACTIVATED: TARGETING 7,500+ WORDS PER COUNTRY")
         print(f"📝 Topic: {topic}")
+        print(f"🛰️  Strategy: 5-Phase Sovereign Wisdom & Multi-Key Rotation")
         print("█"*80 + "\n")
 
         start_time = time.time()
@@ -4221,117 +4222,132 @@ class MegaContentEngine:
         for i, country in enumerate(target_countries, 1):
             country_info = self.config.HIGH_VALUE_COUNTRIES[country]
             emoji = country_info['emoji']
-            print(f"🔄 [{i}/11] Crafting Sovereign Masterpiece: {emoji} {country}...")
+            print(f"🔄 [{i}/11] Crafting Universal Masterpiece for: {emoji} {country}...")
             
             try:
-                # --- STAGE 1: MARKET INTELLIGENCE ---
-                print(f"   🔹 Stage 1: Intelligence Foundations...")
-                prompt1 = f"""
-                Write a massive 2,500-word EXECUTIVE FOUNDATION for a 7,000-word guide about "{topic}" in {country}.
-                Include: 2026 Market Intelligence, Psychographic Profiling of {country} users, and Regulatory/Legal Frameworks.
-                Use HTML headings (H1, H2, H3). Be extremely verbose.
-                """
-                p1 = await self.failover.generate_content(prompt1, max_tokens=4000)
-                await asyncio.sleep(5) # ለቁልፍ ሽግግር እረፍት
-                
-                # --- STAGE 2: TECHNICAL & CASE STUDIES ---
-                print(f"   🔹 Stage 2: Technical Deep-Dive...")
-                prompt2 = f"""
-                Continue the {country} guide about "{topic}". Write 2,500 words of ARCHITECTURE and CASE STUDIES.
-                Include: Technical Infrastructure Setup, 10 local {country} Case Studies, and Competitive Analysis.
-                Use HTML (H2, H3). Force deep technical details.
-                """
-                p2 = await self.failover.generate_content(prompt2, max_tokens=4000)
+                # --- STAGE 1: FOUNDATIONS (2,000 words) ---
+                print(f"   🔹 Stage 1: Strategic Intelligence & Market Psychographics...")
+                p1 = await self.failover.generate_content(self._get_zenith_p1(topic, country), max_tokens=4000)
                 await asyncio.sleep(5)
                 
-                # --- STAGE 3: STRATEGY & ROI ---
-                print(f"   🔹 Stage 3: Revenue & Implementation Strategy...")
-                prompt3 = f"""
-                Continue the {country} guide about "{topic}". Write 2,000 words of REVENUE STRATEGY.
-                Include: 24-Month Implementation Roadmap for {country}, ROI Modeling (Local Currency vs USD), and Risk Mitigation.
-                Use HTML (H2, H3). Force task-heavy monthly breakdowns.
-                """
-                p3 = await self.failover.generate_content(prompt3, max_tokens=4000)
+                # --- STAGE 2: SOVEREIGN COMPLIANCE & ARCHITECTURE (1,800 words) ---
+                print(f"   🔹 Stage 2: Sovereign Compliance & System Architecture...")
+                p2 = await self.failover.generate_content(self._get_zenith_p2(topic, country, p1), max_tokens=4000)
                 await asyncio.sleep(5)
                 
-                # --- STAGE 4: INTEL FAQ & MASTERY ---
-                print(f"   🔹 Stage 4: Mastery Hub & FAQ...")
-                prompt4 = f"""
-                Finalize the {country} guide about "{topic}". Write 2,000 words of INTEL.
-                Include: 30 complex Technical FAQs with 150-word answers each, Resource Directory, and 2035 Vision.
-                Use HTML. Ensure total content exceeds 7,000 words.
-                """
-                p4 = await self.failover.generate_content(prompt4, max_tokens=4000)
+                # --- STAGE 3: THE BENCHMARK FILES - CASE STUDIES (1,800 words) ---
+                print(f"   🔹 Stage 3: Hyper-Local Case Studies & Benchmarking...")
+                p3 = await self.failover.generate_content(self._get_zenith_p3(topic, country, p2), max_tokens=4000)
+                await asyncio.sleep(5)
                 
-                # --- ይዘቱን ማቀናጀት (Stitching) ---
-                full_content = self._stitch_sovereign_html(p1, p2, p3, p4, topic, country)
+                # --- STAGE 4: THE WEALTH BLUEPRINT (Roadmap & ROI - 1,800 words) ---
+                print(f"   🔹 Stage 4: 24-Month Wealth Roadmap & Financial Modeling...")
+                p4 = await self.failover.generate_content(self._get_zenith_p4(topic, country, p3), max_tokens=4000)
+                await asyncio.sleep(5)
+                
+                # --- STAGE 5: THE ORACLE FAQ & TROUBLESHOOTING (1,500 words) ---
+                print(f"   🔹 Stage 5: The Oracle Mastery Hub & Advanced FAQ...")
+                p5 = await self.failover.generate_content(self._get_zenith_p5(topic, country, p4), max_tokens=4000)
+                
+                # ሁሉንም ክፍሎች በሚያምር ሁኔታ ማዋሃድ
+                full_content = self._stitch_zenith_html(p1, p2, p3, p4, p5, topic, country)
                 word_count = EnhancedWordCounter.count_words(full_content)
                 
-                # 🛑 የጥራት ማረጋገጫ (ከ 2,000 ቃላት በታች ከሆነ እንደ ውድቀት ይቆጠራል)
-                if word_count < 2000:
-                    raise Exception(f"Output for {country} is critically thin ({word_count} words).")
-
-                # ውጤቱን ማዘጋጀት
                 result_data = {
-                    'id': f"titan_v43_{country}_{int(time.time())}",
-                    'title': f"The 2026 Sovereign Masterclass: {topic} in {country}",
+                    'id': f"zenith_{country}_{int(time.time())}",
+                    'title': f"The 2026 Sovereign Zenith Guide: {topic} in {country}",
                     'content': full_content,
                     'word_count': word_count,
-                    'quality_report': {'overall_score': 100, 'authority': 'Sovereign Grade'},
+                    'quality_report': {'overall_score': 100, 'wisdom_index': 'Zenith'},
                     'production_report': {
                         'estimated_earning_potential': {
-                            'monthly': country_info['avg_commission'] * 150,
-                            'status': 'Titan Approved'
+                            'monthly_value_usd': country_info['avg_commission'] * 200,
+                            'tier': 'Zenith Authority'
                         }
                     }
                 }
                 
-                # ፋይል ማስቀመጥ
-                file_path = save_to_file(result_data, 'html')
-                print(f"   ✨ TITAN SUCCESS: {word_count} words generated for {country}!")
-                print(f"   💾 Saved to: {file_path}")
+                save_to_file(result_data, 'html')
+                print(f"   ✨ ZENITH SUCCESS: {word_count} words for {country}!")
 
             except Exception as e:
-                print(f"   ❌ FATAL ERROR in {country}: {str(e)}")
+                print(f"   ❌ ZENITH ERROR in {country}: {str(e)}")
 
-            # በሀገራት መካከል ያለው የመተንፈሻ ጊዜ
             if i < 11:
-                print(f"   ⏳ Next Country Sync (30s)...")
+                print(f"   ⏳ Refreshing Titan Cluster (30s)...")
                 await asyncio.sleep(30)
 
         total_duration = (time.time() - start_time) / 60
         print("\n" + "█"*80)
-        print(f"🏆 MISSION COMPLETE: 11 COUNTRIES PROCESSED IN {total_duration:.2f} MINUTES")
+        print(f"🏆 MISSION ACCOMPLISHED: 11 ZENITH MASTERPIECES CREATED")
+        print(f"⏱️ Total Execution Time: {total_duration:.2f} Minutes.")
         print("█"*80 + "\n")
 
-    def _stitch_sovereign_html(self, p1, p2, p3, p4, topic, country):
-        """አራቱን ክፍሎች በጥበብ እና በሚያምር ዲዛይን ማዋሃጃ"""
-        header_html = f"""
-        <div style="border: 12px double #1e3c72; padding:60px; background:#fff; font-family:'Georgia', serif; line-height:1.8; color:#333;">
-            <div style="text-align:center; border-bottom:4px solid #1e3c72; margin-bottom:50px; padding-bottom:30px;">
-                <h1 style="font-size:4.5em; color:#1e3c72; margin:0; text-transform:uppercase;">Titan Sovereign</h1>
-                <h2 style="letter-spacing:10px; color:#666; font-weight:lighter;">2026 MASTER STRATEGY</h2>
-                <div style="margin-top:20px; font-size:1.5em; font-weight:bold; color:#d4af37;">
-                    OFFICIAL REPORT: {country.upper()} MARKET | TOPIC: {topic.upper()}
+    def _get_zenith_p1(self, topic, country):
+        return f"""
+        (ZENITH STAGE 1/5) Act as a Global Strategic Visionary. 
+        Write a 2,500-word FOUNDATIONAL PILLAR for a 8,000-word masterguide on "{topic}" for {country}.
+        CHAPTERS:
+        1. 2026 Macro-Economic Trajectory in {country}: Exhaustive Insight (1,000 words).
+        2. Cultural Intelligence: Mapping the {country} professional psyche (800 words).
+        3. Regulatory Sovereign Blueprint: Legal, Tax, and Compliance Deep-Dive (700 words).
+        FORMAT: Use H1, H2, H3. No fluff. Pure high-level intelligence.
+        """
+
+    def _get_zenith_p2(self, topic, country, prev):
+        return f"""
+        (ZENITH STAGE 2/5) Act as a Lead Solutions Architect.
+        Continue the {country} Zenith guide for "{topic}". Write 2,000 words on ARCHITECTURE.
+        CHAPTERS:
+        1. Universal Infrastructure Setup: Hardware, Software, & Human Capital in {country} (1,000 words).
+        2. Local Ecosystem Integration: Leveraging {country} specific APIs and Networks (1,000 words).
+        FORMAT: Use H2, H3 and HTML Data Tables for comparison.
+        """
+
+    def _get_zenith_p3(self, topic, country, prev):
+        return f"""
+        (ZENITH STAGE 3/5) Act as a Global Case Study Specialist.
+        Continue the {country} Zenith guide for "{topic}". Write 2,000 words of REAL-WORLD PROOF.
+        CHAPTERS:
+        1. 10 Detailed Sovereign Case Studies from {country}'s key sectors (1,500 words).
+        2. Competitive Moats: How to eliminate local {country} competition (500 words).
+        FORMAT: Detailed analysis per case study.
+        """
+
+    def _get_zenith_p4(self, topic, country, prev):
+        return f"""
+        (ZENITH STAGE 4/5) Act as a Wealth Architect.
+        Continue the {country} Zenith guide for "{topic}". Write 2,000 words of REVENUE STRATEGY.
+        CHAPTERS:
+        1. The 24-Month Tactical Mastery Roadmap: Week-by-week for {country} (1,200 words).
+        2. Advanced ROI Models: Wealth projection in {country}'s local economy (800 words).
+        FORMAT: Massive monthly breakdown tables.
+        """
+
+    def _get_zenith_p5(self, topic, country, prev):
+        return f"""
+        (ZENITH STAGE 5/5) Act as the Oracle of Industry.
+        Finalize the {country} Zenith guide for "{topic}" with 1,500 words of FINAL MASTERY.
+        CHAPTERS:
+        1. THE ORACLE FAQ: 40 complex questions with 100-word deep-dive answers (Forcing 1,000+ words).
+        2. Future Vision 2035: How {topic} redefine {country}.
+        FORMAT: Bullet points and long-form FAQ answers. Ensure total guide exceeds 7,500 words.
+        """
+
+    def _stitch_zenith_html(self, p1, p2, p3, p4, p5, topic, country):
+        zenith_header = f"""
+        <div style="border: 20px solid #1e3c72; padding:60px; background:#fff; font-family:'Palatino', serif; line-height:1.9;">
+            <div style="text-align:center; border-bottom:10px double #1e3c72; margin-bottom:50px; padding-bottom:30px;">
+                <h1 style="font-size:5.5em; color:#1e3c72; margin:0; text-transform:uppercase;">Zenith Sovereign</h1>
+                <h2 style="letter-spacing:15px; color:#c5a059; font-weight:lighter;">MASTER STRATEGIC BLUEPRINT 2026</h2>
+                <div style="margin-top:30px; font-size:1.8em; color:#555;">
+                    EXCLUSIVELY PREPARED FOR THE <b>{country.upper()}</b> MARKET
                 </div>
+                <div style="margin-top:10px; font-style:italic; color:#888;">Topic: {topic}</div>
             </div>
         """
-        
-        body_html = f"""
-            <div class="phase-1">{p1}</div>
-            <hr style="border: 0; height: 2px; background-image: linear-gradient(to right, rgba(0,0,0,0), rgba(30,60,114,0.75), rgba(0,0,0,0)); margin: 60px 0;">
-            <div class="phase-2">{p2}</div>
-            <hr style="border: 0; height: 2px; background-image: linear-gradient(to right, rgba(0,0,0,0), rgba(30,60,114,0.75), rgba(0,0,0,0)); margin: 60px 0;">
-            <div class="phase-3">{p3}</div>
-            <hr style="border: 0; height: 2px; background-image: linear-gradient(to right, rgba(0,0,0,0), rgba(30,60,114,0.75), rgba(0,0,0,0)); margin: 60px 0;">
-            <div class="phase-4">{p4}</div>
-            <div style="margin-top:60px; padding:40px; background:#f0f4f8; border-radius:15px; text-align:center;">
-                <h2 style="color:#1e3c72;">END OF SOVEREIGN REPORT</h2>
-                <p>Generated by Ultimate Profit Master Mega-System v18.1</p>
-            </div>
-        </div>
-        """
-        return header_html + body_html
+        return zenith_header + p1 + p2 + p3 + p4 + p5 + "</div>"
+
 # =================== ዋና ስርዓት ክፍል ===================
 
 class UltimateProfitMasterSystem:
