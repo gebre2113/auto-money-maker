@@ -4553,64 +4553,62 @@ class EnterpriseProductionOrchestrator:
                                                    video_research: Dict, cultural_depth: Dict,
                                                    affiliate_product: Optional[Dict], optimized_title: str = None) -> Dict:
         """
-        1. መጀመሪያ ሌሎች ሞጁሎችን ይቀሰቅሳል
-        2. ካልሰሩ 60 ሰከንድ ታግሶ በራሱ በ 3 ዙር ያመርታል
+        1. መጀመሪያ profit_master_system.py እንዲያመርት ትእዛዝ ይሰጣል
+        2. ካልሰራ 60 ሰከንድ ታግሶ በራሱ በ 3 ዙር (Internal AI) ያመርታል
         """
         
-        # --- ደረጃ 1: ሌሎች ሞጁሎችን መቀስቀስ (Trigger External Modules) ---
-        self.logger.info(f"📡 Level 1: Triggering External Modules for {country}...")
+        self.logger.info(f"📡 Requesting content from Profit Master System for {country}...")
         
-        external_content = None
+        # 1. መጀመሪያ ከሌላው እስክሪፕት (Profit Master) ውጤት ለማግኘት መሞከር
         try:
-            # የሌሎች ሞጁሎችን ውጤት ለማግኘት መሞከር
-            # ማሳሰቢያ፡ content_system መኖሩን ያረጋግጣል
-            external_data = await self.content_system.generate_deep_content(topic, country, video_research, affiliate_product)
+            # በሁለቱም የMethod ስሞች ለመፈለግ (generate_deep_content ወይም generate_content)
+            method = None
+            for m_name in ['generate_deep_content', 'generate_content', 'run_production']:
+                if hasattr(self.content_system, m_name):
+                    method = getattr(self.content_system, m_name)
+                    break
             
-            if external_data and len(external_data.get('content', '').split()) >= 5000:
-                self.logger.info(f"✅ External Modules delivered 5000+ words for {country}.")
-                return external_data
+            if method:
+                external_data = await method(topic, country, video_research, affiliate_product)
+                if external_data and len(external_data.get('content', '').split()) >= 5000:
+                    self.logger.info(f"✅ Success: Profit Master delivered 5000+ words.")
+                    return external_data
             else:
-                self.logger.warning(f"⚠️ External content is insufficient or missing for {country}.")
-        
+                self.logger.warning(f"⚠️ Profit Master module found but work method is missing.")
+
         except Exception as e:
-            self.logger.warning(f"⚠️ External Module Error: {e}")
+            self.logger.warning(f"⚠️ Connection to Profit Master System failed: {e}")
 
-        # --- ደረጃ 2: አንድ ደቂቃ መጠበቅ (The 1-Minute Grace Period) ---
-        self.logger.info(f"⏳ External modules failed or timed out. Waiting for 60 seconds (Grace Period) before Internal Production...")
-        await asyncio.sleep(60) # በትክክል 1 ደቂቃ መጠበቅ
+        # 2. አንድ ደቂቃ መጠበቅ (60 Seconds Grace Period)
+        self.logger.info(f"⏳ Waiting for 60 seconds (Grace Period) to allow system recovery before Fallback...")
+        await asyncio.sleep(60)
 
-        # --- ደረጃ 3: የራነሩ የድንገተኛ አደጋ ማምረቻ (Internal 3-Round Production) ---
-        self.logger.info(f"🏗️ Level 2: Starting Internal 3-Round Production for {country}...")
-        
+        # 3. የራሱ የ AI ምርት (3 Rounds)
+        self.logger.info(f"🏗️ Starting Internal 3-Round Production for {country} (Target: 5000+ words)...")
         parts = []
-        # ዙር 1: መግቢያና ገበያ ትንተና
-        self.logger.info(f"🧱 Round 1: Market Analysis for {country}...")
-        p1 = await self.ai_provider.process_task(f"Detailed Executive Summary and Market Analysis for {topic} in {country}. (2000 words)", "refinement")
-        parts.append(p1)
-        await asyncio.sleep(1) # 1s እረፍት
-
-        # ዙር 2: ቴክኒካዊ ትግበራ
-        self.logger.info(f"🧱 Round 2: Technical Implementation for {country}...")
-        p2 = await self.ai_provider.process_task(f"Technical Implementation roadmap and ROI analysis for {topic} in {country}. (2000 words)", "refinement")
-        parts.append(p2)
-        await asyncio.sleep(1) # 1s እረፍት
-
-        # ዙር 3: ጥናቶችና መደምደሚያ
-        self.logger.info(f"🧱 Round 3: Case Studies & Final Strategy for {country}...")
-        p3 = await self.ai_provider.process_task(f"Case studies and 10-year future roadmap for {topic} in {country}. (1500 words)", "refinement")
-        parts.append(p3)
-
-        full_content = "\n\n".join(parts)
-        word_count = len(full_content.split())
-        
-        self.logger.info(f"✅ Internal Production Finished: {word_count} words for {country}.")
-        
-        return {
-            'content': full_content,
-            'word_count': word_count,
-            'enterprise_grade': True,
-            'generation_method': 'Internal_Fallback'
-        }
+        try:
+            prompts = [
+                f"Detailed Executive Summary and Market Analysis for {topic} in {country}. (2000 words)",
+                f"Technical Implementation roadmap and ROI analysis for {topic} in {country}. (2000 words)",
+                f"Case studies and 10-year future roadmap for {topic} in {country}. (1500 words)"
+            ]
+            
+            for i, p in enumerate(prompts):
+                self.logger.info(f"🧱 Round {i+1}/3: Building content for {country}...")
+                # አዲሱ ai_provider እዚህ ጋር በትክክል ይሰራል
+                part = await self.ai_provider.process_task(p, "refinement")
+                parts.append(part)
+                await asyncio.sleep(1) # 1s እረፍት
+                
+            full_content = "\n\n".join(parts)
+            return {
+                'content': full_content,
+                'word_count': len(full_content.split()),
+                'enterprise_grade': True
+            }
+        except Exception as ai_err:
+            self.logger.error(f"❌ Internal Fallback Production also failed: {ai_err}")
+            return {'content': "Production Failed after all attempts.", 'word_count': 0}
     
     async def _stage_5_enterprise_self_correction(self, content: str, target_words: int, 
                                                 cultural_depth_score: float) -> str:
