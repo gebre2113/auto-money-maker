@@ -3914,23 +3914,26 @@ class EnterpriseProductionOrchestrator:
                 async def refine_and_expand(self, content, target_words):
                     return content + "\n\n" + ("Expanded content. " * 50)
             self.content_system = BasicContentSystem()
-    
     def _initialize_all_components(self):
         """
         Enterprise componentsን በስርዓት ያስነሳል። 
         ስህተቶችን ለመከላከል እያንዳንዱ Import መደረጉን ያረጋግጣል።
+        ማሻሻያ፡ ai_provider ተጨምሯል (ስህተቱን ለመፍታት)
         """
         self.logger.info("🏢 Initializing Enterprise Components...")
 
         try:
-            # 1. YouTube Intelligence Hunter
+            # 🚨 አስፈላጊ ማሻሻያ፡ AI Provider መነሳቱን እናረጋግጥ (AttributeError እንዳይመጣ)
+            self.ai_provider = UnstoppableAIProvider()
+            self.logger.info("✅ Unstoppable AI Provider initialized")
+
+            # 1. YouTube Intelligence Hunter (ከ youtube_affiliate_system.py)
             YouTubeIntelligenceHunterPro = self.importer.get_module('YouTubeIntelligenceHunterPro')
             if YouTubeIntelligenceHunterPro:
-                # ሞጁሉ ክላስ ከሆነ instance ይፈጥራል፣ ካልሆነ ግን ያለውን ይወስዳል
                 self.youtube_hunter = YouTubeIntelligenceHunterPro() if callable(YouTubeIntelligenceHunterPro) else YouTubeIntelligenceHunterPro
                 self.logger.info("✅ Enterprise YouTube Intelligence Hunter initialized")
             
-            # 2. Affiliate Manager
+            # 2. Affiliate Manager (ከ youtube_affiliate_system.py)
             UltraAffiliateManager = self.importer.get_module('UltraAffiliateManager')
             if UltraAffiliateManager:
                 if callable(UltraAffiliateManager):
@@ -3939,13 +3942,13 @@ class EnterpriseProductionOrchestrator:
                     self.affiliate_manager = UltraAffiliateManager
                 self.logger.info("✅ Enterprise Affiliate Manager initialized")
             
-            # 3. Content System
+            # 3. Content System (ከ profit_master_system.py)
             UltimateProfitMasterSystem = self.importer.get_module('UltimateProfitMasterSystem')
             if UltimateProfitMasterSystem:
                 self.content_system = UltimateProfitMasterSystem() if callable(UltimateProfitMasterSystem) else UltimateProfitMasterSystem
-                self.logger.info("✅ Enterprise Content System initialized")
+                self.logger.info("✅ Enterprise Content System (Profit Master) initialized")
             
-            # --- Enterprise Components (Mocks/Engines) ---
+            # --- Enterprise Components ( Engines ) ---
             
             # 4. Cultural Guardian
             self.cultural_guardian = self.importer.get_enterprise_component('CulturalDepthGuardian')
@@ -3999,10 +4002,10 @@ class EnterpriseProductionOrchestrator:
             if self.dashboard_manager: self.logger.info("✅ Dashboard Manager initialized")
 
         except Exception as e:
-            self.logger.error(f"❌ Error during component initialization: {str(e)}")
-            # ስህተት ቢፈጠር ወደ መጠባበቂያ (Fallback) ሲስተም ይቀይራል
+            self.logger.error(f"❌ Initialization Error: {e}")
+            # ወደ Fallback ሲስተም እንዲቀይር
             self._create_basic_fallback_system()
-    
+            
     def _create_basic_fallback_system(self):
         """Create basic fallback system when initialization fails"""
         self.logger.warning("⚠️ Creating basic fallback system...")
