@@ -4191,171 +4191,177 @@ class EnhancedWordCounter:
         clean_text = re.sub(r'<[^>]+>', '', text)
         words = re.findall(r'\b\w+\b', clean_text)
         return len(words)
-
 # =========================================================================
-# 🚀 MEGA CONTENT ENGINE - 3,500+ WORDS TWO-PHASE STRATEGY
+# 👑 TITAN v7.0: THE ULTIMATE SOVEREIGN INTELLIGENCE ENGINE (FINAL VERSION)
 # =========================================================================
 
 class MegaContentEngine:
     """
-    💎 TITAN v6.5 - THE SOVEREIGN INFINITE
-    ስትራቴጂ፡ Zero-Waste Intelligence + 6-Phase Recursive Expansion
-    ግብ፡ 10,000 - 12,000 ቃላት (Absolute Authority)
-    ባህሪያት፡ Key-Saving Discovery, Mandatory Expansion, Gilded Design.
+    💎 የዓለማችን እጅግ የላቀ የይዘት ማምረቻ ሞተር።
+    ይህ ሞተር 11 የዓለም አገራትን በአንድ ጊዜ ይቆጣጠራል፣ በእያንዳንዱ አገር ላይ 
+    ከ 8,000 እስከ 12,000 የሚደርሱ እጅግ ጥልቅና ማራኪ የሆኑ የጥበብ ስራዎችን ይፈጥራል።
     """
+    
     def __init__(self, system):
         self.system = system
         self.config = system.config
         self.failover = system.failover_system
-        self.TARGET_WORDS = 9500  # የመጨረሻው የኳንተም ግብ
-        self.logger = logging.getLogger("Titan.v6.5.Infinite")
+        self.TARGET_WORDS = 8500
+        self.MAX_TARGET = 12000
+        self.logger = logging.getLogger("Titan.Zenith.Final")
 
-    async def produce_11_countries_mega_loop(self, topic: str):
-        """11 ሀገራትን እጅግ በረቀቀና ርዕስን በሚያጣራ 6 ዙር ማሳለፍ"""
+    async def produce_11_countries_mega_loop(self, base_topic: str):
+        """የ11 አገራት ሉፕ - እያንዳንዱ አገር ራሱን የቻለ ድንቅ ስራ (Masterpiece) ነው"""
         target_countries = list(self.config.HIGH_VALUE_COUNTRIES.keys())[:11]
         
-        print("\n" + "█"*80)
-        print(f"👑 TITAN v6.5 SOVEREIGN INFINITE ACTIVATED")
-        print(f"🎯 WORLD DOMINATION TARGET: 10,000+ WORDS PER COUNTRY")
-        print(f"🛰️  INTELLIGENCE NODES: Zero-Waste Discovery & Recursive Stretch")
-        print("█"*80 + "\n")
+        print("\n" + "👑"*40)
+        print("    ULTIMATE SOVEREIGN INTELLIGENCE - ACTIVATED")
+        print(f"    TOPIC: {base_topic}")
+        print(f"    GOAL: 8,000 - 12,000 WORDS PER COUNTRY")
+        print("👑"*40 + "\n")
 
-        start_total_time = time.time()
+        start_time = time.time()
 
         for i, country in enumerate(target_countries, 1):
-            country_info = self.config.HIGH_VALUE_COUNTRIES[country]
-            emoji = country_info['emoji']
-            print(f"🔄 [{i}/11] Sovereign Crafting for: {emoji} {country}...")
+            info = self.config.HIGH_VALUE_COUNTRIES[country]
+            print(f"💎 [{i}/11] ስልታዊ ዝግጅት ለ {info['emoji']} {country}...")
             
             try:
-                # --- STAGE 0: ZERO-WASTE TREND DISCOVERY ---
-                raw_discovered = await self._discover_viral_topic_shielded(topic, country)
-                discovered_topic = self._validate_topic(raw_discovered, topic, country)
-                print(f"   🎯 Strategic Focus: '{discovered_topic}'")
-                
-                # --- STAGE 1: FOUNDATIONS (2,500+ words) ---
-                print(f"   🔹 Stage 1: Macro-Economic & Cultural Foundations...")
-                p1 = await self.failover.generate_content(self._get_quantum_p1(discovered_topic, country), max_tokens=4000)
-                await asyncio.sleep(4)
-                
-                # --- STAGE 2: ARCHITECTURE (2,000+ words) ---
-                print(f"   🔹 Stage 2: Technical Architecture & Global Design...")
-                p2 = await self.failover.generate_content(self._get_quantum_p2(discovered_topic, country, p1), max_tokens=4000)
-                await asyncio.sleep(4)
-                
-                # --- STAGE 3: CASE STUDIES (2,000+ words) ---
-                print(f"   🔹 Stage 3: 15 Hyper-Local Benchmarks & Success Stories...")
-                p3 = await self.failover.generate_content(self._get_quantum_p3(discovered_topic, country, p2), max_tokens=4000)
-                await asyncio.sleep(4)
-                
-                # --- STAGE 4: THE WEALTH BLUEPRINT (2,000+ words) ---
-                print(f"   🔹 Stage 4: 24-Month Tactical Roadmap & ROI Models...")
-                p4 = await self.failover.generate_content(self._get_quantum_p4(discovered_topic, country, p3), max_tokens=4000)
-                await asyncio.sleep(4)
-                
-                # --- STAGE 5: FINAL MASTERY (1,500+ words) ---
-                print(f"   🔹 Stage 5: Oracle FAQ (50 Questions) & 2035 Vision...")
-                p5 = await self.failover.generate_content(self._get_quantum_p5(discovered_topic, country, p4), max_tokens=4000)
-                
-                # ውህደት እና ርዝመት ፍተሻ
-                stitched_content = self._stitch_quantum_html(p1, p2, p3, p4, p5, discovered_topic, country)
-                current_word_count = EnhancedWordCounter.count_words(stitched_content)
+                # --- ደረጃ 0: የሰሞኑን መነጋገሪያ ርዕስ ማጣራት (The Oracle) ---
+                print(f"   🔍 መረጃ ፍለጋ፡ በ{country} አሁን ምን እየተወራ ነው?...")
+                raw_topic = await self._discover_viral_topic(base_topic, country)
+                final_topic = self._validate_topic(raw_topic, base_topic, country)
+                print(f"   🎯 የተመረጠው ርዕስ፡ '{final_topic}'")
 
-                # --- STAGE 6: MANDATORY SOVEREIGN STRETCH (9,000 ካልሞላ ማስገደጃ) ---
-                if current_word_count < self.TARGET_WORDS:
-                    print(f"   ⚠️ word count at {current_word_count:,}. Triggering Sovereign Stretch...")
-                    p6 = await self.failover.generate_content(
-                        f"MANDATORY EXPANSION: The guide for '{discovered_topic}' in {country} is incomplete. "
-                        f"Write 3,500 MORE words of advanced technical troubleshooting, local industrial secrets, "
-                        f"detailed tax-optimization strategies, and deep future risk-hedging for 2026-2030. Use HTML.",
-                        max_tokens=4000
-                    )
-                    stitched_content += "\n<hr style='border: 2px solid #1e3c72; margin: 60px 0;'>\n" + p6
+                # --- ደረጃ 1: ስትራቴጂካዊ ጥናት (The Foundations) ---
+                print(f"   🏛️  ደረጃ 1፡ የገበያ ጥናትና ሳይኮሎጂ (2,500 ቃላት)...")
+                p1 = await self.failover.generate_content(self._get_p1_prompt(final_topic, country), max_tokens=4000)
                 
-                final_count = EnhancedWordCounter.count_words(stitched_content)
+                # --- ደረጃ 2: ቴክኒካዊ መዋቅር (The Architecture) ---
+                print(f"   ⚙️  ደረጃ 2፡ የቴክኖሎጂ እና የአሰራር መዋቅር (2,000 ቃላት)...")
+                p2 = await self.failover.generate_content(self._get_p2_prompt(final_topic, country, p1), max_tokens=4000)
                 
-                result_data = {
-                    'id': f"infinite_{country}_{int(time.time())}",
-                    'country': country,
-                    'title': f"The Sovereign Infinite: {discovered_topic} in {country}",
-                    'content': stitched_content,
-                    'word_count': final_count,
-                    'quality_report': {'overall_score': 100, 'quantum_index': 'Infinite Sovereign'},
-                    'production_report': {'earning_potential': country_info['avg_commission'] * 500}
-                }
+                # --- ደረጃ 3: የእውነተኛ ዓለም ተሞክሮ (The Proof) ---
+                print(f"   📜 ደረጃ 3፡ 15 የዓለም አቀፍ ስኬቶች እና ተሞክሮዎች (2,000 ቃላት)...")
+                p3 = await self.failover.generate_content(self._get_quantum_p3(final_topic, country, p2), max_tokens=4000)
                 
-                save_to_file(result_data, 'html')
-                print(f"   ✨ INFINITE SUCCESS: {final_count:,} words for {country}!")
+                # --- ደረጃ 4: የሀብት ማመንጫ ካርታ (The Wealth Roadmap) ---
+                print(f"   💰 ደረጃ 4፡ የ24 ወራት የገቢ ማመንጫ ፕላን (2,000 ቃላት)...")
+                p4 = await self.failover.generate_content(self._get_zenith_p4(final_topic, country, p3), max_tokens=4000)
+                
+                # --- ደረጃ 5: ጥልቅ ጥያቄና መልስ (The Oracle FAQ) ---
+                print(f"   🧠 ደረጃ 5፡ 50 ጥልቅ ጥያቄዎችና መልሶች (1,500 ቃላት)...")
+                p5 = await self.failover.generate_content(self._get_zenith_p5(final_topic, country, p4), max_tokens=4000)
+
+                # --- የይዘት ጥራት አሰፋፈር (Stitching & Sensory Polish) ---
+                raw_full_content = p1 + "\n" + p2 + "\n" + p3 + "\n" + p4 + "\n" + p5
+                
+                # የሰዎችን ልብ የሚነካ የሴንሰሪ እና የኒውሮ ማርኬቲንግ ጥበብ ማከል
+                print(f"   🎨 ይዘቱን በጥበብ መሸመን (Sensory & Neuro-Marketing Polish)...")
+                polished_content = self.system.sensory_writer.transform_to_sensory_content(raw_full_content)
+                polished_content = self.system.neuro_converter.apply_neuro_marketing(polished_content)
+                
+                # ማውጫ እና ዲዛይን ማከል
+                final_html = self._build_royal_structure(polished_content, final_topic, country)
+                
+                word_count = EnhancedWordCounter.count_words(final_html)
+
+                # --- የመጨረሻው ዙር፡ ርዝመት ማረጋገጫ (The Grand Stretch) ---
+                if word_count < self.TARGET_WORDS:
+                    print(f"   ⏳ ርዝመት ማስተካከያ ({word_count} ቃላት)...")
+                    stretch = await self.failover.generate_content(f"Expand the guide for '{final_topic}' with an additional 3,000 words focusing on advanced niche secrets and future-proofing. Use HTML.", max_tokens=4000)
+                    final_html += "\n\n" + stretch
+                    word_count = EnhancedWordCounter.count_words(final_html)
+
+                # ማስቀመጥ
+                file_path = save_to_file({
+                    'id': f"SUPREME_{country}_{int(time.time())}",
+                    'title': f"THE SOVEREIGN GUIDE: {final_topic}",
+                    'content': final_html,
+                    'word_count': word_count,
+                    'quality_report': {'overall_score': 100},
+                    'production_report': {'estimated_earning_potential': {'total_monthly_potential': country_info['avg_commission'] * 200}}
+                }, 'html')
+
+                print(f"   🏆 የ{country} ስራ ተጠናቀቀ! | ቃላት: {word_count} | ፋይል: {file_path}")
 
             except Exception as e:
-                print(f"   ❌ ERROR in {country}: {str(e)}")
+                print(f"   ⚠️ የ{country} ሂደት ተቋርጧል፡ {e}")
+                self.system.error_handler.handle_error(e, component="MegaEngine")
 
+            # በሀገራት መካከል ያለው እረፍት - ለአይፒ ደህንነት
             if i < 11:
-                print(f"   ⏳ Nodes Refreshing (30s)...")
-                await asyncio.sleep(30)
+                print(f"   💤 ለአጭር ጊዜ ማረፍ (Cooling down)...")
+                await asyncio.sleep(45)
 
-        total_dur = (time.time() - start_total_time) / 60
-        print("\n" + "█"*80)
-        print(f"🏆 ZENITH ACHIEVED: 11 INFINITE MASTERPIECES CREATED IN {total_dur:.2f} MINS")
-        print(f"📊 Sovereign Power: Peak | System Status: Unbeatable")
-        print("█"*80 + "\n")
+        print("\n" + "👑"*40)
+        print(f"🎉 እንኳን ደስ አለህ! 11ዱም ሀገራት በታላቅነት ተፈጥረዋል።")
+        print(f"ጠቅላላ የፈጀው ጊዜ: {(time.time() - start_time) / 60:.2f} ደቂቃ")
+        print("👑"*40)
 
-    async def _discover_viral_topic_shielded(self, base_topic, country):
-        """ርዕስ ለመፈለግ 1 ሙከራ ብቻ በማድረግ ቁልፎችን ይቆጥባል"""
-        prompt = f"Trending 2026 high-value business sub-topic in {country} for '{base_topic}'. Return ONLY title."
+    async def _discover_viral_topic(self, base_topic, country):
+        """ለእያንዳንዱ ሀገር ወቅታዊ እና ተፈላጊ ርዕስ መፈለጊያ"""
+        prompt = f"What is the most viral, trending, and profitable sub-niche related to '{base_topic}' in {country} today, February 2026? Give me ONLY the title."
         try:
-            # 1 ሙከራ ብቻ
-            res = await self.failover.generate_content(prompt, max_tokens=50)
-            if "Sync" in res or "Report" in res or len(res) > 100: return "ERROR"
-            return res.strip().replace('"', '')
+            res = await self.failover.generate_content(prompt, max_tokens=100)
+            return res.strip()
         except: return "ERROR"
 
     def _validate_topic(self, discovered, original, country):
-        if discovered == "ERROR" or len(discovered) < 5:
-            fallbacks = [
-                f"Sovereign AI Wealth Engineering in {country}",
-                f"Global Digital Dominance: The 2026 {country} Strategy",
-                f"High-Ticket Automation and Revenue Mastery in {country}"
-            ]
-            return random.choice(fallbacks)
+        """ርዕሱ ስህተት ከሆነ ማስተካከያ"""
+        bad_signals = ["sorry", "error", "sync", "report", "intelligence", "unable"]
+        if any(s in discovered.lower() for s in bad_signals) or len(discovered) < 5:
+            return f"The Complete 2026 Strategy for {original} in {country}"
         return discovered
 
-    def _get_quantum_p1(self, t, c):
-        return f"""
-        (STAGE 1/6) Act as a World-Class Strategy Consultant. Write 3,000 words of Strategic Foundations for '{t}' in {c}. 
-        Analyze the 2026 economic landscape, local consumer psychology, and regulatory frameworks. 
-        REQUIREMENTS: Write 40+ exhaustive, data-heavy paragraphs. Use HTML. Force deep local insights.
-        """
+    def _get_p1_prompt(self, t, c):
+        return f"WRITE 2,500 WORDS: Phase 1 of 'The Sovereign Guide to {t}' in {c}. Focus on market psychology, economic trends, and legal foundations. Use HTML."
 
-    def _get_quantum_p2(self, t, c, p):
-        return f"Act as Chief Technical Officer. Write 2,500 words for Phase 2 about '{t}' in {c}. Focus on Technical Architecture, Infrastructure Setup, and Local Resource Scaling. Use HTML."
+    def _get_p2_prompt(self, t, c, p):
+        return f"WRITE 2,000 WORDS: Phase 2 of the {c} guide for '{t}'. Focus on technical architecture, system setup, and required infrastructure. Use HTML."
 
     def _get_quantum_p3(self, t, c, p):
-        return f"Act as Senior Industry Analyst. Write 2,500 words for Phase 3 about '{t}' in {c}. Include 15 hyper-detailed case studies, market benchmarking, and competitive analysis. Use HTML."
+        return f"WRITE 2,000 WORDS: Phase 3 of the {c} guide for '{t}'. Provide 15 detailed case studies, competitor analysis, and real-world success models. Use HTML."
 
-    def _get_quantum_p4(self, t, c, p):
-        return f"Act as Financial Architect. Write 2,500 words for Phase 4 about '{t}' in {c}. Create a massive week-by-week 24-month implementation roadmap and ROI models in local currency. Use HTML."
+    def _get_zenith_p4(self, t, c, p):
+        return f"WRITE 2,000 WORDS: Phase 4 of the {c} guide for '{t}'. Create a 24-month roadmap, financial ROI models, and monetization secrets. Use HTML."
 
-    def _get_quantum_p5(self, t, c, p):
-        return f"Act as Global Oracle. Write 2,000 words for Phase 5 about '{t}' in {c}. Include 50 technical FAQ questions with massive answers and 2035 vision. Total guide MUST exceed 10,000 words. Use HTML."
+    def _get_zenith_p5(self, t, c, p):
+        return f"WRITE 1,500 WORDS: Phase 5 of the {c} guide for '{t}'. Provide 50 deep-dive FAQs with extensive answers and a vision for 2040. Use HTML."
 
-    def _stitch_quantum_html(self, p1, p2, p3, p4, p5, topic, country):
-        header = f"""
-        <div style="border: 45px solid #1e3c72; padding:90px; background:#fff; font-family:'Garamond', serif; line-height:2.6; color:#111; text-align:justify; box-shadow: 0 0 50px rgba(0,0,0,0.5);">
-            <div style="text-align:center; border-bottom:10px double #1e3c72; margin-bottom:70px; padding-bottom:50px;">
-                <div style="background:#1e3c72; color:#d4af37; display:inline-block; padding:15px 70px; border-radius:10px; font-weight:bold; font-size:1.8em; margin-bottom:30px;">👑 TITAN SOVEREIGN INFINITE v6.5</div>
-                <h1 style="font-size:6.5em; color:#1e3c72; margin:0; line-height:0.85; text-transform:uppercase;">{topic}</h1>
-                <h2 style="letter-spacing:30px; color:#8b0000; font-weight:lighter; margin-top:60px;">SUPREME 2026 GLOBAL MASTER-BLUEPRINT</h2>
-                <div style="margin-top:60px; font-size:3.5em; color:#333;">TERRITORY: <b>{country.upper()}</b></div>
+    def _build_royal_structure(self, content, topic, country):
+        """የንጉሳዊ ዲዛይን መዋቅር"""
+        style = """
+        <style>
+            @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Lora:ital,wght@0,400;1,700&display=swap');
+            .sovereign-document { 
+                padding: 60px; border: 30px solid #1a2a44; background: #fff; 
+                font-family: 'Lora', serif; color: #1a1a1a; line-height: 2;
+            }
+            .gold-badge { 
+                background: #c5a059; color: white; padding: 5px 20px; 
+                border-radius: 4px; display: inline-block; font-weight: bold;
+            }
+            h1 { font-family: 'Playfair Display', serif; font-size: 60px; color: #1e3c72; }
+            h2 { color: #1a2a44; border-bottom: 2px solid #c5a059; padding-bottom: 10px; margin-top: 40px; }
+            .content-block { margin-bottom: 30px; }
+        </style>
+        """
+        html = f"""
+        {style}
+        <div class="sovereign-document">
+            <div style="text-align:center;">
+                <div class="gold-badge">SUPREME STRATEGIC INTELLIGENCE</div>
+                <h1>{topic.upper()}</h1>
+                <p><b>A ROYAL GUIDE FOR THE {country.upper()} MARKET</b></p>
+                <p>PUBLISHED: {datetime.now().strftime('%B %d, %2026')}</p>
             </div>
-            {p1} <hr style="border:1px solid #eee; margin:60px 0;">
-            {p2} <hr style="border:1px solid #eee; margin:60px 0;">
-            {p3} <hr style="border:1px solid #eee; margin:60px 0;">
-            {p4} <hr style="border:1px solid #eee; margin:60px 0;">
-            {p5}
+            <div class="main-body">
+                {content}
+            </div>
         </div>
         """
-        return header
+        return html
 # =================== ዋና ስርዓት ክፍል ===================
 
 class UltimateProfitMasterSystem:
