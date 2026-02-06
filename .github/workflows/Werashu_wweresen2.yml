@@ -54,15 +54,29 @@ jobs:
 
       - name: "🤖 Execute Mega-Production Engine"
         env:
+          # 🔑 ዋና ቁልፎች
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+          
+          # 🔄 የግሮቅ ቁልፎች ሽክርክሪት (Titan v4.6 እንዲሰራ እነዚህ የግድ ያስፈልጋሉ)
+          GROQ_API_KEY_1: ${{ secrets.GROQ_API_KEY_1 }}
+          GROQ_API_KEY_2: ${{ secrets.GROQ_API_KEY_2 }}
+          GROQ_API_KEY_3: ${{ secrets.GROQ_API_KEY_3 }}
+          GROQ_API_KEY_4: ${{ secrets.GROQ_API_KEY_4 }}
+          GROQ_API_KEY_5: ${{ secrets.GROQ_API_KEY_5 }}
+          GROQ_API_KEY_6: ${{ secrets.GROQ_API_KEY_6 }}
+          GROQ_API_KEY_7: ${{ secrets.GROQ_API_KEY_7 }}
+          
+          # ⚙️ ሲስተም ኮንፊግ
           GITHUB_ACTIONS: "true"
           INPUT_TOPIC: ${{ github.event.inputs.topic || 'High-Ticket Affiliate Marketing Strategies 2026' }}
           INPUT_LANGUAGE: ${{ github.event.inputs.language || 'en' }}
           PYTHONUNBUFFERED: 1
         run: |
           echo "🚀 Starting automated Mega-Production (11 Countries x 3500+ Words)..."
+          echo "🔄 Multi-Key Environment Active..."
           
           # '10' የሚለው ቁጥር በቀጥታ ወደ ሜጋ-ስትራቴጂው እንዲገባ ያደርገዋል
           if [ -f "enterprise_production_runner.py" ]; then
