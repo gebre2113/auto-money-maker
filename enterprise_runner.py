@@ -3919,92 +3919,39 @@ class EnterpriseProductionOrchestrator:
             self.content_system = BasicContentSystem()
     
     def _initialize_all_components(self):
-        """
-        Enterprise componentsን በስርዓት ያስነሳል። 
-        ስህተቶችን ለመከላከል እያንዳንዱ Import መደረጉን ያረጋግጣል።
-        """
-        self.logger.info("🏢 Initializing Enterprise Components...")
+        """Initializes all components using the new reliable importer."""
+        self.logger.info("🏢 Initializing Enterprise Components (Reliable Mode)...")
 
-        try:
-            # 1. YouTube Intelligence Hunter
-            YouTubeIntelligenceHunterPro = self.importer.get_module('YouTubeIntelligenceHunterPro')
-            if YouTubeIntelligenceHunterPro:
-                # ሞጁሉ ክላስ ከሆነ instance ይፈጥራል፣ ካልሆነ ግን ያለውን ይወስዳል
-                self.youtube_hunter = YouTubeIntelligenceHunterPro() if callable(YouTubeIntelligenceHunterPro) else YouTubeIntelligenceHunterPro
-                self.logger.info("✅ Enterprise YouTube Intelligence Hunter initialized")
-            
-            # 2. Affiliate Manager
-            UltraAffiliateManager = self.importer.get_module('UltraAffiliateManager')
-            if UltraAffiliateManager:
-                if callable(UltraAffiliateManager):
-                    self.affiliate_manager = UltraAffiliateManager(user_geo="US", user_segment="enterprise")
-                else:
-                    self.affiliate_manager = UltraAffiliateManager
-                self.logger.info("✅ Enterprise Affiliate Manager initialized")
-            
-            # 3. Content System
-            UltimateProfitMasterSystem = self.importer.get_module('UltimateProfitMasterSystem')
-            if UltimateProfitMasterSystem:
-                self.content_system = UltimateProfitMasterSystem() if callable(UltimateProfitMasterSystem) else UltimateProfitMasterSystem
-                self.logger.info("✅ Enterprise Content System initialized")
-            
-            # --- Enterprise Components (Mocks/Engines) ---
-            
-            # 4. Cultural Guardian
-            self.cultural_guardian = self.importer.get_enterprise_component('CulturalDepthGuardian')
-            if self.cultural_guardian: self.logger.info("✅ Cultural Depth Guardian initialized")
-            
-            # 5. Revenue Engine
-            self.revenue_engine = self.importer.get_enterprise_component('RevenueForecastEngine')
-            if self.revenue_engine: self.logger.info("✅ Revenue Forecast Engine initialized")
-            
-            # 6. Ethical Compliance
-            self.compliance_guardian = self.importer.get_enterprise_component('EthicalComplianceGuardian')
-            if self.compliance_guardian: self.logger.info("✅ Ethical Compliance Guardian initialized")
-            
-            # 7. AI Cultural Enricher
-            self.ai_cultural_enricher = self.importer.get_enterprise_component('AICulturalEnricher')
-            if self.ai_cultural_enricher: 
-                status = "✅ (API Key Active)" if self.ai_cultural_enricher.enabled else "⚠️ (No API Key - Fallback Mode)"
-                self.logger.info(f"{status} AI Cultural Enricher initialized")
-            
-            # 8. AI Quality Auditor
-            self.ai_quality_auditor = self.importer.get_enterprise_component('AIQualityAuditor')
-            if self.ai_quality_auditor:
-                status = "✅ (API Key Active)" if self.ai_quality_auditor.enabled else "⚠️ (No API Key - Fallback Mode)"
-                self.logger.info(f"{status} AI Quality Auditor initialized")
-            
-            # 9. AI Title Optimizer
-            self.ai_title_optimizer = self.importer.get_enterprise_component('AITitleOptimizer')
-            if self.ai_title_optimizer:
-                status = "✅ (API Key Active)" if self.ai_title_optimizer.enabled else "⚠️ (No API Key - Fallback Mode)"
-                self.logger.info(f"{status} AI Title Optimizer initialized")
-            
-            # 10. Human Likeness Engine (with AI Cultural Enricher integration)
-            self.human_engine = HumanLikenessEngine(
-                cultural_enricher=self.ai_cultural_enricher
-            )
-            self.logger.info("✅ Human Likeness Engine initialized (95% AI Detection Reduction)")
-            
-            # 11. Smart Image Engine
-            self.image_engine = self.importer.get_enterprise_component('SmartImageEngine')
-            if self.image_engine: self.logger.info("✅ Smart Image Engine initialized (40% SEO Boost)")
-            
-            # 12. Dynamic CTA Engine
-            self.cta_engine = self.importer.get_enterprise_component('DynamicCTAEngine')
-            if self.cta_engine: self.logger.info("✅ Dynamic CTA Engine initialized (35% Revenue Increase)")
-            
-            # 13. Social Media & Dashboard
-            self.social_manager = self.importer.get_enterprise_component('SocialMediaManager')
-            if self.social_manager: self.logger.info("✅ Social Media Manager initialized")
-            
-            self.dashboard_manager = self.importer.get_enterprise_component('DashboardManager')
-            if self.dashboard_manager: self.logger.info("✅ Dashboard Manager initialized")
+        # Get the real, initialized modules from the new importer
+        self.youtube_hunter = self.importer.get_module('youtube_hunter')
+        self.affiliate_manager = self.importer.get_module('affiliate_manager')
+        self.content_system = self.importer.get_module('content_system')
 
-        except Exception as e:
-            self.logger.error(f"❌ Error during component initialization: {str(e)}")
-            # ስህተት ቢፈጠር ወደ መጠባበቂያ (Fallback) ሲስተም ይቀይራል
-            self._create_basic_fallback_system()
+        # Initialize the other enhancement engines as before
+        self.cultural_guardian = CulturalDepthGuardian()
+        self.revenue_engine = RevenueForecastEngine()
+        self.compliance_guardian = EthicalComplianceGuardian()
+        ai_cultural_api_key = os.getenv('AI_CULTURAL_API_KEY')
+        self.ai_cultural_enricher = AICulturalEnricher(api_key=ai_cultural_api_key)
+        ai_audit_api_key = os.getenv('AI_AUDIT_API_KEY')
+        self.ai_quality_auditor = AIQualityAuditor(api_key=ai_audit_api_key)
+        ai_title_api_key = os.getenv('AI_TITLE_API_KEY')
+        self.ai_title_optimizer = AITitleOptimizer(api_key=ai_title_api_key)
+        self.human_engine = HumanLikenessEngine(cultural_enricher=self.ai_cultural_enricher)
+        self.image_engine = SmartImageEngine()
+        self.cta_engine = DynamicCTAEngine()
+        self.social_manager = SocialMediaManager()
+        self.dashboard_manager = DashboardManager()
+        
+        # Verify and log
+        if "Mock" in self.youtube_hunter.__class__.__name__: self.logger.warning("   ⚠️ YouTube Hunter is running in MOCK mode.")
+        else: self.logger.info("   ✅ YouTube Hunter initialized successfully.")
+
+        if "Mock" in self.affiliate_manager.__class__.__name__: self.logger.warning("   ⚠️ Affiliate Manager is running in MOCK mode.")
+        else: self.logger.info("   ✅ Affiliate Manager initialized successfully.")
+
+        if "Mock" in self.content_system.__class__.__name__: self.logger.warning("   ⚠️ Content System is running in MOCK mode.")
+        else: self.logger.info("   ✅ Content System initialized successfully.")
     
     def _create_basic_fallback_system(self):
         """Create basic fallback system when initialization fails"""
