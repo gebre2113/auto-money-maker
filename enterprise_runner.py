@@ -4549,60 +4549,65 @@ class EnterpriseProductionOrchestrator:
     async def _stage_4_enterprise_content_generation(self, topic: str, country: str, 
                                                    video_research: Dict, cultural_depth: Dict,
                                                    affiliate_product: Optional[Dict], optimized_title: str = None) -> Dict:
-        if not hasattr(self, 'content_system'):
-            # Use AI-optimized title if available
-            title = optimized_title or f"ENTERPRISE GUIDE: {topic.upper()} - {country}"
-            return {
-                'content': f"# {title}\n\nEnterprise-grade content with market analysis and implementation roadmap.",
-                'word_count': 2500,
-                'quality_score': 85,
-                'enterprise_grade': True
-            }
+        """
+        1. መጀመሪያ ሌሎች ሞጁሎችን ይቀሰቅሳል
+        2. ካልሰሩ 60 ሰከንድ ታግሶ በራሱ በ 3 ዙር ያመርታል
+        """
         
+        # --- ደረጃ 1: ሌሎች ሞጁሎችን መቀስቀስ (Trigger External Modules) ---
+        self.logger.info(f"📡 Level 1: Triggering External Modules for {country}...")
+        
+        external_content = None
         try:
-            if hasattr(self.content_system, 'generate_deep_content'):
-                content_data = await EnhancedErrorHandler.safe_execute(
-                    self.content_system.generate_deep_content(
-                        topic=topic,
-                        country=country,
-                        video_research=video_research,
-                        affiliate_product=affiliate_product
-                    ),
-                    fallback_value={
-                        'content': f"# Basic Content: {topic} - {country}\n\nContent generation failed, using fallback.",
-                        'word_count': 1500,
-                        'quality_score': 70,
-                        'enterprise_grade': False
-                    },
-                    max_retries=2,
-                    context=f"Content generation for {country}"
-                )
-                
-                # Replace title with AI-optimized title if available
-                if optimized_title and content_data.get('content'):
-                    lines = content_data['content'].split('\n', 1)
-                    if len(lines) > 0 and lines[0].startswith('#'):
-                        content_data['content'] = f"# {optimized_title}\n{lines[1] if len(lines) > 1 else ''}"
-                
-                return content_data
+            # የሌሎች ሞጁሎችን ውጤት ለማግኘት መሞከር
+            # ማሳሰቢያ፡ content_system መኖሩን ያረጋግጣል
+            external_data = await self.content_system.generate_deep_content(topic, country, video_research, affiliate_product)
+            
+            if external_data and len(external_data.get('content', '').split()) >= 5000:
+                self.logger.info(f"✅ External Modules delivered 5000+ words for {country}.")
+                return external_data
             else:
-                title = optimized_title or f"Enterprise Implementation: {topic} - {country}"
-                return {
-                    'content': f"# {title}\n\nComprehensive enterprise guide with ROI analysis and risk assessment.",
-                    'word_count': 2800,
-                    'quality_score': 88,
-                    'enterprise_grade': True
-                }
-                
+                self.logger.warning(f"⚠️ External content is insufficient or missing for {country}.")
+        
         except Exception as e:
-            self.logger.warning(f"⚠️ Content generation failed: {e}")
-            title = optimized_title or f"{topic} - {country} Enterprise Analysis"
-            return {
-                'content': f"# {title}\n\nBasic enterprise information with market overview.",
-                'word_count': 2000,
-                'quality_score': 75,
-                'enterprise_grade': False
-            }
+            self.logger.warning(f"⚠️ External Module Error: {e}")
+
+        # --- ደረጃ 2: አንድ ደቂቃ መጠበቅ (The 1-Minute Grace Period) ---
+        self.logger.info(f"⏳ External modules failed or timed out. Waiting for 60 seconds (Grace Period) before Internal Production...")
+        await asyncio.sleep(60) # በትክክል 1 ደቂቃ መጠበቅ
+
+        # --- ደረጃ 3: የራነሩ የድንገተኛ አደጋ ማምረቻ (Internal 3-Round Production) ---
+        self.logger.info(f"🏗️ Level 2: Starting Internal 3-Round Production for {country}...")
+        
+        parts = []
+        # ዙር 1: መግቢያና ገበያ ትንተና
+        self.logger.info(f"🧱 Round 1: Market Analysis for {country}...")
+        p1 = await self.ai_provider.process_task(f"Detailed Executive Summary and Market Analysis for {topic} in {country}. (2000 words)", "refinement")
+        parts.append(p1)
+        await asyncio.sleep(1) # 1s እረፍት
+
+        # ዙር 2: ቴክኒካዊ ትግበራ
+        self.logger.info(f"🧱 Round 2: Technical Implementation for {country}...")
+        p2 = await self.ai_provider.process_task(f"Technical Implementation roadmap and ROI analysis for {topic} in {country}. (2000 words)", "refinement")
+        parts.append(p2)
+        await asyncio.sleep(1) # 1s እረፍት
+
+        # ዙር 3: ጥናቶችና መደምደሚያ
+        self.logger.info(f"🧱 Round 3: Case Studies & Final Strategy for {country}...")
+        p3 = await self.ai_provider.process_task(f"Case studies and 10-year future roadmap for {topic} in {country}. (1500 words)", "refinement")
+        parts.append(p3)
+
+        full_content = "\n\n".join(parts)
+        word_count = len(full_content.split())
+        
+        self.logger.info(f"✅ Internal Production Finished: {word_count} words for {country}.")
+        
+        return {
+            'content': full_content,
+            'word_count': word_count,
+            'enterprise_grade': True,
+            'generation_method': 'Internal_Fallback'
+        }
     
     async def _stage_5_enterprise_self_correction(self, content: str, target_words: int, 
                                                 cultural_depth_score: float) -> str:
