@@ -4549,19 +4549,11 @@ class EnterpriseProductionOrchestrator:
             self.logger.warning(f"⚠️ Product research failed: {e}")
             return None
     
-    async def _stage_4_enterprise_content_generation(self, topic: str, country: str, 
-                                                   video_research: Dict, cultural_depth: Dict,
-                                                   affiliate_product: Optional[Dict], optimized_title: str = None) -> Dict:
-        """
-        1. መጀመሪያ profit_master_system.py እንዲያመርት ትእዛዝ ይሰጣል
-        2. ካልሰራ 60 ሰከንድ ታግሶ በራሱ በ 3 ዙር (Internal AI) ያመርታል
-        """
+    async def _stage_4_enterprise_content_generation(self, topic, country, video_research, cultural_depth, affiliate_product, optimized_title=None) -> Dict:
+        """በሞጁሎች መካከል ያለውን መረጃ በማቀናጀት ይዘት እንዲመረት ማድረግ"""
         
-        self.logger.info(f"📡 Requesting content from Profit Master System for {country}...")
-        
-        # 1. መጀመሪያ ከሌላው እስክሪፕት (Profit Master) ውጤት ለማግኘት መሞከር
         try:
-            # በሁለቱም የMethod ስሞች ለመፈለግ (generate_deep_content ወይም generate_content)
+            # Profit Masterን መጥራት (የተለያዩ ስሞች ሊኖሩት ስለሚችሉ መፈተሽ)
             method = None
             for m_name in ['generate_deep_content', 'generate_content', 'run_production']:
                 if hasattr(self.content_system, m_name):
@@ -4569,47 +4561,18 @@ class EnterpriseProductionOrchestrator:
                     break
             
             if method:
-                external_data = await method(topic, country, video_research, affiliate_product)
-                if external_data and len(external_data.get('content', '').split()) >= 5000:
-                    self.logger.info(f"✅ Success: Profit Master delivered 5000+ words.")
-                    return external_data
+                self.logger.info(f"🏗️ Profit Master is now weaving YouTube and Affiliate data for {country}...")
+                # መረጃውን ለ Profit Master ያስረክባል
+                return await method(topic, country, video_research, affiliate_product)
             else:
-                self.logger.warning(f"⚠️ Profit Master module found but work method is missing.")
+                raise Exception("Work method not found in Profit Master System")
 
         except Exception as e:
-            self.logger.warning(f"⚠️ Connection to Profit Master System failed: {e}")
-
-        # 2. አንድ ደቂቃ መጠበቅ (60 Seconds Grace Period)
-        self.logger.info(f"⏳ Waiting for 60 seconds (Grace Period) to allow system recovery before Fallback...")
-        await asyncio.sleep(60)
-
-        # 3. የራሱ የ AI ምርት (3 Rounds)
-        self.logger.info(f"🏗️ Starting Internal 3-Round Production for {country} (Target: 5000+ words)...")
-        parts = []
-        try:
-            prompts = [
-                f"Detailed Executive Summary and Market Analysis for {topic} in {country}. (2000 words)",
-                f"Technical Implementation roadmap and ROI analysis for {topic} in {country}. (2000 words)",
-                f"Case studies and 10-year future roadmap for {topic} in {country}. (1500 words)"
-            ]
+            self.logger.warning(f"⚠️ Coordination with Profit Master failed: {e}. Waiting for Fallback...")
+            # እዚህ ጋር ነው ያ የተነጋገሩበት የ 60 ሰከንድ ቆይታ የሚጀምረው
+            await asyncio.sleep(60)
+            return await self._internal_ai_production(topic, country)
             
-            for i, p in enumerate(prompts):
-                self.logger.info(f"🧱 Round {i+1}/3: Building content for {country}...")
-                # አዲሱ ai_provider እዚህ ጋር በትክክል ይሰራል
-                part = await self.ai_provider.process_task(p, "refinement")
-                parts.append(part)
-                await asyncio.sleep(1) # 1s እረፍት
-                
-            full_content = "\n\n".join(parts)
-            return {
-                'content': full_content,
-                'word_count': len(full_content.split()),
-                'enterprise_grade': True
-            }
-        except Exception as ai_err:
-            self.logger.error(f"❌ Internal Fallback Production also failed: {ai_err}")
-            return {'content': "Production Failed after all attempts.", 'word_count': 0}
-    
     async def _stage_5_enterprise_self_correction(self, content: str, target_words: int, 
                                                 cultural_depth_score: float) -> str:
         current_words = len(content.split())
