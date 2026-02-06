@@ -1,39 +1,3 @@
-"""
-🎬 የምርት-ደረጃ የዩቲዩብ-አፊሊዬት ሞኖታይዜሽን ስርዓት v2.1 (FIXED & OPTIMIZED)
-ሁሉም ክፍሎች በሙሉ ተካትተዋል - ምንም ማጣቂያ የለም!
-"""
-
-# =================== አስፈላጊ ግንኙነቶች ===================
-import asyncio
-import aiohttp
-import json
-import time
-import hashlib
-import logging
-import random
-import statistics
-import textwrap
-import re
-import os
-from datetime import datetime, timedelta
-from typing import Dict, List, Tuple, Optional, Callable, Any
-from collections import defaultdict, OrderedDict
-from pydantic import BaseModel, Field, field_validator, ConfigDict
-from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type
-from dataclasses import dataclass, asdict
-from urllib.parse import urlparse
-
-# ሎገር ማስተካከያ
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
-
-# Redis ካለመገኘት አማራጭ
-try:
-    from redis import asyncio as aioredis
-    REDIS_AVAILABLE = True
-except ImportError:
-    REDIS_AVAILABLE = False
-    aioredis = None
     logger.warning("Redis not available, using local cache only")
 
 # =================== የመረጃ ሞዴሎች (የተሻሻለ) ===================
