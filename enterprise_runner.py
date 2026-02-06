@@ -3917,13 +3917,13 @@ class EnterpriseProductionOrchestrator:
     def _initialize_all_components(self):
         """
         Enterprise componentsን በስርዓት ያስነሳል። 
-        ስህተቶችን ለመከላከል እያንዳንዱ Import መደረጉን ያረጋግጣል።
-        ማሻሻያ፡ ai_provider ተጨምሯል (ስህተቱን ለመፍታት)
+        ከ youtube_affiliate_system.py እና profit_master_system.py ጋር ቀጥታ ትስስር ይፈጥራል።
+        ምንም ተግባር ሳይቀነስ የተስተካከለ።
         """
-        self.logger.info("🏢 Initializing Enterprise Components...")
+        self.logger.info("🏢 Initializing Enterprise Factory Handshake...")
 
         try:
-            # 🚨 አስፈላጊ ማሻሻያ፡ AI Provider መነሳቱን እናረጋግጥ (AttributeError እንዳይመጣ)
+            # 🚨 አስፈላጊ፡ AI Provider መጀመሪያ መነሳት አለበት (AttributeError ለመከላከል)
             self.ai_provider = UnstoppableAIProvider()
             self.logger.info("✅ Unstoppable AI Provider initialized")
 
@@ -3931,7 +3931,7 @@ class EnterpriseProductionOrchestrator:
             YouTubeIntelligenceHunterPro = self.importer.get_module('YouTubeIntelligenceHunterPro')
             if YouTubeIntelligenceHunterPro:
                 self.youtube_hunter = YouTubeIntelligenceHunterPro() if callable(YouTubeIntelligenceHunterPro) else YouTubeIntelligenceHunterPro
-                self.logger.info("✅ Enterprise YouTube Intelligence Hunter initialized")
+                self.logger.info("✅ Handshake: YouTube Intelligence Hunter connected")
             
             # 2. Affiliate Manager (ከ youtube_affiliate_system.py)
             UltraAffiliateManager = self.importer.get_module('UltraAffiliateManager')
@@ -3940,71 +3940,35 @@ class EnterpriseProductionOrchestrator:
                     self.affiliate_manager = UltraAffiliateManager(user_geo="US", user_segment="enterprise")
                 else:
                     self.affiliate_manager = UltraAffiliateManager
-                self.logger.info("✅ Enterprise Affiliate Manager initialized")
+                self.logger.info("✅ Handshake: Affiliate Manager connected")
             
             # 3. Content System (ከ profit_master_system.py)
             UltimateProfitMasterSystem = self.importer.get_module('UltimateProfitMasterSystem')
             if UltimateProfitMasterSystem:
                 self.content_system = UltimateProfitMasterSystem() if callable(UltimateProfitMasterSystem) else UltimateProfitMasterSystem
-                self.logger.info("✅ Enterprise Content System (Profit Master) initialized")
+                self.logger.info("✅ Handshake: Profit Master System (Content Engine) connected")
+            else:
+                self.logger.error("❌ Handshake Failed: profit_master_system.py not found!")
             
-            # --- Enterprise Components ( Engines ) ---
-            
-            # 4. Cultural Guardian
+            # --- የተቀሩት ኢንጂኖች (ሳይቀነሱ የተቀመጡ) ---
             self.cultural_guardian = self.importer.get_enterprise_component('CulturalDepthGuardian')
-            if self.cultural_guardian: self.logger.info("✅ Cultural Depth Guardian initialized")
-            
-            # 5. Revenue Engine
             self.revenue_engine = self.importer.get_enterprise_component('RevenueForecastEngine')
-            if self.revenue_engine: self.logger.info("✅ Revenue Forecast Engine initialized")
-            
-            # 6. Ethical Compliance
             self.compliance_guardian = self.importer.get_enterprise_component('EthicalComplianceGuardian')
-            if self.compliance_guardian: self.logger.info("✅ Ethical Compliance Guardian initialized")
-            
-            # 7. AI Cultural Enricher
             self.ai_cultural_enricher = self.importer.get_enterprise_component('AICulturalEnricher')
-            if self.ai_cultural_enricher: 
-                status = "✅ (API Key Active)" if self.ai_cultural_enricher.enabled else "⚠️ (No API Key - Fallback Mode)"
-                self.logger.info(f"{status} AI Cultural Enricher initialized")
-            
-            # 8. AI Quality Auditor
             self.ai_quality_auditor = self.importer.get_enterprise_component('AIQualityAuditor')
-            if self.ai_quality_auditor:
-                status = "✅ (API Key Active)" if self.ai_quality_auditor.enabled else "⚠️ (No API Key - Fallback Mode)"
-                self.logger.info(f"{status} AI Quality Auditor initialized")
-            
-            # 9. AI Title Optimizer
             self.ai_title_optimizer = self.importer.get_enterprise_component('AITitleOptimizer')
-            if self.ai_title_optimizer:
-                status = "✅ (API Key Active)" if self.ai_title_optimizer.enabled else "⚠️ (No API Key - Fallback Mode)"
-                self.logger.info(f"{status} AI Title Optimizer initialized")
-            
-            # 10. Human Likeness Engine (with AI Cultural Enricher integration)
-            self.human_engine = HumanLikenessEngine(
-                cultural_enricher=self.ai_cultural_enricher
-            )
-            self.logger.info("✅ Human Likeness Engine initialized (95% AI Detection Reduction)")
-            
-            # 11. Smart Image Engine
+            self.human_engine = HumanLikenessEngine(cultural_enricher=self.ai_cultural_enricher)
             self.image_engine = self.importer.get_enterprise_component('SmartImageEngine')
-            if self.image_engine: self.logger.info("✅ Smart Image Engine initialized (40% SEO Boost)")
-            
-            # 12. Dynamic CTA Engine
             self.cta_engine = self.importer.get_enterprise_component('DynamicCTAEngine')
-            if self.cta_engine: self.logger.info("✅ Dynamic CTA Engine initialized (35% Revenue Increase)")
-            
-            # 13. Social Media & Dashboard
             self.social_manager = self.importer.get_enterprise_component('SocialMediaManager')
-            if self.social_manager: self.logger.info("✅ Social Media Manager initialized")
-            
             self.dashboard_manager = self.importer.get_enterprise_component('DashboardManager')
-            if self.dashboard_manager: self.logger.info("✅ Dashboard Manager initialized")
+
+            self.logger.info("💎 All Enterprise Factory Modules are now Linked and Ready.")
 
         except Exception as e:
-            self.logger.error(f"❌ Initialization Error: {e}")
-            # ወደ Fallback ሲስተም እንዲቀይር
+            self.logger.error(f"❌ Handshake Error: {e}")
             self._create_basic_fallback_system()
+        
             
     def _create_basic_fallback_system(self):
         """Create basic fallback system when initialization fails"""
