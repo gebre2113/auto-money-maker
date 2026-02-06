@@ -4198,138 +4198,148 @@ class EnhancedWordCounter:
 
 class MegaContentEngine:
     """
-    💎 TITAN v5.0 - THE IMMORTAL ORACLE (Quantum Edition)
-    ስትራቴጂ፡ Shielded Trend Discovery + 5-Phase Quantum Expansion
-    ግብ፡ 8,000 - 10,000 ቃላት (Unbeatable Global Authority)
-    """
-    def __init__(self, system):
-        self.system = system
-        self.config = system.config
-        self.failover = system.failover_system
-
-    async def produce_11_countries_mega_loop(self, topic: str):
-        """11 ሀገራትን እጅግ በረቀቀና ርዕስን በሚያጣራ 5 ዙር ማሳለፍ"""
-        target_countries = list(self.config.HIGH_VALUE_COUNTRIES.keys())[:11]
-        
-        print("\n" + "█"*80)
-        print(f"🚀 TITAN v5.0 QUANTUM ACTIVATED: TARGETING 8,000+ WORDS")
-        print(f"🛰️  System Status: Shielded Trend Discovery & Quantum Expansion")
-        print("█"*80 + "\n")
-
-        start_time = time.time()
-
-        for i, country in enumerate(target_countries, 1):
-            emoji = self.config.HIGH_VALUE_COUNTRIES[country]['emoji']
-            
-            try:
-                # --- STAGE 0: SHIELDED TREND DISCOVERY ---
-                print(f"🔄 [{i}/11] Phase 0: Shielded intelligence gathering for {emoji} {country}...")
-                raw_topic = await self._discover_viral_topic_shielded(topic, country)
-                discovered_topic = self._validate_topic(raw_topic, topic, country)
-                print(f"🎯 Strategic Focus for {country}: '{discovered_topic}'")
-                
-                # --- STAGE 1: GLOBAL FOUNDATIONS (2,500+ words) ---
-                print(f"   🔹 Stage 1: Macro-Economic & Psychological Intelligence...")
-                p1 = await self.failover.generate_content(self._get_quantum_p1(discovered_topic, country), max_tokens=4000)
-                await asyncio.sleep(4)
-                
-                # --- STAGE 2: TECHNICAL ECOSYSTEM (2,000+ words) ---
-                print(f"   🔹 Stage 2: Technical Architecture & System Design...")
-                p2 = await self.failover.generate_content(self._get_quantum_p2(discovered_topic, country, p1), max_tokens=4000)
-                await asyncio.sleep(4)
-                
-                # --- STAGE 3: SOVEREIGN BENCHMARKS (2,000+ words) ---
-                print(f"   🔹 Stage 3: High-Level Case Studies & Competitive Moats...")
-                p3 = await self.failover.generate_content(self._get_quantum_p3(discovered_topic, country, p2), max_tokens=4000)
-                await asyncio.sleep(4)
-                
-                # --- STAGE 4: WEALTH ARCHITECTURE (2,000+ words) ---
-                print(f"   🔹 Stage 4: 24-Month Roadmap & ROI Modeling...")
-                p4 = await self.failover.generate_content(self._get_quantum_p4(discovered_topic, country, p3), max_tokens=4000)
-                await asyncio.sleep(4)
-                
-                # --- STAGE 5: MASTERY & FAQ (1,500+ words) ---
-                print(f"   🔹 Stage 5: The Oracle Mastery Hub (40 Questions)...")
-                p5 = await self.failover.generate_content(self._get_quantum_p5(discovered_topic, country, p4), max_tokens=4000)
-                
-                # ውህደት
-                full_content = self._stitch_quantum_html(p1, p2, p3, p4, p5, discovered_topic, country)
-                word_count = EnhancedWordCounter.count_words(full_content)
-                
-                result_data = {
-                    'id': f"quantum_{country}_{int(time.time())}",
-                    'title': f"Sovereign Masterclass: {discovered_topic} in {country}",
-                    'content': full_content,
-                    'word_count': word_count,
-                    'quality_report': {'overall_score': 100, 'intelligence_depth': 'Quantum'},
-                    'production_report': {'estimated_earning_potential': {'monthly_value': 8500, 'currency': 'USD'}}
-                }
-                
-                save_to_file(result_data, 'html')
-                print(f"   ✨ QUANTUM SUCCESS: {word_count} words for {country}!")
-
-            except Exception as e:
-                print(f"   ❌ ERROR in {country}: {str(e)}")
-
-            if i < 11:
-                print(f"   ⏳ Next Node Sync (30s)...")
-                await asyncio.sleep(30)
-
-        total_duration = (time.time() - start_time) / 60
-        print("\n" + "█"*80)
-        print(f"🏆 ZENITH COMPLETE: 11 TITAN MASTERPIECES GENERATED IN {total_duration:.2f} MINS")
-        print("█"*80 + "\n")
-
-    async def _discover_viral_topic_shielded(self, base_topic, country):
-        """ርዕስ ለመፈለግ 1 ሙከራ ብቻ በማድረግ ቁልፎችን ይቆጥባል"""
-        trend_prompt = f"Identify the #1 highest-growth sub-topic in {country} for Feb 2026 related to '{base_topic}'. Return ONLY the title (max 10 words)."
-        try:
-            res = await self.failover.generate_content(trend_prompt, max_tokens=100)
-            return res.strip().replace('"', '')
-        except:
-            return "ERROR"
-
-    def _validate_topic(self, discovered, original, country):
-        """ርዕሱን ማጣሪያ - ስህተት ከሆነ ፕሪሚየም ርዕስ ይሰጣል"""
-        if "System" in discovered or "Error" in discovered or len(discovered) > 150 or len(discovered) < 5:
-            fallbacks = [
-                f"Sovereign Wealth: AI-Driven Business Automation in {country} (2026)",
-                f"High-Ticket Digital Transformation: {country} Market Blueprint",
-                f"Strategic Revenue Engineering in the {country} Digital Economy"
-            ]
-            return random.choice(fallbacks)
-        return discovered
-
-    def _get_quantum_p1(self, t, c):
+    def _get_quantum_p2(self, topic: str, country: str, previous_content: str) -> str:
+        country_name = HIGH_VALUE_COUNTRIES[country]['name']
         return f"""
-        (STAGE 1/5) Act as a Global Strategic Visionary. Write the first 2,500 words of an 8,000-word Sovereign Guide about '{t}' for the {c} market.
-        FOCUS: Macro-economic trajectory, cultural psychology of {c}, and regulatory framework.
-        REQUIREMENTS: Use HTML (H1, H2, H3). Write at least 30 detailed, data-rich paragraphs. Do not summarize.
-        """
+(QUANTUM STAGE 2/5) Act as Chief Technology Architect and Systems Engineer.
+Continue the Sovereign Masterclass about "{topic}" in {country_name} with 2,000+ words of TECHNICAL ARCHITECTURE content.
 
-    def _get_quantum_p2(self, t, c, p):
-        return f"Stage 2: Technical Architecture. Write 2,000 words on infrastructure, technical setup, and required resources for '{t}' in {c}. Use HTML."
+SECTIONS TO COVER:
+1. SYSTEM ARCHITECTURE DESIGN (700 words)
+   - Cloud infrastructure selection and optimization for {country_name}.
+   - Microservices vs monolithic architecture for local scalability.
+   - API design and integration frameworks specific to local business nodes.
 
-    def _get_quantum_p3(self, t, c, p):
-        return f"Stage 3: Real-World Proof. Write 2,000 words featuring 10 hyper-detailed success stories and local benchmarks in {c}. Use HTML."
+2. TECHNOLOGY STACK SELECTION (700 words)
+   - Evaluation of programming frameworks and local development talent in {country_name}.
+   - Database design, data management, and storage optimization.
+   - Security tools and protocols for enterprise protection.
 
-    def _get_quantum_p4(self, t, c, p):
-        return f"Stage 4: Wealth Engineering. Write 2,000 words on a 24-month tactical roadmap and advanced ROI models for {c}. Use HTML."
+3. SECURITY & COMPLIANCE INTEGRATION (600 words)
+   - Implementing local data sovereignty laws in {country_name}.
+   - Threat modeling, encryption, and access control systems.
+   - Regular security audit protocols for {country_name} standards.
 
-    def _get_quantum_p5(self, t, c, p):
-        return f"Stage 5: Final Mastery. Write 1,500 words with 40 technical FAQ questions (long answers) and a 2035 future vision. Ensure total exceeds 8,000 words. Use HTML."
+REQUIREMENTS: Use HTML (H2, H3). Provide extreme technical depth. Write at least 25 detailed paragraphs.
+"""
+
+    def _get_quantum_p3(self, topic: str, country: str, previous_content: str) -> str:
+        country_name = HIGH_VALUE_COUNTRIES[country]['name']
+        return f"""
+(QUANTUM STAGE 3/5) Act as Global Case Study Specialist and Industry Analyst.
+Write 2,000+ words of REAL-WORLD PROOF for "{topic}" in {country_name}.
+
+SECTIONS TO COVER:
+1. 10 HYPER-DETAILED CASE STUDIES (1,500 words)
+   - Present 10 distinct success/failure models specifically for {country_name}.
+   - Break down each case study by: Objective, Strategy, Implementation, and Data-Driven Results.
+   - Include specific local company names or industry-equivalent examples in {country_name}.
+
+2. COMPETITIVE BENCHMARKING (500 words)
+   - How to outperform local rivals in {country_name}.
+   - Market share analysis and gap identification.
+
+REQUIREMENTS: Use HTML (H2, H3). Minimum 500 words per major case study category. Be extremely exhaustive.
+"""
+
+    def _get_quantum_p4(self, topic: str, country: str, previous_content: str) -> str:
+        country_name = HIGH_VALUE_COUNTRIES[country]['name']
+        return f"""
+(QUANTUM STAGE 4/5) Act as Chief Wealth Architect and Strategic Consultant.
+Write 2,000+ words of WEALTH ARCHITECTURE and IMPLEMENTATION content for "{topic}" in {country_name}.
+
+SECTIONS TO COVER:
+1. THE ELITE 24-MONTH MASTERY ROADMAP (1,000 words)
+   - Month-by-month tactical execution plan for {country_name}.
+   - Monthly milestones, resource allocation, and performance KPIs.
+
+2. FINANCIAL ROI MODELS & MONETIZATION (1,000 words)
+   - Detailed ROI calculations using local {country_name} economic data vs USD.
+   - Advanced monetization channels (High-ticket offers, recurring revenue models).
+   - Scaling strategies for the local {country_name} market.
+
+REQUIREMENTS: Use HTML (H2, H3). Create massive, task-heavy monthly breakdowns.
+"""
+
+    def _get_quantum_p5(self, topic: str, country: str, previous_content: str) -> str:
+        country_name = HIGH_VALUE_COUNTRIES[country]['name']
+        return f"""
+(QUANTUM STAGE 5/5) Act as the Oracle of Global Industry.
+Finalize the 8,000-word guide about "{topic}" in {country_name} with 1,500+ words of MASTERY content.
+
+SECTIONS TO COVER:
+1. THE ORACLE FAQ HUB (1,000 words)
+   - 40 complex, technical, and strategic questions with 100-word deep-dive answers each.
+   - Focus on troubleshooting, advanced edge cases, and local {country_name} nuances.
+
+2. FUTURE VISION 2035 (500 words)
+   - How "{topic}" will redefine the socio-economic fabric of {country_name} in the next decade.
+
+REQUIREMENTS: Use HTML. Ensure answers are exhaustive. Total guide MUST exceed 8,000 words.
+"""
 
     def _stitch_quantum_html(self, p1, p2, p3, p4, p5, topic, country):
+        """ይዘቱን በጥበብ የሚያዋህድ እና የግርማ ሞገስ ዲዛይን የሚሰጥ"""
         header = f"""
-        <div style="border: 30px double #1e3c72; padding:80px; background:#fff; font-family:'Times New Roman', serif; line-height:2.2; color:#111;">
+        <div style="border: 30px double #1e3c72; padding:80px; background:#fff; font-family:'Palatino', serif; line-height:2.1; color:#111;">
             <div style="text-align:center; border-bottom:5px solid #1e3c72; margin-bottom:50px; padding-bottom:30px;">
-                <div style="background:#1e3c72; color:gold; display:inline-block; padding:10px 40px; border-radius:5px; font-weight:bold; font-size:1.2em; margin-bottom:20px;">TITAN SOVEREIGN QUANTUM</div>
-                <h1 style="font-size:5.5em; color:#1e3c72; margin:0; line-height:1.0;">{topic.upper()}</h1>
-                <h2 style="letter-spacing:15px; color:#8b0000; font-weight:lighter; margin-top:30px;">EXECUTIVE 2026 MARKET MASTERCLASS</h2>
-                <div style="margin-top:30px; font-size:2em; color:#333;">REGION: <b>{country.upper()}</b></div>
+                <div style="background:#1e3c72; color:gold; display:inline-block; padding:10px 40px; border-radius:5px; font-weight:bold; font-size:1.2em; margin-bottom:20px; text-transform:uppercase;">TITAN SOVEREIGN QUANTUM</div>
+                <h1 style="font-size:5.5em; color:#1e3c72; margin:0; line-height:1.0; text-transform:uppercase;">{topic}</h1>
+                <h2 style="letter-spacing:15px; color:#8b0000; font-weight:lighter; margin-top:30px; text-transform:uppercase;">OFFICIAL 2026 MARKET MASTERCLASS</h2>
+                <div style="margin-top:30px; font-size:2em; color:#333;">TERRITORY: <b>{country}</b></div>
             </div>
+            <div id="foundations">{p1}</div>
+            <hr style="margin:60px 0; border:1px solid #eee;">
+            <div id="technical">{p2}</div>
+            <hr style="margin:60px 0; border:1px solid #eee;">
+            <div id="benchmarks">{p3}</div>
+            <hr style="margin:60px 0; border:1px solid #eee;">
+            <div id="wealth">{p4}</div>
+            <hr style="margin:60px 0; border:1px solid #eee;">
+            <div id="mastery">{p5}</div>
+            <div style="text-align:center; margin-top:100px; font-style:italic; color:#666;">
+                © 2026 Titan Sovereign Intelligence Cluster. All Rights Reserved.
+            </div>
+        </div>
         """
-        return header + p1 + p2 + p3 + p4 + p5 + "</div>"
+        # አላስፈላጊ የሆኑ የውስጥ <h1> ታጎችን ማስወገድ
+        stitched = re.sub(r'(<h1.*?>.*?</h1>)', r'', header, flags=re.IGNORECASE) if '<h1' in p1 else header
+        return stitched
+
+    async def _apply_titan_enhancements(self, content, country, topic, current_count):
+        """ይዘቱ 8,000 እስኪሞላ ድረስ በጥበብ የሚያሰፋው ክፍል"""
+        if current_count >= self.TARGET_WORDS:
+            return content
+        
+        print(f"   ⚠️ Word count at {current_count:,}. Triggering Quantum Expansion...")
+        expansion_prompt = f"The previous 5-stage content for '{topic}' in {country} is only {current_count} words. Write 2,000 more words of advanced technical analysis, detailed local statistics, and deeper implementation tactics. Use HTML."
+        
+        expansion = await self._call_quantum_ai(expansion_prompt, "expansion")
+        return content + "\n\n" + expansion
+
+    def _count_words(self, text: str) -> int:
+        clean = re.sub(r'<[^>]+>', '', text)
+        return len(clean.split())
+
+    def _save_titan_output(self, data):
+        output_dir = Path("enterprise_outputs")
+        output_dir.mkdir(exist_ok=True)
+        filename = output_dir / f"output_titan_quantum_{data['country']}_{int(time.time())}.html"
+        with open(filename, 'w', encoding='utf-8') as f:
+            f.write(data['content'])
+        return str(filename)
+
+    def _generate_titan_summary(self, results, topic, duration):
+        summary_dir = Path("enterprise_logs")
+        summary_dir.mkdir(exist_ok=True)
+        summary = {
+            "topic": topic,
+            "total_duration_mins": duration,
+            "results": [{r['country']: r.get('word_count', 0)} for r in results],
+            "status": "ZENITH_SUCCESS"
+        }
+        with open(summary_dir / f"summary_{int(time.time())}.json", 'w') as f:
+            json.dump(summary, f, indent=2)
 # =================== ዋና ስርዓት ክፍል ===================
 
 class UltimateProfitMasterSystem:
