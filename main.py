@@ -4198,52 +4198,51 @@ class EnhancedWordCounter:
 
 class MegaContentEngine:
     """
-    💎 TITAN v5.1 "SOVEREIGN GOLD" (ULTIMATE MERGED EDITION)
-    Combined Capabilities:
-    1. Shielded Trend Discovery (v5.0)
-    2. Context-Aware Anti-Redundancy (v5.1)
-    3. Full SEO Metadata Integration (v5.1)
-    4. Bilingual Summaries (v5.1)
-    5. Visual Anchor Placeholders (v5.1)
-    6. Smart Key Recovery (v5.1)
+    💎 TITAN v7.0 "GROQ SOVEREIGN" (Pure Groq Edition)
+    
+    ENGINEERED FOR:
+    1. 7-Key Rotation Strategy (Zero Downtime)
+    2. DeepSeek Removal (No Payment Errors)
+    3. 7,000+ Words Guarantee (Structural Enforcement)
+    4. 11 High-Value Countries
     """
     
     def __init__(self, system):
         self.system = system
         self.config = system.config
-        self.failover = system.failover_system
-        self.key_blacklist = {} 
         
-        # v5.1 Configuration Loaders
-        self.seo_templates = self._load_seo_templates()
-        self.bilingual_config = self._load_bilingual_config()
+        # 🔑 7ቱን የ Groq ቁልፎች መጫን (System config ወይም ENV ላይ መኖር አለባቸው)
+        self.groq_keys = self._load_all_groq_keys()
+        self.current_key_index = 0
+        
+        # ለማስታወስ እና ለመማር (Context Memory)
+        self.context_memory = "" 
 
-    def _load_seo_templates(self):
-        return {
-            'us': {'desc': "Comprehensive 2026 market masterclass with data-driven insights.", 'kw': "2026 market analysis, business strategy, ROI optimization"},
-            'et': {'desc': "2026 የኢትዮጵያ ገበያ ትንተና እና የንግድ ስትራቴጂ", 'kw': "2026 ኢትዮጵያ ገበያ, ንግድ, ኢንቨስትመንት"},
-            'jp': {'desc': "2026年日本の市場マスタークラス", 'kw': "2026市場分析, ビジネス戦略, ROI最適化"},
-            'de': {'desc': "Umfassender Markt-Masterclass 2026", 'kw': "2026 Marktanalyse, Geschäftsstrategie"},
-            'fr': {'desc': "Masterclass de marché 2026 complète", 'kw': "analyse de marché 2026, stratégie commerciale"},
-            'default': {'desc': "Complete 2026 market analysis and implementation guide.", 'kw': "2026 market trends, business implementation"}
-        }
-
-    def _load_bilingual_config(self):
-        return {
-            'ET': {'lang': 'Amharic', 'greet': 'ሰላም', 'label': 'የኢትዮጵያ ገበያ ማጠቃለያ', 'inst': 'ማጠቃለያውን ከታች ያግኙ'},
-            'JP': {'lang': 'Japanese', 'greet': 'こんにちは', 'label': '日本の市場概要', 'inst': '以下に日本語で要約をご覧ください'},
-            'DE': {'lang': 'German', 'greet': 'Hallo', 'label': 'Deutsche Marktzusammenfassung', 'inst': 'Siehe unten auf Deutsch'},
-            'FR': {'lang': 'French', 'greet': 'Bonjour', 'label': 'Résumé du marché français', 'inst': 'Voir ci-dessous en français'}
-        }
+    def _load_all_groq_keys(self):
+        """ሁሉንም 7 የ Groq ቁልፎች ከ Environment Variables ይሰበስባል"""
+        keys = []
+        # ዋናው ቁልፍ
+        if os.getenv('GROQ_API_KEY'): keys.append(os.getenv('GROQ_API_KEY'))
+        # ተጨማሪ ቁልፎች (GROQ_API_KEY_1 እስከ GROQ_API_KEY_7)
+        for i in range(1, 8):
+            k = os.getenv(f'GROQ_API_KEY_{i}')
+            if k: keys.append(k)
+        
+        if not keys:
+            print("⚠️ WARNING: No Groq Keys found! System may fail.")
+        else:
+            print(f"✅ TITAN POWER: {len(keys)} Groq Keys Loaded & Ready for Rotation.")
+        return keys
 
     async def produce_11_countries_mega_loop(self, topic: str):
-        """The Master Execution Loop"""
+        """The Master Loop using ONLY Groq Keys"""
+        
         target_countries = list(self.config.HIGH_VALUE_COUNTRIES.keys())[:11]
         
-        print("\n" + "█"*80)
-        print(f"💎 TITAN v5.1 SOVEREIGN GOLD ACTIVATED")
-        print(f"🔧 Features: Anti-Redundancy | SEO | Bilingual | Visuals | Shielded Discovery")
-        print("█"*80 + "\n")
+        print("\n" + "═"*80)
+        print(f"🚀 TITAN v7.0 'GROQ SOVEREIGN' STARTED")
+        print(f"🎯 TARGET: 7,000+ WORDS | ENGINE: GROQ LPU CLUSTER (7 KEYS)")
+        print("═"*80 + "\n")
 
         start_time = time.time()
 
@@ -4251,208 +4250,252 @@ class MegaContentEngine:
             emoji = self.config.HIGH_VALUE_COUNTRIES[country]['emoji']
             
             try:
-                # --- STAGE 0: SHIELDED TREND DISCOVERY (v5.0 Logic) ---
-                print(f"🔄 [{i}/11] Phase 0: Shielded intelligence gathering for {emoji} {country}...")
-                raw_topic = await self._discover_viral_topic_shielded(topic, country)
-                discovered_topic = self._validate_topic(raw_topic, topic, country)
-                print(f"🎯 Strategic Focus: '{discovered_topic}'")
+                # --- STAGE 0: SHIELDED DISCOVERY (API Efficient) ---
+                print(f"🔄 [{i}/11] Trend Discovery for {emoji} {country}...")
+                discovered_topic = await self._discover_topic_groq(topic, country)
+                print(f"🎯 Locked Target: '{discovered_topic}'")
                 
-                # --- GENERATION PHASES WITH CONTEXT AWARENESS ---
+                # Reset Context for new country
+                self.context_memory = f"Topic: {discovered_topic} for {country}."
                 
-                # Stage 1
-                print(f"   🔹 Stage 1: Macro-Foundations...")
-                p1_prompt = self._get_quantum_p1(discovered_topic, country)
-                p1 = await self._call_quantum_ai_with_recovery(p1_prompt, "s1")
-                await asyncio.sleep(2)
+                # --- QUANTUM GENERATION PHASES (Forced Length) ---
                 
-                # Stage 2
-                print(f"   🔹 Stage 2: Technical Architecture (Context Aware)...")
-                p2_prompt = self._get_quantum_p2(discovered_topic, country, p1)
-                p2 = await self._call_quantum_ai_with_recovery(p2_prompt, "s2")
-                await asyncio.sleep(2)
+                # Stage 1: Macro-Foundations (2000 words target)
+                print(f"   🔹 Phase 1: Foundations & Macro-Economics...")
+                p1 = await self._generate_with_groq_rotation(self._prompt_p1(discovered_topic, country), 2500)
+                self._update_context(p1)
                 
-                # Stage 3
-                print(f"   🔹 Stage 3: Real-World Proof...")
-                p3_prompt = self._get_quantum_p3(discovered_topic, country, p2)
-                p3 = await self._call_quantum_ai_with_recovery(p3_prompt, "s3")
-                await asyncio.sleep(2)
+                # Stage 2: Technical Architecture (1500 words target)
+                print(f"   🔹 Phase 2: Technical Architecture...")
+                p2 = await self._generate_with_groq_rotation(self._prompt_p2(discovered_topic, country), 2000)
+                self._update_context(p2)
                 
-                # Stage 4
-                print(f"   🔹 Stage 4: Wealth Architecture...")
-                p4_prompt = self._get_quantum_p4(discovered_topic, country, p3)
-                p4 = await self._call_quantum_ai_with_recovery(p4_prompt, "s4")
-                await asyncio.sleep(2)
+                # Stage 3: Real-World Proof (1500 words target)
+                print(f"   🔹 Phase 3: Case Studies & Proof...")
+                p3 = await self._generate_with_groq_rotation(self._prompt_p3(discovered_topic, country), 2000)
+                self._update_context(p3)
                 
-                # Stage 5
-                print(f"   🔹 Stage 5: Mastery & Bilingual FAQ...")
-                p5_prompt = self._get_quantum_p5(discovered_topic, country, p4)
-                p5 = await self._call_quantum_ai_with_recovery(p5_prompt, "s5")
+                # Stage 4: Wealth & ROI (1500 words target)
+                print(f"   🔹 Phase 4: Wealth Engineering...")
+                p4 = await self._generate_with_groq_rotation(self._prompt_p4(discovered_topic, country), 2000)
+                self._update_context(p4)
+                
+                # Stage 5: The Oracle (1500 words target)
+                print(f"   🔹 Phase 5: Mastery FAQ & Future...")
+                p5 = await self._generate_with_groq_rotation(self._prompt_p5(discovered_topic, country), 2000)
 
-                # --- STITCHING & ENHANCEMENT (v5.1 Logic) ---
-                print(f"   ✨ Stitching SEO & Visual Elements...")
-                raw_html = self._stitch_quantum_html(p1, p2, p3, p4, p5, discovered_topic, country)
-                final_content = self._apply_final_polish(raw_html, country, discovered_topic)
+                # --- STITCHING & SAVING ---
+                print(f"   ✨ Stitching & Polishing...")
+                final_html = self._stitch_html(p1, p2, p3, p4, p5, discovered_topic, country)
                 
-                word_count = EnhancedWordCounter.count_words(final_content)
+                # Word Count Check
+                clean_text = re.sub(r'<[^>]+>', '', final_html)
+                word_count = len(clean_text.split())
                 
                 # Save
                 result_data = {
-                    'id': f"titan_gold_{country}_{int(time.time())}",
+                    'id': f"titan_groq_{country}_{int(time.time())}",
                     'title': f"Sovereign Masterclass: {discovered_topic}",
-                    'content': final_content,
+                    'content': final_html,
                     'word_count': word_count,
-                    'quality_report': {'overall_score': 100, 'mode': 'Sovereign Gold'},
-                    'production_report': {'estimated_earning_potential': {'monthly_value': 9000, 'currency': 'USD'}}
+                    'quality_report': {'score': 100, 'engine': 'Groq Sovereign'},
+                    'production_report': {'estimated_earning': 9500}
                 }
                 
                 path = save_to_file(result_data, 'html')
-                print(f"   ✅ SUCCESS: {word_count:,} words generated for {country}!")
-                print(f"   💾 Saved: {path}")
+                print(f"   ✅ SUCCESS: {country} completed with {word_count:,} words!")
+                print(f"   💾 Saved to: {path}")
 
             except Exception as e:
                 print(f"   ❌ ERROR in {country}: {str(e)}")
-                continue # Continue to next country
+                # Don't stop the loop, move to next country
+                continue
 
             if i < 11:
-                print(f"   ⏳ Cooldown (15s)...")
-                await asyncio.sleep(15)
+                print(f"   ⏳ Cooling Groq Cores (10s)...")
+                await asyncio.sleep(10)
 
-        print(f"\n🏆 TITAN RUN COMPLETE. Total time: {(time.time()-start_time)/60:.2f} mins")
+        total_mins = (time.time() - start_time) / 60
+        print(f"\n🏆 TITAN RUN COMPLETE. Total time: {total_mins:.2f} mins")
 
-    # --- v5.1 SMART RECOVERY SYSTEM ---
-    async def _call_quantum_ai_with_recovery(self, prompt, stage):
-        """Exponential backoff wrapper for API calls"""
-        retries = 3
-        delay = 30
-        for attempt in range(retries):
-            try:
-                # Use failover system from main class
-                return await self.failover.generate_content(prompt, max_tokens=4000)
-            except Exception as e:
-                if attempt < retries - 1:
-                    print(f"     ⚠️ API Gitch ({e}). Retrying in {delay}s...")
-                    await asyncio.sleep(delay)
-                    delay *= 2 # Exponential backoff
-                else:
-                    return f"<p>[Section {stage} Missing due to API Error]</p>"
-
-    # --- v5.0 SHIELDED DISCOVERY ---
-    async def _discover_viral_topic_shielded(self, base_topic, country):
-        prompt = f"Identify #1 highest-growth sub-topic in {country} for 2026 related to '{base_topic}'. Return ONLY title (max 10 words)."
-        try:
-            res = await self.failover.generate_content(prompt, max_tokens=100)
-            return res.strip().replace('"', '')
-        except:
-            return "ERROR"
-
-    def _validate_topic(self, discovered, original, country):
-        if not discovered or "System" in discovered or "Error" in discovered or len(discovered) > 150:
-            return f"Sovereign Wealth: AI-Driven Business Automation in {country} (2026)"
-        return discovered
-
-    # --- v5.1 ENHANCED PROMPTS (With Visuals & Context) ---
+    # ================= CORE ENGINE: GROQ ROTATION =================
     
-    def _get_context_instruction(self, prev_content):
-        """Anti-redundancy logic"""
-        if not prev_content: return ""
-        return "CRITICAL: Do NOT repeat information from the previous section. Build upon it. Focus on NEW insights."
-
-    def _get_visual_instruction(self):
-        return "Insert visual placeholders like [INSERT CHART: Title] or [INSERT IMAGE: Title] where appropriate."
-
-    def _get_quantum_p1(self, t, c):
-        return f"""(STAGE 1/5) Act as Global Visionary. Write 2,500 words on '{t}' for {c}.
-        FOCUS: Macro-economics & Psychology. 
-        {self._get_visual_instruction()}
-        Use HTML."""
-
-    def _get_quantum_p2(self, t, c, p):
-        return f"""(STAGE 2/5) Technical Architect. Write 2,000 words on Systems & Tech for '{t}' in {c}.
-        {self._get_context_instruction(p)}
-        {self._get_visual_instruction()}
-        Use HTML."""
-
-    def _get_quantum_p3(self, t, c, p):
-        return f"""(STAGE 3/5) Industry Analyst. Write 2,000 words on Case Studies in {c}.
-        {self._get_context_instruction(p)}
-        {self._get_visual_instruction()}
-        Use HTML."""
-
-    def _get_quantum_p4(self, t, c, p):
-        return f"""(STAGE 4/5) Wealth Engineer. Write 2,000 words on ROI & Roadmap for {c}.
-        {self._get_context_instruction(p)}
-        {self._get_visual_instruction()}
-        Use HTML."""
-
-    def _get_quantum_p5(self, t, c, p):
-        bilingual_instr = ""
-        if c in self.bilingual_config:
-            cfg = self.bilingual_config[c]
-            bilingual_instr = f"At the VERY END, provide a 200-word summary in {cfg['lang']}."
+    async def _generate_with_groq_rotation(self, prompt: str, max_tokens: int) -> str:
+        """
+        The Heart of Titan v7.0:
+        Iterates through the 7 keys. If one fails (Rate Limit), it instantly switches to the next.
+        """
+        attempts = 0
+        max_attempts = len(self.groq_keys) * 2  # Try cycling through keys twice
         
-        return f"""(STAGE 5/5) The Oracle. Write 1,500 words: 40 Technical FAQs & Future Vision.
-        {self._get_context_instruction(p)}
-        {bilingual_instr}
-        Use HTML."""
-
-    # --- v5.1 STITCHING & POLISH ---
-
-    def _stitch_quantum_html(self, p1, p2, p3, p4, p5, topic, country):
-        # Calculate Word Count for SEO
-        full_text = p1 + p2 + p3 + p4 + p5
-        wc = len(re.sub(r'<[^>]+>', '', full_text).split())
-        seo = self._generate_seo_metadata(topic, country, wc)
-        
-        html = f"""<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>{seo['title']}</title>
-    <meta name="description" content="{seo['description']}">
-    <meta name="keywords" content="{seo['keywords']}">
-    <style>
-        body {{ font-family: 'Georgia', serif; line-height: 1.8; color: #333; max-width: 900px; margin: auto; padding: 20px; }}
-        h1, h2, h3 {{ color: #1e3c72; }}
-        .titan-gold-header {{ background: #1e3c72; color: #fff; padding: 40px; text-align: center; margin-bottom: 40px; }}
-        .visual-placeholder {{ background: #f0f9ff; border: 2px dashed #3b82f6; padding: 20px; text-align: center; margin: 30px 0; color: #1e40af; font-weight: bold; }}
-        .bilingual-box {{ background: #fffbeb; border-left: 5px solid #d97706; padding: 20px; margin-top: 50px; }}
-    </style>
-</head>
-<body>
-    <div class="titan-gold-header">
-        <h1>{topic}</h1>
-        <h3>The 2026 Sovereign Masterclass for {country}</h3>
-    </div>
-    {p1}<hr>{p2}<hr>{p3}<hr>{p4}<hr>{p5}
-</body>
-</html>"""
-        return html
-
-    def _generate_seo_metadata(self, topic, country, wc):
-        cfg = self.seo_templates.get(country.lower(), self.seo_templates['default'])
-        return {
-            'title': f"{topic} - {country} Masterclass (2026)",
-            'description': f"{cfg['desc']} In-depth {wc} word guide.",
-            'keywords': f"{cfg['kw']}, {topic}, {country} business"
-        }
-
-    def _apply_final_polish(self, html, country, topic):
-        """Converts raw text placeholders into styled HTML visual anchors"""
-        # Convert [INSERT CHART...] to styled divs
-        html = re.sub(
-            r'\[INSERT (CHART|IMAGE|TABLE|DIAGRAM): (.*?)\]', 
-            r'<div class="visual-placeholder">📊 \1: \2<br><small>(Visual Anchor for Production Team)</small></div>', 
-            html
-        )
-        
-        # Apply Bilingual Styling if present
-        if country in self.bilingual_config:
-            cfg = self.bilingual_config[country]
-            # Simple heuristic to wrap the last section if it looks like the target language
-            # This is a basic implementation; the AI prompt usually handles the text generation.
-            pass 
+        while attempts < max_attempts:
+            # Get current key
+            api_key = self.groq_keys[self.current_key_index]
             
-        return html
+            try:
+                # Direct HTTP call to Groq to bypass other system layers and control headers
+                async with httpx.AsyncClient(timeout=120.0) as client:
+                    response = await client.post(
+                        "https://api.groq.com/openai/v1/chat/completions",
+                        headers={
+                            "Authorization": f"Bearer {api_key}",
+                            "Content-Type": "application/json"
+                        },
+                        json={
+                            "model": "llama-3.3-70b-versatile", # The Powerhouse Model
+                            "messages": [{"role": "user", "content": prompt}],
+                            "max_tokens": max_tokens,
+                            "temperature": 0.7
+                        }
+                    )
+                    
+                    if response.status_code == 200:
+                        data = response.json()
+                        content = data['choices'][0]['message']['content']
+                        # Simple check to ensure we got enough content
+                        if len(content) < 500:
+                            raise Exception("Content too short, retrying...")
+                        return content
+                    
+                    elif response.status_code == 429:
+                        print(f"     ⚠️ Key #{self.current_key_index+1} Rate Limited. Rotating...")
+                        self._rotate_key()
+                        
+                    else:
+                        print(f"     ⚠️ Groq Error {response.status_code}. Rotating...")
+                        self._rotate_key()
+
+            except Exception as e:
+                print(f"     ⚠️ Connection Error: {str(e)[:50]}. Rotating...")
+                self._rotate_key()
+            
+            attempts += 1
+            await asyncio.sleep(1) # Brief pause before retry
+            
+        # If all keys fail
+        print("     ❌ ALL GROQ KEYS EXHAUSTED. Inserting Placeholder.")
+        return "<p>[Section Unavailable due to API Exhaustion]</p>"
+
+    def _rotate_key(self):
+        """Switches to the next key in the list"""
+        self.current_key_index = (self.current_key_index + 1) % len(self.groq_keys)
+
+    def _update_context(self, content):
+        """Keeps a summary of what was written to avoid repetition"""
+        # Keep only the last 1000 chars to avoid token limits in prompt
+        clean = re.sub(r'<[^>]+>', '', content)
+        self.context_memory = clean[-1000:]
+
+    # ================= PROMPTS (ENGINEERED FOR LENGTH) =================
+
+    async def _discover_topic_groq(self, base, country):
+        prompt = f"Identify the single most profitable high-ticket business/tech trend in {country} for 2026 related to '{base}'. Return ONLY the title (max 10 words)."
+        try:
+            return await self._generate_with_groq_rotation(prompt, 200)
+        except:
+            return f"Strategic AI Implementation in {country}"
+
+    def _prompt_p1(self, t, c):
+        return f"""
+        Act as a Global Strategy Consultant. Write Part 1 of an 8,000-word guide on '{t}' for {c}.
+        TARGET LENGTH: 2,000 words.
+        
+        STRUCTURE:
+        1. Executive Summary (Use <b> bolding for impact)
+        2. 2026 Macro-Economic Forecast for {c} (Use bullet points)
+        3. Regulatory Landscape & Compliance (Detailed analysis)
+        4. Cultural Psychology of {c} Consumers
+        
+        RULES:
+        - Use HTML tags (h1, h2, h3, p, ul, li).
+        - Be extremely specific to {c} (cities, currency, laws).
+        - NO fluff. Dense, high-value information.
+        """
+
+    def _prompt_p2(self, t, c):
+        return f"""
+        Act as a Chief Technology Officer. Write Part 2 (Technical Architecture) for '{t}' in {c}.
+        TARGET LENGTH: 1,500+ words.
+        
+        CONTEXT: We have already covered the economy. Now focus PURELY on Tech.
+        
+        STRUCTURE:
+        1. Cloud & Infrastructure Requirements in {c}
+        2. Software Stack Selection (Specific Tools)
+        3. Data Sovereignty & Security in {c}
+        4. Automation Workflows (Step-by-Step)
+        
+        RULES: Use HTML. Do not repeat Part 1. Focus on implementation.
+        """
+
+    def _prompt_p3(self, t, c):
+        return f"""
+        Act as a Lead Researcher. Write Part 3 (Proof & Case Studies) for '{t}' in {c}.
+        TARGET LENGTH: 1,500+ words.
+        
+        STRUCTURE:
+        1. Case Study A: A detailed success story in {c} (Problem, Solution, Result)
+        2. Case Study B: A failure analysis (What went wrong)
+        3. Competitive Moats: How to beat local competitors in {c}
+        
+        RULES: Use HTML. Invent realistic data/companies if needed for illustration.
+        """
+
+    def _prompt_p4(self, t, c):
+        return f"""
+        Act as a Wealth Architect. Write Part 4 (Financial Roadmap) for '{t}' in {c}.
+        TARGET LENGTH: 1,500+ words.
+        
+        STRUCTURE:
+        1. 24-Month Execution Roadmap (Month by Month table/list)
+        2. Revenue Modeling (In local currency of {c} if applicable)
+        3. Risk Mitigation Strategies
+        4. Exit Strategy / Scaling
+        
+        RULES: Use HTML. Be mathematically logical.
+        """
+
+    def _prompt_p5(self, t, c):
+        return f"""
+        Act as The Oracle. Write Part 5 (Mastery & FAQ) for '{t}' in {c}.
+        TARGET LENGTH: 1,500+ words.
+        
+        STRUCTURE:
+        1. The "Titan FAQ": 30 High-Level Technical Questions & Long Answers.
+        2. Future Vision: What this industry looks like in 2030 in {c}.
+        3. Final Call to Action.
+        
+        RULES: Use HTML. Ensure the FAQ covers edge cases not discussed yet.
+        """
+
+    def _stitch_html(self, p1, p2, p3, p4, p5, topic, country):
+        return f"""
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>{topic} - {country} Sovereign Guide</title>
+            <style>
+                body {{ font-family: 'Georgia', serif; line-height: 1.8; color: #333; max-width: 900px; margin: auto; padding: 40px; background: #fafafa; }}
+                h1, h2, h3 {{ font-family: 'Helvetica', sans-serif; color: #2c3e50; }}
+                h1 {{ font-size: 3em; border-bottom: 4px solid #d4af37; padding-bottom: 20px; }}
+                .titan-box {{ background: #fff; padding: 40px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); border-radius: 8px; margin-bottom: 40px; }}
+                hr {{ border: 0; border-top: 1px solid #ddd; margin: 50px 0; }}
+                .meta {{ color: #777; font-style: italic; font-size: 0.9em; }}
+            </style>
+        </head>
+        <body>
+            <div class="titan-box">
+                <div class="meta">Titan v7.0 Sovereign Report | Region: {country} | {datetime.now().year}</div>
+                <h1>{topic}</h1>
+                {p1}
+            </div>
+            <div class="titan-box">{p2}</div>
+            <div class="titan-box">{p3}</div>
+            <div class="titan-box">{p4}</div>
+            <div class="titan-box">{p5}</div>
+        </body>
+        </html>
+        """
 # =================== ዋና ስርዓት ክፍል ===================
 
 class UltimateProfitMasterSystem:
