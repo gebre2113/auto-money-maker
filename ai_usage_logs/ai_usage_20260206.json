@@ -118,5 +118,185 @@
     "error": "Groq API Error: Error code: 400 - {'error': {'message': 'The model",
     "response_time": 0.13917016983032227,
     "fallback_order": 2
+  },
+  {
+    "timestamp": "2026-02-06T15:03:35.575966",
+    "model": "gemini",
+    "model_name": "Gemini Pro (Google)",
+    "task_type": "refinement",
+    "success": false,
+    "error": "Gemini API Error: 400 API key not valid. Please pass a valid API key",
+    "response_time": 0.561546802520752,
+    "fallback_order": 1
+  },
+  {
+    "timestamp": "2026-02-06T15:03:35.923845",
+    "model": "groq",
+    "model_name": "Llama 3 (Groq)",
+    "task_type": "refinement",
+    "success": false,
+    "error": "Groq API Error: Error code: 400 - {'error': {'message': 'The model",
+    "response_time": 0.9094300270080566,
+    "fallback_order": 2
+  },
+  {
+    "timestamp": "2026-02-06T15:03:37.011937",
+    "model": "gemini",
+    "model_name": "Gemini Pro (Google)",
+    "task_type": "refinement",
+    "success": false,
+    "error": "Gemini API Error: 400 API key not valid. Please pass a valid API key",
+    "response_time": 0.08530783653259277,
+    "fallback_order": 1
+  },
+  {
+    "timestamp": "2026-02-06T15:03:37.119958",
+    "model": "groq",
+    "model_name": "Llama 3 (Groq)",
+    "task_type": "refinement",
+    "success": false,
+    "error": "Groq API Error: Error code: 400 - {'error': {'message': 'The model",
+    "response_time": 0.193342924118042,
+    "fallback_order": 2
+  },
+  {
+    "timestamp": "2026-02-06T15:03:38.206189",
+    "model": "gemini",
+    "model_name": "Gemini Pro (Google)",
+    "task_type": "refinement",
+    "success": false,
+    "error": "Gemini API Error: 400 API key not valid. Please pass a valid API key",
+    "response_time": 0.08340024948120117,
+    "fallback_order": 1
+  },
+  {
+    "timestamp": "2026-02-06T15:03:38.311188",
+    "model": "groq",
+    "model_name": "Llama 3 (Groq)",
+    "task_type": "refinement",
+    "success": false,
+    "error": "Groq API Error: Error code: 400 - {'error': {'message': 'The model",
+    "response_time": 0.18840384483337402,
+    "fallback_order": 2
+  },
+  {
+    "timestamp": "2026-02-06T15:05:10.441999",
+    "model": "gemini",
+    "model_name": "Gemini Pro (Google)",
+    "task_type": "refinement",
+    "success": false,
+    "error": "Gemini API Error: 400 API key not valid. Please pass a valid API key",
+    "response_time": 0.0833127498626709,
+    "fallback_order": 1
+  },
+  {
+    "timestamp": "2026-02-06T15:05:10.547397",
+    "model": "groq",
+    "model_name": "Llama 3 (Groq)",
+    "task_type": "refinement",
+    "success": false,
+    "error": "Groq API Error: Error code: 400 - {'error': {'message': 'The model",
+    "response_time": 0.18871450424194336,
+    "fallback_order": 2
+  },
+  {
+    "timestamp": "2026-02-06T15:05:11.633131",
+    "model": "gemini",
+    "model_name": "Gemini Pro (Google)",
+    "task_type": "refinement",
+    "success": false,
+    "error": "Gemini API Error: 400 API key not valid. Please pass a valid API key",
+    "response_time": 0.08264470100402832,
+    "fallback_order": 1
+  },
+  {
+    "timestamp": "2026-02-06T15:05:11.729602",
+    "model": "groq",
+    "model_name": "Llama 3 (Groq)",
+    "task_type": "refinement",
+    "success": false,
+    "error": "Groq API Error: Error code: 400 - {'error': {'message': 'The model",
+    "response_time": 0.17911815643310547,
+    "fallback_order": 2
+  },
+  {
+    "timestamp": "2026-02-06T15:05:12.815619",
+    "model": "gemini",
+    "model_name": "Gemini Pro (Google)",
+    "task_type": "refinement",
+    "success": false,
+    "error": "Gemini API Error: 400 API key not valid. Please pass a valid API key",
+    "response_time": 0.08292889595031738,
+    "fallback_order": 1
+  },
+  {
+    "timestamp": "2026-02-06T15:05:12.910898",
+    "model": "groq",
+    "model_name": "Llama 3 (Groq)",
+    "task_type": "refinement",
+    "success": false,
+    "error": "Groq API Error: Error code: 400 - {'error': {'message': 'The model",
+    "response_time": 0.17821216583251953,
+    "fallback_order": 2
+  },
+  {
+    "timestamp": "2026-02-06T15:06:45.099493",
+    "model": "gemini",
+    "model_name": "Gemini Pro (Google)",
+    "task_type": "refinement",
+    "success": false,
+    "error": "Gemini API Error: 400 API key not valid. Please pass a valid API key",
+    "response_time": 0.08107614517211914,
+    "fallback_order": 1
+  },
+  {
+    "timestamp": "2026-02-06T15:06:45.204949",
+    "model": "groq",
+    "model_name": "Llama 3 (Groq)",
+    "task_type": "refinement",
+    "success": false,
+    "error": "Groq API Error: Error code: 400 - {'error': {'message': 'The model",
+    "response_time": 0.18653321266174316,
+    "fallback_order": 2
+  },
+  {
+    "timestamp": "2026-02-06T15:06:46.292247",
+    "model": "gemini",
+    "model_name": "Gemini Pro (Google)",
+    "task_type": "refinement",
+    "success": false,
+    "error": "Gemini API Error: 400 API key not valid. Please pass a valid API key",
+    "response_time": 0.08397078514099121,
+    "fallback_order": 1
+  },
+  {
+    "timestamp": "2026-02-06T15:06:46.384832",
+    "model": "groq",
+    "model_name": "Llama 3 (Groq)",
+    "task_type": "refinement",
+    "success": false,
+    "error": "Groq API Error: Error code: 400 - {'error': {'message': 'The model",
+    "response_time": 0.17653989791870117,
+    "fallback_order": 2
+  },
+  {
+    "timestamp": "2026-02-06T15:06:47.468260",
+    "model": "gemini",
+    "model_name": "Gemini Pro (Google)",
+    "task_type": "refinement",
+    "success": false,
+    "error": "Gemini API Error: 400 API key not valid. Please pass a valid API key",
+    "response_time": 0.08093571662902832,
+    "fallback_order": 1
+  },
+  {
+    "timestamp": "2026-02-06T15:06:47.568787",
+    "model": "groq",
+    "model_name": "Llama 3 (Groq)",
+    "task_type": "refinement",
+    "success": false,
+    "error": "Groq API Error: Error code: 400 - {'error': {'message': 'The model",
+    "response_time": 0.18146753311157227,
+    "fallback_order": 2
   }
 ]
