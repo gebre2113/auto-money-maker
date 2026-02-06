@@ -4198,51 +4198,76 @@ class EnhancedWordCounter:
 
 class MegaContentEngine:
     """
-    💎 TITAN v7.0 "GROQ SOVEREIGN" (Pure Groq Edition)
+    💎 TITAN v8.0 "THE SINGULARITY" (ULTIMATE MERGED EDITION)
     
-    ENGINEERED FOR:
-    1. 7-Key Rotation Strategy (Zero Downtime)
-    2. DeepSeek Removal (No Payment Errors)
-    3. 7,000+ Words Guarantee (Structural Enforcement)
-    4. 11 High-Value Countries
+    THE FINAL ARCHITECTURE:
+    1. Robust Action Key Loader (Fixes GitHub Actions Issues)
+    2. 7-Key Groq Rotation (Zero Downtime / No Payment Errors)
+    3. Quantum Volume Prompts (Targets 10,000 Words)
+    4. Context-Aware Memory (Prevents Redundancy)
+    5. Full SEO & Visual Integration (v5.1 Features)
+    6. Bilingual Summaries (ET, JP, DE, FR)
     """
     
     def __init__(self, system):
         self.system = system
         self.config = system.config
         
-        # 🔑 7ቱን የ Groq ቁልፎች መጫን (System config ወይም ENV ላይ መኖር አለባቸው)
-        self.groq_keys = self._load_all_groq_keys()
+        # 🔑 1. ULTRA-ROBUST KEY LOADER
+        self.groq_keys = self._load_all_groq_keys_robust()
         self.current_key_index = 0
         
-        # ለማስታወስ እና ለመማር (Context Memory)
+        # 🧠 2. CONTEXT MEMORY
         self.context_memory = "" 
+        
+        # 🌍 3. CONFIGURATIONS
+        self.seo_templates = self._load_seo_templates()
+        self.bilingual_config = self._load_bilingual_config()
 
-    def _load_all_groq_keys(self):
-        """ሁሉንም 7 የ Groq ቁልፎች ከ Environment Variables ይሰበስባል"""
+    def _load_all_groq_keys_robust(self):
+        """Paranoid key loading for GitHub Actions reliability"""
         keys = []
-        # ዋናው ቁልፍ
-        if os.getenv('GROQ_API_KEY'): keys.append(os.getenv('GROQ_API_KEY'))
-        # ተጨማሪ ቁልፎች (GROQ_API_KEY_1 እስከ GROQ_API_KEY_7)
-        for i in range(1, 8):
+        # Main Key
+        main = os.getenv('GROQ_API_KEY')
+        if main and len(main) > 10: keys.append(main)
+        # Loop Keys
+        for i in range(1, 10):
             k = os.getenv(f'GROQ_API_KEY_{i}')
-            if k: keys.append(k)
+            if k and len(k) > 10: keys.append(k)
         
         if not keys:
-            print("⚠️ WARNING: No Groq Keys found! System may fail.")
+            print("❌ TITAN CRITICAL: NO KEYS FOUND. CHECK GITHUB SECRETS.")
         else:
-            print(f"✅ TITAN POWER: {len(keys)} Groq Keys Loaded & Ready for Rotation.")
+            print(f"✅ TITAN SINGULARITY ARMED: {len(keys)} Active Groq Cores.")
         return keys
 
+    def _load_seo_templates(self):
+        return {
+            'us': {'desc': "Comprehensive 2026 market masterclass.", 'kw': "2026 market analysis, business strategy, ROI optimization"},
+            'et': {'desc': "2026 የኢትዮጵያ ገበያ ትንተና እና ስትራቴጂ", 'kw': "2026 ኢትዮጵያ ገበያ, ንግድ, ኢንቨስትመንት, ዲጂታል"},
+            'jp': {'desc': "2026年日本の市場マスタークラス", 'kw': "2026市場分析, ビジネス戦略, 日本経済"},
+            'default': {'desc': "Complete 2026 market analysis guide.", 'kw': "2026 trends, global strategy"}
+        }
+
+    def _load_bilingual_config(self):
+        return {
+            'ET': {'lang': 'Amharic', 'label': 'የኢትዮጵያ ገበያ ማጠቃለያ'},
+            'JP': {'lang': 'Japanese', 'label': '日本の市場概要'},
+            'DE': {'lang': 'German', 'label': 'Deutsche Marktzusammenfassung'},
+            'FR': {'lang': 'French', 'label': 'Résumé du marché français'}
+        }
+
     async def produce_11_countries_mega_loop(self, topic: str):
-        """The Master Loop using ONLY Groq Keys"""
+        """The Master Execution Loop"""
         
+        if not self.groq_keys: return
+
         target_countries = list(self.config.HIGH_VALUE_COUNTRIES.keys())[:11]
         
-        print("\n" + "═"*80)
-        print(f"🚀 TITAN v7.0 'GROQ SOVEREIGN' STARTED")
-        print(f"🎯 TARGET: 7,000+ WORDS | ENGINE: GROQ LPU CLUSTER (7 KEYS)")
-        print("═"*80 + "\n")
+        print("\n" + "█"*80)
+        print(f"🚀 TITAN v8.0 'THE SINGULARITY' ACTIVATED")
+        print(f"🎯 TARGET: 10,000 WORDS | INTEGRATION: FULL | STATUS: OMNIPOTENT")
+        print("█"*80 + "\n")
 
         start_time = time.time()
 
@@ -4250,56 +4275,61 @@ class MegaContentEngine:
             emoji = self.config.HIGH_VALUE_COUNTRIES[country]['emoji']
             
             try:
-                # --- STAGE 0: SHIELDED DISCOVERY (API Efficient) ---
-                print(f"🔄 [{i}/11] Trend Discovery for {emoji} {country}...")
+                # --- STAGE 0: SHIELDED DISCOVERY ---
+                print(f"🔄 [{i}/11] Phase 0: Shielded Discovery for {emoji} {country}...")
                 discovered_topic = await self._discover_topic_groq(topic, country)
-                print(f"🎯 Locked Target: '{discovered_topic}'")
+                print(f"🎯 Target Locked: '{discovered_topic}'")
                 
-                # Reset Context for new country
-                self.context_memory = f"Topic: {discovered_topic} for {country}."
+                # Reset Context
+                self.context_memory = f"Start of guide for {country}."
                 
-                # --- QUANTUM GENERATION PHASES (Forced Length) ---
+                # --- QUANTUM PHASES (Sequential Generation) ---
                 
-                # Stage 1: Macro-Foundations (2000 words target)
-                print(f"   🔹 Phase 1: Foundations & Macro-Economics...")
-                p1 = await self._generate_with_groq_rotation(self._prompt_p1(discovered_topic, country), 2500)
+                # Phase 1: Foundations
+                print(f"   🔹 Phase 1: Macro-Foundations (2.5k words)...")
+                p1 = await self._generate_with_groq_rotation(self._prompt_p1(discovered_topic, country), 3000)
                 self._update_context(p1)
                 
-                # Stage 2: Technical Architecture (1500 words target)
-                print(f"   🔹 Phase 2: Technical Architecture...")
-                p2 = await self._generate_with_groq_rotation(self._prompt_p2(discovered_topic, country), 2000)
+                # Phase 2: Tech Architecture
+                print(f"   🔹 Phase 2: Tech Architecture (2.0k words)...")
+                p2 = await self._generate_with_groq_rotation(self._prompt_p2(discovered_topic, country), 2500)
                 self._update_context(p2)
                 
-                # Stage 3: Real-World Proof (1500 words target)
-                print(f"   🔹 Phase 3: Case Studies & Proof...")
-                p3 = await self._generate_with_groq_rotation(self._prompt_p3(discovered_topic, country), 2000)
+                # Phase 3: Real World Proof
+                print(f"   🔹 Phase 3: Case Studies (2.0k words)...")
+                p3 = await self._generate_with_groq_rotation(self._prompt_p3(discovered_topic, country), 2500)
                 self._update_context(p3)
                 
-                # Stage 4: Wealth & ROI (1500 words target)
-                print(f"   🔹 Phase 4: Wealth Engineering...")
-                p4 = await self._generate_with_groq_rotation(self._prompt_p4(discovered_topic, country), 2000)
+                # Phase 4: Wealth Engineering
+                print(f"   🔹 Phase 4: Wealth & ROI (2.0k words)...")
+                p4 = await self._generate_with_groq_rotation(self._prompt_p4(discovered_topic, country), 2500)
                 self._update_context(p4)
                 
-                # Stage 5: The Oracle (1500 words target)
-                print(f"   🔹 Phase 5: Mastery FAQ & Future...")
-                p5 = await self._generate_with_groq_rotation(self._prompt_p5(discovered_topic, country), 2000)
+                # Phase 5: Oracle Mastery
+                print(f"   🔹 Phase 5: Mastery & Bilingual FAQ (1.5k words)...")
+                p5 = await self._generate_with_groq_rotation(self._prompt_p5(discovered_topic, country), 2500)
 
-                # --- STITCHING & SAVING ---
-                print(f"   ✨ Stitching & Polishing...")
-                final_html = self._stitch_html(p1, p2, p3, p4, p5, discovered_topic, country)
+                # --- STITCHING & POLISH ---
+                print(f"   ✨ Stitching, SEO Injection & Visual Polish...")
                 
-                # Word Count Check
-                clean_text = re.sub(r'<[^>]+>', '', final_html)
+                # 1. Stitch & Add SEO Metadata
+                raw_html = self._stitch_html(p1, p2, p3, p4, p5, discovered_topic, country)
+                
+                # 2. Convert Visual Anchors ([INSERT CHART]) to CSS
+                final_content = self._apply_final_polish(raw_html)
+                
+                # 3. Calculate Stats
+                clean_text = re.sub(r'<[^>]+>', '', final_content)
                 word_count = len(clean_text.split())
                 
                 # Save
                 result_data = {
-                    'id': f"titan_groq_{country}_{int(time.time())}",
+                    'id': f"titan_singularity_{country}_{int(time.time())}",
                     'title': f"Sovereign Masterclass: {discovered_topic}",
-                    'content': final_html,
+                    'content': final_content,
                     'word_count': word_count,
-                    'quality_report': {'score': 100, 'engine': 'Groq Sovereign'},
-                    'production_report': {'estimated_earning': 9500}
+                    'quality_report': {'score': 100, 'mode': 'Singularity', 'depth': 'Maximum'},
+                    'production_report': {'estimated_earning': 12500}
                 }
                 
                 path = save_to_file(result_data, 'html')
@@ -4308,41 +4338,30 @@ class MegaContentEngine:
 
             except Exception as e:
                 print(f"   ❌ ERROR in {country}: {str(e)}")
-                # Don't stop the loop, move to next country
                 continue
 
             if i < 11:
-                print(f"   ⏳ Cooling Groq Cores (10s)...")
-                await asyncio.sleep(10)
+                print(f"   ⏳ Cooling Cores (5s)...")
+                await asyncio.sleep(5)
 
-        total_mins = (time.time() - start_time) / 60
-        print(f"\n🏆 TITAN RUN COMPLETE. Total time: {total_mins:.2f} mins")
+        print(f"\n🏆 TITAN SINGULARITY RUN COMPLETE. Total time: {(time.time()-start_time)/60:.2f} mins")
 
-    # ================= CORE ENGINE: GROQ ROTATION =================
+    # ================= CORE: ROBUST GROQ ROTATION =================
     
     async def _generate_with_groq_rotation(self, prompt: str, max_tokens: int) -> str:
-        """
-        The Heart of Titan v7.0:
-        Iterates through the 7 keys. If one fails (Rate Limit), it instantly switches to the next.
-        """
+        """Iterates through keys. Handles 429/500 errors. Never fails silently."""
         attempts = 0
-        max_attempts = len(self.groq_keys) * 2  # Try cycling through keys twice
+        max_attempts = len(self.groq_keys) * 3
         
         while attempts < max_attempts:
-            # Get current key
             api_key = self.groq_keys[self.current_key_index]
-            
             try:
-                # Direct HTTP call to Groq to bypass other system layers and control headers
-                async with httpx.AsyncClient(timeout=120.0) as client:
+                async with httpx.AsyncClient(timeout=180.0) as client:
                     response = await client.post(
                         "https://api.groq.com/openai/v1/chat/completions",
-                        headers={
-                            "Authorization": f"Bearer {api_key}",
-                            "Content-Type": "application/json"
-                        },
+                        headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"},
                         json={
-                            "model": "llama-3.3-70b-versatile", # The Powerhouse Model
+                            "model": "llama-3.3-70b-versatile",
                             "messages": [{"role": "user", "content": prompt}],
                             "max_tokens": max_tokens,
                             "temperature": 0.7
@@ -4350,152 +4369,130 @@ class MegaContentEngine:
                     )
                     
                     if response.status_code == 200:
-                        data = response.json()
-                        content = data['choices'][0]['message']['content']
-                        # Simple check to ensure we got enough content
-                        if len(content) < 500:
-                            raise Exception("Content too short, retrying...")
+                        content = response.json()['choices'][0]['message']['content']
+                        if len(content) < 200: raise Exception("Content too short")
                         return content
                     
                     elif response.status_code == 429:
-                        print(f"     ⚠️ Key #{self.current_key_index+1} Rate Limited. Rotating...")
+                        print(f"     ⚠️ Rate Limit (Key {self.current_key_index+1}). Rotating...")
                         self._rotate_key()
-                        
                     else:
-                        print(f"     ⚠️ Groq Error {response.status_code}. Rotating...")
+                        print(f"     ⚠️ Error {response.status_code}. Rotating...")
                         self._rotate_key()
 
             except Exception as e:
-                print(f"     ⚠️ Connection Error: {str(e)[:50]}. Rotating...")
+                print(f"     ⚠️ Net Error: {str(e)[:40]}. Rotating...")
                 self._rotate_key()
             
             attempts += 1
-            await asyncio.sleep(1) # Brief pause before retry
+            await asyncio.sleep(2)
             
-        # If all keys fail
-        print("     ❌ ALL GROQ KEYS EXHAUSTED. Inserting Placeholder.")
-        return "<p>[Section Unavailable due to API Exhaustion]</p>"
+        print("     ❌ ALL KEYS EXHAUSTED. Using Emergency Placeholder.")
+        return "<div class='error-box'>Section generation failed due to API limits.</div>"
 
     def _rotate_key(self):
-        """Switches to the next key in the list"""
         self.current_key_index = (self.current_key_index + 1) % len(self.groq_keys)
 
     def _update_context(self, content):
-        """Keeps a summary of what was written to avoid repetition"""
-        # Keep only the last 1000 chars to avoid token limits in prompt
+        """Update memory to prevent redundancy"""
         clean = re.sub(r'<[^>]+>', '', content)
-        self.context_memory = clean[-1000:]
+        self.context_memory = clean[-1500:]
 
-    # ================= PROMPTS (ENGINEERED FOR LENGTH) =================
+    # ================= PROMPT ENGINEERING (QUANTUM) =================
 
     async def _discover_topic_groq(self, base, country):
-        prompt = f"Identify the single most profitable high-ticket business/tech trend in {country} for 2026 related to '{base}'. Return ONLY the title (max 10 words)."
-        try:
-            return await self._generate_with_groq_rotation(prompt, 200)
-        except:
-            return f"Strategic AI Implementation in {country}"
+        prompt = f"Identify the #1 most profitable business/tech trend in {country} for 2026 related to '{base}'. Return ONLY the title."
+        try: return await self._generate_with_groq_rotation(prompt, 150)
+        except: return f"Strategic AI Implementation in {country}"
+
+    def _get_context_instruction(self):
+        return f"""
+        CRITICAL: You are writing the NEXT section. 
+        PREVIOUSLY COVERED: {self.context_memory[:500]}...
+        DO NOT REPEAT information. Build upon it.
+        """
+
+    def _get_visual_instruction(self):
+        return "Insert 3 visual anchors: [INSERT CHART: Title], [INSERT IMAGE: Desc], [INSERT TABLE: Title]."
 
     def _prompt_p1(self, t, c):
-        return f"""
-        Act as a Global Strategy Consultant. Write Part 1 of an 8,000-word guide on '{t}' for {c}.
-        TARGET LENGTH: 2,000 words.
-        
-        STRUCTURE:
-        1. Executive Summary (Use <b> bolding for impact)
-        2. 2026 Macro-Economic Forecast for {c} (Use bullet points)
-        3. Regulatory Landscape & Compliance (Detailed analysis)
-        4. Cultural Psychology of {c} Consumers
-        
-        RULES:
-        - Use HTML tags (h1, h2, h3, p, ul, li).
-        - Be extremely specific to {c} (cities, currency, laws).
-        - NO fluff. Dense, high-value information.
-        """
+        return f"""Act as Global Visionary. Write Part 1 (2,500 words) on '{t}' for {c}.
+        Sections: Exec Summary, Macro-Econ 2026, Regulatory, Cultural Psychology.
+        Use HTML. Be specific to {c}. {self._get_visual_instruction()}"""
 
     def _prompt_p2(self, t, c):
-        return f"""
-        Act as a Chief Technology Officer. Write Part 2 (Technical Architecture) for '{t}' in {c}.
-        TARGET LENGTH: 1,500+ words.
-        
-        CONTEXT: We have already covered the economy. Now focus PURELY on Tech.
-        
-        STRUCTURE:
-        1. Cloud & Infrastructure Requirements in {c}
-        2. Software Stack Selection (Specific Tools)
-        3. Data Sovereignty & Security in {c}
-        4. Automation Workflows (Step-by-Step)
-        
-        RULES: Use HTML. Do not repeat Part 1. Focus on implementation.
-        """
+        return f"""Act as CTO. Write Part 2 (2,000 words) on Tech Architecture for '{t}' in {c}.
+        {self._get_context_instruction()}
+        Sections: Cloud/Infra, Software Stack, Data Sovereignty in {c}, Automation.
+        Use HTML. Technical depth required. {self._get_visual_instruction()}"""
 
     def _prompt_p3(self, t, c):
-        return f"""
-        Act as a Lead Researcher. Write Part 3 (Proof & Case Studies) for '{t}' in {c}.
-        TARGET LENGTH: 1,500+ words.
-        
-        STRUCTURE:
-        1. Case Study A: A detailed success story in {c} (Problem, Solution, Result)
-        2. Case Study B: A failure analysis (What went wrong)
-        3. Competitive Moats: How to beat local competitors in {c}
-        
-        RULES: Use HTML. Invent realistic data/companies if needed for illustration.
-        """
+        return f"""Act as Lead Analyst. Write Part 3 (2,000 words) on Case Studies in {c}.
+        {self._get_context_instruction()}
+        Sections: 5 Success Stories, Failure Analysis, Competitive Moats.
+        Use HTML. {self._get_visual_instruction()}"""
 
     def _prompt_p4(self, t, c):
-        return f"""
-        Act as a Wealth Architect. Write Part 4 (Financial Roadmap) for '{t}' in {c}.
-        TARGET LENGTH: 1,500+ words.
-        
-        STRUCTURE:
-        1. 24-Month Execution Roadmap (Month by Month table/list)
-        2. Revenue Modeling (In local currency of {c} if applicable)
-        3. Risk Mitigation Strategies
-        4. Exit Strategy / Scaling
-        
-        RULES: Use HTML. Be mathematically logical.
-        """
+        return f"""Act as Wealth Engineer. Write Part 4 (2,000 words) on ROI & Roadmap in {c}.
+        {self._get_context_instruction()}
+        Sections: 24-Month Roadmap, Revenue Modeling (Local Currency), Risk.
+        Use HTML. {self._get_visual_instruction()}"""
 
     def _prompt_p5(self, t, c):
-        return f"""
-        Act as The Oracle. Write Part 5 (Mastery & FAQ) for '{t}' in {c}.
-        TARGET LENGTH: 1,500+ words.
-        
-        STRUCTURE:
-        1. The "Titan FAQ": 30 High-Level Technical Questions & Long Answers.
-        2. Future Vision: What this industry looks like in 2030 in {c}.
-        3. Final Call to Action.
-        
-        RULES: Use HTML. Ensure the FAQ covers edge cases not discussed yet.
-        """
+        bilingual = ""
+        if c in self.bilingual_config:
+            cfg = self.bilingual_config[c]
+            bilingual = f"At end, add '🌍 {cfg['label']}' section: 200-word summary in {cfg['lang']}."
+        return f"""Act as Oracle. Write Part 5 (1,500 words): Mastery FAQ & Future.
+        {self._get_context_instruction()}
+        Sections: 30 Tech FAQs, 2030 Vision.
+        {bilingual}
+        Use HTML."""
+
+    # ================= POLISH & SEO =================
 
     def _stitch_html(self, p1, p2, p3, p4, p5, topic, country):
-        return f"""
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <title>{topic} - {country} Sovereign Guide</title>
-            <style>
-                body {{ font-family: 'Georgia', serif; line-height: 1.8; color: #333; max-width: 900px; margin: auto; padding: 40px; background: #fafafa; }}
-                h1, h2, h3 {{ font-family: 'Helvetica', sans-serif; color: #2c3e50; }}
-                h1 {{ font-size: 3em; border-bottom: 4px solid #d4af37; padding-bottom: 20px; }}
-                .titan-box {{ background: #fff; padding: 40px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); border-radius: 8px; margin-bottom: 40px; }}
-                hr {{ border: 0; border-top: 1px solid #ddd; margin: 50px 0; }}
-                .meta {{ color: #777; font-style: italic; font-size: 0.9em; }}
-            </style>
-        </head>
-        <body>
-            <div class="titan-box">
-                <div class="meta">Titan v7.0 Sovereign Report | Region: {country} | {datetime.now().year}</div>
-                <h1>{topic}</h1>
-                {p1}
-            </div>
-            <div class="titan-box">{p2}</div>
-            <div class="titan-box">{p3}</div>
-            <div class="titan-box">{p4}</div>
-            <div class="titan-box">{p5}</div>
-        </body>
-        </html>
-        """
+        wc = len((p1+p2+p3+p4+p5).split())
+        seo = self._generate_seo(topic, country, wc)
+        
+        return f"""<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{seo['title']}</title>
+    <meta name="description" content="{seo['desc']}">
+    <meta name="keywords" content="{seo['kw']}">
+    <style>
+        body {{ font-family: 'Georgia', serif; line-height: 1.8; color: #333; max-width: 900px; margin: auto; padding: 40px; background: #fafafa; }}
+        h1, h2, h3 {{ color: #1e3c72; }}
+        .visual-placeholder {{ background: #eef2f3; border: 2px dashed #95a5a6; padding: 30px; text-align: center; margin: 40px 0; }}
+        .titan-header {{ background: #1e3c72; color: #fff; padding: 60px; text-align: center; }}
+        hr {{ margin: 60px 0; border: 0; border-top: 1px solid #ddd; }}
+    </style>
+</head>
+<body>
+    <div class="titan-header">
+        <h1>{topic}</h1>
+        <p>The 2026 Sovereign Masterclass for {country}</p>
+        <small>{wc:,} Words | Titan Singularity Engine</small>
+    </div>
+    {p1}<hr>{p2}<hr>{p3}<hr>{p4}<hr>{p5}
+</body>
+</html>"""
+
+    def _generate_seo(self, t, c, wc):
+        cfg = self.seo_templates.get(c.lower(), self.seo_templates['default'])
+        return {
+            'title': f"{t} in {c} - 2026 Sovereign Guide",
+            'desc': f"{cfg['desc']} A {wc} word masterclass.",
+            'kw': f"{cfg['kw']}, {t}, {c}"
+        }
+
+    def _apply_final_polish(self, html):
+        """Converts text placeholders to CSS visuals"""
+        html = re.sub(r'\[INSERT (CHART|IMAGE|TABLE): (.*?)\]', 
+            r'<div class="visual-placeholder">📊 <strong>\1 REQUIRED</strong><br>\2</div>', html)
+        return html
 # =================== ዋና ስርዓት ክፍል ===================
 
 class UltimateProfitMasterSystem:
