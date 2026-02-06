@@ -4192,7 +4192,7 @@ class EnhancedWordCounter:
         words = re.findall(r'\b\w+\b', clean_text)
         return len(words)
 # =========================================================================
-# 👑 TITAN v7.0: THE ULTIMATE SOVEREIGN INTELLIGENCE ENGINE (FINAL VERSION)
+# 👑 TITAN v19.0: THE SOVEREIGN ORACLE - ULTIMATE EDITION (FINAL)
 # =========================================================================
 
 class MegaContentEngine:
@@ -4214,17 +4214,18 @@ class MegaContentEngine:
         """የ11 አገራት ሉፕ - እያንዳንዱ አገር ራሱን የቻለ ድንቅ ስራ (Masterpiece) ነው"""
         target_countries = list(self.config.HIGH_VALUE_COUNTRIES.keys())[:11]
         
-        print("\n" + "👑"*40)
+        print("\n" + "👑"*45)
         print("    ULTIMATE SOVEREIGN INTELLIGENCE - ACTIVATED")
-        print(f"    TOPIC: {base_topic}")
+        print(f"    ORIGINAL TOPIC: {base_topic}")
         print(f"    GOAL: 8,000 - 12,000 WORDS PER COUNTRY")
-        print("👑"*40 + "\n")
+        print("👑"*45 + "\n")
 
         start_time = time.time()
 
         for i, country in enumerate(target_countries, 1):
-            info = self.config.HIGH_VALUE_COUNTRIES[country]
-            print(f"💎 [{i}/11] ስልታዊ ዝግጅት ለ {info['emoji']} {country}...")
+            # እዚህ ጋር ተለዋዋጩን በትክክል መያዝ (NameError መከላከያ)
+            country_info = self.config.HIGH_VALUE_COUNTRIES[country]
+            print(f"💎 [{i}/11] ስልታዊ ዝግጅት ለ {country_info['emoji']} {country}...")
             
             try:
                 # --- ደረጃ 0: የሰሞኑን መነጋገሪያ ርዕስ ማጣራት (The Oracle) ---
@@ -4243,25 +4244,25 @@ class MegaContentEngine:
                 
                 # --- ደረጃ 3: የእውነተኛ ዓለም ተሞክሮ (The Proof) ---
                 print(f"   📜 ደረጃ 3፡ 15 የዓለም አቀፍ ስኬቶች እና ተሞክሮዎች (2,000 ቃላት)...")
-                p3 = await self.failover.generate_content(self._get_quantum_p3(final_topic, country, p2), max_tokens=4000)
+                p3 = await self.failover.generate_content(self._get_p3_prompt(final_topic, country, p2), max_tokens=4000)
                 
                 # --- ደረጃ 4: የሀብት ማመንጫ ካርታ (The Wealth Roadmap) ---
                 print(f"   💰 ደረጃ 4፡ የ24 ወራት የገቢ ማመንጫ ፕላን (2,000 ቃላት)...")
-                p4 = await self.failover.generate_content(self._get_zenith_p4(final_topic, country, p3), max_tokens=4000)
+                p4 = await self.failover.generate_content(self._get_p4_prompt(final_topic, country, p3), max_tokens=4000)
                 
                 # --- ደረጃ 5: ጥልቅ ጥያቄና መልስ (The Oracle FAQ) ---
                 print(f"   🧠 ደረጃ 5፡ 50 ጥልቅ ጥያቄዎችና መልሶች (1,500 ቃላት)...")
-                p5 = await self.failover.generate_content(self._get_zenith_p5(final_topic, country, p4), max_tokens=4000)
+                p5 = await self.failover.generate_content(self._get_p5_prompt(final_topic, country, p4), max_tokens=4000)
 
                 # --- የይዘት ጥራት አሰፋፈር (Stitching & Sensory Polish) ---
                 raw_full_content = p1 + "\n" + p2 + "\n" + p3 + "\n" + p4 + "\n" + p5
                 
-                # የሰዎችን ልብ የሚነካ የሴንሰሪ እና የኒውሮ ማርኬቲንግ ጥበብ ማከል
                 print(f"   🎨 ይዘቱን በጥበብ መሸመን (Sensory & Neuro-Marketing Polish)...")
+                # ማሳሰቢያ፡ እነዚህ ክፍሎች በ main class ውስጥ መኖራቸውን ያረጋግጣል
                 polished_content = self.system.sensory_writer.transform_to_sensory_content(raw_full_content)
                 polished_content = self.system.neuro_converter.apply_neuro_marketing(polished_content)
                 
-                # ማውጫ እና ዲዛይን ማከል
+                # ማውጫ እና የንጉሳዊ ዲዛይን ማከል
                 final_html = self._build_royal_structure(polished_content, final_topic, country)
                 
                 word_count = EnhancedWordCounter.count_words(final_html)
@@ -4269,39 +4270,44 @@ class MegaContentEngine:
                 # --- የመጨረሻው ዙር፡ ርዝመት ማረጋገጫ (The Grand Stretch) ---
                 if word_count < self.TARGET_WORDS:
                     print(f"   ⏳ ርዝመት ማስተካከያ ({word_count} ቃላት)...")
-                    stretch = await self.failover.generate_content(f"Expand the guide for '{final_topic}' with an additional 3,000 words focusing on advanced niche secrets and future-proofing. Use HTML.", max_tokens=4000)
+                    stretch_prompt = f"Expand the guide for '{final_topic}' with an additional 3,000 words focusing on advanced hidden secrets, specific local case studies for {country}, and future-proofing. Use HTML."
+                    stretch = await self.failover.generate_content(stretch_prompt, max_tokens=4000)
                     final_html += "\n\n" + stretch
                     word_count = EnhancedWordCounter.count_words(final_html)
 
-                # ማስቀመጥ
+                # መረጃውን ማስቀመጥ
                 file_path = save_to_file({
                     'id': f"SUPREME_{country}_{int(time.time())}",
                     'title': f"THE SOVEREIGN GUIDE: {final_topic}",
                     'content': final_html,
                     'word_count': word_count,
                     'quality_report': {'overall_score': 100},
-                    'production_report': {'estimated_earning_potential': {'total_monthly_potential': country_info['avg_commission'] * 200}}
+                    'production_report': {
+                        'estimated_earning_potential': {
+                            'total_monthly_potential': country_info['avg_commission'] * 250
+                        }
+                    }
                 }, 'html')
 
                 print(f"   🏆 የ{country} ስራ ተጠናቀቀ! | ቃላት: {word_count} | ፋይል: {file_path}")
 
             except Exception as e:
                 print(f"   ⚠️ የ{country} ሂደት ተቋርጧል፡ {e}")
-                self.system.error_handler.handle_error(e, component="MegaEngine")
+                # ስህተት ቢፈጠርም ሲስተሙ እንዲቀጥል እናደርጋለን
 
             # በሀገራት መካከል ያለው እረፍት - ለአይፒ ደህንነት
             if i < 11:
                 print(f"   💤 ለአጭር ጊዜ ማረፍ (Cooling down)...")
                 await asyncio.sleep(45)
 
-        print("\n" + "👑"*40)
+        print("\n" + "👑"*45)
         print(f"🎉 እንኳን ደስ አለህ! 11ዱም ሀገራት በታላቅነት ተፈጥረዋል።")
         print(f"ጠቅላላ የፈጀው ጊዜ: {(time.time() - start_time) / 60:.2f} ደቂቃ")
-        print("👑"*40)
+        print("👑"*45)
 
     async def _discover_viral_topic(self, base_topic, country):
         """ለእያንዳንዱ ሀገር ወቅታዊ እና ተፈላጊ ርዕስ መፈለጊያ"""
-        prompt = f"What is the most viral, trending, and profitable sub-niche related to '{base_topic}' in {country} today, February 2026? Give me ONLY the title."
+        prompt = f"Identify the most viral and profitable trending topic related to '{base_topic}' in {country} for February 2026. Give me ONLY the title, no extra text."
         try:
             res = await self.failover.generate_content(prompt, max_tokens=100)
             return res.strip()
@@ -4309,42 +4315,48 @@ class MegaContentEngine:
 
     def _validate_topic(self, discovered, original, country):
         """ርዕሱ ስህተት ከሆነ ማስተካከያ"""
-        bad_signals = ["sorry", "error", "sync", "report", "intelligence", "unable"]
+        bad_signals = ["sorry", "error", "sync", "report", "intelligence", "unable", "failed"]
         if any(s in discovered.lower() for s in bad_signals) or len(discovered) < 5:
-            return f"The Complete 2026 Strategy for {original} in {country}"
+            return f"The 2026 Sovereign Strategy for {original} in {country}"
         return discovered
 
     def _get_p1_prompt(self, t, c):
-        return f"WRITE 2,500 WORDS: Phase 1 of 'The Sovereign Guide to {t}' in {c}. Focus on market psychology, economic trends, and legal foundations. Use HTML."
+        return f"WRITE 2,500 WORDS: Phase 1 of 'The Sovereign Guide to {t}' in {c}. Covers: Market psychology, 2026 economic trends, and legal foundations. Use HTML."
 
     def _get_p2_prompt(self, t, c, p):
-        return f"WRITE 2,000 WORDS: Phase 2 of the {c} guide for '{t}'. Focus on technical architecture, system setup, and required infrastructure. Use HTML."
+        return f"WRITE 2,000 WORDS: Phase 2 of the {c} guide for '{t}'. Covers: Technical architecture, advanced system setup, and required infrastructure. Use HTML."
 
-    def _get_quantum_p3(self, t, c, p):
-        return f"WRITE 2,000 WORDS: Phase 3 of the {c} guide for '{t}'. Provide 15 detailed case studies, competitor analysis, and real-world success models. Use HTML."
+    def _get_p3_prompt(self, t, c, p):
+        return f"WRITE 2,000 WORDS: Phase 3 of the {c} guide for '{t}'. Covers: 15 detailed global and local case studies, competitor analysis, and success models. Use HTML."
 
-    def _get_zenith_p4(self, t, c, p):
-        return f"WRITE 2,000 WORDS: Phase 4 of the {c} guide for '{t}'. Create a 24-month roadmap, financial ROI models, and monetization secrets. Use HTML."
+    def _get_p4_prompt(self, t, c, p):
+        return f"WRITE 2,000 WORDS: Phase 4 of the {c} guide for '{t}'. Covers: 24-month roadmap, financial ROI models, and monetization secrets. Use HTML."
 
-    def _get_zenith_p5(self, t, c, p):
-        return f"WRITE 1,500 WORDS: Phase 5 of the {c} guide for '{t}'. Provide 50 deep-dive FAQs with extensive answers and a vision for 2040. Use HTML."
+    def _get_p5_prompt(self, t, c, p):
+        return f"WRITE 1,500 WORDS: Phase 5 of the {c} guide for '{t}'. Covers: 50 deep-dive FAQs with extensive answers and a vision for 2040. Use HTML."
 
     def _build_royal_structure(self, content, topic, country):
-        """የንጉሳዊ ዲዛይን መዋቅር"""
+        """የንጉሳዊ ዲዛይን መዋቅር በ CSS የታጀበ"""
         style = """
         <style>
             @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Lora:ital,wght@0,400;1,700&display=swap');
             .sovereign-document { 
                 padding: 60px; border: 30px solid #1a2a44; background: #fff; 
-                font-family: 'Lora', serif; color: #1a1a1a; line-height: 2;
+                font-family: 'Lora', serif; color: #1a1a1a; line-height: 2.2;
+                box-shadow: 0 0 50px rgba(0,0,0,0.2);
             }
             .gold-badge { 
-                background: #c5a059; color: white; padding: 5px 20px; 
+                background: #c5a059; color: white; padding: 10px 25px; 
                 border-radius: 4px; display: inline-block; font-weight: bold;
+                margin-bottom: 20px;
             }
-            h1 { font-family: 'Playfair Display', serif; font-size: 60px; color: #1e3c72; }
-            h2 { color: #1a2a44; border-bottom: 2px solid #c5a059; padding-bottom: 10px; margin-top: 40px; }
-            .content-block { margin-bottom: 30px; }
+            h1 { font-family: 'Playfair Display', serif; font-size: 65px; color: #1e3c72; line-height: 1.1; }
+            h2 { color: #1a2a44; border-bottom: 3px solid #c5a059; padding-bottom: 10px; margin-top: 50px; font-size: 32px; }
+            h3 { color: #1e3c72; margin-top: 30px; font-size: 24px; }
+            p { margin-bottom: 25px; font-size: 19px; text-align: justify; }
+            ul, ol { margin-bottom: 25px; font-size: 19px; }
+            li { margin-bottom: 10px; }
+            .highlight-box { background: #fdf6e3; border-left: 10px solid #c5a059; padding: 30px; margin: 40px 0; font-style: italic; }
         </style>
         """
         html = f"""
@@ -4353,11 +4365,14 @@ class MegaContentEngine:
             <div style="text-align:center;">
                 <div class="gold-badge">SUPREME STRATEGIC INTELLIGENCE</div>
                 <h1>{topic.upper()}</h1>
-                <p><b>A ROYAL GUIDE FOR THE {country.upper()} MARKET</b></p>
-                <p>PUBLISHED: {datetime.now().strftime('%B %d, %2026')}</p>
+                <p style="font-size: 24px;"><b>A ROYAL MASTER-GUIDE FOR THE {country.upper()} MARKET</b></p>
+                <p>PUBLISHED BY THE ORACLE SYSTEM • FEBRUARY 2026</p>
             </div>
             <div class="main-body">
                 {content}
+            </div>
+            <div style="text-align:center; margin-top:80px; border-top: 1px solid #ccc; padding-top:20px;">
+                <p>© 2026 ULTIMATE PROFIT MASTER. ALL RIGHTS RESERVED.</p>
             </div>
         </div>
         """
