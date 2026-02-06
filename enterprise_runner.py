@@ -2350,184 +2350,176 @@ class DynamicCTAEngine:
 
 # =================== ENTERPRISE IMPORT SYSTEM ===================
 
+# =================== ENTERPRISE IMPORT SYSTEM (REFACTORED FOR RELIABILITY v2.0) ===================
+
 class EnterpriseImportSystem:
-    """Enterprise-grade import system with all enhancements"""
+    """
+    An enterprise-grade import system, refactored for direct, reliable, and transparent module loading.
+    It attempts to import the real systems first and only falls back to obvious mocks upon failure.
+    """
     
     def __init__(self):
         self.modules = {}
-        self.enterprise_components = {}
+        self.enterprise_components = {} # This will hold non-core enhancements
         self.import_errors = []
         
     def import_enterprise_system(self) -> Dict:
-        """Import complete enterprise system with all enhancements"""
-        
+        """
+        Imports the complete enterprise system with a clear and direct approach.
+        """
         print("\n" + "="*80)
-        print("🔌 ENTERPRISE SYSTEM IMPORT - ALL COMPONENTS")
+        print("🔌 ENTERPRISE SYSTEM IMPORT - v2.0 RELIABLE DIRECT IMPORT")
         print("="*80)
         
-        results = {
-            'core_systems': {'success': False, 'modules': []},
-            'enhancements': {'success': False, 'modules': []},
-            'integrations': {'success': False, 'modules': []},
-            'errors': []
-        }
+        # --- 1. Import Core Systems ---
+        self._import_core_systems()
         
-        # Import Core Systems (from previous versions)
-        print("\n🎯 CORE PRODUCTION SYSTEMS")
-        print("-" * 40)
+        # --- 2. Import and Initialize Enhancement Engines ---
+        self._import_enhancement_engines()
+
+        # --- 3. Final Summary ---
+        print("\n📦 ENTERPRISE IMPORT SUMMARY")
+        print("-" * 80)
         
-        # Import YouTube Affiliate System
-        try:
-            import youtube_affiliate_system as yt
-            self.modules['YouTubeIntelligenceHunterPro'] = getattr(yt, 'YouTubeIntelligenceHunterPro', None)
-            self.modules['UltraAffiliateManager'] = getattr(yt, 'UltraAffiliateManager', None)
-            self.modules['NeuroMarketingEngine'] = getattr(yt, 'NeuroMarketingEngine', None)
-            
-            core_modules = ['YouTubeIntelligenceHunterPro', 'UltraAffiliateManager', 'NeuroMarketingEngine']
-            for module in core_modules:
-                if self.modules.get(module):
-                    print(f"   ✅ {module}")
-                    results['core_systems']['modules'].append(module)
-                else:
-                    print(f"   ⚠️  {module} (Premium Mock)")
-                    self.modules[module] = self._create_enterprise_mock(module)
-            
-            results['core_systems']['success'] = True
-            
-        except Exception as e:
-            error_msg = f"Core system import: {str(e)[:50]}"
-            print(f"   ⚠️  {error_msg}")
-            self.import_errors.append(error_msg)
-            self._create_core_mocks()
-            results['core_systems']['modules'] = [m + " (Mock)" for m in ['YouTubeIntelligenceHunterPro', 'UltraAffiliateManager']]
+        # Check status of core modules
+        core_status = all(
+            "Mock" not in module.__class__.__name__ 
+            for module in [self.modules.get('youtube_hunter'), self.modules.get('affiliate_manager'), self.modules.get('content_system')]
+            if module is not None
+        )
+        print(f"{'✅' if core_status else '⚠️'} Core Production Systems Initialized.")
         
-        # Import Profit Master System
-        print("\n💰 PROFIT MASTER SYSTEM")
-        print("-" * 40)
-        try:
-            if Path("profit_master_system.py").exists():
-                import profit_master_system as pm
-                self.modules['UltimateProfitMasterSystem'] = getattr(pm, 'UltimateProfitMasterSystem', None)
-                self.modules['AdvancedAIContentGenerator'] = getattr(pm, 'AdvancedAIContentGenerator', None)
-                
-                for module in ['UltimateProfitMasterSystem', 'AdvancedAIContentGenerator']:
-                    if self.modules.get(module):
-                        print(f"   ✅ {module}")
-                        results['core_systems']['modules'].append(module)
-                    else:
-                        print(f"   ⚠️  {module} (Premium Mock)")
-                        self.modules[module] = self._create_enterprise_mock(module)
-                
-            else:
-                print("   ⚠️  profit_master_system.py not found - using enterprise mocks")
-                self._create_profit_mocks()
-                results['core_systems']['modules'].append('UltimateProfitMasterSystem (Enterprise Mock)')
-        
-        except Exception as e:
-            error_msg = f"Profit system import: {str(e)[:50]}"
-            print(f"   ⚠️  {error_msg}")
-            self.import_errors.append(error_msg)
-        
-        # Import Enhancement Systems (New Enterprise Features)
-        print("\n🆕 ENTERPRISE ENHANCEMENTS")
-        print("-" * 40)
-        
-        try:
-            # Cultural Depth Guardian
-            self.enterprise_components['CulturalDepthGuardian'] = CulturalDepthGuardian()
-            print("   ✅ CulturalDepthGuardian")
-            results['enhancements']['modules'].append('CulturalDepthGuardian')
-            
-            # Revenue Forecast Engine
-            self.enterprise_components['RevenueForecastEngine'] = RevenueForecastEngine()
-            print("   ✅ RevenueForecastEngine")
-            results['enhancements']['modules'].append('RevenueForecastEngine')
-            
-            # Ethical Compliance Guardian
-            self.enterprise_components['EthicalComplianceGuardian'] = EthicalComplianceGuardian()
-            print("   ✅ EthicalComplianceGuardian")
-            results['enhancements']['modules'].append('EthicalComplianceGuardian')
-            
-            # Initialize output directory for audio files
-            os.makedirs('output', exist_ok=True)
-            
-            # NEW: AI Cultural Enricher
-            ai_cultural_api_key = os.getenv('AI_CULTURAL_API_KEY')
-            self.enterprise_components['AICulturalEnricher'] = AICulturalEnricher(api_key=ai_cultural_api_key)
-            status = "✅" if ai_cultural_api_key else "⚠️ (No API Key)"
-            print(f"   {status} AICulturalEnricher - AI Cultural Phrase Generator")
-            results['enhancements']['modules'].append('AICulturalEnricher')
-            
-            # NEW: AI Quality Auditor
-            ai_audit_api_key = os.getenv('AI_AUDIT_API_KEY')
-            self.enterprise_components['AIQualityAuditor'] = AIQualityAuditor(api_key=ai_audit_api_key)
-            status = "✅" if ai_audit_api_key else "⚠️ (No API Key)"
-            print(f"   {status} AIQualityAuditor - AI Content Reviewer")
-            results['enhancements']['modules'].append('AIQualityAuditor')
-            
-            # NEW: AI Title Optimizer
-            ai_title_api_key = os.getenv('AI_TITLE_API_KEY')
-            self.enterprise_components['AITitleOptimizer'] = AITitleOptimizer(api_key=ai_title_api_key)
-            status = "✅" if ai_title_api_key else "⚠️ (No API Key)"
-            print(f"   {status} AITitleOptimizer - AI SEO Title Generator")
-            results['enhancements']['modules'].append('AITitleOptimizer')
-            
-            # Human Likeness Engine (updated to use AICulturalEnricher)
-            self.enterprise_components['HumanLikenessEngine'] = HumanLikenessEngine(
-                cultural_enricher=self.enterprise_components.get('AICulturalEnricher')
-            )
-            print("   ✅ HumanLikenessEngine (95% AI Detection Reduction)")
-            results['enhancements']['modules'].append('HumanLikenessEngine')
-            
-            # Smart Image Engine
-            self.enterprise_components['SmartImageEngine'] = SmartImageEngine()
-            print("   ✅ SmartImageEngine (40% SEO Boost)")
-            results['enhancements']['modules'].append('SmartImageEngine')
-            
-            # Dynamic CTA Engine
-            self.enterprise_components['DynamicCTAEngine'] = DynamicCTAEngine()
-            print("   ✅ DynamicCTAEngine (35% Revenue Increase)")
-            results['enhancements']['modules'].append('DynamicCTAEngine')
-            
-            # Social Media Integration
-            self.enterprise_components['SocialMediaManager'] = SocialMediaManager()
-            print("   ✅ SocialMediaManager")
-            results['integrations']['modules'].append('SocialMediaManager')
-            
-            # Dashboard Integration
-            self.enterprise_components['DashboardManager'] = DashboardManager()
-            print("   ✅ DashboardManager")
-            results['integrations']['modules'].append('DashboardManager')
-            
-            results['enhancements']['success'] = len(results['enhancements']['modules']) > 0
-            results['integrations']['success'] = len(results['integrations']['modules']) > 0
-            
-        except Exception as e:
-            error_msg = f"Enhancements import: {str(e)[:50]}"
-            print(f"   ⚠️  {error_msg}")
-            self.import_errors.append(error_msg)
-        
-        results['errors'] = self.import_errors
-        
-        print("\n" + "="*80)
-        print("📦 ENTERPRISE IMPORT SUMMARY")
-        print("="*80)
-        
-        total_modules = sum(len(data['modules']) for cat, data in results.items() if cat != 'errors')
-        print(f"Total Components: {total_modules}")
-        for category, data in results.items():
-            if category != 'errors':
-                status = "✅" if data.get('success', True) else "⚠️"
-                print(f"{status} {category.replace('_', ' ').title():25} | {len(data['modules']):2} modules")
-        
-        if results['errors']:
-            print(f"\n⚠️  Import Errors: {len(results['errors'])}")
-            for error in results['errors'][:3]:
+        enhancement_count = len(self.enterprise_components)
+        print(f"{'✅' if enhancement_count > 5 else '⚠️'} {enhancement_count} Enhancement Engines Initialized.")
+
+        if self.import_errors:
+            print(f"\n⚠️  {len(self.import_errors)} Import Error(s) Encountered:")
+            for error in self.import_errors:
                 print(f"   • {error}")
         
         print("="*80)
+        return {'errors': self.import_errors}
+
+    def _import_core_systems(self):
+        """Imports the three main specialist modules: YouTube, Affiliate, and Content."""
         
-        return results
+        # Import YouTube & Affiliate System
+        print("🎯 Importing Core Research & Monetization Systems...")
+        try:
+            from youtube_affiliate_system import YouTubeIntelligenceHunterPro, UltraAffiliateManager
+            
+            # Instantiate the real, powerful classes
+            self.modules['youtube_hunter'] = YouTubeIntelligenceHunterPro()
+            self.modules['affiliate_manager'] = UltraAffiliateManager(user_geo="US", user_segment="enterprise")
+            
+            print("   ✅ Real 'YouTubeIntelligenceHunterPro' system is online.")
+            print("   ✅ Real 'UltraAffiliateManager' system is online.")
+
+        except (ImportError, ModuleNotFoundError) as e:
+            error_msg = f"Failed to import from 'youtube_affiliate_system.py'. Error: {e}"
+            print(f"   ❌ CRITICAL: {error_msg}")
+            print("   ⚠️  Switching to BASIC MOCK for Research & Monetization.")
+            self.import_errors.append(error_msg)
+            # Create obvious mocks so we know something is wrong
+            self.modules['youtube_hunter'] = self._create_basic_mock('YouTubeHunter')
+            self.modules['affiliate_manager'] = self._create_basic_mock('AffiliateManager')
+
+        # Import Profit Master System (Content Generation)
+        print("\n💰 Importing Core Content Generation System...")
+        try:
+            from profit_master_system import UltimateProfitMasterSystem
+            
+            # Instantiate the real content factory
+            self.modules['content_system'] = UltimateProfitMasterSystem()
+            print("   ✅ Real 'UltimateProfitMasterSystem' content factory is online.")
+
+        except (ImportError, ModuleNotFoundError) as e:
+            error_msg = f"Failed to import from 'profit_master_system.py'. Error: {e}"
+            print(f"   ❌ CRITICAL: {error_msg}")
+            print("   ⚠️  Switching to BASIC MOCK for Content Generation.")
+            self.import_errors.append(error_msg)
+            self.modules['content_system'] = self._create_basic_mock('ContentSystem')
+            
+    def _import_enhancement_engines(self):
+        """Initializes all the self-contained enhancement engines within the runner."""
+        print("\n🆕 Initializing Enterprise Enhancement Engines...")
+        try:
+            self.enterprise_components['CulturalDepthGuardian'] = CulturalDepthGuardian()
+            self.enterprise_components['RevenueForecastEngine'] = RevenueForecastEngine()
+            self.enterprise_components['EthicalComplianceGuardian'] = EthicalComplianceGuardian()
+            
+            ai_key_cultural = os.getenv('AI_CULTURAL_API_KEY')
+            self.enterprise_components['AICulturalEnricher'] = AICulturalEnricher(api_key=ai_key_cultural)
+            
+            ai_key_audit = os.getenv('AI_AUDIT_API_KEY')
+            self.enterprise_components['AIQualityAuditor'] = AIQualityAuditor(api_key=ai_key_audit)
+            
+            ai_key_title = os.getenv('AI_TITLE_API_KEY')
+            self.enterprise_components['AITitleOptimizer'] = AITitleOptimizer(api_key=ai_key_title)
+            
+            # Link AI enricher to HumanLikenessEngine
+            self.enterprise_components['HumanLikenessEngine'] = HumanLikenessEngine(
+                cultural_enricher=self.enterprise_components.get('AICulturalEnricher')
+            )
+            
+            self.enterprise_components['SmartImageEngine'] = SmartImageEngine()
+            self.enterprise_components['DynamicCTAEngine'] = DynamicCTAEngine()
+            self.enterprise_components['SocialMediaManager'] = SocialMediaManager()
+            self.enterprise_components['DashboardManager'] = DashboardManager()
+            
+            print(f"   ✅ Successfully initialized {len(self.enterprise_components)} enhancement engines.")
+
+        except NameError as e:
+            # This happens if the enhancement classes are not defined in the runner file
+            error_msg = f"Failed to initialize enhancement engines. A required class is missing. Error: {e}"
+            print(f"   ❌ CRITICAL: {error_msg}")
+            self.import_errors.append(error_msg)
+            
+    def _create_basic_mock(self, mock_type: str):
+        """Creates a very simple, obvious mock to prevent crashes when a module is missing."""
+        
+        class MockYouTubeHunter:
+            """A mock that does nothing but log that it's being used."""
+            async def find_relevant_videos(self, topic, country, max_results=5):
+                logging.warning(f"--- MOCK WARNING: Real 'YouTubeIntelligenceHunterPro' not found. Using empty mock. ---")
+                return []
+            async def summarize_video(self, video_id):
+                return {}
+
+        class MockAffiliateManager:
+            """A mock that does nothing but log that it's being used."""
+            async def get_best_product(self, topic, country):
+                logging.warning(f"--- MOCK WARNING: Real 'UltraAffiliateManager' not found. Using empty mock. ---")
+                return None # Return None to simulate no product found
+            async def inject_affiliate_links(self, content, **kwargs):
+                 logging.warning(f"--- MOCK WARNING: Real affiliate injector not found. Content will not be monetized. ---")
+                 return content, {}
+
+        class MockContentSystem:
+            """A mock that generates short, obvious placeholder content."""
+            async def generate_deep_content(self, topic, country, **kwargs):
+                logging.warning(f"--- MOCK WARNING: Real 'UltimateProfitMasterSystem' not found. Generating short placeholder content. ---")
+                return {
+                    'content': f'<h1>Mock Content for {topic} in {country}</h1><p>This is placeholder content because the real content generation module could not be loaded. Please check file names and locations.</p>',
+                    'word_count': 25,
+                    'quality_score': 10
+                }
+            async def refine_and_expand(self, content, target_words):
+                return content
+
+        # Return the correct mock based on the type requested
+        if mock_type == 'YouTubeHunter': return MockYouTubeHunter()
+        if mock_type == 'AffiliateManager': return MockAffiliateManager()
+        if mock_type == 'ContentSystem': return MockContentSystem()
+        return None
+
+    def get_module(self, module_name):
+        """Gets a loaded core module by its key."""
+        return self.modules.get(module_name)
+    
+    def get_enterprise_component(self, component_name):
+        """Gets a loaded enhancement component by its key (class name)."""
+        return self.enterprise_components.get(component_name)
     
     def _create_enterprise_mock(self, class_name):
         """
