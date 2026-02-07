@@ -4171,7 +4171,7 @@ class MegaContentEngine:
         self.failover = system.failover_system  # <--- 'ai_provider' የነበረውን ወደ 'failover_system' ቀይረው
         self.TARGET_WORDS = 7500
 
-    async def produce_sovereign_content(self, base_topic: str, country: str):
+    async def produce_single_country_sovereign_logic(self, topic: str, country: str):
         """ለአንድ ሀገር 7,000 - 12,000 ቃላት በ 7 ደረጃዎች ማምረት"""
         info = HIGH_VALUE_COUNTRIES[country]
         
