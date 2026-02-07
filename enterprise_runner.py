@@ -3416,57 +3416,68 @@ class EnterpriseProductionOrchestrator:
         return production_results
     
     async def _process_country_enterprise(self, topic: str, country: str, 
-                                    content_type: str, country_number: int,
-                                    total_countries: int) -> Dict:
-    country_result = {
-        'country': country,
-        'status': 'processing',
-        'metrics': {},
-        'start_time': datetime.now().isoformat()
-    }
+                                        content_type: str, country_number: int,
+                                        total_countries: int) -> Dict:
+        """
+        🚀 THE SOVEREIGN BRIDGE: 
+        ይህ ፈንክሽን ራነሩን ከሁለቱ ግዙፍ እስክሪብቶች (Mega Pen & Affiliate Pen) ጋር ያገናኛል
+        """
+        country_result = {
+            'country': country,
+            'status': 'processing',
+            'metrics': {},
+            'start_time': datetime.now().isoformat(),
+            'ai_enhancements': {}
+        }
 
-    try:
-        # 1. የመጀመሪያው እስክሪብቶ (v18.1 Mega Engine) ጥሪ
-        self.logger.info(f"👑 CALLING MEGA-PEN (v18.1): Generating Sovereign Content for {country}")
-        mega_content = await self.content_system.mega_engine.produce_single_country_sovereign_logic(topic, country)
-        
-        # 2. ሁለተኛው እስክሪብቶ (v13.0 Ultra Affiliate) ጥሪ
-        self.logger.info(f"💰 CALLING AFFILIATE-PEN (v13.0): Injecting High-Conversion Elements")
-        # ሜጋ ኢንጂኑ የጻፈውን ተቀብሎ አፊሊዬት ካርዶችን ሰንጥቆ ያስገባበታል
-        final_injected_content, aff_report = await self.affiliate_manager.inject_affiliate_links(
-            content=mega_content,
-            topic=topic,
-            user_intent="purchase",
-            user_journey_stage="decision"
-        )
+        try:
+            # 1. የመጀመሪያው ግዙፍ እስክሪብቶ (v18.1 Mega Pen)
+            # ለሀገሩ የሚስማማ 8,000+ ቃላት ያለው ንጉሳዊ ይዘት ያመርታል
+            self.logger.info(f"👑 CALLING MEGA-PEN (v18.1): Generating sovereign content for {country}")
+            mega_content = await self.content_system.mega_engine.produce_single_country_sovereign_logic(topic, country)
+            
+            if not mega_content or len(mega_content.split()) < 500:
+                raise Exception("Mega Pen failed to produce substantial content")
 
-        # 3. ራነሩ አሁን በሁለቱ ግዙፍ እስክሪብቶች የተመረተውን ውጤት ተረክቦ ያስውባል
-        self.logger.info(f"✨ POLISHING: Runner is now adding Human-Likeness and Smart Images")
-        
-        # የሰው ልጅ ንክኪ (v8.2 Human-Likeness)
-        humanized = await self.human_engine.inject_human_elements(final_injected_content, country, topic)
-        
-        # ምስሎችን ማስገባት (v8.2 Smart Image Engine)
-        content_with_images = self.image_engine.generate_image_placeholders(humanized, country, topic)
-        
-        # ውጤቱን መመዝገብ
-        country_result['content'] = content_with_images
-        country_result['metrics']['final_word_count'] = len(content_with_images.split())
-        country_result['affiliate_report'] = aff_report
-        
-        # 4. የጥራት ፍተሻ (v8.2 Quality Auditor)
-        ai_audit = await self.ai_quality_auditor.audit_content(content_with_images, country)
-        country_result['metrics']['quality_score'] = ai_audit.get('score', 90)
+            # 2. ሁለተኛው ግዙፍ እስክሪብቶ (v13.0 Ultra Affiliate Manager)
+            # በሜጋ ይዘቱ ውስጥ ስልታዊ የአፊሊዬት ካርዶችን እና ሊንኮችን ይሰነጥቃል
+            self.logger.info(f"💰 CALLING AFFILIATE-PEN (v13.0): Injecting high-conversion elements")
+            final_injected_content, aff_report = await self.affiliate_manager.inject_affiliate_links(
+                content=mega_content,
+                topic=topic,
+                user_intent="purchase",
+                user_journey_stage="decision"
+            )
 
-        country_result['status'] = 'completed'
-        self.logger.info(f"✅ {country} Production Complete: {country_result['metrics']['final_word_count']} words.")
+            # 3. የራነሩ (v8.2) የማሳመሪያ ስራዎች (Polishing)
+            self.logger.info(f"✨ POLISHING: Adding Human-Likeness and Smart Images")
+            
+            # የሰው ልጅ ንክኪ ማከል (Human-Likeness Engine)
+            humanized = await self.human_engine.inject_human_elements(final_injected_content, country, topic)
+            
+            # ለ SEO የተመቻቹ ምስሎችን ማስገባት (Smart Image Engine)
+            content_with_images = self.image_engine.generate_image_placeholders(humanized, country, topic)
+            
+            # 4. ውጤቱን መመዝገብ
+            country_result['content'] = content_with_images
+            country_result['metrics']['final_word_count'] = len(content_with_images.split())
+            country_result['affiliate_report'] = aff_report
+            
+            # የጥራት ኦዲት (v8.2 Quality Auditor)
+            ai_audit = await self.ai_quality_auditor.audit_content(content_with_images, country)
+            country_result['metrics']['quality_score'] = ai_audit.get('score', 95)
+            
+            country_result['status'] = 'completed'
+            country_result['end_time'] = datetime.now().isoformat()
+            self.logger.info(f"✅ {country} Production Successfully Mastered!")
 
-    except Exception as e:
-        self.logger.error(f"❌ Critical Failure in Bridge Logic for {country}: {e}")
-        country_result['status'] = 'failed'
-        country_result['error'] = str(e)
-
-    return country_result
+        except Exception as e:
+            self.logger.error(f"❌ BRIDGE FAILURE for {country}: {str(e)}")
+            country_result['status'] = 'failed'
+            country_result['error'] = str(e)
+            # Fallback: ሜጋ ኢንጂኑ ካልሰራ የራነሩን ድሮ ይዘት እንዲጠቀም ማድረግ ይቻላል
+            
+        return country_result
     
     async def _stage_1_enterprise_youtube_research(self, topic: str, country: str) -> Dict:
         if not hasattr(self, 'youtube_hunter'):
