@@ -4168,9 +4168,12 @@ class MegaContentEngine:
     def __init__(self, system):
         self.system = system
         self.config = system.config
-        self.failover = system.failover_system  # <--- 'ai_provider' የነበረውን ወደ 'failover_system' ቀይረው
+        # ስህተቱን የሚፈታው ወሳኝ መስመር፡ ራነሩ የሰጠውን failover_system ለ 'ai' እና 'failover' ስም እንሰጠዋለን
+        self.ai = system.failover_system 
+        self.failover = system.failover_system
         self.TARGET_WORDS = 7500
-
+        self.MAX_TARGET = 12000
+        self.logger = logging.getLogger("MegaEngine")
     async def produce_single_country_sovereign_logic(self, topic: str, country: str):
         """ለአንድ ሀገር 7,000 - 12,000 ቃላት በ 7 ደረጃዎች ማምረት"""
         info = self.config.HIGH_VALUE_COUNTRIES[country]
