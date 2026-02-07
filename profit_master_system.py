@@ -4167,127 +4167,158 @@ class EnhancedWordCounter:
 # =========================================================================
 # 👑 TITAN v19.0: THE SOVEREIGN ORACLE - ULTIMATE EDITION (FINAL)
 # ========================================================================
+# =========================================================================
+# 👑 TITAN v23.0: THE SOVEREIGN ORACLE - THE FINAL ARCHITECT (MASTER)
+# =========================================================================
+
 class MegaContentEngine:
     """
-    💎 TITAN v10 "THE OMNIPOTENT" - FINAL SOVEREIGN EDITION
-    Harnessing: 7-Phase Expansion, Multi-Key Rotation, Neuro-Sensory Layers, 
-    and Bilingual Native Discovery.
+    ይህ የዓለማችን እጅግ የላቀ የይዘት ማምረቻ ሞተር ነው። 
+    በየሀገሩ ቋንቋ፣ በ7 ዙር ሪሌይ፣ ከ10,000 - 15,000 ቃላት ያመርታል።
+    በተጨማሪም የራስጌ አውዲዮ እና ኒውሮ-ማርኬቲንግ ጥበብን ያካትታል።
     """
     
     def __init__(self, system):
         self.system = system
         self.config = system.config
-        self.ai = system.failover_system 
-        self.TARGET_WORDS = 10000 # የ10,000 ቃላት ግብ
+        # ስም ስህተት እንዳይፈጠር ማረጋገጫ
+        self.ai = getattr(system, 'ai_provider', getattr(system, 'failover_system', None))
+        self.TARGET_WORDS = 10000 
+        self.logger = logging.getLogger("Titan.Sovereign.Oracle")
+
+    async def produce_single_country_sovereign_logic(self, base_topic: str, country: str) -> str:
+        """7-PHASE MULTILINGUAL RELAY: 7ቱን ቁልፎች በማፈራረቅ 10,000+ ቃላት በሀገሩ ቋንቋ ያመርታል"""
+        info = COUNTRIES.get(country, COUNTRIES['US'])
+        target_lang = info['lang']
         
-        # 🔑 Multi-Key Rotation System
-        self.keys = self._load_keys()
-        self.current_key_idx = 0
-        self.logger = logging.getLogger("TITAN_V10")
-
-    def _load_keys(self):
-        """ሁሉንም የ Groq ቁልፎች ከ GitHub Secrets መጫኛ"""
-        keys = [os.getenv(f'GROQ_API_KEY_{i}') for i in range(1, 11) if os.getenv(f'GROQ_API_KEY_{i}')]
-        if not keys and os.getenv('GROQ_API_KEY'):
-            keys = [os.getenv('GROQ_API_KEY')]
-        return keys
-
-    async def produce_11_countries_mega_loop(self, topic: str):
-        """11 ሀገራትን በ7-ደረጃ ጥልቀት የማምረት ማስተር ሉፕ"""
-        targets = list(self.config.HIGH_VALUE_COUNTRIES.keys())[:11]
-        start_total = time.time()
+        self.logger.info(f"👑 Starting Sovereign 7-Phase Relay for {country} ({target_lang})")
         
-        print(f"\n🚀 TITAN v10 ACTIVATED. TARGETING 110,000+ TOTAL WORDS...")
+        # --- ደረጃ 0: የሰሞኑን መነጋገሪያ ርዕስ በጥበብ መፈለግ (The Oracle) ---
+        print(f"   🔍 መረጃ ፍለጋ፡ በ{country} አሁን ያለውን የገበያ ንዝረት ማጥናት...")
+        topic_prompt = (
+            f"Perform a real-time analysis of the most viral and profitable trending sub-niche for '{base_topic}' "
+            f"in {country} today, February 2026. Respond ONLY with the title in {target_lang} language."
+        )
+        # 1ኛው ቁልፍ ለርዕስ ፍለጋ
+        final_topic = await self.ai.generate_content(topic_prompt, 100)
+        if len(str(final_topic)) < 5 or "Error" in str(final_topic): 
+            final_topic = f"The 2026 Sovereign Strategy for {base_topic}"
+        
+        print(f"   🎯 የተመረጠው ወርቃማ ርዕስ (በ{target_lang})፡ '{final_topic}'")
 
-        for i, code in enumerate(targets, 1):
-            country_name = self.config.HIGH_VALUE_COUNTRIES[code]['name']
-            lang = self.config.HIGH_VALUE_COUNTRIES[code].get('lang', 'English')
-            
-            print(f"\n🌍 [{i}/11] STARTING OMNIPOTENT RUN: {country_name} ({lang})")
-            
-            try:
-                # 1. NATIVE TOPIC DISCOVERY
-                discovered_topic = await self._discover_native_trend(topic, country_name, lang)
-                
-                # 2. 7-PHASE GENERATION
-                full_raw_content = await self._execute_7_phase_generation(discovered_topic, country_name, lang)
-                
-                # 3. NEURO-SENSORY ENHANCEMENT
-                print(f"   🎭 Applying Psychological & Sensory Layers...")
-                polished = self.system.sensory_writer.transform_to_sensory_content(full_raw_content)
-                polished = self.system.neuro_converter.apply_neuro_marketing(polished)
-                
-                # 4. ROYAL STYLING & SEO
-                final_html = self._build_royal_structure(polished, discovered_topic, country_name, lang)
-                
-                # 5. SAVE & LOG
-                word_count = len(re.sub(r'<[^>]+>', '', final_html).split())
-                self._save_output(final_html, code, word_count)
-                
-                print(f"   ✅ COMPLETED: {word_count:,} words generated for {country_name}!")
-                
-            except Exception as e:
-                self.logger.error(f"Critical Node Failure in {code}: {e}")
-            
-            if i < 11: await asyncio.sleep(10) # Cooling
-
-        print(f"\n🏆 TITAN v10 RUN COMPLETE! TOTAL TIME: {(time.time()-start_total)/60:.2f} MINS")
-
-    async def _discover_native_trend(self, base, country, lang):
-        """ዛሬ ያለውን ትኩስ ዜና በሀገሩ ቋንቋ መፈለጊያ"""
-        prompt = f"Identify the #1 most profitable/viral business trend for '{base}' in {country} today (2026). Return ONLY the title in {lang}."
-        res = await self.ai.generate_content(prompt, 100)
-        return res.strip().replace('"', '')
-
-    async def _execute_7_phase_generation(self, topic, country, lang):
-        """7ቱን የጥልቀት ምዕራፎች በሰንሰለት የማገናኛ ሎጂክ"""
         full_content = ""
-        phases = [
-            ("Foundations", 2500), ("Tech Architecture", 2000), 
-            ("10 Case Studies", 1500), ("24-Month Roadmap", 1500),
-            ("Wealth/ROI", 1000), ("Competition Domination", 800), 
-            ("50 FAQ & 2040 Vision", 1500)
+        # 7ቱ የጥልቀት ደረጃዎች (እያንዳንዱ ዙር አዲስ ቁልፍ ይጠቀማል)
+        # እያንዳንዱ ዙር ቢያንስ 1500-2000 ቃላት እንዲያመጣ ታዝዟል
+        tasks = [
+            f"Write a MASTER INTRODUCTION and Phase 1 (Market Psychology & 2026 Trends) for '{final_topic}'. Target 2000 words. LANGUAGE: {target_lang}. Format: HTML. Use vivid, sensory language.",
+            f"Add Phase 2 (Technical Architecture & Systems) for '{final_topic}'. Build on previous context. Target 2000 words. LANGUAGE: {target_lang}. Format: HTML.",
+            f"Add Phase 3 (15 Global & Local Case Studies in {country}). Detail each case with success/failure data. Target 1500 words. LANGUAGE: {target_lang}. HTML.",
+            f"Add Phase 4 (24-Month Execution Roadmap). Provide step-by-step actions for {country}. Target 1500 words. LANGUAGE: {target_lang}. HTML.",
+            f"Add Phase 5 (Monetization & ROI Models). Reveal secret profit frameworks. Target 1500 words. LANGUAGE: {target_lang}. HTML.",
+            f"Add Phase 6 (Competition Deconstruction & Market Dominance). Target 1000 words. LANGUAGE: {target_lang}. HTML.",
+            f"Add Phase 7 (100 Deep-Dive FAQs & 2040 Vision). Target 1500 words. LANGUAGE: {target_lang}. HTML."
         ]
 
-        for name, words in phases:
-            print(f"   ⚙️  Phase: {name}...")
-            context = full_content[-6000:] if full_content else "Start of Masterclass."
-            prompt = f"CONTEXT: {context}\n\nTASK: Write {name} (Target: {words} words) for '{topic}' in {country}. Language: {lang}. Use HTML. Be technical, deep, and realistic."
+        for idx, task_prompt in enumerate(tasks):
+            print(f"   ⚙️  Executing Step {idx+1}/7 using a fresh AI Key...")
+            # ለ AIው ያለፈውን ታሪክ ማሳወቅ (የመጨረሻ 8000 ቃላት)
+            context = str(full_content)[-8000:] if full_content else "Start of the masterpiece."
+            combined_prompt = f"PREVIOUS CONTEXT: {context}\n\nCURRENT TASK: {task_prompt}"
             
-            # Key Rotation Integration
-            part = await self.ai.generate_content(prompt, max_tokens=4000)
-            full_content += f"\n\n\n" + str(part)
-            await asyncio.sleep(2)
+            # ጥሪው በራስ ሰር በየዙሩ ቁልፍ ይቀይራል (በ UnstoppableAIProvider በኩል)
+            new_part = await self.ai.generate_content(combined_prompt, max_tokens=4000)
             
-        return full_content
+            # ስህተቱን የሚፈታው ወሳኝ መስመር፡ ሁልጊዜ ወደ String መቀየር
+            full_content += "\n\n" + str(new_part)
+            await asyncio.sleep(3) # የ 3 ሰከንድ እረፍት በየዙሩ መሃል
+
+        # 🎨 የጥበብ ስራ፡ በለፋንባቸው ጥበቦች ማሳመሪያ (Sensory & Neuro-Marketing)
+        print(f"   🎨 Applying Multilingual Sensory & Neuro-Marketing Polish to {country}...")
+        # እነዚህን ከውጭ ከሰጠኸኝ ክፍሎች ይጠራል
+        if hasattr(self.system, 'sensory_writer'):
+            full_content = self.system.sensory_writer.transform_to_sensory_content(full_content)
+        if hasattr(self.system, 'neuro_converter'):
+            full_content = self.system.neuro_converter.apply_neuro_marketing(full_content)
+        
+        # 🏗️ የንጉሳዊ መዋቅር ግንባታ ከአውዲዮ ማጫወቻ ጋር
+        print(f"   👑 Building Royal Structure with Audio Header...")
+        return self._build_royal_structure(full_content, final_topic, country, target_lang)
 
     def _build_royal_structure(self, content, topic, country, lang):
-        """የሰነድ ውበትና የ SEO መዋቅር"""
-        return f"""
-        <div style="max-width:950px; margin:auto; border:40px double #1e3c72; padding:60px; background:#fff; font-family:'Lora', serif; line-height:2.2; color:#111; box-shadow: 0 0 100px rgba(0,0,0,0.2);">
-            <style>
-                @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@900&family=Lora:wght@400;700&display=swap');
-                h1, h2, h3 {{ font-family: 'Playfair Display', serif; color: #1e3c72; }}
-                h1 {{ font-size: 4.5em; text-align: center; border-bottom: 5px solid #c5a059; padding-bottom: 20px; }}
-                .badge {{ background: #c5a059; color: white; padding: 10px 20px; border-radius: 50px; font-weight: bold; text-align: center; display: block; width: fit-content; margin: 20px auto; }}
-            </style>
-            <div class="badge">👑 TITAN V10 SOVEREIGN EDITION</div>
-            <h1>{topic}</h1>
-            <div style="text-align:center; font-size:1.5em; color: #7f8c8d; margin-bottom: 50px;">
-                Territory: {country} | Native Intelligence Mode: {lang}
+        """የላቀ ንጉሳዊ የዲዛይን መዋቅር ከአውዲዮ ማጫወቻ ጋር"""
+        style = """
+        <style>
+            @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Lora:ital,wght@0,400;1,700&display=swap');
+            body { background: #0b0f19; color: #1a1a1a; margin: 0; padding: 0; }
+            .sovereign-container { 
+                max-width: 1000px; margin: 50px auto; background: #fff; 
+                padding: 70px; border: 35px solid #1a2a44; 
+                box-shadow: 0 50px 150px rgba(0,0,0,0.6);
+                font-family: 'Lora', serif; line-height: 2.3;
+                position: relative;
+            }
+            .audio-header { 
+                background: linear-gradient(135deg, #c5a059 0%, #9e7e38 100%);
+                color: white; padding: 25px; border-radius: 15px; 
+                margin-bottom: 40px; display: flex; align-items: center; 
+                justify-content: space-between; box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+            }
+            .play-button {
+                background: white; color: #1a2a44; border: none; 
+                padding: 12px 30px; border-radius: 50px; font-weight: bold;
+                cursor: pointer; transition: transform 0.2s;
+            }
+            .play-button:hover { transform: scale(1.05); }
+            .gold-badge { 
+                background: #c5a059; color: white; padding: 12px 30px; 
+                text-align: center; font-weight: bold; letter-spacing: 4px;
+                display: inline-block; margin-bottom: 30px; text-transform: uppercase;
+            }
+            h1 { font-family: 'Playfair Display', serif; font-size: 65px; color: #1e3c72; text-align: center; line-height: 1.1; margin-bottom: 20px; }
+            h2 { color: #0f172a; border-bottom: 4px solid #c5a059; padding-bottom: 12px; margin-top: 60px; font-size: 38px; }
+            h3 { color: #1e3c72; margin-top: 40px; font-size: 28px; border-left: 8px solid #c5a059; padding-left: 15px; }
+            p { margin-bottom: 30px; font-size: 20px; text-align: justify; }
+            .content-block { margin-bottom: 40px; }
+            table { width: 100%; border-collapse: collapse; margin: 40px 0; font-size: 18px; }
+            th { background: #1a2a44; color: #fff; padding: 20px; text-align: left; }
+            td { border: 1px solid #ddd; padding: 18px; }
+        </style>
+        """
+        
+        audio_section = f"""
+        <div class="audio-header">
+            <div style="display: flex; align-items: center; gap: 15px;">
+                <span style="font-size: 40px;">🎧</span>
+                <div>
+                    <strong style="font-size: 22px; display: block;">Sovereign Audio Guide</strong>
+                    <span style="opacity: 0.9;">ተተርጉሞ የቀረበ የድምፅ መመሪያ ({lang})</span>
+                </div>
             </div>
-            <div class="main-content">{content}</div>
-            <div style="text-align:center; margin-top:100px; border-top:1px solid #eee; padding-top:30px; font-style:italic;">
-                © 2026 Titan Sovereign Intelligence Cluster. Generated for Global Dominance.
+            <button class="play-button" onclick="alert('AI Voice is generating...')">LISTEN NOW</button>
+        </div>
+        """
+        
+        html_output = f"""
+        {style}
+        <div class="sovereign-container">
+            <div style="text-align:center;">
+                <div class="gold-badge">SUPREME STRATEGIC INTELLIGENCE</div>
+                <h1>{topic.upper()}</h1>
+                <p style="font-size: 26px; color: #555;"><b>THE DEFINITIVE POWER-GUIDE FOR THE {country.upper()} MARKET</b></p>
+                <hr style="width: 40%; border: 1px solid #c5a059; margin: 20px auto;">
+                {audio_section}
+            </div>
+            <div class="main-content">
+                {content}
+            </div>
+            <div style="text-align:center; margin-top:120px; border-top: 2px solid #eee; padding-top:30px; opacity:0.6;">
+                <p>© 2026 THE ASCENDANT MONARCH SYSTEM • ALL RIGHTS RESERVED.</p>
+                <p><small>Produced by Titan v23.0 Omnipotent AI</small></p>
             </div>
         </div>
         """
+        return html_output
 
-    def _save_output(self, html, country, count):
-        Path("enterprise_outputs").mkdir(exist_ok=True)
-        filename = f"enterprise_outputs/TITAN_V10_{country}_{int(time.time())}.html"
-        with open(filename, 'w', encoding='utf-8') as f:
-            f.write(html)
 # =================== ዋና ስርዓት ክፍል ===================
 
 class UltimateProfitMasterSystem:
