@@ -1044,76 +1044,86 @@ class ComprehensiveErrorHandler:
 
 # =================== 🔄 TITAN v21.0: THE SEVEN-KEY FORTRESS ===================
 class EnhancedAIFailoverSystem:
-    # *args እና **kwargs መጨመር ማንኛውንም አይነት ብዛት ያለው መረጃ እንዲቀበል ያደርገዋል
-    def __init__(self, config=None, *args, **kwargs):
+    def __init__(self, config=None):
         self.config = config
-        # ሁሉንም 7 የግሮቅ ቁልፎች እዚህ ጋር ይጫኑ...
-        self.keys = {
-            'groq': self._load_keys('GROQ_API_KEY', 7),
-            'deepseek': [os.getenv('DEEPSEEK_API_KEY')],
-            'openai': [os.getenv('OPENAI_API_KEY')],
-            'gemini': [os.getenv('GEMINI_API_KEY')]
-        }
-        self.indices = defaultdict(int)
+        # 7ቱን የግሮቅ ቁልፎች መጫን
+        self.groq_pool = self._load_key_pool('GROQ_API_KEY', 7)
+        self.groq_index = 0  # የትኛው ቁልፍ ላይ እንዳለን መቆጣጠሪያ
+        self.deepseek_key = os.getenv('DEEPSEEK_API_KEY')
+        self.gemini_key = os.getenv('GEMINI_API_KEY')
+        logger.info(f"👑 TITAN v22.0 RELAY Ready with {len(self.groq_pool)} Groq keys.")
 
-    def _load_keys(self, base_name, count):
+    def _load_key_pool(self, base_name, count):
         keys = []
-        if os.getenv(base_name): keys.append(os.getenv(base_name))
+        main_key = os.getenv(base_name)
+        if main_key: keys.append(main_key)
         for i in range(1, count + 1):
             k = os.getenv(f"{base_name}_{i}")
             if k and k not in keys: keys.append(k)
         return keys
 
     async def generate_content(self, prompt: str, max_tokens: int = 4000) -> str:
-        """በየዙሩ (ጥሪ) ቁልፍ እየቀያየረ ይዘት ያመነጫል"""
-        
-        # 1. መጀመሪያ በግሮቅ በኩል ይሞክራል (7 ቁልፎች እስኪያልቁ)
-        for _ in range(len(self.keys['groq'])):
-            idx = self.indices['groq'] % len(self.keys['groq'])
-            key = self.keys['groq'][idx]
-            self.indices['groq'] += 1 # ወደ ቀጣዩ ቁልፍ ጠቋሚውን ያዛውራል
+        """STRICT SEQUENTIAL ROTATION: ለእያንዳንዱ ጥያቄ አዲስ ቁልፍ ይጠቀማል"""
+        if not self.groq_pool:
+            logger.error("❌ No Groq keys found!")
+        else:
+            # 🔄 ሁሉንም 7ቱን ቁልፎች በየተራ የመሞከር ዑደት
+            for _ in range(len(self.groq_pool)):
+                idx = self.groq_index % len(self.groq_pool)
+                api_key = self.groq_pool[idx]
+                
+                # ለቀጣዩ ጥያቄ አሁኑኑ ኢንዴክሱን እንጨምራለን (ይህ ነው ቁልፎቹን የሚያፈራርቀው)
+                self.groq_index += 1 
 
-            try:
-                logger.info(f"🚀 [GROQ] Using Key #{idx + 1} for this phase...")
-                return await self._call_api('groq', key, prompt, max_tokens)
-            except Exception as e:
-                if "429" in str(e):
-                    logger.warning(f"⚠️ Key #{idx + 1} hit rate limit, jumping to next...")
+                try:
+                    logger.info(f"🚀 [GROQ] Attempting with Key #{idx + 1}...")
+                    content = await self._execute_api_call('groq', api_key, prompt, max_tokens)
+                    
+                    if content and len(str(content).strip()) > 100:
+                        # ጥሪው ሲሳካ ለ3 ሰከንድ አየር መስጠት
+                        await asyncio.sleep(3) 
+                        return str(content) # ሁልጊዜ String መሆኑን እናረጋግጣለን
+                except Exception as e:
+                    if "429" in str(e):
+                        logger.warning(f"⚠️ Key #{idx + 1} hit Rate Limit, jumping to Key #{((idx + 1) % len(self.groq_pool)) + 1}")
+                        continue # ሳይቆም ወደ ቀጣዩ ቁልፍ ይዘልላል
+                    logger.error(f"❌ Key #{idx + 1} failed: {str(e)[:50]}")
                     continue
-                logger.error(f"❌ Key #{idx + 1} failed: {e}")
 
-        # 2. ግሮቅ ካልሰራ ወደ DeepSeek ይሄዳል
-        if self.keys['deepseek'][0]:
-            try:
-                print("🏰 Switching to DEEPSEEK Backup...")
-                return await self._call_api('deepseek', self.keys['deepseek'][0], prompt, max_tokens)
-            except: pass
+        # 🏰 7ቱም የግሮቅ ቁልፎች ካልሰሩ ወደ መጠባበቂያዎቹ (Fallbacks) ይሄዳል
+        try:
+            if self.deepseek_key:
+                logger.info("🏰 DeepSeek Fallback Activated...")
+                return await self._execute_api_call('deepseek', self.deepseek_key, prompt, max_tokens)
+            if self.gemini_key:
+                logger.info("🌟 Gemini Fallback Activated...")
+                return await self._call_gemini(self.gemini_key, prompt)
+        except Exception as e:
+            logger.error(f"❌ All Fallbacks failed: {e}")
+        
+        return "Error: All AI Systems and 7 Groq Keys Exhausted."
 
-        # 3. መጨረሻ ላይ ጀሚኒ (v1 የተረጋጋ ሊንክ)
-        if self.keys['gemini'][0]:
-            try:
-                print("🌟 Switching to GEMINI Final Backup...")
-                return await self._call_gemini(self.keys['gemini'][0], prompt, max_tokens)
-            except: pass
-
-        return "Error: All backup systems failed."
-
-    async def _call_api(self, service, key, prompt, max_tokens):
+    async def _execute_api_call(self, service, key, prompt, max_tokens):
         url = "https://api.groq.com/openai/v1/chat/completions" if service == 'groq' else "https://api.deepseek.com/chat/completions"
         model = "llama-3.3-70b-versatile" if service == 'groq' else "deepseek-chat"
-        async with httpx.AsyncClient(timeout=120.0) as client:
-            resp = await client.post(url, headers={"Authorization": f"Bearer {key}"}, 
-                                     json={"model": model, "messages": [{"role": "user", "content": prompt}], "max_tokens": max_tokens})
-            if resp.status_code == 200: return resp.json()['choices'][0]['message']['content']
-            raise Exception(f"Error {resp.status_code}")
+        async with httpx.AsyncClient(timeout=160.0) as client:
+            resp = await client.post(url, 
+                headers={"Authorization": f"Bearer {key}"},
+                json={"model": model, "messages": [{"role": "user", "content": prompt}], "max_tokens": max_tokens, "temperature": 0.7},
+                follow_redirects=True
+            )
+            if resp.status_code == 200:
+                return resp.json()['choices'][0]['message']['content']
+            raise Exception(f"API {resp.status_code}")
 
-    async def _call_gemini(self, key, prompt, max_tokens):
-        # የተረጋጋው የጀሚኒ v1 ሊንክ
-        url = f"https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key={key}"
+    async def _call_gemini(self, key, prompt):
+        # የጀሚኒ v1beta ሊንክ የበለጠ የተረጋጋ ነው
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={key}"
         async with httpx.AsyncClient(timeout=120.0) as client:
             resp = await client.post(url, json={"contents": [{"parts": [{"text": prompt}]}]})
-            if resp.status_code == 200: return resp.json()['candidates'][0]['content']['parts'][0]['text']
-            raise Exception("Gemini Error")
+            if resp.status_code == 200:
+                return resp.json()['candidates'][0]['content']['parts'][0]['text']
+            raise Exception(f"Gemini Error {resp.status_code}")
 # =================== 📝 የተሻሻለ የይዘት ጀነሬተር ===================
 
 class ProductionContentGenerator:
@@ -4168,71 +4178,64 @@ class MegaContentEngine:
     def __init__(self, system):
         self.system = system
         self.config = system.config
-        # ስህተቱን የሚፈታው ወሳኝ መስመር፡ ራነሩ የሰጠውን failover_system ለ 'ai' እና 'failover' ስም እንሰጠዋለን
-        self.ai = system.failover_system 
-        self.failover = system.failover_system
-        self.TARGET_WORDS = 7500
-        self.MAX_TARGET = 12000
+        # ራነሩ የሚጠቀምበትን ትክክለኛ ስም እንይዛለን
+        self.failover = system.failover_system 
+        self.TARGET_WORDS = 8500
         self.logger = logging.getLogger("MegaEngine")
-    async def produce_single_country_sovereign_logic(self, topic: str, country: str):
-        """ለአንድ ሀገር 7,000 - 12,000 ቃላት በ 7 ደረጃዎች ማምረት"""
-        info = self.config.HIGH_VALUE_COUNTRIES[country]
-        
-        # ደረጃ 0: ትሬንድ ማጣራት
-        topic_prompt = f"What is the most viral and profitable trending sub-niche for '{topic}' in {country} today, February 2026? Give me ONLY the title."
-        final_topic = await self.ai.generate_content(topic_prompt, 100)
-        if len(final_topic) < 5: final_topic = base_topic
 
-        print(f"👑 Starting 7-Phase Production for {country} on topic: {final_topic}")
+    async def produce_single_country_sovereign_logic(self, topic: str, country: str) -> str:
+        """7-PHASE RELAY RACE: 7ቱንም ቁልፎች በማፈራረቅ 10,000 ቃላት ያመርታል"""
+        self.logger.info(f"👑 Starting Sovereign 7-Phase Relay for {country}")
         
-        phases = []
-        # 7ቱንም ደረጃዎች በተለያዩ የግሮቅ ቁልፎች ማስኬድ
-        prompts = [
-            f"WRITE 1500 WORDS: Phase 1 - Global & {country} Market Psychology and 2026 Trends. HTML.",
-            f"WRITE 1500 WORDS: Phase 2 - Technical Architecture and System Infrastructure for {country}. HTML.",
-            f"WRITE 1500 WORDS: Phase 3 - 10 In-depth Case Studies of success in {country}. HTML.",
-            f"WRITE 1500 WORDS: Phase 4 - Step-by-Step 24-Month Implementation Roadmap. HTML.",
-            f"WRITE 1500 WORDS: Phase 5 - Financial ROI Models and Monetization Secrets for {country}. HTML.",
-            f"WRITE 1500 WORDS: Phase 6 - Competitive Deconstruction and Market Dominance. HTML.",
-            f"WRITE 1500 WORDS: Phase 7 - 50 Deep-Dive FAQs with 100-word responses and 2040 Vision. HTML."
+        full_content = ""
+        
+        # የ7 ዙር የጥልቀት ጥያቄዎች (እያንዳንዱ 1500+ ቃላት)
+        tasks = [
+            f"Write MASTER INTRODUCTION and Phase 1 (Market Psychology & 2026 Trends) for '{topic}' in {country}. Target 1500 words. HTML.",
+            f"Add Phase 2 (Technical Infrastructure & System Architecture) for '{topic}' in {country}. Build on previous context. Target 1500 words. HTML.",
+            f"Add Phase 3 (15 Global & Local Case Studies) for '{topic}' in {country}. Detail each case. Target 1500 words. HTML.",
+            f"Add Phase 4 (24-Month Execution Roadmap) for '{topic}' in {country}. Step-by-step. Target 1500 words. HTML.",
+            f"Add Phase 5 (Monetization, ROI Models & Profit Secrets) for '{topic}' in {country}. Target 1500 words. HTML.",
+            f"Add Phase 6 (Competition Deconstruction & Market Dominance) for '{topic}' in {country}. Target 1000 words. HTML.",
+            f"Add Phase 7 (50 Deep-Dive FAQs & 2040 Vision) for '{topic}' in {country}. Target 1500 words. HTML."
         ]
 
-        for idx, p in enumerate(prompts):
-            print(f"   ⚙️  የደረጃ {idx+1} ምርት በሂደት ላይ...")
-            content_part = await self.ai.generate_content(p, 4000)
-            phases.append(content_part)
-            await asyncio.sleep(3) # በየዙሩ መሃል 3 ሰከንድ እረፍት (እንደጠየቅከው)
+        for idx, task_prompt in enumerate(tasks):
+            self.logger.info(f"⚙️  Executing Relay Lap {idx+1}/7 using a fresh key...")
+            
+            # ያለፈውን ይዘት እንደ ኮንቴክስት መስጠት (የመጨረሻ 8000 ቃላት)
+            context = full_content[-8000:] if full_content else "Starting the masterpiece."
+            combined_prompt = f"PREVIOUS CONTEXT: {context}\n\nCURRENT TASK: {task_prompt}"
+            
+            # ጥሪውን እናካሂዳለን (ይህ በየጥሪው ቁልፍ ይቀይራል)
+            new_part = await self.failover.generate_content(combined_prompt, max_tokens=4000)
+            
+            # ስህተቱን የሚፈታው ወሳኝ መስመር፡ ሁልጊዜ ወደ String መቀየር
+            full_content += "\n\n" + str(new_part)
+            
+            # በዙሮች መካከል 3 ሰከንድ እረፍት
+            await asyncio.sleep(3)
 
-        full_raw = "\n\n".join(phases)
-        
-        # የጥበብ ስራ እና ማሳመሪያ (Sensory & Neuro)
-        print(f"   🎨 ይዘቱን በጥበብ መሸመን (Sensory & Neuro-Marketing Polish)...")
-        polished = self.system.sensory_writer.transform_to_sensory_content(full_raw)
+        # 🎨 የጥበብ ስራ፡ በለፋንባቸው ጥበቦች ማሳመሪያ (Sensory & Neuro)
+        print(f"   🎨 Applying Sensory & Neuro-Marketing Polish to {country}...")
+        polished = self.system.sensory_writer.transform_to_sensory_content(full_content)
         polished = self.system.neuro_converter.apply_neuro_marketing(polished)
         
-        # የንጉሳዊ ዲዛይን ግንባታ
-        final_html = self._build_royal_structure(polished, final_topic, country)
-        word_count = EnhancedWordCounter.count_words(final_html)
-        
-        return {
-            'id': f"SUPREME_{country}_{int(time.time())}",
-            'country': country,
-            'title': final_topic,
-            'content': final_html,
-            'word_count': word_count,
-            'commission': info['avg_commission']
-        }
+        # የንጉሳዊ መዋቅር ግንባታ
+        return self._build_royal_structure(polished, topic, country)
 
     def _build_royal_structure(self, content, topic, country):
-        style = """<style>
-            @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Lora&display=swap');
-            .sovereign-doc { padding: 60px; border: 35px solid #0f172a; font-family: 'Lora', serif; line-height: 2.3; background: #fff; }
-            h1 { font-family: 'Playfair Display', serif; font-size: 65px; color: #1e3c72; text-align: center; margin-bottom: 30px; }
+        """የተራቀቀ የዲዛይን መዋቅር"""
+        style = """
+        <style>
+            @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Lora:line-height:2.3&display=swap');
+            .sovereign-doc { padding: 60px; border: 35px solid #0f172a; background: #fff; font-family: 'Lora', serif; }
+            h1 { font-family: 'Playfair Display', serif; font-size: 65px; color: #1e3c72; text-align: center; }
             h2 { border-bottom: 4px solid #c5a059; padding-bottom: 10px; margin-top: 50px; color: #0f172a; }
             .gold-badge { background: #c5a059; color: white; padding: 10px; text-align: center; font-weight: bold; letter-spacing: 2px; }
-        </style>"""
-        return f"{style}<div class='sovereign-doc'><div class='gold-badge'>SUPREME STRATEGIC INTELLIGENCE</div><h1>{topic}</h1>{content}</div>"
-
+        </style>
+        """
+        return f"{style}<div class='sovereign-doc'><div class='gold-badge'>SUPREME STRATEGIC INTELLIGENCE</div><h1>{topic.upper()} - {country}</h1>{content}</div>"
 # =================== ዋና ስርዓት ክፍል ===================
 
 class UltimateProfitMasterSystem:
