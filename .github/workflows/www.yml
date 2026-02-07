@@ -1,29 +1,23 @@
 name: 👑 TITAN v22.0 ULTIMATE MULTI-CHANNEL ORACLE
 
 on:
-  # 1. በየ 6 ሰዓቱ በራስ-ሰር ይነሳል (ለቋሚ ገቢ ፍሰት)
+  # በየ 6 ሰዓቱ በራስ-ሰር እንዲነሳ
   schedule:
     - cron: '0 */6 * * *'
       
-  # 2. በማንኛውም ጊዜ በእጅ ለማስጀመር
+  # በማንኛውም ጊዜ በእጅ ለማስጀመር
   workflow_dispatch:
     inputs:
       topic:
-        description: 'Target Topic (e.g., Global Finance 2026)'
+        description: 'የይዘት ርዕስ (Topic)'
         required: false
         default: 'Future of Global Wealth and AI 2026'
-      language:
-        description: 'Primary Language'
-        required: false
-        default: 'en'
 
-# የሲስተም ፈቃዶች
 permissions:
   contents: write
   issues: write
   actions: read
 
-# ተደጋጋሚ ስራዎችን ለመከላከል (Concurrency)
 concurrency:
   group: production-pipeline
   cancel-in-progress: true
@@ -35,29 +29,29 @@ jobs:
     timeout-minutes: 180 
 
     steps:
-    # 1. ኮዱን ማውረድ
+    # 1. ኮዱን ከሪፖዚቶሪው ማውረድ
     - name: 📥 Checkout Repository
       uses: actions/checkout@v4
       with:
         fetch-depth: 0
 
-    # 2. ፓይተን ማዘጋጀት (Python 3.12 - Latest Stable)
+    # 2. ፓይተን 3.12 ማዘጋጀት
     - name: 🐍 Set up Python 3.12
       uses: actions/setup-python@v5
       with:
         python-version: '3.12'
         cache: 'pip'
 
-    # 3. የሲስተም ሶፍትዌሮች
+    # 3. የሲስተም ሶፍትዌሮችን መጫን (ለቪዲዮ እና ምስል)
     - name: 🎥 Install System Tools
       run: |
         sudo apt-get update
         sudo apt-get install -y ffmpeg libmagick++-dev
 
-    # 4. ፓይተን ላይብረሪዎች (ሁሉንም የቆዩና አዳዲስ ጥገኝነቶችን ያካተተ)
+    # 4. ፓይተን ላይብረሪዎችን መጫን (ስህተቱ እዚህ ተስተካክሏል)
     - name: 📦 Install Dependencies
       run: |
-        python -m pip install --upgrade pip
+        python -m pip install --upgrade pip setuptools wheel
         pip install tenacity requests psutil python-dotenv pyyaml aiohttp \
                     google-generativeai groq openai \
                     beautifulsoup4 pandas jinja2 lxml \
@@ -72,7 +66,7 @@ jobs:
     # 5. የሜጋ ምርት እና የስርጭት ሂደትን ማስጀመር
     - name: 👑 Run Unified Sovereign Engine
       env:
-        # --- AI API KEYS (MULTI-KEY ROTATION) ---
+        # --- AI API KEYS (7-KEY ROTATION) ---
         GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
         GROQ_API_KEY_1: ${{ secrets.GROQ_API_KEY_1 }}
         GROQ_API_KEY_2: ${{ secrets.GROQ_API_KEY_2 }}
@@ -82,7 +76,7 @@ jobs:
         GROQ_API_KEY_6: ${{ secrets.GROQ_API_KEY_6 }}
         GROQ_API_KEY_7: ${{ secrets.GROQ_API_KEY_7 }}
         
-        # --- OTHER AI PROVIDERS ---
+        # --- ሌሎች AI አቅራቢዎች ---
         GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
@@ -90,7 +84,7 @@ jobs:
         AI_AUDIT_API_KEY: ${{ secrets.AI_AUDIT_API_KEY }}
         AI_TITLE_API_KEY: ${{ secrets.AI_TITLE_API_KEY }}
 
-        # --- MULTI-CHANNEL DISTRIBUTION KEYS ---
+        # --- የማህበራዊ ሚዲያ ቁልፎች ---
         WP_URL: ${{ secrets.WP_URL }}
         WP_USERNAME: ${{ secrets.WP_USERNAME }}
         WP_PASSWORD: ${{ secrets.WP_PASSWORD }}
@@ -105,54 +99,61 @@ jobs:
         LINKEDIN_TOKEN: ${{ secrets.LINKEDIN_TOKEN }}
         LINKEDIN_URN: ${{ secrets.LINKEDIN_URN }}
         
-        # --- CONFIGURATION ---
+        # --- አጠቃላይ ውቅረት ---
         ENTERPRISE_TOPIC: ${{ github.event.inputs.topic || 'Future of Global Wealth and AI 2026' }}
         INPUT_TOPIC: ${{ github.event.inputs.topic || 'Future of Global Wealth and AI 2026' }}
         GITHUB_ACTIONS: "true"
         PYTHONPATH: .
         PYTHONUNBUFFERED: 1
       run: |
-        echo "🚀 Starting Unified Sovereign Engine..."
-        # ራነሩን ማስጀመር - የ 10 ቁጥር ምርጫን እና ርዕስን በራስ ሰር ይልካል
+        echo "🚀 Starting TITAN v22.0 Sovereign Engine..."
+        # ራነሩን ማስጀመር - የ 10 ቁጥር ምርጫን (Mega-Production) እና ርዕስን በራስ ሰር ይልካል
         python main.py <<EOF
         10
         $INPUT_TOPIC
         EOF
 
-    # 6. የላቀ የዳሽቦርድ ሪፖርት (GitHub Issues)
+    # 6. የሪፖርት ማጠቃለያ ለ GitHub Issues መላክ (የእርስዎ ቦርድ)
     - name: 📊 Update GitHub Enterprise Dashboard
       if: success()
       run: |
         TIMESTAMP=$(date '+%Y-%m-%d %H:%M:%S')
-        TOPIC="${{ github.event.inputs.topic || 'Automated Run' }}"
+        TOPIC="${{ github.event.inputs.topic || 'Automated Scheduled Run' }}"
+        
         curl -X POST \
           -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
           -H "Accept: application/vnd.github.v3+json" \
-          -d "{\"title\": \"✅ Production: $TOPIC [$TIMESTAMP]\", \"body\": \"Production finished successfully. Check enterprise_outputs for details.\"}" \
+          -d "{\"title\": \"✅ Production Complete: $TOPIC\", \"body\": \"### 👑 Sovereign Production Summary\n- **Status:** Successfully Generated & Distributed\n- **Execution Time:** $TIMESTAMP\n\nCheck `enterprise_outputs` for full reports.\"}" \
           "https://api.github.com/repos/${{ github.repository }}/issues"
 
-    # 7. አዳዲስ ፋይሎችን ወደ ሪፖዚቶሪ መመለስ (Smart Rebase)
+    # 7. አዳዲስ ፋይሎችን ወደ ሪፖዚቶሪ መመለስ (Auto-Push)
     - name: 📤 Sync & Push to GitHub
       if: always()
       run: |
         git config --local user.email "action@github.com"
         git config --local user.name "Sovereign-Bot 👑"
+        
+        # አስፈላጊ የሆኑ ፎልደሮች መኖራቸውን ማረጋገጥ
         mkdir -p enterprise_outputs production_backups enterprise_logs ai_usage_logs
+        
         git add .
+        
         if git diff --staged --quiet; then
           echo "🚫 No changes to commit."
         else
+          echo "✅ New files detected. Syncing with remote..."
           git commit -m "👑 Sovereign Output: [Run ${{ github.run_number }}]"
           git pull --rebase origin main
           git push origin main
         fi
 
-    # 8. አርቲፋክቶችን ማስቀመጥ
+    # 8. አርቲፋክቶችን ማስቀመጥ (ለማውረድ እንዲመች)
     - name: 💾 Archive Production Results
       if: always()
       uses: actions/upload-artifact@v4
       with:
-        name: sovereign-results-v22
+        name: sovereign-final-results-v22
+        retention-days: 30
         path: |
           enterprise_outputs/
           enterprise_logs/
