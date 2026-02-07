@@ -1043,7 +1043,7 @@ class ComprehensiveErrorHandler:
             return "🔴 ከፍተኛ ችግር አለ"
 
 # =================== 🔄 TITAN v21.0: THE SEVEN-KEY FORTRESS ===================
-class UnstoppableAIProvider:
+class EnhancedAIFailoverSystem:
     def __init__(self):
         # ሁሉንም 7 የግሮቅ ቁልፎች መጫን
         self.keys = {
