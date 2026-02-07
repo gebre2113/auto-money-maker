@@ -1044,7 +1044,7 @@ class ComprehensiveErrorHandler:
 
 # =================== 🔄 TITAN v21.0: THE SEVEN-KEY FORTRESS ===================
 class EnhancedAIFailoverSystem:
-    def __init__(self):
+    def __init__(self, config=None):
         # ሁሉንም 7 የግሮቅ ቁልፎች መጫን
         self.keys = {
             'groq': self._load_keys('GROQ_API_KEY', 7),
