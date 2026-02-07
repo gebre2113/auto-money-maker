@@ -2348,7 +2348,8 @@ class DynamicCTAEngine:
         
         return ""
 
-# =================== ENTERPRISE IMPORT SYSTEM ===================
+
+# =================== 🛡️ ENTERPRISE IMPORT SYSTEM (STRICT EDITION) ===================
 
 class EnterpriseImportSystem:
     """
@@ -2356,114 +2357,119 @@ class EnterpriseImportSystem:
     ምንም አይነት ማስመስል (Mocking) የማይፈቅድ እና እውነተኛዎቹን ኃያላን ኢንጂኖች
     (v18.1 እና v2.3) ብቻ እንዲሰሩ የሚያስገድድ ጥብቅ ስርዓት::
     """
-    
     def __init__(self):
         self.modules = {}
         self.enterprise_components = {}
-        self.import_errors = []
-        
-    def import_enterprise_system(self) -> Dict:
-        """
-        ሁሉንም ሲስተሞች በሃይል እና በጥብቅ ሁኔታ ይጭናል::
-        """
+
+    def import_enterprise_system(self):
         print("\n" + "⚔️"*40)
         print("⚡ STRICT ENTERPRISE LOADER ACTIVATED - NO MOCKS ALLOWED")
         print("⚔️"*40)
         
-        # --- 1. ዋና ዋናዎቹን ኃያላን ሲስተሞች መጫን ---
-        self._import_core_systems()
-        
-        # --- 2. ማሻሻያ ኢንጂኖችን መጫን ---
-        self._import_enhancement_engines()
-
-        print("\n📦 LOADER FINAL STATUS")
-        print("-" * 80)
-        
-        # ስኬቱን ማረጋገጫ (ሁሉም 'Mock' ያልሆኑ መሆናቸውን ቼክ ያደርጋል)
-        is_ready = all(k in self.modules for k in ['youtube_hunter', 'affiliate_manager', 'content_system'])
-        
-        if is_ready:
-            print("✅ ALL TITAN ENGINES ONLINE: v18.1 & v2.3 are Linked.")
-        else:
-            print("❌ SYSTEM INCOMPLETE: Production cannot proceed without core files.")
-            # ማስመሰል ስለማንፈልግ ሲስተሙን እዚህ ጋር እናቆመዋለን
-            raise SystemExit("🚫 FATAL: Core Engines Missing. Check file names and locations!")
-
-        print("="*80)
-        return {'errors': self.import_errors}
-
-    def _import_core_systems(self):
-        """
-        ሰራተኞቹን (v18.1 እና v2.3) ከፋይላቸው ቀስቅሶ ያመጣል::
-        """
-        
-        # 1. YouTube & Affiliate System (v2.3) መጫን
-        print("🎯 Loading Monetization Engine (v2.3)...")
+        # 1. Mega-Content Factory (v18.1) መጫን
+        print("💰 Loading Mega-Content Factory (v18.1)...")
         try:
-            # ፋይሉ 'youtube_affiliate_system.py' መሆኑን እርግጠኛ ሁን
-            from youtube_affiliate_system import YouTubeIntelligenceHunterPro, VideoAffiliateIntegrationEngine
-            
-            self.modules['youtube_hunter'] = YouTubeIntelligenceHunterPro()
-            # v2.3 ውስጥ ያለውን እውነተኛውን Integration Engine እንጭናለን
-            self.modules['affiliate_manager'] = VideoAffiliateIntegrationEngine(enable_ethical_mode=True)
-            
-            print("   ✅ YouTube Intelligence Hunter: ONLINE")
-            print("   ✅ Video Affiliate Engine: ONLINE")
-
-        except (ImportError, ModuleNotFoundError) as e:
-            print(f"   ❌ FATAL ERROR: 'youtube_affiliate_system.py' አልተገኘም!")
-            print(f"   💡 መፍትሄ: ፋይሉን በትክክል ሰይመህ ወደ ዋናው ፎልደር ክተተው::")
-            raise e
-
-        # 2. Mega-Content Factory (v18.1) መጫን
-        print("\n💰 Loading Mega-Content Factory (v18.1)...")
-        try:
-            # ፋይሉ 'profit_master_system.py' መሆኑን እርግጠኛ ሁን
             from profit_master_system import UltimateProfitMasterSystem
-            
             self.modules['content_system'] = UltimateProfitMasterSystem()
             print("   ✅ Ultimate Profit Master (v18.1): ONLINE")
-
         except (ImportError, ModuleNotFoundError) as e:
-            print(f"   ❌ FATAL ERROR: 'profit_master_system.py' አልተገኘም!")
-            print(f"   💡 መፍትሄ: v18.1 ፋይልህን 'profit_master_system.py' ብለህ ሰይመው::")
-            raise e
-            
-    def _import_enhancement_engines(self):
-        """ራነሩ (Runner) ይዘቱን እንዲያርም የሚያደርጉት ሞተሮች መጫኛ"""
-        print("\n🆕 Initializing Auditor Engines (Runner Level)...")
+            print(f"   ❌ FATAL: 'profit_master_system.py' አልተገኘም!")
+            raise ImportError("🚫 ስህተት: Mega-System v18.1 ሳይኖር ምርት መጀመር አይቻልም!")
+
+        # 2. YouTube & Affiliate System (v2.3) መጫን
+        print("\n🎯 Loading Monetization Engine (v2.3)...")
         try:
-            # እነዚህ በራነሩ ፋይል ውስጥ ያሉ ክላሶች ናቸው
-            self.enterprise_components['CulturalDepthGuardian'] = CulturalDepthGuardian()
-            self.enterprise_components['RevenueForecastEngine'] = RevenueForecastEngine()
-            self.enterprise_components['EthicalComplianceGuardian'] = EthicalComplianceGuardian()
-            
-            # AI Keys ካሉ AI Auditor ይነሳል
-            ai_key = os.getenv('AI_CULTURAL_API_KEY')
-            self.enterprise_components['AICulturalEnricher'] = AICulturalEnricher(api_key=ai_key)
-            self.enterprise_components['AIQualityAuditor'] = AIQualityAuditor(api_key=os.getenv('AI_AUDIT_API_KEY'))
-            
-            # Human Likeness (ይዘቱን 'ሰው' የሚያደርገው)
-            self.enterprise_components['HumanLikenessEngine'] = HumanLikenessEngine(
-                cultural_enricher=self.enterprise_components.get('AICulturalEnricher')
+            from youtube_affiliate_system import VideoAffiliateIntegrationEngine, YouTubeIntelligenceHunterPro
+            self.modules['yt_hunter'] = YouTubeIntelligenceHunterPro()
+            self.modules['affiliate_manager'] = VideoAffiliateIntegrationEngine(enable_ethical_mode=True)
+            print("   ✅ Video Affiliate Engine (v2.3): ONLINE")
+        except (ImportError, ModuleNotFoundError) as e:
+            print(f"   ❌ FATAL: 'youtube_affiliate_system.py' አልተገኘም!")
+            raise ImportError("🚫 ስህተት: YouTube-Affiliate v2.3 ሳይኖር ገቢ ማመንጨት አይቻልም!")
+
+    def get_module(self, name):
+        return self.modules.get(name)
+
+# =================== 👑 MASTER PRODUCTION ORCHESTRATOR ===================
+
+class EnterpriseProductionOrchestrator:
+    """
+    ይህ ራነር የጸሐፊዎቹን ስራ ተቀብሎ የሚያርም፣ የሚሰፋ እና የሚሸምን ዳኛ ነው::
+    """
+    def __init__(self):
+        self.importer = EnterpriseImportSystem()
+        self.importer.import_enterprise_system()
+        
+        # ሰራተኞቹን መጥራት
+        self.writer = self.importer.get_module('content_system')
+        self.monetizer = self.importer.get_module('affiliate_manager')
+        
+        # የራነሩ የጥበብ ሞተሮች
+        self.humanizer = HumanLikenessEngine()
+        self.image_engine = SmartImageEngine()
+        self.compliance_guardian = EthicalComplianceGuardian()
+        
+        self.output_dir = Path("enterprise_outputs")
+        self.output_dir.mkdir(exist_ok=True)
+
+    async def run_country_production(self, topic: str, country: str):
+        """አንዱን አገር ቀስቅሶ በ v18.1 እና v2.3 ውጤት እንዲያመርት ያደርጋል"""
+        print(f"\n🌍 አሁን ለ {country} ምርት እየተካሄደ ነው...")
+        
+        # Step 1: በ v18.1 ኃይል ጥልቅ ይዘት ማስጻፍ (8,000+ ቃላት)
+        print(f"   ✍️  ደረጃ 1: Mega-System 8,000 ቃላት እያመረተ ነው...")
+        mega_result = await self.writer.full_production_pipeline(topic, target_countries=[country])
+        content = mega_result.get('content', "")
+        
+        if len(content.split()) < 2000:
+            print("   ⚠️  ይዘቱ አጭር ነው - ራነሩ እያረመው ነው...")
+            # ራነሩ ራሱ ይዘቱን ያስፋፋዋል
+            content = await self.writer.content_generator.failover_system.generate_content(
+                f"Expand this content for {country} to 8000 words: {content[:1000]}", max_tokens=4000
             )
-            
-            self.enterprise_components['SmartImageEngine'] = SmartImageEngine()
-            self.enterprise_components['DynamicCTAEngine'] = DynamicCTAEngine()
-            
-            print(f"   ✅ Auditor Engines Initialized: {len(self.enterprise_components)} components.")
 
-        except Exception as e:
-            print(f"   ❌ ERROR Initializing Auditors: {e}")
-            raise e
+        # Step 2: በ v2.3 ኃይል አፊሊዬት እና ቪዲዮ መርፌ መውጋት
+        print(f"   💰 ደረጃ 2: Monetizer ቪዲዮና አፊሊዬት ሊንክ እያዘጋጀ ነው...")
+        product = {'id': 'p1', 'name': topic, 'commission': 50.0, 'link': 'https://profit.link'}
+        campaign = await self.monetizer.create_video_affiliate_campaign(topic, product, country)
+        
+        # የቪዲዮ HTML ን ከ v2.3 ውጤት ላይ መውሰድ
+        video_html = campaign.get('content_integrations', [{}])[0].get('html', "")
+        
+        # Step 3: የራነሩ "ሽመና" (Stitching & Polishing)
+        print(f"   🎨 ደረጃ 3: ራነሩ ይዘቱን እያረመና 'ሰው' እንዲመስል እያደረገ ነው...")
+        
+        # ቪዲዮውን መሃል ላይ ሰክቶ ማዋሃድ
+        final_woven_content = content.replace("</h2>", f"</h2>\n{video_html}\n", 1)
+        
+        # ራነሩ የራሱን Humanization እና ምስል ይጨምራል
+        final_woven_content = await self.humanizer.inject_human_elements(final_woven_content, country, topic)
+        final_woven_content = self.image_engine.generate_image_placeholders(final_woven_content, country, topic)
+        
+        return final_woven_content
 
-    def get_module(self, module_name):
-        return self.modules.get(module_name)
-    
-    def get_enterprise_component(self, component_name):
-        return self.enterprise_components.get(component_name)
+    async def run_all_markets(self, topic: str):
+        """ሁሉንም 11 አገራት በሃይል ያዞራል"""
+        markets = ['US', 'GB', 'CA', 'AU', 'DE', 'FR', 'JP', 'CH', 'NO', 'SE', 'ET']
+        
+        for country in markets:
+            try:
+                final_html = await self.run_country_production(topic, country)
+                
+                # ፋይሉን በሃይል መጻፍ (ይህ ነው Git Commit እንዲያደርግ የሚያስገድደው)
+                file_path = self.output_dir / f"{country}_Sovereign_Masterpiece.html"
+                with open(file_path, 'w', encoding='utf-8') as f:
+                    f.write(final_html)
+                
+                print(f"✅ {country} ተጠናቆ ተቀምጧል: {file_path}")
+                
+                # አጭር እረፍት ለአይፒ ደህንነት
+                await asyncio.sleep(10)
+                
+            except Exception as e:
+                print(f"❌ ስህተት በ {country}: {e}")
+                continue
 
-    # 🗑️ የድሮው _create_basic_mock ክፍል ሙሉ በሙሉ ተወግዷል!
 # =================== ENTERPRISE ENHANCEMENT COMPONENTS ===================
 
 class CulturalDepthGuardian:
