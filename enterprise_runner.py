@@ -2350,377 +2350,120 @@ class DynamicCTAEngine:
 
 # =================== ENTERPRISE IMPORT SYSTEM ===================
 
-# =================== ENTERPRISE IMPORT SYSTEM (REFACTORED FOR RELIABILITY v2.0) ===================
-
 class EnterpriseImportSystem:
     """
-    An enterprise-grade import system, refactored for direct, reliable, and transparent module loading.
-    It attempts to import the real systems first and only falls back to obvious mocks upon failure.
+    🚀 ENTERPRISE-GRADE STRICT LOADER v3.0
+    ምንም አይነት ማስመስል (Mocking) የማይፈቅድ እና እውነተኛዎቹን ኃያላን ኢንጂኖች
+    (v18.1 እና v2.3) ብቻ እንዲሰሩ የሚያስገድድ ጥብቅ ስርዓት::
     """
     
     def __init__(self):
         self.modules = {}
-        self.enterprise_components = {} # This will hold non-core enhancements
+        self.enterprise_components = {}
         self.import_errors = []
         
     def import_enterprise_system(self) -> Dict:
         """
-        Imports the complete enterprise system with a clear and direct approach.
+        ሁሉንም ሲስተሞች በሃይል እና በጥብቅ ሁኔታ ይጭናል::
         """
-        print("\n" + "="*80)
-        print("🔌 ENTERPRISE SYSTEM IMPORT - v2.0 RELIABLE DIRECT IMPORT")
-        print("="*80)
+        print("\n" + "⚔️"*40)
+        print("⚡ STRICT ENTERPRISE LOADER ACTIVATED - NO MOCKS ALLOWED")
+        print("⚔️"*40)
         
-        # --- 1. Import Core Systems ---
+        # --- 1. ዋና ዋናዎቹን ኃያላን ሲስተሞች መጫን ---
         self._import_core_systems()
         
-        # --- 2. Import and Initialize Enhancement Engines ---
+        # --- 2. ማሻሻያ ኢንጂኖችን መጫን ---
         self._import_enhancement_engines()
 
-        # --- 3. Final Summary ---
-        print("\n📦 ENTERPRISE IMPORT SUMMARY")
+        print("\n📦 LOADER FINAL STATUS")
         print("-" * 80)
         
-        # Check status of core modules
-        core_status = all(
-            "Mock" not in module.__class__.__name__ 
-            for module in [self.modules.get('youtube_hunter'), self.modules.get('affiliate_manager'), self.modules.get('content_system')]
-            if module is not None
-        )
-        print(f"{'✅' if core_status else '⚠️'} Core Production Systems Initialized.")
+        # ስኬቱን ማረጋገጫ (ሁሉም 'Mock' ያልሆኑ መሆናቸውን ቼክ ያደርጋል)
+        is_ready = all(k in self.modules for k in ['youtube_hunter', 'affiliate_manager', 'content_system'])
         
-        enhancement_count = len(self.enterprise_components)
-        print(f"{'✅' if enhancement_count > 5 else '⚠️'} {enhancement_count} Enhancement Engines Initialized.")
+        if is_ready:
+            print("✅ ALL TITAN ENGINES ONLINE: v18.1 & v2.3 are Linked.")
+        else:
+            print("❌ SYSTEM INCOMPLETE: Production cannot proceed without core files.")
+            # ማስመሰል ስለማንፈልግ ሲስተሙን እዚህ ጋር እናቆመዋለን
+            raise SystemExit("🚫 FATAL: Core Engines Missing. Check file names and locations!")
 
-        if self.import_errors:
-            print(f"\n⚠️  {len(self.import_errors)} Import Error(s) Encountered:")
-            for error in self.import_errors:
-                print(f"   • {error}")
-        
         print("="*80)
         return {'errors': self.import_errors}
 
     def _import_core_systems(self):
-        """Imports the three main specialist modules: YouTube, Affiliate, and Content."""
+        """
+        ሰራተኞቹን (v18.1 እና v2.3) ከፋይላቸው ቀስቅሶ ያመጣል::
+        """
         
-        # Import YouTube & Affiliate System
-        print("🎯 Importing Core Research & Monetization Systems...")
+        # 1. YouTube & Affiliate System (v2.3) መጫን
+        print("🎯 Loading Monetization Engine (v2.3)...")
         try:
-            from youtube_affiliate_system import YouTubeIntelligenceHunterPro, UltraAffiliateManager
+            # ፋይሉ 'youtube_affiliate_system.py' መሆኑን እርግጠኛ ሁን
+            from youtube_affiliate_system import YouTubeIntelligenceHunterPro, VideoAffiliateIntegrationEngine
             
-            # Instantiate the real, powerful classes
             self.modules['youtube_hunter'] = YouTubeIntelligenceHunterPro()
-            self.modules['affiliate_manager'] = UltraAffiliateManager(user_geo="US", user_segment="enterprise")
+            # v2.3 ውስጥ ያለውን እውነተኛውን Integration Engine እንጭናለን
+            self.modules['affiliate_manager'] = VideoAffiliateIntegrationEngine(enable_ethical_mode=True)
             
-            print("   ✅ Real 'YouTubeIntelligenceHunterPro' system is online.")
-            print("   ✅ Real 'UltraAffiliateManager' system is online.")
+            print("   ✅ YouTube Intelligence Hunter: ONLINE")
+            print("   ✅ Video Affiliate Engine: ONLINE")
 
         except (ImportError, ModuleNotFoundError) as e:
-            error_msg = f"Failed to import from 'youtube_affiliate_system.py'. Error: {e}"
-            print(f"   ❌ CRITICAL: {error_msg}")
-            print("   ⚠️  Switching to BASIC MOCK for Research & Monetization.")
-            self.import_errors.append(error_msg)
-            # Create obvious mocks so we know something is wrong
-            self.modules['youtube_hunter'] = self._create_basic_mock('YouTubeHunter')
-            self.modules['affiliate_manager'] = self._create_basic_mock('AffiliateManager')
+            print(f"   ❌ FATAL ERROR: 'youtube_affiliate_system.py' አልተገኘም!")
+            print(f"   💡 መፍትሄ: ፋይሉን በትክክል ሰይመህ ወደ ዋናው ፎልደር ክተተው::")
+            raise e
 
-        # Import Profit Master System (Content Generation)
-        print("\n💰 Importing Core Content Generation System...")
+        # 2. Mega-Content Factory (v18.1) መጫን
+        print("\n💰 Loading Mega-Content Factory (v18.1)...")
         try:
+            # ፋይሉ 'profit_master_system.py' መሆኑን እርግጠኛ ሁን
             from profit_master_system import UltimateProfitMasterSystem
             
-            # Instantiate the real content factory
             self.modules['content_system'] = UltimateProfitMasterSystem()
-            print("   ✅ Real 'UltimateProfitMasterSystem' content factory is online.")
+            print("   ✅ Ultimate Profit Master (v18.1): ONLINE")
 
         except (ImportError, ModuleNotFoundError) as e:
-            error_msg = f"Failed to import from 'profit_master_system.py'. Error: {e}"
-            print(f"   ❌ CRITICAL: {error_msg}")
-            print("   ⚠️  Switching to BASIC MOCK for Content Generation.")
-            self.import_errors.append(error_msg)
-            self.modules['content_system'] = self._create_basic_mock('ContentSystem')
+            print(f"   ❌ FATAL ERROR: 'profit_master_system.py' አልተገኘም!")
+            print(f"   💡 መፍትሄ: v18.1 ፋይልህን 'profit_master_system.py' ብለህ ሰይመው::")
+            raise e
             
     def _import_enhancement_engines(self):
-        """Initializes all the self-contained enhancement engines within the runner."""
-        print("\n🆕 Initializing Enterprise Enhancement Engines...")
+        """ራነሩ (Runner) ይዘቱን እንዲያርም የሚያደርጉት ሞተሮች መጫኛ"""
+        print("\n🆕 Initializing Auditor Engines (Runner Level)...")
         try:
+            # እነዚህ በራነሩ ፋይል ውስጥ ያሉ ክላሶች ናቸው
             self.enterprise_components['CulturalDepthGuardian'] = CulturalDepthGuardian()
             self.enterprise_components['RevenueForecastEngine'] = RevenueForecastEngine()
             self.enterprise_components['EthicalComplianceGuardian'] = EthicalComplianceGuardian()
             
-            ai_key_cultural = os.getenv('AI_CULTURAL_API_KEY')
-            self.enterprise_components['AICulturalEnricher'] = AICulturalEnricher(api_key=ai_key_cultural)
+            # AI Keys ካሉ AI Auditor ይነሳል
+            ai_key = os.getenv('AI_CULTURAL_API_KEY')
+            self.enterprise_components['AICulturalEnricher'] = AICulturalEnricher(api_key=ai_key)
+            self.enterprise_components['AIQualityAuditor'] = AIQualityAuditor(api_key=os.getenv('AI_AUDIT_API_KEY'))
             
-            ai_key_audit = os.getenv('AI_AUDIT_API_KEY')
-            self.enterprise_components['AIQualityAuditor'] = AIQualityAuditor(api_key=ai_key_audit)
-            
-            ai_key_title = os.getenv('AI_TITLE_API_KEY')
-            self.enterprise_components['AITitleOptimizer'] = AITitleOptimizer(api_key=ai_key_title)
-            
-            # Link AI enricher to HumanLikenessEngine
+            # Human Likeness (ይዘቱን 'ሰው' የሚያደርገው)
             self.enterprise_components['HumanLikenessEngine'] = HumanLikenessEngine(
                 cultural_enricher=self.enterprise_components.get('AICulturalEnricher')
             )
             
             self.enterprise_components['SmartImageEngine'] = SmartImageEngine()
             self.enterprise_components['DynamicCTAEngine'] = DynamicCTAEngine()
-            self.enterprise_components['SocialMediaManager'] = SocialMediaManager()
-            self.enterprise_components['DashboardManager'] = DashboardManager()
             
-            print(f"   ✅ Successfully initialized {len(self.enterprise_components)} enhancement engines.")
+            print(f"   ✅ Auditor Engines Initialized: {len(self.enterprise_components)} components.")
 
-        except NameError as e:
-            # This happens if the enhancement classes are not defined in the runner file
-            error_msg = f"Failed to initialize enhancement engines. A required class is missing. Error: {e}"
-            print(f"   ❌ CRITICAL: {error_msg}")
-            self.import_errors.append(error_msg)
-            
-    def _create_basic_mock(self, mock_type: str):
-        """Creates a very simple, obvious mock to prevent crashes when a module is missing."""
-        
-        class MockYouTubeHunter:
-            """A mock that does nothing but log that it's being used."""
-            async def find_relevant_videos(self, topic, country, max_results=5):
-                logging.warning(f"--- MOCK WARNING: Real 'YouTubeIntelligenceHunterPro' not found. Using empty mock. ---")
-                return []
-            async def summarize_video(self, video_id):
-                return {}
-
-        class MockAffiliateManager:
-            """A mock that does nothing but log that it's being used."""
-            async def get_best_product(self, topic, country):
-                logging.warning(f"--- MOCK WARNING: Real 'UltraAffiliateManager' not found. Using empty mock. ---")
-                return None # Return None to simulate no product found
-            async def inject_affiliate_links(self, content, **kwargs):
-                 logging.warning(f"--- MOCK WARNING: Real affiliate injector not found. Content will not be monetized. ---")
-                 return content, {}
-
-        class MockContentSystem:
-            """A mock that generates short, obvious placeholder content."""
-            async def generate_deep_content(self, topic, country, **kwargs):
-                logging.warning(f"--- MOCK WARNING: Real 'UltimateProfitMasterSystem' not found. Generating short placeholder content. ---")
-                return {
-                    'content': f'<h1>Mock Content for {topic} in {country}</h1><p>This is placeholder content because the real content generation module could not be loaded. Please check file names and locations.</p>',
-                    'word_count': 25,
-                    'quality_score': 10
-                }
-            async def refine_and_expand(self, content, target_words):
-                return content
-
-        # Return the correct mock based on the type requested
-        if mock_type == 'YouTubeHunter': return MockYouTubeHunter()
-        if mock_type == 'AffiliateManager': return MockAffiliateManager()
-        if mock_type == 'ContentSystem': return MockContentSystem()
-        return None
+        except Exception as e:
+            print(f"   ❌ ERROR Initializing Auditors: {e}")
+            raise e
 
     def get_module(self, module_name):
-        """Gets a loaded core module by its key."""
         return self.modules.get(module_name)
     
     def get_enterprise_component(self, component_name):
-        """Gets a loaded enhancement component by its key (class name)."""
-        return self.enterprise_components.get(component_name)
-    
-    def _create_enterprise_mock(self, class_name):
-        """
-        Enterprise-grade mock system:
-        ሁሉንም የክፍተት እና የሎጂክ ስህተቶች የሚያስተካክል ስሪት
-        """
-        # 1. YouTube Intelligence Hunter ክፍል
-        if class_name == 'YouTubeIntelligenceHunterPro':
-            class EnterpriseYouTubeHunter:
-                def __init__(self):
-                    self.enterprise_grade = True
-                    self.cultural_depth = 95
-
-                async def find_relevant_videos(self, topic, country, max_results=7):
-                    import asyncio
-                    await asyncio.sleep(0.5)
-                    return [{'id': 'vid1', 'title': 'Enterprise Video', 'quality_score': 95}]
-
-                async def summarize_video(self, video_id, include_key_points=True):
-                    import asyncio
-                    await asyncio.sleep(2.0)
-                    return {
-                        'summary': "Enterprise-grade summary with market analysis.",
-                        'key_points': ["Market growth", "Revenue models"],
-                        'enterprise_grade': True
-                    }
-                
-                async def apply_auto_fixes(self, content, *args, **kwargs):
-                    return content
-
-            return EnterpriseYouTubeHunter()
-
-        # 2. Affiliate Manager ክፍል
-        elif class_name == 'UltraAffiliateManager':
-            class EnterpriseAffiliateManager:
-                def __init__(self, user_geo="US", user_segment="enterprise"):
-                    self.user_geo = user_geo
-                    self.user_segment = user_segment
-                    self.enterprise_grade = True
-                    self.cultural_depth = 95
-                    self.enterprise_products = self._load_enterprise_products()
-                
-                def _load_enterprise_products(self):
-                    return {
-                        'enterprise_software': [
-                            {'name': 'Enterprise CRM System', 'price': 2999.99, 'commission_rate': 0.15, 'category': 'software'},
-                            {'name': 'AI Analytics Platform', 'price': 4999.99, 'commission_rate': 0.12, 'category': 'ai_tools'}
-                        ],
-                        'premium_services': [
-                            {'name': 'Enterprise Consulting', 'price': 5000.00, 'commission_rate': 0.25, 'category': 'consulting'}
-                        ],
-                        'hardware_solutions': [
-                            {'name': 'Enterprise Server', 'price': 8999.99, 'commission_rate': 0.08, 'category': 'hardware'}
-                        ]
-                    }
-
-                async def get_best_product(self, topic, country):
-                    import asyncio, random
-                    await asyncio.sleep(1.5)
-                    topic_lower = topic.lower()
-                    category = 'premium_services'
-                    
-                    if any(word in topic_lower for word in ['software', 'saas', 'platform', 'system']):
-                        category = 'enterprise_software'
-                    elif any(word in topic_lower for word in ['hardware', 'server', 'infrastructure', 'device']):
-                        category = 'hardware_solutions'
-                    
-                    products = self.enterprise_products.get(category, [])
-                    if products:
-                        product = random.choice(products).copy()
-                        product.update({
-                            'country': country,
-                            'topic_relevance': random.uniform(0.88, 0.98),
-                            'enterprise_grade': True
-                        })
-                        return product
-                    return None
-
-                async def apply_auto_fixes(self, content, *args, **kwargs):
-                    return content
-
-            return EnterpriseAffiliateManager()
-
-        # 3. ለሌሎች በሙሉ የሚሆን Fallback
-        class GeneralEnterpriseMock:
-            def __init__(self):
-                self.enterprise_grade = True
-                self.cultural_depth = 95
-
-            async def __call__(self, *args, **kwargs):
-                return 95
-
-            def __getattr__(self, name):
-                # በቀድሞው የነበረ ስህተት እዚህ ተስተካክሏል
-                if name == "get_depth":
-                    return lambda: 95
-
-                if name == "refine_and_expand":
-                    async def expand_content(content, target_words=None):
-                        return content + "\n\n" + (
-                            "Expanded enterprise content section. " * 50
-                        )
-                    return expand_content
-
-                # generic async mock fallback
-                async def generic_mock_func(*args, **kwargs):
-                    return args[0] if args else 95
-
-                return generic_mock_func
-
-        return GeneralEnterpriseMock()
-    
-    def _create_core_mocks(self):
-        """Create basic mock systems for core modules"""
-        print("   ⚠️ Creating basic mock systems for core modules")
-        
-        # Create simple mocks
-        self.modules['YouTubeIntelligenceHunterPro'] = self._create_enterprise_mock('YouTubeIntelligenceHunterPro')
-        self.modules['UltraAffiliateManager'] = self._create_enterprise_mock('UltraAffiliateManager')
-        
-    def _create_profit_mocks(self):
-        """Create profit master mock systems"""
-        class MockProfitSystem:
-            def __init__(self):
-                self.enterprise_grade = True
-            
-            async def generate_deep_content(self, topic, country, video_research, affiliate_product):
-                # ENHANCED MOCK CONTENT GENERATION (2500+ Words)
-                intro = f"""
-# The Ultimate Guide to {topic} in {country}
-
-In today's rapidly evolving digital landscape, mastering **{topic}** has become a critical imperative for businesses operating in {country}. As we move further into 2026, the intersection of technology and market dynamics is creating unprecedented opportunities for those prepared to adapt.
-
-This comprehensive guide delves deep into the strategies, tools, and methodologies required to excel in {topic}. Whether you are a startup founder in a bustling tech hub or an enterprise executive looking to optimize operations, the insights provided here are tailored to the unique economic and cultural context of {country}.
-
-## Executive Summary
-
-The {country} market presents a unique set of challenges and advantages for {topic}. Recent data suggests that early adopters in this sector have seen a **40% increase in operational efficiency** and a **25% boost in revenue** year-over-year. However, navigating the regulatory landscape and understanding local consumer behavior remains a significant hurdle.
-
-In this guide, we will cover:
-1.  **Market Analysis:** A detailed look at the current state of {topic} in {country}.
-2.  **Strategic Implementation:** Step-by-step frameworks for deploying {topic} solutions.
-3.  **Risk Management:** Identifying and mitigating potential pitfalls.
-4.  **Future Trends:** What to expect in the next 3-5 years.
-
-Let's embark on this journey to transform your business capabilities through {topic}.
-"""
-                body = ""
-                sections = [
-                    ("The Strategic Importance of " + topic, "Understanding the 'Why'", 400),
-                    ("Market Landscape in " + country, "Local Insights and Data", 500),
-                    ("Key Technologies Driving " + topic, "Innovation and Tools", 600),
-                    ("Step-by-Step Implementation Framework", "Actionable Strategy", 700),
-                    ("Overcoming Common Challenges", "Risk Mitigation", 400),
-                    ("Case Studies: Success Stories in " + country, "Real-world Examples", 500),
-                    ("Future Outlook: 2026 and Beyond", "Predictions and Trends", 300)
-                ]
-
-                for title, subtitle, words in sections:
-                    body += f"\n\n## {title}\n### {subtitle}\n\n"
-                    # Generate filler text that looks like real content
-                    for _ in range(words // 20): 
-                        body += f"The implementation of {topic} in {country} requires a nuanced understanding of {subtitle.lower()}. "
-                        body += "Industry experts agree that a robust strategy is paramount. "
-                        body += "Data from recent studies supports the notion that agility and scalability are key drivers of success. "
-                        body += f"Furthermore, considering the local regulations in {country}, businesses must be vigilant. "
-                        body += "This involves a multi-faceted approach to compliance and ethical standards. "
-                        body += "Leveraging advanced analytics can provide a competitive edge. " 
-                    body += "\n\n"
-
-                conclusion = f"""
-## Conclusion
-
-As we have explored, {topic} is not just a buzzword but a transformative force in the {country} market. By adopting the strategies outlined in this guide, businesses can position themselves for long-term success. The journey may be complex, but the rewards of mastering {topic} are substantial.
-
-Start your transformation today.
-"""
-                
-                full_content = intro + body + conclusion
-                
-                return {
-                    'content': full_content,
-                    'word_count': len(full_content.split()),
-                    'quality_score': 92, # Higher quality score for longer content
-                    'enterprise_grade': True
-                }
-
-            async def refine_and_expand(self, content, target_words):
-                # Simply return content as it's already long enough from generation
-                return content
-        
-        self.modules['UltimateProfitMasterSystem'] = MockProfitSystem()
-    
-    def get_module(self, module_name):
-        """Get a module by name"""
-        return self.modules.get(module_name)
-    
-    def get_enterprise_component(self, component_name):
-        """Get an enterprise component by name"""
         return self.enterprise_components.get(component_name)
 
+    # 🗑️ የድሮው _create_basic_mock ክፍል ሙሉ በሙሉ ተወግዷል!
 # =================== ENTERPRISE ENHANCEMENT COMPONENTS ===================
 
 class CulturalDepthGuardian:
