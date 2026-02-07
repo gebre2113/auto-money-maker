@@ -4193,174 +4193,73 @@ class EnhancedWordCounter:
         return len(words)
 # =========================================================================
 # 👑 TITAN v19.0: THE SOVEREIGN ORACLE - ULTIMATE EDITION (FINAL)
-# =========================================================================
+# ========================================================================
 
 class MegaContentEngine:
-    """
-    💎 የዓለማችን እጅግ የላቀ የይዘት ማምረቻ ሞተር።
-    ይህ ሞተር 11 የዓለም አገራትን በአንድ ጊዜ ይቆጣጠራል፣ በእያንዳንዱ አገር ላይ 
-    ከ 8,000 እስከ 12,000 የሚደርሱ እጅግ ጥልቅና ማራኪ የሆኑ የጥበብ ስራዎችን ይፈጥራል።
-    """
-    
     def __init__(self, system):
         self.system = system
-        self.config = system.config
-        self.failover = system.failover_system
-        self.TARGET_WORDS = 8500
-        self.MAX_TARGET = 12000
-        self.logger = logging.getLogger("Titan.Zenith.Final")
+        self.ai = system.ai_provider
+        self.TARGET_WORDS = 7500 # ቢያንስ 7500 ቃላት
 
-    # --- 1. የራነሩ ድልድይ (ለአንድ ሀገር ብቻ ሲፈለግ) ---
-    async def produce_single_country_sovereign_logic(self, topic: str, country: str) -> str:
-        """ራነሩ (v8.2) ለአንድ ሀገር ብቻ ጥልቅ ይዘት ሲፈልግ የሚጠራው ዋናው ድልድይ"""
-        self.logger.info(f"👑 Titan Sovereign Engine: Commencing 5-Phase research for {country}")
+    async def produce_sovereign_content(self, base_topic: str, country: str):
+        """ለአንድ ሀገር 7,000 - 12,000 ቃላት በ 7 ደረጃዎች ማምረት"""
+        info = HIGH_VALUE_COUNTRIES[country]
         
-        country_info = self.config.HIGH_VALUE_COUNTRIES.get(country, self.config.HIGH_VALUE_COUNTRIES['US'])
+        # ደረጃ 0: ትሬንድ ማጣራት
+        topic_prompt = f"What is the most viral and profitable trending sub-niche for '{base_topic}' in {country} today, February 2026? Give me ONLY the title."
+        final_topic = await self.ai.generate_content(topic_prompt, 100)
+        if len(final_topic) < 5: final_topic = base_topic
+
+        print(f"👑 Starting 7-Phase Production for {country} on topic: {final_topic}")
         
-        try:
-            # ደረጃ 0: መነጋገሪያ ርዕሱን ማጣራት
-            raw_topic = await self._discover_viral_topic(topic, country)
-            final_topic = self._validate_topic(raw_topic, topic, country)
+        phases = []
+        # 7ቱንም ደረጃዎች በተለያዩ የግሮቅ ቁልፎች ማስኬድ
+        prompts = [
+            f"WRITE 1500 WORDS: Phase 1 - Global & {country} Market Psychology and 2026 Trends. HTML.",
+            f"WRITE 1500 WORDS: Phase 2 - Technical Architecture and System Infrastructure for {country}. HTML.",
+            f"WRITE 1500 WORDS: Phase 3 - 10 In-depth Case Studies of success in {country}. HTML.",
+            f"WRITE 1500 WORDS: Phase 4 - Step-by-Step 24-Month Implementation Roadmap. HTML.",
+            f"WRITE 1500 WORDS: Phase 5 - Financial ROI Models and Monetization Secrets for {country}. HTML.",
+            f"WRITE 1500 WORDS: Phase 6 - Competitive Deconstruction and Market Dominance. HTML.",
+            f"WRITE 1500 WORDS: Phase 7 - 50 Deep-Dive FAQs with 100-word responses and 2040 Vision. HTML."
+        ]
 
-            # ደረጃ 1 - 5: ይዘቱን በደረጃ ማምረት
-            p1 = await self.failover.generate_content(self._get_p1_prompt(final_topic, country), max_tokens=4000)
-            p2 = await self.failover.generate_content(self._get_p2_prompt(final_topic, country, p1), max_tokens=4000)
-            p3 = await self.failover.generate_content(self._get_p3_prompt(final_topic, country, p2), max_tokens=4000)
-            p4 = await self.failover.generate_content(self._get_p4_prompt(final_topic, country, p3), max_tokens=4000)
-            p5 = await self.failover.generate_content(self._get_p5_prompt(final_topic, country, p4), max_tokens=4000)
-            
-            full_raw = p1 + "\n" + p2 + "\n" + p3 + "\n" + p4 + "\n" + p5
-            
-            # ይዘቱን ማረም እና ማስዋብ (Sensory & Neuro-Marketing)
-            polished_content = self.system.sensory_writer.transform_to_sensory_content(full_raw)
-            polished_content = self.system.neuro_converter.apply_neuro_marketing(polished_content)
-            
-            # ንጉሳዊ ዲዛይን እና መዋቅር መጨመር
-            final_html = self._build_royal_structure(polished_content, final_topic, country)
-            
-            return final_html
+        for idx, p in enumerate(prompts):
+            print(f"   ⚙️  የደረጃ {idx+1} ምርት በሂደት ላይ...")
+            content_part = await self.ai.generate_content(p, 4000)
+            phases.append(content_part)
+            await asyncio.sleep(3) # በየዙሩ መሃል 3 ሰከንድ እረፍት (እንደጠየቅከው)
 
-        except Exception as e:
-            self.logger.error(f"❌ Sovereign Bridge Failed for {country}: {e}")
-            return f"<h1>{topic}</h1><p>Strategic analysis for {country} is being processed.</p>"
-
-    # --- 2. የ11 ሀገራት አጠቃላይ ሉፕ (Automation) ---
-    async def produce_11_countries_mega_loop(self, base_topic: str):
-        """የ11 አገራት ሉፕ - እያንዳንዱ አገር ራሱን የቻለ Masterpiece የሚያመርትበት"""
-        target_countries = list(self.config.HIGH_VALUE_COUNTRIES.keys())[:11]
+        full_raw = "\n\n".join(phases)
         
-        print("\n" + "👑"*45)
-        print("    ULTIMATE SOVEREIGN INTELLIGENCE - ACTIVATED")
-        print(f"    GOAL: 8,000 - 12,000 WORDS PER COUNTRY")
-        print("👑"*45 + "\n")
-
-        start_time = time.time()
-
-        for i, country in enumerate(target_countries, 1):
-            country_info = self.config.HIGH_VALUE_COUNTRIES[country]
-            print(f"💎 [{i}/11] ስልታዊ ዝግጅት ለ {country_info['emoji']} {country}...")
-            
-            try:
-                # ለአንድ ሀገር የሚያመርተውን ፈንክሽን መጥራት (Code Re-use)
-                final_html = await self.produce_single_country_sovereign_logic(base_topic, country)
-                word_count = EnhancedWordCounter.count_words(final_html)
-
-                # ርዝመት ማረጋገጫ (The Grand Stretch)
-                if word_count < self.TARGET_WORDS:
-                    print(f"   ⏳ ርዝመት ማስተካከያ ({word_count} ቃላት)...")
-                    stretch_prompt = f"Expand this guide with an additional 3,000 words focusing on hidden secrets and case studies for {country}. Use HTML."
-                    stretch = await self.failover.generate_content(stretch_prompt, max_tokens=4000)
-                    final_html += "\n\n" + stretch
-                    word_count = EnhancedWordCounter.count_words(final_html)
-
-                # ውጤቱን ማስቀመጥ
-                file_path = save_to_file({
-                    'id': f"SUPREME_{country}_{int(time.time())}",
-                    'title': f"THE SOVEREIGN GUIDE: {base_topic}",
-                    'content': final_html,
-                    'word_count': word_count,
-                    'quality_report': {'overall_score': 100},
-                    'production_report': {
-                        'estimated_earning_potential': {
-                            'total_monthly_potential': country_info['avg_commission'] * 250
-                        }
-                    }
-                }, 'html')
-
-                print(f"   🏆 የ{country} ስራ ተጠናቀቀ! | ቃላት: {word_count} | ፋይል: {file_path}")
-
-            except Exception as e:
-                print(f"   ⚠️ የ{country} ሂደት ተቋርጧል፡ {e}")
-
-            if i < 11:
-                print(f"   💤 ለአጭር ጊዜ ማረፍ (Cooling down)...")
-                await asyncio.sleep(45)
-
-        print("\n" + "👑"*45)
-        print(f"🎉 11ዱም ሀገራት ተጠናቀቁ! ጠቅላላ ጊዜ: {(time.time() - start_time) / 60:.2f} ደቂቃ")
-        print("👑"*45)
-
-    # --- 3. አጋዥ ፈንክሽኖች (Helper Methods) ---
-    async def _discover_viral_topic(self, base_topic, country):
-        prompt = f"Identify the most viral and profitable trending topic related to '{base_topic}' in {country} for February 2026. Give me ONLY the title."
-        try:
-            res = await self.failover.generate_content(prompt, max_tokens=100)
-            return res.strip()
-        except: return "ERROR"
-
-    def _validate_topic(self, discovered, original, country):
-        bad_signals = ["sorry", "error", "unable", "failed"]
-        if any(s in discovered.lower() for s in bad_signals) or len(discovered) < 5:
-            return f"The 2026 Sovereign Strategy for {original} in {country}"
-        return discovered
-
-    def _get_p1_prompt(self, t, c):
-        return f"WRITE 2,500 WORDS: Phase 1 of 'The Sovereign Guide to {t}' in {c}. Covers: Market psychology and foundations. Use HTML."
-
-    def _get_p2_prompt(self, t, c, p):
-        return f"WRITE 2,000 WORDS: Phase 2 for '{t}' in {c}. Covers: Technical architecture. Use HTML."
-
-    def _get_p3_prompt(self, t, c, p):
-        return f"WRITE 2,000 WORDS: Phase 3 for '{t}' in {c}. Covers: 15 Case studies. Use HTML."
-
-    def _get_p4_prompt(self, t, c, p):
-        return f"WRITE 2,000 WORDS: Phase 4 for '{t}' in {c}. Covers: 24-month Roadmap. Use HTML."
-
-    def _get_p5_prompt(self, t, c, p):
-        return f"WRITE 1,500 WORDS: Phase 5 for '{t}' in {c}. Covers: 50 Deep-dive FAQs. Use HTML."
+        # የጥበብ ስራ እና ማሳመሪያ (Sensory & Neuro)
+        print(f"   🎨 ይዘቱን በጥበብ መሸመን (Sensory & Neuro-Marketing Polish)...")
+        polished = self.system.sensory_writer.transform_to_sensory_content(full_raw)
+        polished = self.system.neuro_converter.apply_neuro_marketing(polished)
+        
+        # የንጉሳዊ ዲዛይን ግንባታ
+        final_html = self._build_royal_structure(polished, final_topic, country)
+        word_count = EnhancedWordCounter.count_words(final_html)
+        
+        return {
+            'id': f"SUPREME_{country}_{int(time.time())}",
+            'country': country,
+            'title': final_topic,
+            'content': final_html,
+            'word_count': word_count,
+            'commission': info['avg_commission']
+        }
 
     def _build_royal_structure(self, content, topic, country):
-        style = """
-        <style>
-            @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Lora:ital,wght@0,400;1,700&display=swap');
-            .sovereign-document { 
-                padding: 60px; border: 30px solid #1a2a44; background: #fff; 
-                font-family: 'Lora', serif; color: #1a1a1a; line-height: 2.2;
-                box-shadow: 0 0 50px rgba(0,0,0,0.2);
-            }
-            .gold-badge { 
-                background: #c5a059; color: white; padding: 10px 25px; 
-                border-radius: 4px; display: inline-block; font-weight: bold;
-            }
-            h1 { font-family: 'Playfair Display', serif; font-size: 65px; color: #1e3c72; }
-            h2 { color: #1a2a44; border-bottom: 3px solid #c5a059; padding-bottom: 10px; margin-top: 50px; }
-            p { margin-bottom: 25px; font-size: 19px; text-align: justify; }
-        </style>
-        """
-        html = f"""
-        {style}
-        <div class="sovereign-document">
-            <div style="text-align:center;">
-                <div class="gold-badge">SUPREME STRATEGIC INTELLIGENCE</div>
-                <h1>{topic.upper()}</h1>
-                <p><b>A ROYAL MASTER-GUIDE FOR THE {country.upper()} MARKET</b></p>
-            </div>
-            <div class="main-body">
-                {content}
-            </div>
-        </div>
-        """
-        return html
+        style = """<style>
+            @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Lora&display=swap');
+            .sovereign-doc { padding: 60px; border: 35px solid #0f172a; font-family: 'Lora', serif; line-height: 2.3; background: #fff; }
+            h1 { font-family: 'Playfair Display', serif; font-size: 65px; color: #1e3c72; text-align: center; margin-bottom: 30px; }
+            h2 { border-bottom: 4px solid #c5a059; padding-bottom: 10px; margin-top: 50px; color: #0f172a; }
+            .gold-badge { background: #c5a059; color: white; padding: 10px; text-align: center; font-weight: bold; letter-spacing: 2px; }
+        </style>"""
+        return f"{style}<div class='sovereign-doc'><div class='gold-badge'>SUPREME STRATEGIC INTELLIGENCE</div><h1>{topic}</h1>{content}</div>"
+
 # =================== ዋና ስርዓት ክፍል ===================
 
 class UltimateProfitMasterSystem:
