@@ -304,7 +304,7 @@ HIGH_VALUE_COUNTRIES = {
         'conversion_rate': 0.035,
         'research_depth': 'deep',
         'content_length': 3000,
-        'delay_seconds': (180, 240),
+        'delay_seconds': (60, 90),
         'cultural_tips': [
             "Focus on data-driven arguments and ROI",
             "Include case studies from Fortune 500 companies",
@@ -325,7 +325,7 @@ HIGH_VALUE_COUNTRIES = {
         'conversion_rate': 0.032,
         'research_depth': 'deep',
         'content_length': 2800,
-        'delay_seconds': (150, 210),
+        'delay_seconds': (60, 90),
         'cultural_tips': [
             "Balance formal and conversational tone",
             "Include references to UK/EU regulations",
@@ -345,7 +345,7 @@ HIGH_VALUE_COUNTRIES = {
         'conversion_rate': 0.030,
         'research_depth': 'deep',
         'content_length': 2600,
-        'delay_seconds': (120, 180),
+        'delay_seconds': (60, 90),
         'cultural_tips': [
             "Bilingual references (English/French)",
             "Include Canadian case studies",
@@ -365,7 +365,7 @@ HIGH_VALUE_COUNTRIES = {
         'conversion_rate': 0.029,
         'research_depth': 'medium',
         'content_length': 2500,
-        'delay_seconds': (120, 180),
+        'delay_seconds': (60, 90),
         'cultural_tips': [
             "Direct, no-nonsense approach",
             "Include Asia-Pacific market context",
@@ -385,7 +385,7 @@ HIGH_VALUE_COUNTRIES = {
         'conversion_rate': 0.028,
         'research_depth': 'deep',
         'content_length': 2700,
-        'delay_seconds': (150, 210),
+        'delay_seconds': (60, 90),
         'cultural_tips': [
             "Precision and detail-oriented content",
             "Technical specifications and data",
@@ -405,7 +405,7 @@ HIGH_VALUE_COUNTRIES = {
         'conversion_rate': 0.026,
         'research_depth': 'medium',
         'content_length': 2400,
-        'delay_seconds': (120, 180),
+        'delay_seconds': (60, 90),
         'cultural_tips': [
             "Elegant, sophisticated language",
             "Philosophical and conceptual framing",
@@ -425,7 +425,7 @@ HIGH_VALUE_COUNTRIES = {
         'conversion_rate': 0.025,
         'research_depth': 'deep',
         'content_length': 2800,
-        'delay_seconds': (180, 240),
+        'delay_seconds': (60, 90),
         'cultural_tips': [
             "Extreme attention to detail",
             "Harmony and consensus building",
@@ -445,7 +445,7 @@ HIGH_VALUE_COUNTRIES = {
         'conversion_rate': 0.024,
         'research_depth': 'deep',
         'content_length': 2900,
-        'delay_seconds': (150, 210),
+        'delay_seconds': (60, 90),
         'cultural_tips': [
             "Multilingual considerations (DE/FR/IT)",
             "Precision and reliability emphasis",
@@ -465,7 +465,7 @@ HIGH_VALUE_COUNTRIES = {
         'conversion_rate': 0.023,
         'research_depth': 'medium',
         'content_length': 2500,
-        'delay_seconds': (120, 180),
+        'delay_seconds': (60, 90),
         'cultural_tips': [
             "Social equality and fairness themes",
             "Sustainability and environmental focus",
@@ -485,7 +485,7 @@ HIGH_VALUE_COUNTRIES = {
         'conversion_rate': 0.022,
         'research_depth': 'medium',
         'content_length': 2400,
-        'delay_seconds': (120, 180),
+        'delay_seconds': (60, 90),
         'cultural_tips': [
             "Innovation and technology focus",
             "Gender equality and social justice",
@@ -505,7 +505,7 @@ HIGH_VALUE_COUNTRIES = {
         'conversion_rate': 0.018,
         'research_depth': 'deep',
         'content_length': 2200,
-        'delay_seconds': (90, 150),
+        'delay_seconds': (60, 90),
         'cultural_tips': [
             "Community and relationship focus",
             "Local business examples and success stories",
