@@ -41,7 +41,20 @@ try:
     import psutil
 except ImportError as e:
     print(f"⚠️  WARNING: Missing dependency: {e}")
-
+# --- ይህንን በፋይሉ አናት ላይ (Global) ያስቀምጡ ---
+COUNTRIES = {
+    'US': {'name': 'USA', 'emoji': '🇺🇸', 'lang': 'English', 'comm': 50, 'delay': 45},
+    'GB': {'name': 'UK', 'emoji': '🇬🇧', 'lang': 'English', 'comm': 45, 'delay': 45},
+    'DE': {'name': 'Germany', 'emoji': '🇩🇪', 'lang': 'German', 'comm': 40, 'delay': 45},
+    'FR': {'name': 'France', 'emoji': '🇫🇷', 'lang': 'French', 'comm': 38, 'delay': 45},
+    'JP': {'name': 'Japan', 'emoji': '🇯🇵', 'lang': 'Japanese', 'comm': 43, 'delay': 60},
+    'CH': {'name': 'Switzerland', 'emoji': '🇨🇭', 'lang': 'German', 'comm': 55, 'delay': 45},
+    'NO': {'name': 'Norway', 'emoji': '🇳🇴', 'lang': 'Norwegian', 'comm': 47, 'delay': 45},
+    'SE': {'name': 'Sweden', 'emoji': '🇸🇪', 'lang': 'Swedish', 'comm': 41, 'delay': 45},
+    'CA': {'name': 'Canada', 'emoji': '🇨🇦', 'lang': 'English', 'comm': 42, 'delay': 45},
+    'AU': {'name': 'Australia', 'emoji': '🇦🇺', 'lang': 'English', 'comm': 48, 'delay': 45},
+    'ET': {'name': 'Ethiopia', 'emoji': '🇪🇹', 'lang': 'Amharic', 'comm': 25, 'delay': 30}
+}
 # =================== ከፍ ያሉ ገላጭ ማስታወሻዎች ===================
 def save_to_file(content: Dict, format: str = 'json') -> str:
     """ውጤትን ወደ ፋይል አስቀምጥ"""
