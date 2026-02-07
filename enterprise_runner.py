@@ -2352,43 +2352,38 @@ class DynamicCTAEngine:
 # =================== 🛡️ ENTERPRISE IMPORT SYSTEM (STRICT EDITION) ===================
 
 class EnterpriseImportSystem:
-    """
-    🚀 ENTERPRISE-GRADE STRICT LOADER v3.0
-    ምንም አይነት ማስመስል (Mocking) የማይፈቅድ እና እውነተኛዎቹን ኃያላን ኢንጂኖች
-    (v18.1 እና v2.3) ብቻ እንዲሰሩ የሚያስገድድ ጥብቅ ስርዓት::
-    """
+    """ኃያላን ኢንጂኖችን (v18.1 እና v2.3) በሃይል የሚጭን እና Mockን የሚያስወግድ ክፍል"""
     def __init__(self):
         self.modules = {}
         self.enterprise_components = {}
-
-    def import_enterprise_system(self):
+        self.import_errors = []
+        
+    def import_enterprise_system(self) -> Dict:
         print("\n" + "⚔️"*40)
-        print("⚡ STRICT ENTERPRISE LOADER ACTIVATED - NO MOCKS ALLOWED")
+        print("⚡ STRICT LOADER: CONNECTING TO v18.1 & v2.3")
         print("⚔️"*40)
         
         # 1. Mega-Content Factory (v18.1) መጫን
-        print("💰 Loading Mega-Content Factory (v18.1)...")
         try:
             from profit_master_system import UltimateProfitMasterSystem
             self.modules['content_system'] = UltimateProfitMasterSystem()
-            print("   ✅ Ultimate Profit Master (v18.1): ONLINE")
-        except (ImportError, ModuleNotFoundError) as e:
-            print(f"   ❌ FATAL: 'profit_master_system.py' አልተገኘም!")
-            raise ImportError("🚫 ስህተት: Mega-System v18.1 ሳይኖር ምርት መጀመር አይቻልም!")
+            print("   ✅ Mega-Content Factory (v18.1): ONLINE")
+        except ImportError:
+            raise ImportError("🚫 FATAL: 'profit_master_system.py' አልተገኘም! እባክህ ፋይሉን ስም አስተካክል::")
 
         # 2. YouTube & Affiliate System (v2.3) መጫን
-        print("\n🎯 Loading Monetization Engine (v2.3)...")
         try:
-            from youtube_affiliate_system import VideoAffiliateIntegrationEngine, YouTubeIntelligenceHunterPro
-            self.modules['yt_hunter'] = YouTubeIntelligenceHunterPro()
+            from youtube_affiliate_system import VideoAffiliateIntegrationEngine
+            # እዚህ ጋር 'affiliate_manager' የሚለውን ስም ለራነሩ እንዲመቸው እናደርጋለን
             self.modules['affiliate_manager'] = VideoAffiliateIntegrationEngine(enable_ethical_mode=True)
-            print("   ✅ Video Affiliate Engine (v2.3): ONLINE")
-        except (ImportError, ModuleNotFoundError) as e:
-            print(f"   ❌ FATAL: 'youtube_affiliate_system.py' አልተገኘም!")
-            raise ImportError("🚫 ስህተት: YouTube-Affiliate v2.3 ሳይኖር ገቢ ማመንጨት አይቻልም!")
+            print("   ✅ Monetization Engine (v2.3): ONLINE")
+        except ImportError:
+            raise ImportError("🚫 FATAL: 'youtube_affiliate_system.py' አልተገኘም!")
 
-    def get_module(self, name):
-        return self.modules.get(name)
+        return {'status': 'success'}
+
+    def get_module(self, module_name):
+        return self.modules.get(module_name)
 
 # =================== 👑 MASTER PRODUCTION ORCHESTRATOR ===================
 
