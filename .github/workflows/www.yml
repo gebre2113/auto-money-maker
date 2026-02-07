@@ -95,7 +95,7 @@ jobs:
       run: |
         echo "🚀 Starting Unified Sovereign Engine..."
         # ራነሩን ማስጀመር - የ 10 ቁጥር ምርጫን እና ርዕስን በራስ ሰር ይልካል
-        python main.py <<EOF
+        python enterprise_runner.py <<EOF
         10
         $INPUT_TOPIC
         EOF
