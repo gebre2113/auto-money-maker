@@ -1,28 +1,38 @@
-name: 🚀 Profit Master Elite - ULTIMATE PRODUCTION ON
+name: 👑 TITAN v21.0: THE UNIFIED SOVEREIGN - AUTOMATION
 
 on:
-  # 1. በእጅ ማስጀመር
+  # 1. በየ 6 ሰዓቱ በራስ-ሰር ይነሳል
+  schedule:
+    - cron: '0 */6 * * *'
+      
+  # 2. በማንኛውም ጊዜ በእጅ ለማስጀመር
   workflow_dispatch:
     inputs:
       topic:
-        description: 'Target Topic (e.g., Enterprise AI 2026)'
+        description: 'Target Topic (e.g., Future of AI 2026)'
         required: false
-        default: 'Enterprise AI Implementation Strategies 2026'
-      
-  # 2. በየቀኑ ጠዋት 12:00 (6:00 UTC) በራስ ሰር ይነሳል
-  schedule:
-    - cron: '0 6 * * *'
+        default: 'Emerging AI Technologies and Global Economic Impact 2026'
+      language:
+        description: 'Language'
+        required: false
+        default: 'en'
 
-# 🔐 ፈቃዶች
+# የሲስተም ፈቃዶች
 permissions:
   contents: write
+  issues: write
   actions: read
 
+# ተደጋጋሚ ስራዎችን ለመከላከል (Concurrency)
+concurrency:
+  group: production-pipeline
+  cancel-in-progress: true
+
 jobs:
-  run-enterprise-engine:
-    name: 🏭 Run Enterprise Engine
+  run-sovereign-engine:
+    name: 👑 Execute Sovereign Production
     runs-on: ubuntu-latest
-    timeout-minutes: 60
+    timeout-minutes: 120 # ረጅም ይዘት ስለሆነ ጊዜ እንሰጠዋለን
 
     steps:
     # 1. ኮዱን ማውረድ
@@ -31,93 +41,118 @@ jobs:
       with:
         fetch-depth: 0
 
-    # 2. ፓይተን ማዘጋጀት
-    - name: 🐍 Set up Python 3.10
+    # 2. ፓይተን ማዘጋጀት (Latest Stable)
+    - name: 🐍 Set up Python 3.12
       uses: actions/setup-python@v5
       with:
-        python-version: '3.10'
+        python-version: '3.12'
         cache: 'pip'
 
-    # 3. የሲስተም ሶፍትዌሮች
+    # 3. የሲስተም ሶፍትዌሮች (ለቪዲዮ እና ምስል ሂደት)
     - name: 🎥 Install System Tools
       run: |
         sudo apt-get update
         sudo apt-get install -y ffmpeg
 
-    # 4. ፓይተን ላይብረሪዎች (tenacity እና ሌሎች የተሟሉ)
+    # 4. ፓይተን ላይብረሪዎች (ሁሉንም የላቁ ሞጁሎችን ያካትታል)
     - name: 📦 Install Dependencies
       run: |
         python -m pip install --upgrade pip
-        # Core & Robustness
-        pip install tenacity requests psutil python-dotenv pyyaml aiohttp asyncio
-        # AI Engines
-        pip install google-generativeai groq openai
-        # Content Processing
-        pip install beautifulsoup4 pandas jinja2 lxml
-        # Publishing & Integration
-        pip install python-wordpress-xmlrpc
-        # Requirements.txt ካለ እሱንም ይጨምር
+        pip install tenacity requests psutil python-dotenv pyyaml aiohttp asyncio \
+                    google-generativeai groq openai \
+                    beautifulsoup4 pandas jinja2 lxml \
+                    textblob nltk numpy \
+                    python-wordpress-xmlrpc
+        
+        # የቋንቋ ማቀነባበሪያ ዳታዎችን ማውረድ
+        python -m nltk.downloader punkt stopwords wordnet averaged_perceptron_tagger_eng
+        
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
-    # 5. ስራውን ማስጀመር (The Main Engine)
-    - name: 🚀 Execute Enterprise Runner
+    # 5. የሜጋ ምርት ሂደትን ማስጀመር
+    - name: 👑 Run Unified Sovereign Engine
       env:
+        # --- AI API KEYS (MULTI-KEY ROTATION) ---
         GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+        GROQ_API_KEY_1: ${{ secrets.GROQ_API_KEY_1 }}
+        GROQ_API_KEY_2: ${{ secrets.GROQ_API_KEY_2 }}
+        GROQ_API_KEY_3: ${{ secrets.GROQ_API_KEY_3 }}
+        GROQ_API_KEY_4: ${{ secrets.GROQ_API_KEY_4 }}
+        GROQ_API_KEY_5: ${{ secrets.GROQ_API_KEY_5 }}
+        GROQ_API_KEY_6: ${{ secrets.GROQ_API_KEY_6 }}
+        GROQ_API_KEY_7: ${{ secrets.GROQ_API_KEY_7 }}
+        
+        # --- OTHER AI PROVIDERS ---
         GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
         AI_CULTURAL_API_KEY: ${{ secrets.AI_CULTURAL_API_KEY }}
         AI_AUDIT_API_KEY: ${{ secrets.AI_AUDIT_API_KEY }}
         AI_TITLE_API_KEY: ${{ secrets.AI_TITLE_API_KEY }}
+
+        # --- DISTRIBUTION KEYS ---
         WP_URL: ${{ secrets.WP_URL }}
         WP_USERNAME: ${{ secrets.WP_USERNAME }}
         WP_PASSWORD: ${{ secrets.WP_PASSWORD }}
         TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
         TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-        ENTERPRISE_TOPIC: ${{ github.event.inputs.topic || 'Enterprise AI Implementation Strategies 2026' }}
+        
+        # --- CONFIGURATION ---
+        ENTERPRISE_TOPIC: ${{ github.event.inputs.topic || 'Future of Global Wealth and AI 2026' }}
+        INPUT_TOPIC: ${{ github.event.inputs.topic || 'Future of Global Wealth and AI 2026' }}
+        GITHUB_ACTIONS: "true"
         PYTHONPATH: .
+        PYTHONUNBUFFERED: 1
       run: |
-        echo "🔥 Starting Production Engine for topic: $ENTERPRISE_TOPIC"
-        set +e 
-        python enterprise_runner.py
-        exit_code=$?
-        if [ $exit_code -ne 0 ]; then
-          echo "⚠️ Script finished with warnings (Code: $exit_code)"
-        else
-          echo "✅ Script finished successfully"
-        fi
+        echo "🚀 Starting Unified Sovereign Engine..."
+        echo "🌍 Target Topic: $INPUT_TOPIC"
+        # ራነሩን ማስጀመር - የ 10 ቁጥር ምርጫን በራስ ሰር ይልካል
+        python main.py <<EOF
+        10
+        $INPUT_TOPIC
+        EOF
 
-    # 6. ውጤቱን ወደ GitHub መልሶ መጫን
+    # 6. የሪፖርት ማጠቃለያ ለ GitHub Issues መላክ
+    - name: 📝 Create GitHub Issue Summary
+      if: success()
+      run: |
+        curl -X POST \
+          -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+          -H "Accept: application/vnd.github.v3+json" \
+          -d "{\"title\": \"✅ Production Complete: ${{ github.event.inputs.topic || 'Auto-Run' }}\", \"body\": \"### 👑 Sovereign Production Summary\n- **Topic:** ${{ github.event.inputs.topic || 'Scheduled' }}\n- **Status:** Successfully generated and distributed.\n- **Timestamp:** $(date)\n\nCheck `enterprise_outputs` for full reports.\"}" \
+          "https://api.github.com/repos/${{ github.repository }}/issues"
+
+    # 7. አዳዲስ ፋይሎችን ወደ ሪፖዚቶሪ መመለስ
     - name: 📤 Commit & Push Results
       if: always()
       run: |
         git config --local user.email "action@github.com"
-        git config --local user.name "Enterprise Bot 🤖"
+        git config --local user.name "Sovereign-Bot 👑"
         
-        # አስፈላጊ የሆኑ ፎልደሮች መኖራቸውን አረጋግጥ
+        # ማህደሮችን መፍጠር
         mkdir -p enterprise_outputs production_backups enterprise_logs ai_usage_logs
         
-        git add enterprise_outputs/ production_backups/ enterprise_logs/ ai_usage_logs/ || true
+        git add enterprise_outputs/ production_backups/ enterprise_logs/ ai_usage_logs/ *.html *.json *.md || true
         
         if git diff --staged --quiet; then
           echo "🚫 No changes to commit."
         else
-          echo "✅ Changes detected. Committing..."
-          git commit -m "🚀 Enterprise Output: [${{ github.run_id }}]"
+          echo "✅ Changes detected. Syncing with remote..."
+          git commit -m "👑 Sovereign Output: [Run ${{ github.run_number }}] - $INPUT_TOPIC"
           git pull --rebase origin main
           git push origin main
         fi
 
-    # 7. ፋይሎቹን ለዳውሎድ ማዘጋጀት (Artifacts)
-    - name: 💾 Upload Artifacts (Zip)
+    # 8. አርቲፋክቶችን ማስቀመጥ (ለማውረድ እንዲመች)
+    - name: 💾 Archive Production Results
       if: always()
       uses: actions/upload-artifact@v4
       with:
-        name: enterprise-production-results
-        retention-days: 90
+        name: sovereign-production-v21
+        retention-days: 30
         path: |
           enterprise_outputs/
           enterprise_logs/
           production_backups/
           *.html
           *.json
-          *.md
