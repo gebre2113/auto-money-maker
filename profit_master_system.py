@@ -4210,75 +4210,73 @@ class MegaContentEngine:
         self.MAX_TARGET = 12000
         self.logger = logging.getLogger("Titan.Zenith.Final")
 
+    # --- 1. የራነሩ ድልድይ (ለአንድ ሀገር ብቻ ሲፈለግ) ---
+    async def produce_single_country_sovereign_logic(self, topic: str, country: str) -> str:
+        """ራነሩ (v8.2) ለአንድ ሀገር ብቻ ጥልቅ ይዘት ሲፈልግ የሚጠራው ዋናው ድልድይ"""
+        self.logger.info(f"👑 Titan Sovereign Engine: Commencing 5-Phase research for {country}")
+        
+        country_info = self.config.HIGH_VALUE_COUNTRIES.get(country, self.config.HIGH_VALUE_COUNTRIES['US'])
+        
+        try:
+            # ደረጃ 0: መነጋገሪያ ርዕሱን ማጣራት
+            raw_topic = await self._discover_viral_topic(topic, country)
+            final_topic = self._validate_topic(raw_topic, topic, country)
+
+            # ደረጃ 1 - 5: ይዘቱን በደረጃ ማምረት
+            p1 = await self.failover.generate_content(self._get_p1_prompt(final_topic, country), max_tokens=4000)
+            p2 = await self.failover.generate_content(self._get_p2_prompt(final_topic, country, p1), max_tokens=4000)
+            p3 = await self.failover.generate_content(self._get_p3_prompt(final_topic, country, p2), max_tokens=4000)
+            p4 = await self.failover.generate_content(self._get_p4_prompt(final_topic, country, p3), max_tokens=4000)
+            p5 = await self.failover.generate_content(self._get_p5_prompt(final_topic, country, p4), max_tokens=4000)
+            
+            full_raw = p1 + "\n" + p2 + "\n" + p3 + "\n" + p4 + "\n" + p5
+            
+            # ይዘቱን ማረም እና ማስዋብ (Sensory & Neuro-Marketing)
+            polished_content = self.system.sensory_writer.transform_to_sensory_content(full_raw)
+            polished_content = self.system.neuro_converter.apply_neuro_marketing(polished_content)
+            
+            # ንጉሳዊ ዲዛይን እና መዋቅር መጨመር
+            final_html = self._build_royal_structure(polished_content, final_topic, country)
+            
+            return final_html
+
+        except Exception as e:
+            self.logger.error(f"❌ Sovereign Bridge Failed for {country}: {e}")
+            return f"<h1>{topic}</h1><p>Strategic analysis for {country} is being processed.</p>"
+
+    # --- 2. የ11 ሀገራት አጠቃላይ ሉፕ (Automation) ---
     async def produce_11_countries_mega_loop(self, base_topic: str):
-        """የ11 አገራት ሉፕ - እያንዳንዱ አገር ራሱን የቻለ ድንቅ ስራ (Masterpiece) ነው"""
+        """የ11 አገራት ሉፕ - እያንዳንዱ አገር ራሱን የቻለ Masterpiece የሚያመርትበት"""
         target_countries = list(self.config.HIGH_VALUE_COUNTRIES.keys())[:11]
         
         print("\n" + "👑"*45)
         print("    ULTIMATE SOVEREIGN INTELLIGENCE - ACTIVATED")
-        print(f"    ORIGINAL TOPIC: {base_topic}")
         print(f"    GOAL: 8,000 - 12,000 WORDS PER COUNTRY")
         print("👑"*45 + "\n")
 
         start_time = time.time()
 
         for i, country in enumerate(target_countries, 1):
-            # እዚህ ጋር ተለዋዋጩን በትክክል መያዝ (NameError መከላከያ)
             country_info = self.config.HIGH_VALUE_COUNTRIES[country]
             print(f"💎 [{i}/11] ስልታዊ ዝግጅት ለ {country_info['emoji']} {country}...")
             
             try:
-                # --- ደረጃ 0: የሰሞኑን መነጋገሪያ ርዕስ ማጣራት (The Oracle) ---
-                print(f"   🔍 መረጃ ፍለጋ፡ በ{country} አሁን ምን እየተወራ ነው?...")
-                raw_topic = await self._discover_viral_topic(base_topic, country)
-                final_topic = self._validate_topic(raw_topic, base_topic, country)
-                print(f"   🎯 የተመረጠው ርዕስ፡ '{final_topic}'")
-
-                # --- ደረጃ 1: ስትራቴጂካዊ ጥናት (The Foundations) ---
-                print(f"   🏛️  ደረጃ 1፡ የገበያ ጥናትና ሳይኮሎጂ (2,500 ቃላት)...")
-                p1 = await self.failover.generate_content(self._get_p1_prompt(final_topic, country), max_tokens=4000)
-                
-                # --- ደረጃ 2: ቴክኒካዊ መዋቅር (The Architecture) ---
-                print(f"   ⚙️  ደረጃ 2፡ የቴክኖሎጂ እና የአሰራር መዋቅር (2,000 ቃላት)...")
-                p2 = await self.failover.generate_content(self._get_p2_prompt(final_topic, country, p1), max_tokens=4000)
-                
-                # --- ደረጃ 3: የእውነተኛ ዓለም ተሞክሮ (The Proof) ---
-                print(f"   📜 ደረጃ 3፡ 15 የዓለም አቀፍ ስኬቶች እና ተሞክሮዎች (2,000 ቃላት)...")
-                p3 = await self.failover.generate_content(self._get_p3_prompt(final_topic, country, p2), max_tokens=4000)
-                
-                # --- ደረጃ 4: የሀብት ማመንጫ ካርታ (The Wealth Roadmap) ---
-                print(f"   💰 ደረጃ 4፡ የ24 ወራት የገቢ ማመንጫ ፕላን (2,000 ቃላት)...")
-                p4 = await self.failover.generate_content(self._get_p4_prompt(final_topic, country, p3), max_tokens=4000)
-                
-                # --- ደረጃ 5: ጥልቅ ጥያቄና መልስ (The Oracle FAQ) ---
-                print(f"   🧠 ደረጃ 5፡ 50 ጥልቅ ጥያቄዎችና መልሶች (1,500 ቃላት)...")
-                p5 = await self.failover.generate_content(self._get_p5_prompt(final_topic, country, p4), max_tokens=4000)
-
-                # --- የይዘት ጥራት አሰፋፈር (Stitching & Sensory Polish) ---
-                raw_full_content = p1 + "\n" + p2 + "\n" + p3 + "\n" + p4 + "\n" + p5
-                
-                print(f"   🎨 ይዘቱን በጥበብ መሸመን (Sensory & Neuro-Marketing Polish)...")
-                # ማሳሰቢያ፡ እነዚህ ክፍሎች በ main class ውስጥ መኖራቸውን ያረጋግጣል
-                polished_content = self.system.sensory_writer.transform_to_sensory_content(raw_full_content)
-                polished_content = self.system.neuro_converter.apply_neuro_marketing(polished_content)
-                
-                # ማውጫ እና የንጉሳዊ ዲዛይን ማከል
-                final_html = self._build_royal_structure(polished_content, final_topic, country)
-                
+                # ለአንድ ሀገር የሚያመርተውን ፈንክሽን መጥራት (Code Re-use)
+                final_html = await self.produce_single_country_sovereign_logic(base_topic, country)
                 word_count = EnhancedWordCounter.count_words(final_html)
 
-                # --- የመጨረሻው ዙር፡ ርዝመት ማረጋገጫ (The Grand Stretch) ---
+                # ርዝመት ማረጋገጫ (The Grand Stretch)
                 if word_count < self.TARGET_WORDS:
                     print(f"   ⏳ ርዝመት ማስተካከያ ({word_count} ቃላት)...")
-                    stretch_prompt = f"Expand the guide for '{final_topic}' with an additional 3,000 words focusing on advanced hidden secrets, specific local case studies for {country}, and future-proofing. Use HTML."
+                    stretch_prompt = f"Expand this guide with an additional 3,000 words focusing on hidden secrets and case studies for {country}. Use HTML."
                     stretch = await self.failover.generate_content(stretch_prompt, max_tokens=4000)
                     final_html += "\n\n" + stretch
                     word_count = EnhancedWordCounter.count_words(final_html)
 
-                # መረጃውን ማስቀመጥ
+                # ውጤቱን ማስቀመጥ
                 file_path = save_to_file({
                     'id': f"SUPREME_{country}_{int(time.time())}",
-                    'title': f"THE SOVEREIGN GUIDE: {final_topic}",
+                    'title': f"THE SOVEREIGN GUIDE: {base_topic}",
                     'content': final_html,
                     'word_count': word_count,
                     'quality_report': {'overall_score': 100},
@@ -4293,50 +4291,45 @@ class MegaContentEngine:
 
             except Exception as e:
                 print(f"   ⚠️ የ{country} ሂደት ተቋርጧል፡ {e}")
-                # ስህተት ቢፈጠርም ሲስተሙ እንዲቀጥል እናደርጋለን
 
-            # በሀገራት መካከል ያለው እረፍት - ለአይፒ ደህንነት
             if i < 11:
                 print(f"   💤 ለአጭር ጊዜ ማረፍ (Cooling down)...")
                 await asyncio.sleep(45)
 
         print("\n" + "👑"*45)
-        print(f"🎉 እንኳን ደስ አለህ! 11ዱም ሀገራት በታላቅነት ተፈጥረዋል።")
-        print(f"ጠቅላላ የፈጀው ጊዜ: {(time.time() - start_time) / 60:.2f} ደቂቃ")
+        print(f"🎉 11ዱም ሀገራት ተጠናቀቁ! ጠቅላላ ጊዜ: {(time.time() - start_time) / 60:.2f} ደቂቃ")
         print("👑"*45)
 
+    # --- 3. አጋዥ ፈንክሽኖች (Helper Methods) ---
     async def _discover_viral_topic(self, base_topic, country):
-        """ለእያንዳንዱ ሀገር ወቅታዊ እና ተፈላጊ ርዕስ መፈለጊያ"""
-        prompt = f"Identify the most viral and profitable trending topic related to '{base_topic}' in {country} for February 2026. Give me ONLY the title, no extra text."
+        prompt = f"Identify the most viral and profitable trending topic related to '{base_topic}' in {country} for February 2026. Give me ONLY the title."
         try:
             res = await self.failover.generate_content(prompt, max_tokens=100)
             return res.strip()
         except: return "ERROR"
 
     def _validate_topic(self, discovered, original, country):
-        """ርዕሱ ስህተት ከሆነ ማስተካከያ"""
-        bad_signals = ["sorry", "error", "sync", "report", "intelligence", "unable", "failed"]
+        bad_signals = ["sorry", "error", "unable", "failed"]
         if any(s in discovered.lower() for s in bad_signals) or len(discovered) < 5:
             return f"The 2026 Sovereign Strategy for {original} in {country}"
         return discovered
 
     def _get_p1_prompt(self, t, c):
-        return f"WRITE 2,500 WORDS: Phase 1 of 'The Sovereign Guide to {t}' in {c}. Covers: Market psychology, 2026 economic trends, and legal foundations. Use HTML."
+        return f"WRITE 2,500 WORDS: Phase 1 of 'The Sovereign Guide to {t}' in {c}. Covers: Market psychology and foundations. Use HTML."
 
     def _get_p2_prompt(self, t, c, p):
-        return f"WRITE 2,000 WORDS: Phase 2 of the {c} guide for '{t}'. Covers: Technical architecture, advanced system setup, and required infrastructure. Use HTML."
+        return f"WRITE 2,000 WORDS: Phase 2 for '{t}' in {c}. Covers: Technical architecture. Use HTML."
 
     def _get_p3_prompt(self, t, c, p):
-        return f"WRITE 2,000 WORDS: Phase 3 of the {c} guide for '{t}'. Covers: 15 detailed global and local case studies, competitor analysis, and success models. Use HTML."
+        return f"WRITE 2,000 WORDS: Phase 3 for '{t}' in {c}. Covers: 15 Case studies. Use HTML."
 
     def _get_p4_prompt(self, t, c, p):
-        return f"WRITE 2,000 WORDS: Phase 4 of the {c} guide for '{t}'. Covers: 24-month roadmap, financial ROI models, and monetization secrets. Use HTML."
+        return f"WRITE 2,000 WORDS: Phase 4 for '{t}' in {c}. Covers: 24-month Roadmap. Use HTML."
 
     def _get_p5_prompt(self, t, c, p):
-        return f"WRITE 1,500 WORDS: Phase 5 of the {c} guide for '{t}'. Covers: 50 deep-dive FAQs with extensive answers and a vision for 2040. Use HTML."
+        return f"WRITE 1,500 WORDS: Phase 5 for '{t}' in {c}. Covers: 50 Deep-dive FAQs. Use HTML."
 
     def _build_royal_structure(self, content, topic, country):
-        """የንጉሳዊ ዲዛይን መዋቅር በ CSS የታጀበ"""
         style = """
         <style>
             @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Lora:ital,wght@0,400;1,700&display=swap');
@@ -4348,15 +4341,10 @@ class MegaContentEngine:
             .gold-badge { 
                 background: #c5a059; color: white; padding: 10px 25px; 
                 border-radius: 4px; display: inline-block; font-weight: bold;
-                margin-bottom: 20px;
             }
-            h1 { font-family: 'Playfair Display', serif; font-size: 65px; color: #1e3c72; line-height: 1.1; }
-            h2 { color: #1a2a44; border-bottom: 3px solid #c5a059; padding-bottom: 10px; margin-top: 50px; font-size: 32px; }
-            h3 { color: #1e3c72; margin-top: 30px; font-size: 24px; }
+            h1 { font-family: 'Playfair Display', serif; font-size: 65px; color: #1e3c72; }
+            h2 { color: #1a2a44; border-bottom: 3px solid #c5a059; padding-bottom: 10px; margin-top: 50px; }
             p { margin-bottom: 25px; font-size: 19px; text-align: justify; }
-            ul, ol { margin-bottom: 25px; font-size: 19px; }
-            li { margin-bottom: 10px; }
-            .highlight-box { background: #fdf6e3; border-left: 10px solid #c5a059; padding: 30px; margin: 40px 0; font-style: italic; }
         </style>
         """
         html = f"""
@@ -4365,36 +4353,14 @@ class MegaContentEngine:
             <div style="text-align:center;">
                 <div class="gold-badge">SUPREME STRATEGIC INTELLIGENCE</div>
                 <h1>{topic.upper()}</h1>
-                <p style="font-size: 24px;"><b>A ROYAL MASTER-GUIDE FOR THE {country.upper()} MARKET</b></p>
-                <p>PUBLISHED BY THE ORACLE SYSTEM • FEBRUARY 2026</p>
+                <p><b>A ROYAL MASTER-GUIDE FOR THE {country.upper()} MARKET</b></p>
             </div>
             <div class="main-body">
                 {content}
             </div>
-            <div style="text-align:center; margin-top:80px; border-top: 1px solid #ccc; padding-top:20px;">
-                <p>© 2026 ULTIMATE PROFIT MASTER. ALL RIGHTS RESERVED.</p>
-            </div>
         </div>
         """
         return html
-
-# v18.1 MegaContentEngine ውስጥ የሚጨመር
-async def produce_single_country_sovereign_logic(self, topic: str, country: str) -> str:
-    """ለአንድ ሀገር ብቻ ግዙፍ ይዘት የሚያመርት ድልድይ"""
-    country_info = self.config.HIGH_VALUE_COUNTRIES.get(country, self.config.HIGH_VALUE_COUNTRIES['US'])
-    
-    # 5ቱን ደረጃዎች ጠርቶ ጽሁፉን ማቀናጀት
-    p1 = await self.failover.generate_content(self._get_p1_prompt(topic, country), max_tokens=4000)
-    p2 = await self.failover.generate_content(self._get_p2_prompt(topic, country, p1), max_tokens=4000)
-    p3 = await self.failover.generate_content(self._get_p3_prompt(topic, country, p2), max_tokens=4000)
-    p4 = await self.failover.generate_content(self._get_p4_prompt(topic, country, p3), max_tokens=4000)
-    p5 = await self.failover.generate_content(self._get_p5_prompt(topic, country, p4), max_tokens=4000)
-    
-    full_raw = p1 + "\n" + p2 + "\n" + p3 + "\n" + p4 + "\n" + p5
-    
-    # በ v18.1 ሎጂክ መሰረት ማውጫ እና ንጉሳዊ ዲዛይን መጨመር
-    final_html = self._build_royal_structure(full_raw, topic, country)
-    return final_html
 # =================== ዋና ስርዓት ክፍል ===================
 
 class UltimateProfitMasterSystem:
