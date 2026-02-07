@@ -4176,7 +4176,7 @@ class MegaContentEngine:
         info = self.config.HIGH_VALUE_COUNTRIES[country]
         
         # ደረጃ 0: ትሬንድ ማጣራት
-        topic_prompt = f"What is the most viral and profitable trending sub-niche for '{base_topic}' in {country} today, February 2026? Give me ONLY the title."
+        topic_prompt = f"What is the most viral and profitable trending sub-niche for '{topic}' in {country} today, February 2026? Give me ONLY the title."
         final_topic = await self.ai.generate_content(topic_prompt, 100)
         if len(final_topic) < 5: final_topic = base_topic
 
