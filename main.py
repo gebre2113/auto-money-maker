@@ -4377,6 +4377,24 @@ class MegaContentEngine:
         </div>
         """
         return html
+
+# v18.1 MegaContentEngine ውስጥ የሚጨመር
+async def produce_single_country_sovereign_logic(self, topic: str, country: str) -> str:
+    """ለአንድ ሀገር ብቻ ግዙፍ ይዘት የሚያመርት ድልድይ"""
+    country_info = self.config.HIGH_VALUE_COUNTRIES.get(country, self.config.HIGH_VALUE_COUNTRIES['US'])
+    
+    # 5ቱን ደረጃዎች ጠርቶ ጽሁፉን ማቀናጀት
+    p1 = await self.failover.generate_content(self._get_p1_prompt(topic, country), max_tokens=4000)
+    p2 = await self.failover.generate_content(self._get_p2_prompt(topic, country, p1), max_tokens=4000)
+    p3 = await self.failover.generate_content(self._get_p3_prompt(topic, country, p2), max_tokens=4000)
+    p4 = await self.failover.generate_content(self._get_p4_prompt(topic, country, p3), max_tokens=4000)
+    p5 = await self.failover.generate_content(self._get_p5_prompt(topic, country, p4), max_tokens=4000)
+    
+    full_raw = p1 + "\n" + p2 + "\n" + p3 + "\n" + p4 + "\n" + p5
+    
+    # በ v18.1 ሎጂክ መሰረት ማውጫ እና ንጉሳዊ ዲዛይን መጨመር
+    final_html = self._build_royal_structure(full_raw, topic, country)
+    return final_html
 # =================== ዋና ስርዓት ክፍል ===================
 
 class UltimateProfitMasterSystem:
