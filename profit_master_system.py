@@ -4173,7 +4173,7 @@ class MegaContentEngine:
 
     async def produce_single_country_sovereign_logic(self, topic: str, country: str):
         """ለአንድ ሀገር 7,000 - 12,000 ቃላት በ 7 ደረጃዎች ማምረት"""
-        info = HIGH_VALUE_COUNTRIES[country]
+        info = self.config.HIGH_VALUE_COUNTRIES[country]
         
         # ደረጃ 0: ትሬንድ ማጣራት
         topic_prompt = f"What is the most viral and profitable trending sub-niche for '{base_topic}' in {country} today, February 2026? Give me ONLY the title."
