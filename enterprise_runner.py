@@ -2350,59 +2350,67 @@ class DynamicCTAEngine:
 
 
 # =================== 🛡️ ENTERPRISE IMPORT SYSTEM (STRICT EDITION) ===================
+# =================== 🛡️ ENTERPRISE IMPORT SYSTEM (STRICT MASTER) ===================
 
 class EnterpriseImportSystem:
     """
-    🚀 ENTERPRISE-GRADE STRICT LOADER v3.0
-    v18.1 እና v2.3 ኢንጂኖችን በሃይል የሚጭን እና Mockን ሙሉ በሙሉ ያስቀረ ጥብቅ ሲስተም::
+    🚀 የሲስተሙን መቆለፊያ የሚከፍት ዋና መጫኛ::
+    v18.1 እና v2.3 ፋይሎችን ካላገኘ ስራውን በሃይል ያቆማል::
     """
     def __init__(self):
         self.modules = {}
-        self.enterprise_components = {}
-        self.import_errors = []
 
-    def import_enterprise_system(self) -> Dict:
-        print("\n" + "⚔️"*40)
-        print("⚡ STRICT ENTERPRISE LOADER ACTIVATED")
-        print("⚔️"*40)
+    def import_enterprise_system(self):
+        print("\n" + "⚔️"*50)
+        print("🛡️  ULTIMATE STRICT LOADER v4.0 ACTIVATED")
+        print("⚔️"*50)
         
+        # 1. Mega-Content Factory (v18.1) መጫን
+        print("\n💰 Loading Mega-Content Factory (v18.1)...")
         try:
             from profit_master_system import UltimateProfitMasterSystem
             self.modules['content_system'] = UltimateProfitMasterSystem()
-            print("   ✅ Mega-Content Factory (v18.1): ONLINE")
-        except ImportError:
-            raise ImportError("🚫 FATAL: 'profit_master_system.py' አልተገኘም!")
+            print("   ✅ SUCCESS: Mega-System Linked.")
+        except ImportError as e:
+            print(f"   ❌ FATAL: 'profit_master_system.py' missing or has errors: {e}")
+            sys.exit(1)
 
+        # 2. YouTube & Affiliate System (v2.3) መጫን
+        print("\n🎯 Loading Monetization Engine (v2.3)...")
         try:
             from youtube_affiliate_system import VideoAffiliateIntegrationEngine, YouTubeIntelligenceHunterPro
-            self.modules['youtube_hunter'] = YouTubeIntelligenceHunterPro()
             self.modules['affiliate_manager'] = VideoAffiliateIntegrationEngine(enable_ethical_mode=True)
-            print("   ✅ Monetization Engine (v2.3): ONLINE")
-        except ImportError:
-            raise ImportError("🚫 FATAL: 'youtube_affiliate_system.py' አልተገኘም!")
+            self.modules['yt_hunter'] = YouTubeIntelligenceHunterPro()
+            print("   ✅ SUCCESS: Monetization Engine Linked.")
+        except ImportError as e:
+            print(f"   ❌ FATAL: 'youtube_affiliate_system.py' missing or has errors: {e}")
+            sys.exit(1)
 
-        return {'status': 'success'}
+    def get_module(self, name):
+        if name not in self.modules:
+            raise KeyError(f"🚫 Module {name} was not loaded!")
+        return self.modules[name]
 
-    def get_module(self, module_name):
-        return self.modules.get(module_name)
+# =================== 👑 MASTER PRODUCTION ORCHESTRATOR ===================
 
 class EnterpriseProductionOrchestrator:
     """
-    ይህ ራነር v18.1 እና v2.3 ን አቀናጅቶ ውጤቱን የሚሸምን ዋና ዳኛ ነው::
+    ይህ ራነር v18.1 ን (ጸሐፊ) እና v2.3 ን (ገቢ አመንጪ) አጣምሮ 
+    ውጤቱን የሚሸምን ዋናው ኢንጂነር ነው::
     """
     def __init__(self):
-        self.logger = logging.getLogger('enterprise_orchestrator')
+        self.logger = logging.getLogger('MasterOrchestrator')
         self.importer = EnterpriseImportSystem()
         self.importer.import_enterprise_system()
         
+        # ሰራተኞቹን ከጭነት በኋላ መያዝ
         self.writer = self.importer.get_module('content_system')
         self.monetizer = self.importer.get_module('affiliate_manager')
         
+        # የራነሩ ማሻሻያ መሳሪያዎች
         self.humanizer = HumanLikenessEngine()
         self.image_engine = SmartImageEngine()
         self.revenue_engine = RevenueForecastEngine()
-        self.ai_quality_auditor = AIQualityAuditor(api_key=os.getenv('AI_AUDIT_API_KEY'))
-        self.ai_title_optimizer = AITitleOptimizer(api_key=os.getenv('AI_TITLE_API_KEY'))
         
         self.output_dir = Path("enterprise_outputs")
         self.output_dir.mkdir(exist_ok=True)
@@ -2410,150 +2418,85 @@ class EnterpriseProductionOrchestrator:
     async def _process_country_enterprise(self, topic: str, country: str, 
                                         content_type: str, country_number: int,
                                         total_countries: int) -> Dict:
-        country_result = {
-            'country': country, 'country_number': country_number,
-            'status': 'processing', 'metrics': {}, 'start_time': datetime.now().isoformat()
-        }
+        """የአንድ አገር ሙሉ ምርት በ v18.1 እና v2.3 ኃይል"""
         
         try:
-            self.logger.info(f"🏛️  STAGE 1: MEGA-CONTENT FACTORY (v18.1) ACTIVATED FOR {country}")
+            print(f"\n🌍 [{country_number}/{total_countries}] ምርት ለ {country} ተጀመረ...")
+
+            # 1. ጽሑፍ ማመንጨት (v18.1 - Mega System)
+            # ማሳሰቢያ፡ full_production_pipeline 8,000 ቃላት ያመጣል
             mega_result = await self.writer.full_production_pipeline(topic, target_countries=[country])
             raw_content = mega_result.get('content', "")
-            
-            if not raw_content or len(raw_content.split()) < 500:
-                raise ValueError(f"❌ v18.1 failed to produce valid content for {country}")
 
-            self.logger.info(f"💰 STAGE 2: MONETIZATION ENGINE (v2.3) ACTIVATED")
+            if not raw_content or len(raw_content.split()) < 1000:
+                raise ValueError("v18.1 produced empty or insufficient content.")
+
+            # 2. ሞኒታይዜሽን (v2.3 - Video Affiliate Engine)
             product = {'id': 'p1', 'name': topic, 'commission': 50.0, 'link': 'https://profit.link'}
             campaign = await self.monetizer.create_video_affiliate_campaign(topic, product, country)
-            video_html = campaign.get('content_integrations', [{}])[0].get('html', "")
             
-            self.logger.info(f"🎨 STAGE 3: WEAVING & HUMAN-LIKENESS")
-            final_woven_content = raw_content.replace("</h2>", f"</h2>\n{video_html}\n", 1)
+            # ቪዲዮውን ከውጤቱ ውስጥ ፈልጎ ማውጣት
+            video_html = ""
+            if campaign.get('content_integrations'):
+                video_html = campaign['content_integrations'][0].get('html', "")
+            
+            # 3. ሽመና (Weaving) - የ v18.1 ጽሑፍ እና v2.3 ቪዲዮ ውህደት
+            # ቪዲዮውን ከመጀመሪያው ሰብ-ርዕስ (H2) በኋላ እንሰካዋለን
+            if "</h2>" in raw_content:
+                final_woven_content = raw_content.replace("</h2>", f"</h2>\n{video_html}\n", 1)
+            else:
+                final_woven_content = raw_content + "\n" + video_html
+
+            # 4. የራነሩ ማረሚያ (Polish)
             final_woven_content = await self.humanizer.inject_human_elements(final_woven_content, country, topic)
             final_woven_content = self.image_engine.generate_image_placeholders(final_woven_content, country, topic)
 
-            country_result['content'] = final_woven_content
-            country_result['metrics'] = {
-                'final_word_count': len(final_woven_content.split()),
-                'quality_score': 95,
-                'quality_status': 'PASS'
+            # የቃላት ብዛት እና ጥራት ሪፖርት
+            word_count = len(final_woven_content.split())
+            
+            # ውጤቱን ወደ ፋይል መጻፍ (Git commit እንዲያደርገው የግድ መጻፍ አለበት)
+            file_name = f"{country}_Sovereign_Guide.html"
+            file_path = self.output_dir / file_name
+            with open(file_path, "w", encoding="utf-8") as f:
+                f.write(final_woven_content)
+
+            print(f"   ✅ ተጠናቀቀ: {word_count} ቃላት | ፋይል: {file_name}")
+
+            return {
+                'country': country,
+                'status': 'completed',
+                'final_word_count': word_count,
+                'file_path': str(file_path)
             }
-            
-            revenue_forecast = await self.revenue_engine.forecast_revenue(country_result, country)
-            country_result['revenue_forecast'] = revenue_forecast
-            country_result['status'] = 'completed'
-            country_result['end_time'] = datetime.now().isoformat()
-            
-            self.logger.info(f"✅ {country} COMPLETE: {country_result['metrics']['final_word_count']} words")
-            return country_result
 
         except Exception as e:
-            self.logger.error(f"❌ Failed to process {country}: {e}")
-            country_result['status'] = 'failed'
-            country_result['error'] = str(e)
-            return country_result
+            print(f"   ❌ ስህተት በ {country}: {str(e)}")
+            return {'country': country, 'status': 'failed', 'error': str(e)}
 
-    async def run_production_with_monitoring(self, topic: str, markets: List[str] = None, content_type: str = "enterprise_guide") -> Dict:
-        if markets is None: markets = ['US', 'GB', 'CA', 'AU', 'DE', 'FR', 'JP', 'CH', 'NO', 'SE', 'ET']
+    async def run_production_with_monitoring(self, topic: str, markets: List[str] = None, content_type: str = "enterprise_guide"):
+        """ዋናው አስገዳጅ ትዕዛዝ"""
+        if markets is None:
+            markets = ['US', 'GB', 'CA', 'AU', 'DE', 'FR', 'JP', 'CH', 'NO', 'SE', 'ET']
         
-        production_id = f"prod_{hashlib.md5(topic.encode()).hexdigest()[:8]}"
-        results = {'production_id': production_id, 'topic': topic, 'country_results': [], 'start_time': datetime.now().isoformat()}
+        start_time = time.time()
+        print(f"\n🚀 Starting Global Production: {topic}")
         
+        results = []
         for idx, country in enumerate(markets):
             res = await self._process_country_enterprise(topic, country, content_type, idx+1, len(markets))
-            results['country_results'].append(res)
-            
-            if res['status'] == 'completed':
-                file_path = self.output_dir / f"{country}_Sovereign_Masterpiece.html"
-                with open(file_path, 'w', encoding='utf-8') as f:
-                    f.write(res['content'])
-            
+            results.append(res)
+            # በአገራት መካከል እረፍት (API ደህንነት)
             await asyncio.sleep(5)
-            
-        results['status'] = 'completed'
-        results['overall_metrics'] = {'total_countries': len(markets), 'completed': len([r for r in results['country_results'] if r['status'] == 'completed'])}
-        return results
-
-# =================== 👑 MASTER PRODUCTION ORCHESTRATOR ===================
-
-class EnterpriseProductionOrchestrator:
-    """
-    ይህ ራነር የጸሐፊዎቹን ስራ ተቀብሎ የሚያርም፣ የሚሰፋ እና የሚሸምን ዳኛ ነው::
-    """
-    def __init__(self):
-        self.importer = EnterpriseImportSystem()
-        self.importer.import_enterprise_system()
         
-        # ሰራተኞቹን መጥራት
-        self.writer = self.importer.get_module('content_system')
-        self.monetizer = self.importer.get_module('affiliate_manager')
+        total_duration = (time.time() - start_time) / 60
+        print(f"\n🏆 GLOBAL PRODUCTION FINISHED: {total_duration:.2f} minutes")
         
-        # የራነሩ የጥበብ ሞተሮች
-        self.humanizer = HumanLikenessEngine()
-        self.image_engine = SmartImageEngine()
-        self.compliance_guardian = EthicalComplianceGuardian()
-        
-        self.output_dir = Path("enterprise_outputs")
-        self.output_dir.mkdir(exist_ok=True)
-
-    async def run_country_production(self, topic: str, country: str):
-        """አንዱን አገር ቀስቅሶ በ v18.1 እና v2.3 ውጤት እንዲያመርት ያደርጋል"""
-        print(f"\n🌍 አሁን ለ {country} ምርት እየተካሄደ ነው...")
-        
-        # Step 1: በ v18.1 ኃይል ጥልቅ ይዘት ማስጻፍ (8,000+ ቃላት)
-        print(f"   ✍️  ደረጃ 1: Mega-System 8,000 ቃላት እያመረተ ነው...")
-        mega_result = await self.writer.full_production_pipeline(topic, target_countries=[country])
-        content = mega_result.get('content', "")
-        
-        if len(content.split()) < 2000:
-            print("   ⚠️  ይዘቱ አጭር ነው - ራነሩ እያረመው ነው...")
-            # ራነሩ ራሱ ይዘቱን ያስፋፋዋል
-            content = await self.writer.content_generator.failover_system.generate_content(
-                f"Expand this content for {country} to 8000 words: {content[:1000]}", max_tokens=4000
-            )
-
-        # Step 2: በ v2.3 ኃይል አፊሊዬት እና ቪዲዮ መርፌ መውጋት
-        print(f"   💰 ደረጃ 2: Monetizer ቪዲዮና አፊሊዬት ሊንክ እያዘጋጀ ነው...")
-        product = {'id': 'p1', 'name': topic, 'commission': 50.0, 'link': 'https://profit.link'}
-        campaign = await self.monetizer.create_video_affiliate_campaign(topic, product, country)
-        
-        # የቪዲዮ HTML ን ከ v2.3 ውጤት ላይ መውሰድ
-        video_html = campaign.get('content_integrations', [{}])[0].get('html', "")
-        
-        # Step 3: የራነሩ "ሽመና" (Stitching & Polishing)
-        print(f"   🎨 ደረጃ 3: ራነሩ ይዘቱን እያረመና 'ሰው' እንዲመስል እያደረገ ነው...")
-        
-        # ቪዲዮውን መሃል ላይ ሰክቶ ማዋሃድ
-        final_woven_content = content.replace("</h2>", f"</h2>\n{video_html}\n", 1)
-        
-        # ራነሩ የራሱን Humanization እና ምስል ይጨምራል
-        final_woven_content = await self.humanizer.inject_human_elements(final_woven_content, country, topic)
-        final_woven_content = self.image_engine.generate_image_placeholders(final_woven_content, country, topic)
-        
-        return final_woven_content
-
-    async def run_all_markets(self, topic: str):
-        """ሁሉንም 11 አገራት በሃይል ያዞራል"""
-        markets = ['US', 'GB', 'CA', 'AU', 'DE', 'FR', 'JP', 'CH', 'NO', 'SE', 'ET']
-        
-        for country in markets:
-            try:
-                final_html = await self.run_country_production(topic, country)
-                
-                # ፋይሉን በሃይል መጻፍ (ይህ ነው Git Commit እንዲያደርግ የሚያስገድደው)
-                file_path = self.output_dir / f"{country}_Sovereign_Masterpiece.html"
-                with open(file_path, 'w', encoding='utf-8') as f:
-                    f.write(final_html)
-                
-                print(f"✅ {country} ተጠናቆ ተቀምጧል: {file_path}")
-                
-                # አጭር እረፍት ለአይፒ ደህንነት
-                await asyncio.sleep(10)
-                
-            except Exception as e:
-                print(f"❌ ስህተት በ {country}: {e}")
-                continue
+        return {
+            'status': 'completed',
+            'topic': topic,
+            'duration_min': total_duration,
+            'results': results
+        }
 
 # =================== ENTERPRISE ENHANCEMENT COMPONENTS ===================
 
