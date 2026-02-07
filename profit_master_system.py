@@ -4173,151 +4173,187 @@ class EnhancedWordCounter:
 
 class MegaContentEngine:
     """
-    ይህ የዓለማችን እጅግ የላቀ የይዘት ማምረቻ ሞተር ነው። 
-    በየሀገሩ ቋንቋ፣ በ7 ዙር ሪሌይ፣ ከ10,000 - 15,000 ቃላት ያመርታል።
-    በተጨማሪም የራስጌ አውዲዮ እና ኒውሮ-ማርኬቲንግ ጥበብን ያካትታል።
+    የዓለማችን ቁንጮ የይዘት ማምረቻ ሞተር።
+    - 7-Phase Strategic Relay (12,000 - 15,000 ቃላት)
+    - Multilingual Excellence (በየሀገሩ ቋንቋ)
+    - Integrated Neuro-Marketing & Sensory Arts
+    - Enterprise-Grade Structural Design
     """
     
     def __init__(self, system):
         self.system = system
         self.config = system.config
-        # ስም ስህተት እንዳይፈጠር ማረጋገጫ
-        self.ai = getattr(system, 'ai_provider', getattr(system, 'failover_system', None))
+        # የ AI አቅራቢውን ስም በአስተማማኝ ሁኔታ መለየት
+        self.ai = getattr(system, 'failover_system', getattr(system, 'ai_provider', None))
         self.TARGET_WORDS = 10000 
-        self.logger = logging.getLogger("Titan.Sovereign.Oracle")
+        self.logger = logging.getLogger("Titan.Omnipotent.Oracle")
 
-    async def produce_single_country_sovereign_logic(self, base_topic: str, country: str) -> str:
-        """7-PHASE MULTILINGUAL RELAY: 7ቱን ቁልፎች በማፈራረቅ 10,000+ ቃላት በሀገሩ ቋንቋ ያመርታል"""
+    async def produce_single_country_sovereign_logic(self, topic: str, country: str) -> str:
+        """የ7-ደረጃ ንጉሳዊ ምርት፡ 7ቱን ቁልፎች በማፈራረቅ እጅግ ግዙፍና ጥልቅ ስራ ያመርታል"""
+        # የሀገር መረጃን ከ config መውሰድ
         info = COUNTRIES.get(country, COUNTRIES['US'])
         target_lang = info['lang']
         
-        self.logger.info(f"👑 Starting Sovereign 7-Phase Relay for {country} ({target_lang})")
+        self.logger.info(f"👑 ZENITH ACTIVATED: Producing Masterpiece for {country} in {target_lang}")
         
-        # --- ደረጃ 0: የሰሞኑን መነጋገሪያ ርዕስ በጥበብ መፈለግ (The Oracle) ---
-        print(f"   🔍 መረጃ ፍለጋ፡ በ{country} አሁን ያለውን የገበያ ንዝረት ማጥናት...")
+        # --- ደረጃ 0: የገበያ ንዝረት ጥናት (The Sovereign Research) ---
+        print(f"   🔍 መረጃ ፍለጋ፡ በ{country} ያለውን የገበያ ጥማት ማጥናት...")
         topic_prompt = (
-            f"Perform a real-time analysis of the most viral and profitable trending sub-niche for '{base_topic}' "
-            f"in {country} today, February 2026. Respond ONLY with the title in {target_lang} language."
+            f"Analyze the most viral, high-ticket, and profitable trending sub-niche for '{topic}' "
+            f"in {country} for 2026. Return ONLY a powerful, click-optimized title in {target_lang}."
         )
-        # 1ኛው ቁልፍ ለርዕስ ፍለጋ
-        final_topic = await self.ai.generate_content(topic_prompt, 100)
-        if len(str(final_topic)) < 5 or "Error" in str(final_topic): 
-            final_topic = f"The 2026 Sovereign Strategy for {base_topic}"
         
-        print(f"   🎯 የተመረጠው ወርቃማ ርዕስ (በ{target_lang})፡ '{final_topic}'")
+        # 1ኛው ቁልፍ ለርዕስ ፍለጋ
+        final_topic = await self.ai.generate_content(topic_prompt, max_tokens=200)
+        final_topic = str(final_topic).strip().replace('"', '')
+        if len(final_topic) < 10 or "Error" in final_topic: 
+            final_topic = f"The 2026 Sovereign Strategy for {topic} in {country}"
+        
+        print(f"   🎯 የተመረጠው ወርቃማ ርዕስ፡ '{final_topic}'")
 
         full_content = ""
-        # 7ቱ የጥልቀት ደረጃዎች (እያንዳንዱ ዙር አዲስ ቁልፍ ይጠቀማል)
-        # እያንዳንዱ ዙር ቢያንስ 1500-2000 ቃላት እንዲያመጣ ታዝዟል
+        # 7ቱ የጥልቀት ምዕራፎች - እያንዳንዱ ምዕራፍ አዲስ ቁልፍ ይጠቀማል
         tasks = [
-            f"Write a MASTER INTRODUCTION and Phase 1 (Market Psychology & 2026 Trends) for '{final_topic}'. Target 2000 words. LANGUAGE: {target_lang}. Format: HTML. Use vivid, sensory language.",
-            f"Add Phase 2 (Technical Architecture & Systems) for '{final_topic}'. Build on previous context. Target 2000 words. LANGUAGE: {target_lang}. Format: HTML.",
-            f"Add Phase 3 (15 Global & Local Case Studies in {country}). Detail each case with success/failure data. Target 1500 words. LANGUAGE: {target_lang}. HTML.",
-            f"Add Phase 4 (24-Month Execution Roadmap). Provide step-by-step actions for {country}. Target 1500 words. LANGUAGE: {target_lang}. HTML.",
-            f"Add Phase 5 (Monetization & ROI Models). Reveal secret profit frameworks. Target 1500 words. LANGUAGE: {target_lang}. HTML.",
-            f"Add Phase 6 (Competition Deconstruction & Market Dominance). Target 1000 words. LANGUAGE: {target_lang}. HTML.",
-            f"Add Phase 7 (100 Deep-Dive FAQs & 2040 Vision). Target 1500 words. LANGUAGE: {target_lang}. HTML."
+            f"Write a MASTER INTRODUCTION and Phase 1 (Advanced Market Psychology & 2026 Prediction). Target 2000 words. Language: {target_lang}. Use HTML. Focus on deep emotional hooks.",
+            f"Add Phase 2 (Technical Infrastructure & Global System Design). Detail every tool and integration needed. Target 2000 words. Language: {target_lang}. Use HTML.",
+            f"Add Phase 3 (15 Exclusive Global & Local Case Studies in {country}). Include exact ROI data and failure/success analysis. Target 2000 words. Language: {target_lang}. Use HTML.",
+            f"Add Phase 4 (24-Month Strategic Execution Roadmap). Provide weekly milestones and scaling secrets. Target 1500 words. Language: {target_lang}. Use HTML.",
+            f"Add Phase 5 (Monetization Mastery & Hidden Revenue Streams). Reveal high-ticket funnels. Target 1500 words. Language: {target_lang}. Use HTML.",
+            f"Add Phase 6 (Competition Annihilation & Industry Dominance). How to outpace everyone in {country}. Target 1500 words. Language: {target_lang}. Use HTML.",
+            f"Add Phase 7 (100 Ultimate FAQs & The 2040 Future Vision). A definitive closing that leaves no doubt. Target 1500 words. Language: {target_lang}. Use HTML."
         ]
 
         for idx, task_prompt in enumerate(tasks):
-            print(f"   ⚙️  Executing Step {idx+1}/7 using a fresh AI Key...")
-            # ለ AIው ያለፈውን ታሪክ ማሳወቅ (የመጨረሻ 8000 ቃላት)
-            context = str(full_content)[-8000:] if full_content else "Start of the masterpiece."
-            combined_prompt = f"PREVIOUS CONTEXT: {context}\n\nCURRENT TASK: {task_prompt}"
+            print(f"   ⚙️  Executing Sovereign Step {idx+1}/7 [Key Handover Mode]...")
             
-            # ጥሪው በራስ ሰር በየዙሩ ቁልፍ ይቀይራል (በ UnstoppableAIProvider በኩል)
+            # Context window ማዘጋጀት (የመጨረሻዎቹን 8000 ቃላት ብቻ ለ AIው በመስጠት ትኩረቱን መጠበቅ)
+            context = str(full_content)[-10000:] if full_content else "Beginning of the Sovereign Masterpiece."
+            combined_prompt = (
+                f"--- PREVIOUS WORK CONTEXT ---\n{context}\n\n"
+                f"--- YOUR SPECIFIC TASK ---\n"
+                f"Continue the masterpiece. DO NOT REPEAT introduction. Start directly with the next phase.\n"
+                f"{task_prompt}"
+            )
+            
+            # ጥሪው በየዙሩ በራስ-ሰር ቁልፍ ይቀይራል (UnstoppableAIProvider)
             new_part = await self.ai.generate_content(combined_prompt, max_tokens=4000)
             
-            # ስህተቱን የሚፈታው ወሳኝ መስመር፡ ሁልጊዜ ወደ String መቀየር
+            # ውጤቱን ማከማቸት
             full_content += "\n\n" + str(new_part)
-            await asyncio.sleep(3) # የ 3 ሰከንድ እረፍት በየዙሩ መሃል
+            
+            # በየዙሩ 3 ሰከንድ እረፍት ለ API ደህንነት
+            await asyncio.sleep(3)
 
-        # 🎨 የጥበብ ስራ፡ በለፋንባቸው ጥበቦች ማሳመሪያ (Sensory & Neuro-Marketing)
+        # --- 🎨 የጥበብ ስራ፡ ኒውሮ እና ሴንሰሪ ማሳመሪያ (The Grand Polish) ---
         print(f"   🎨 Applying Multilingual Sensory & Neuro-Marketing Polish to {country}...")
-        # እነዚህን ከውጭ ከሰጠኸኝ ክፍሎች ይጠራል
+        
+        # 1. ሴንሰሪ (ስሜት ቀስቃሽ) ጽሁፍ ማረም
         if hasattr(self.system, 'sensory_writer'):
             full_content = self.system.sensory_writer.transform_to_sensory_content(full_content)
+        
+        # 2. ኒውሮ-ማርኬቲንግ (የመግዛት ስሜት) መጨመር
         if hasattr(self.system, 'neuro_converter'):
             full_content = self.system.neuro_converter.apply_neuro_marketing(full_content)
         
-        # 🏗️ የንጉሳዊ መዋቅር ግንባታ ከአውዲዮ ማጫወቻ ጋር
-        print(f"   👑 Building Royal Structure with Audio Header...")
-        return self._build_royal_structure(full_content, final_topic, country, target_lang)
+        # 3. ምስሎችን ስልታዊ በሆነ ቦታ መሰንጠቅ (Smart Image SEO)
+        if hasattr(self.system, 'image_engine'):
+            print(f"   🖼️  Injecting Smart SEO Visuals for {country}...")
+            full_content = self.system.image_engine.generate_image_placeholders(full_content, country, final_topic)
 
-    def _build_royal_structure(self, content, topic, country, lang):
-        """የላቀ ንጉሳዊ የዲዛይን መዋቅር ከአውዲዮ ማጫወቻ ጋር"""
+        # 🏗️ የመጨረሻው ንጉሳዊ መዋቅር ግንባታ
+        print(f"   👑 Constructing The Zenith Visual Structure...")
+        return self._build_zenith_royal_design(full_content, final_topic, country, target_lang)
+
+    def _build_zenith_royal_design(self, content, topic, country, lang):
+        """እጅግ ዘመናዊ፣ ንጉሳዊ እና የሚስብ የዲዛይን መዋቅር"""
         style = """
         <style>
-            @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Lora:ital,wght@0,400;1,700&display=swap');
-            body { background: #0b0f19; color: #1a1a1a; margin: 0; padding: 0; }
-            .sovereign-container { 
-                max-width: 1000px; margin: 50px auto; background: #fff; 
-                padding: 70px; border: 35px solid #1a2a44; 
-                box-shadow: 0 50px 150px rgba(0,0,0,0.6);
-                font-family: 'Lora', serif; line-height: 2.3;
+            @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Lora:ital,wght@0,400;1,700&family=Inter:wght@300;400;700&display=swap');
+            
+            :root { --royal-blue: #1a2a44; --gold: #c5a059; --pure-white: #ffffff; --deep-black: #0b0f19; }
+            
+            .zenith-container { 
+                max-width: 1100px; margin: 60px auto; background: var(--pure-white); 
+                padding: 80px; border: 40px solid var(--royal-blue); 
+                box-shadow: 0 70px 200px rgba(0,0,0,0.7);
+                font-family: 'Lora', serif; line-height: 2.4;
                 position: relative;
             }
-            .audio-header { 
-                background: linear-gradient(135deg, #c5a059 0%, #9e7e38 100%);
-                color: white; padding: 25px; border-radius: 15px; 
-                margin-bottom: 40px; display: flex; align-items: center; 
-                justify-content: space-between; box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+            
+            .audio-crown { 
+                background: linear-gradient(135deg, var(--gold) 0%, #9e7e38 100%);
+                color: white; padding: 30px; border-radius: 20px; 
+                margin-bottom: 50px; display: flex; align-items: center; 
+                justify-content: space-between; border: 2px solid rgba(255,255,255,0.3);
             }
-            .play-button {
-                background: white; color: #1a2a44; border: none; 
-                padding: 12px 30px; border-radius: 50px; font-weight: bold;
-                cursor: pointer; transition: transform 0.2s;
+            
+            .play-btn {
+                background: white; color: var(--royal-blue); border: none; 
+                padding: 15px 40px; border-radius: 50px; font-weight: 900;
+                cursor: pointer; transition: all 0.3s; font-family: 'Inter', sans-serif;
             }
-            .play-button:hover { transform: scale(1.05); }
-            .gold-badge { 
-                background: #c5a059; color: white; padding: 12px 30px; 
-                text-align: center; font-weight: bold; letter-spacing: 4px;
-                display: inline-block; margin-bottom: 30px; text-transform: uppercase;
+            .play-btn:hover { transform: scale(1.1); box-shadow: 0 0 20px var(--gold); }
+            
+            .sovereign-badge { 
+                background: var(--gold); color: white; padding: 15px 40px; 
+                text-align: center; font-weight: 900; letter-spacing: 6px;
+                display: inline-block; margin-bottom: 40px; text-transform: uppercase;
+                font-family: 'Inter', sans-serif; clip-path: polygon(10% 0, 100% 0, 90% 100%, 0 100%);
             }
-            h1 { font-family: 'Playfair Display', serif; font-size: 65px; color: #1e3c72; text-align: center; line-height: 1.1; margin-bottom: 20px; }
-            h2 { color: #0f172a; border-bottom: 4px solid #c5a059; padding-bottom: 12px; margin-top: 60px; font-size: 38px; }
-            h3 { color: #1e3c72; margin-top: 40px; font-size: 28px; border-left: 8px solid #c5a059; padding-left: 15px; }
-            p { margin-bottom: 30px; font-size: 20px; text-align: justify; }
-            .content-block { margin-bottom: 40px; }
-            table { width: 100%; border-collapse: collapse; margin: 40px 0; font-size: 18px; }
-            th { background: #1a2a44; color: #fff; padding: 20px; text-align: left; }
-            td { border: 1px solid #ddd; padding: 18px; }
+            
+            h1 { font-family: 'Playfair Display', serif; font-size: 72px; color: var(--royal-blue); text-align: center; line-height: 1.05; margin-bottom: 25px; }
+            h2 { color: var(--royal-blue); border-bottom: 5px solid var(--gold); padding-bottom: 15px; margin-top: 70px; font-size: 42px; font-family: 'Playfair Display', serif; }
+            h3 { color: #2c3e50; margin-top: 45px; font-size: 30px; border-left: 10px solid var(--gold); padding-left: 20px; }
+            
+            p { margin-bottom: 35px; font-size: 21px; text-align: justify; color: #333; }
+            
+            .fact-box { 
+                background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 15px; 
+                padding: 30px; margin: 40px 0; border-top: 5px solid var(--primary-blue);
+            }
+            
+            .footer-seal { 
+                text-align: center; margin-top: 150px; border-top: 3px solid #f1f1f1; 
+                padding-top: 50px; opacity: 0.5; font-family: 'Inter', sans-serif;
+            }
         </style>
         """
         
-        audio_section = f"""
-        <div class="audio-header">
-            <div style="display: flex; align-items: center; gap: 15px;">
-                <span style="font-size: 40px;">🎧</span>
+        audio_header = f"""
+        <div class="audio-crown">
+            <div style="display: flex; align-items: center; gap: 20px;">
+                <span style="font-size: 50px;">🎙️</span>
                 <div>
-                    <strong style="font-size: 22px; display: block;">Sovereign Audio Guide</strong>
-                    <span style="opacity: 0.9;">ተተርጉሞ የቀረበ የድምፅ መመሪያ ({lang})</span>
+                    <strong style="font-size: 24px; display: block; letter-spacing: 1px;">SOVEREIGN AUDIO ORACLE</strong>
+                    <span style="opacity: 0.9; font-style: italic;">በ{lang} ቋንቋ የተዘጋጀ የድምፅ ትረካ</span>
                 </div>
             </div>
-            <button class="play-button" onclick="alert('AI Voice is generating...')">LISTEN NOW</button>
+            <button class="play-btn">START NARRATION</button>
         </div>
         """
         
-        html_output = f"""
+        return f"""
         {style}
-        <div class="sovereign-container">
+        <div class="zenith-container">
             <div style="text-align:center;">
-                <div class="gold-badge">SUPREME STRATEGIC INTELLIGENCE</div>
+                <div class="sovereign-badge">Supreme Strategic Legacy</div>
                 <h1>{topic.upper()}</h1>
-                <p style="font-size: 26px; color: #555;"><b>THE DEFINITIVE POWER-GUIDE FOR THE {country.upper()} MARKET</b></p>
-                <hr style="width: 40%; border: 1px solid #c5a059; margin: 20px auto;">
-                {audio_section}
+                <p style="font-size: 28px; color: var(--gold); font-style: italic;"><b>The Definitive Power-Guide for the {country.upper()} Market</b></p>
+                <div style="width: 100px; height: 5px; background: var(--gold); margin: 20px auto;"></div>
+                {audio_header}
             </div>
-            <div class="main-content">
+            <div class="zenith-body">
                 {content}
             </div>
-            <div style="text-align:center; margin-top:120px; border-top: 2px solid #eee; padding-top:30px; opacity:0.6;">
-                <p>© 2026 THE ASCENDANT MONARCH SYSTEM • ALL RIGHTS RESERVED.</p>
-                <p><small>Produced by Titan v23.0 Omnipotent AI</small></p>
+            <div class="footer-seal">
+                <p><b>THE OMNIPOTENT ORACLE SYSTEM</b></p>
+                <p>Architected for Global Dominance • February 2026</p>
+                <p><small>Protocol: TITAN v25.0 Zenith</small></p>
             </div>
         </div>
         """
-        return html_output
+
+# =================== END OF OMNIPOTENT ORACLE v25.0 ===================
 
 # =================== ዋና ስርዓት ክፍል ===================
 
