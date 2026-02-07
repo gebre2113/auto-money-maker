@@ -4167,49 +4167,127 @@ class EnhancedWordCounter:
 # =========================================================================
 # 👑 TITAN v19.0: THE SOVEREIGN ORACLE - ULTIMATE EDITION (FINAL)
 # ========================================================================
-
 class MegaContentEngine:
+    """
+    💎 TITAN v10 "THE OMNIPOTENT" - FINAL SOVEREIGN EDITION
+    Harnessing: 7-Phase Expansion, Multi-Key Rotation, Neuro-Sensory Layers, 
+    and Bilingual Native Discovery.
+    """
+    
     def __init__(self, system):
         self.system = system
         self.config = system.config
-        self.failover = system.failover_system 
-        self.TARGET_WORDS = 7000
-
-    async def produce_single_country_sovereign_logic(self, topic: str, country: str) -> str:
-        """7-PHASE RELAY: 7ቱንም ቁልፎች በመጠቀም 7,000+ ቃላት ያመርታል"""
-        print(f"👑 Starting Sovereign 7-Phase Relay for {country}")
-        full_content = ""
+        self.ai = system.failover_system 
+        self.TARGET_WORDS = 10000 # የ10,000 ቃላት ግብ
         
-        # ሰባቱ የጥልቀት ደረጃዎች
-        tasks = [
-            f"Write 1500 words: Intro and Phase 1 (Market Trends 2026) for '{topic}' in {country}. HTML.",
-            f"Write 1500 words: Phase 2 (Technical Architecture) for '{topic}' in {country}. HTML.",
-            f"Write 1500 words: Phase 3 (15 Local Case Studies) for '{topic}' in {country}. HTML.",
-            f"Write 1200 words: Phase 4 (24-Month Roadmap) for '{topic}' in {country}. HTML.",
-            f"Write 1200 words: Phase 5 (Monetization & ROI) for '{topic}' in {country}. HTML.",
-            f"Write 1000 words: Phase 6 (Competition Analysis) for '{topic}' in {country}. HTML.",
-            f"Write 1000 words: Phase 7 (50 FAQs & 2040 Vision) for '{topic}' in {country}. HTML."
+        # 🔑 Multi-Key Rotation System
+        self.keys = self._load_keys()
+        self.current_key_idx = 0
+        self.logger = logging.getLogger("TITAN_V10")
+
+    def _load_keys(self):
+        """ሁሉንም የ Groq ቁልፎች ከ GitHub Secrets መጫኛ"""
+        keys = [os.getenv(f'GROQ_API_KEY_{i}') for i in range(1, 11) if os.getenv(f'GROQ_API_KEY_{i}')]
+        if not keys and os.getenv('GROQ_API_KEY'):
+            keys = [os.getenv('GROQ_API_KEY')]
+        return keys
+
+    async def produce_11_countries_mega_loop(self, topic: str):
+        """11 ሀገራትን በ7-ደረጃ ጥልቀት የማምረት ማስተር ሉፕ"""
+        targets = list(self.config.HIGH_VALUE_COUNTRIES.keys())[:11]
+        start_total = time.time()
+        
+        print(f"\n🚀 TITAN v10 ACTIVATED. TARGETING 110,000+ TOTAL WORDS...")
+
+        for i, code in enumerate(targets, 1):
+            country_name = self.config.HIGH_VALUE_COUNTRIES[code]['name']
+            lang = self.config.HIGH_VALUE_COUNTRIES[code].get('lang', 'English')
+            
+            print(f"\n🌍 [{i}/11] STARTING OMNIPOTENT RUN: {country_name} ({lang})")
+            
+            try:
+                # 1. NATIVE TOPIC DISCOVERY
+                discovered_topic = await self._discover_native_trend(topic, country_name, lang)
+                
+                # 2. 7-PHASE GENERATION
+                full_raw_content = await self._execute_7_phase_generation(discovered_topic, country_name, lang)
+                
+                # 3. NEURO-SENSORY ENHANCEMENT
+                print(f"   🎭 Applying Psychological & Sensory Layers...")
+                polished = self.system.sensory_writer.transform_to_sensory_content(full_raw_content)
+                polished = self.system.neuro_converter.apply_neuro_marketing(polished)
+                
+                # 4. ROYAL STYLING & SEO
+                final_html = self._build_royal_structure(polished, discovered_topic, country_name, lang)
+                
+                # 5. SAVE & LOG
+                word_count = len(re.sub(r'<[^>]+>', '', final_html).split())
+                self._save_output(final_html, code, word_count)
+                
+                print(f"   ✅ COMPLETED: {word_count:,} words generated for {country_name}!")
+                
+            except Exception as e:
+                self.logger.error(f"Critical Node Failure in {code}: {e}")
+            
+            if i < 11: await asyncio.sleep(10) # Cooling
+
+        print(f"\n🏆 TITAN v10 RUN COMPLETE! TOTAL TIME: {(time.time()-start_total)/60:.2f} MINS")
+
+    async def _discover_native_trend(self, base, country, lang):
+        """ዛሬ ያለውን ትኩስ ዜና በሀገሩ ቋንቋ መፈለጊያ"""
+        prompt = f"Identify the #1 most profitable/viral business trend for '{base}' in {country} today (2026). Return ONLY the title in {lang}."
+        res = await self.ai.generate_content(prompt, 100)
+        return res.strip().replace('"', '')
+
+    async def _execute_7_phase_generation(self, topic, country, lang):
+        """7ቱን የጥልቀት ምዕራፎች በሰንሰለት የማገናኛ ሎጂክ"""
+        full_content = ""
+        phases = [
+            ("Foundations", 2500), ("Tech Architecture", 2000), 
+            ("10 Case Studies", 1500), ("24-Month Roadmap", 1500),
+            ("Wealth/ROI", 1000), ("Competition Domination", 800), 
+            ("50 FAQ & 2040 Vision", 1500)
         ]
 
-        for idx, task in enumerate(tasks):
-            print(f"⚙️  Executing Step {idx+1}/7...")
-            context = full_content[-5000:] if full_content else ""
-            prompt = f"CONTEXT: {context}\n\nTASK: {task}"
+        for name, words in phases:
+            print(f"   ⚙️  Phase: {name}...")
+            context = full_content[-6000:] if full_content else "Start of Masterclass."
+            prompt = f"CONTEXT: {context}\n\nTASK: Write {name} (Target: {words} words) for '{topic}' in {country}. Language: {lang}. Use HTML. Be technical, deep, and realistic."
             
-            # በእያንዳንዱ ጥሪ አዲስ ቁልፍ በራስ ሰር ይጠቀማል
-            new_part = await self.failover.generate_content(prompt)
-            full_content += "\n\n" + str(new_part)
+            # Key Rotation Integration
+            part = await self.ai.generate_content(prompt, max_tokens=4000)
+            full_content += f"\n\n\n" + str(part)
             await asyncio.sleep(2)
+            
+        return full_content
 
-        # 🎨 የጥበብ ስራ ማሳመሪያዎች
-        polished = self.system.sensory_writer.transform_to_sensory_content(full_content)
-        polished = self.system.neuro_converter.apply_neuro_marketing(polished)
-        
-        return self._build_royal_structure(polished, topic, country)
+    def _build_royal_structure(self, content, topic, country, lang):
+        """የሰነድ ውበትና የ SEO መዋቅር"""
+        return f"""
+        <div style="max-width:950px; margin:auto; border:40px double #1e3c72; padding:60px; background:#fff; font-family:'Lora', serif; line-height:2.2; color:#111; box-shadow: 0 0 100px rgba(0,0,0,0.2);">
+            <style>
+                @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@900&family=Lora:wght@400;700&display=swap');
+                h1, h2, h3 {{ font-family: 'Playfair Display', serif; color: #1e3c72; }}
+                h1 {{ font-size: 4.5em; text-align: center; border-bottom: 5px solid #c5a059; padding-bottom: 20px; }}
+                .badge {{ background: #c5a059; color: white; padding: 10px 20px; border-radius: 50px; font-weight: bold; text-align: center; display: block; width: fit-content; margin: 20px auto; }}
+            </style>
+            <div class="badge">👑 TITAN V10 SOVEREIGN EDITION</div>
+            <h1>{topic}</h1>
+            <div style="text-align:center; font-size:1.5em; color: #7f8c8d; margin-bottom: 50px;">
+                Territory: {country} | Native Intelligence Mode: {lang}
+            </div>
+            <div class="main-content">{content}</div>
+            <div style="text-align:center; margin-top:100px; border-top:1px solid #eee; padding-top:30px; font-style:italic;">
+                © 2026 Titan Sovereign Intelligence Cluster. Generated for Global Dominance.
+            </div>
+        </div>
+        """
 
-    def _build_royal_structure(self, content, topic, country):
-        style = "<style>body{font-family:'Lora',serif;line-height:2.3;padding:50px;} .doc{border:30px solid #0f172a; padding:40px;}</style>"
-        return f"{style}<div class='doc'><h1>{topic.upper()} - {country}</h1>{content}</div>"
+    def _save_output(self, html, country, count):
+        Path("enterprise_outputs").mkdir(exist_ok=True)
+        filename = f"enterprise_outputs/TITAN_V10_{country}_{int(time.time())}.html"
+        with open(filename, 'w', encoding='utf-8') as f:
+            f.write(html)
 # =================== ዋና ስርዓት ክፍል ===================
 
 class UltimateProfitMasterSystem:
