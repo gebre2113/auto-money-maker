@@ -1,0 +1,61 @@
+{
+  "production_id": "enterprise_f4f0241672bf",
+  "topic": "Enterprise AI Implementation Strategies 2026",
+  "target_countries": [
+    "US",
+    "GB",
+    "CA",
+    "AU",
+    "DE",
+    "FR",
+    "JP",
+    "CH",
+    "NO",
+    "SE",
+    "ET"
+  ],
+  "content_type": "enterprise_guide",
+  "enterprise_standards": {
+    "min_words": 3000,
+    "min_quality": 88,
+    "min_cultural_depth": 85,
+    "min_compliance_score": 95,
+    "sequential_processing": true,
+    "intelligent_delays": true,
+    "quality_guarantee": true
+  },
+  "status": "failed",
+  "start_time": "2026-02-07T12:56:25.488014",
+  "performance_monitoring": true,
+  "country_results": [],
+  "overall_metrics": {},
+  "enhancement_reports": {},
+  "error": "Production failed",
+  "performance_report": {
+    "profile_output": "         1151053 function calls (1143537 primitive calls) in 1101.991 seconds\n\n   Ordered by: cumulative time, internal time\n   List reduced from 1247 to 30 due to restriction <30>\n\n   ncalls  tottime  percall  cumtime  percall filename:lineno(function)\n     4841    0.035    0.000 1101.962    0.228 /opt/hostedtoolcache/Python/3.10.19/x64/lib/python3.10/asyncio/base_events.py:1832(_run_once)\n     4841    0.016    0.000 1097.293    0.227 /opt/hostedtoolcache/Python/3.10.19/x64/lib/python3.10/selectors.py:452(select)\n     4841 1097.272    0.227 1097.272    0.227 {method 'poll' of 'select.epoll' objects}\n     6381    0.008    0.000    4.621    0.001 /opt/hostedtoolcache/Python/3.10.19/x64/lib/python3.10/asyncio/events.py:78(_run)\n     6381    0.032    0.000    4.613    0.001 {method 'run' of '_contextvars.Context' objects}\n6089/3045    0.003    0.000    4.446    0.001 /home/runner/work/auto-money-maker/auto-money-maker/enterprise_runner.py:154(safe_execute)\n     3044    0.002    0.000    4.444    0.001 /home/runner/work/auto-money-maker/auto-money-maker/enterprise_runner.py:3327(run_enterprise_production)\n     3044    0.002    0.000    4.427    0.001 /home/runner/work/auto-money-maker/auto-money-maker/enterprise_runner.py:3418(_process_country_enterprise)\n     3044    0.002    0.000    4.420    0.001 /home/runner/work/auto-money-maker/auto-money-maker/enterprise_runner.py:4427(main_execution)\n     3044    0.003    0.000    4.419    0.001 /home/runner/work/auto-money-maker/auto-money-maker/profit_master_system.py:4177(produce_single_country_sovereign_logic)\n     3044    0.001    0.000    4.418    0.001 /home/runner/work/auto-money-maker/auto-money-maker/enterprise_runner.py:3236(run_production_with_monitoring)\n     3044    0.004    0.000    4.386    0.001 /home/runner/work/auto-money-maker/auto-money-maker/profit_master_system.py:1067(generate_content)\n      154    0.002    0.000    3.237    0.021 /opt/hostedtoolcache/Python/3.10.19/x64/lib/python3.10/site-packages/httpx/_client.py:1345(__init__)\n      154    0.001    0.000    3.167    0.021 /opt/hostedtoolcache/Python/3.10.19/x64/lib/python3.10/site-packages/httpx/_client.py:1428(_init_transport)\n      154    0.002    0.000    3.167    0.021 /opt/hostedtoolcache/Python/3.10.19/x64/lib/python3.10/site-packages/httpx/_transports/default.py:258(__init__)\n      154    0.001    0.000    3.163    0.021 /opt/hostedtoolcache/Python/3.10.19/x64/lib/python3.10/site-packages/httpx/_config.py:46(create_ssl_context)\n      154    0.001    0.000    3.162    0.021 /opt/hostedtoolcache/Python/3.10.19/x64/lib/python3.10/site-packages/httpx/_config.py:64(__init__)\n      154    0.001    0.000    3.162    0.021 /opt/hostedtoolcache/Python/3.10.19/x64/lib/python3.10/site-packages/httpx/_config.py:78(load_ssl_context)\n      154    0.003    0.000    3.161    0.021 /opt/hostedtoolcache/Python/3.10.19/x64/lib/python3.10/site-packages/httpx/_config.py:101(load_ssl_context_verify)\n      154    3.085    0.020    3.085    0.020 {method 'load_verify_locations' of '_ssl._SSLContext' objects}\n     1766    0.003    0.000    2.519    0.001 /home/runner/work/auto-money-maker/auto-money-maker/profit_master_system.py:1101(_call_api)\n     1344    0.002    0.000    1.840    0.001 /home/runner/work/auto-money-maker/auto-money-maker/profit_master_system.py:1110(_call_gemini)\n     2802    0.001    0.000    1.090    0.000 /opt/hostedtoolcache/Python/3.10.19/x64/lib/python3.10/site-packages/httpx/_client.py:1827(post)\n     2802    0.002    0.000    1.088    0.000 /opt/hostedtoolcache/Python/3.10.19/x64/lib/python3.10/site-packages/httpx/_client.py:1484(request)\n     2802    0.002    0.000    1.035    0.000 /opt/hostedtoolcache/Python/3.10.19/x64/lib/python3.10/site-packages/httpx/_client.py:1584(send)\n     2470    0.003    0.000    0.825    0.000 /opt/hostedtoolcache/Python/3.10.19/x64/lib/python3.10/site-packages/httpx/_client.py:1633(_send_handling_auth)\n     2470    0.002    0.000    0.820    0.000 /opt/hostedtoolcache/Python/3.10.19/x64/lib/python3.10/site-packages/httpx/_client.py:1667(_send_handling_redirects)\n     2470    0.005    0.000    0.817    0.000 /opt/hostedtoolcache/Python/3.10.19/x64/lib/python3.10/site-packages/httpx/_client.py:1705(_send_single_request)\n     2470    0.005    0.000    0.716    0.000 /opt/hostedtoolcache/Python/3.10.19/x64/lib/python3.10/site-packages/httpx/_transports/default.py:347(handle_async_request)\n     2470    0.004    0.000    0.696    0.000 /opt/hostedtoolcache/Python/3.10.19/x64/lib/python3.10/site-packages/httpcore/_async/connection_pool.py:206(handle_async_request)\n\n\n",
+    "elapsed_time_seconds": 1102.1067752838135,
+    "memory_report": {
+      "rss_mb": 126.2421875,
+      "vms_mb": 420.1171875,
+      "percent": 0.7892630142432692,
+      "available_system_mb": 15032.32421875,
+      "cpu_percent": 0.0
+    },
+    "peak_memory_mb": 124.6171875
+  },
+  "system_status": {
+    "memory": {
+      "total_mb": 15994.9453125,
+      "available_mb": 15032.32421875,
+      "percent_used": 6.0,
+      "swap_mb": 0.0
+    },
+    "cpu": {
+      "percent": 0.0,
+      "count": 4
+    },
+    "disk": {
+      "free_gb": 21.00167465209961
+    }
+  }
+}
