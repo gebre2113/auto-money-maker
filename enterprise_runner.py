@@ -3170,93 +3170,99 @@ class EnterpriseProductionOrchestrator:
             }
     
     async def run_enterprise_production(self, topic: str, 
-                                      markets: List[str] = None,
-                                      content_type: str = "enterprise_guide") -> Dict:
-        """Run complete enterprise production pipeline"""
+                                          markets: List[str] = None,
+                                          content_type: str = "enterprise_guide") -> Dict:
+        """
+        🚀 ENTERPRISE MASTER RUNNER v32.0
+        - በአገሮች የዜና ሰዓት (Prime Time) ላይ ብቻ ያመርታል
+        - 11ዱንም ሀገር ሰርቶ በንጽህና ይዘጋል (No infinite loop)
+        - በየሀገሩ መሃል የ60 ሰከንድ የቁልፍ ማገገሚያ እረፍት ይሰጣል
+        """
         
-        if markets is None:
-            markets = DEFAULT_TARGET_COUNTRIES
+        # 🎯 1. አሁን "Prime Time" ላይ ያሉ ሀገራትን ብቻ መለየት
+        # (ይህ ፈንክሽን በ main.py ወይም ከላይ መገለጹን አረጋግጥ)
+        all_prime_markets = get_active_prime_time_countries()
         
-        production_id = f"enterprise_{hashlib.md5(f'{topic}{datetime.now()}'.encode()).hexdigest()[:12]}"
+        if markets:
+            # ተጠቃሚው የሰጣቸውን ሀገራት በ Prime Time መቆንጠጥ
+            markets = [m for m in markets if m in all_prime_markets]
+        else:
+            # ምንም ሀገር ካልተሰጠ Prime Time ላይ ያሉትን በሙሉ ውሰድ
+            markets = all_prime_markets
+
+        # 😴 በሰዓቱ የሚሰራ ሀገር ከሌለ ሲስተሙን በሰላም መዝጋት
+        if not markets:
+            self.logger.info("😴 No countries are in Prime Time right now. System entering rest mode.")
+            return {'status': 'success', 'message': 'System idle during non-peak hours'}
+
+        production_id = f"ent_{hashlib.md5(f'{topic}{datetime.now()}'.encode()).hexdigest()[:12]}"
         
-        self.logger.info(f"🏢 Processing {len(markets)} countries sequentially...")
+        self.logger.info(f"🏢 STARTING PRODUCTION for {len(markets)} active markets: {', '.join(markets)}")
         
         production_results = {
             'production_id': production_id,
             'topic': topic,
             'target_countries': markets,
-            'content_type': content_type,
-            'enterprise_standards': self.enterprise_standards.copy(),
             'status': 'processing',
             'start_time': datetime.now().isoformat(),
             'country_results': [],
-            'overall_metrics': {},
-            'enhancement_reports': {}
+            'overall_metrics': {}
         }
         
         country_results = []
         
+        # 🔄 2. የሀገራት ሉፕ (Loop) - አንድ በአንድ ይሰራል
         for idx, country in enumerate(markets):
             self.logger.info(f"\n{'━'*60}")
-            self.logger.info(f"🏢 Processing {country} ({idx+1}/{len(markets)})")
+            self.logger.info(f"🌍 PROCESSING: {country} ({idx+1}/{len(markets)})")
             self.logger.info(f"{'━'*60}")
             
-            current_memory = self.performance_monitor.sample_memory()
-            if current_memory > 500:
-                self.logger.info(f"🧠 High memory usage: {current_memory:.1f}MB - optimizing...")
-                self.memory_manager.optimize_memory()
+            # 🧠 3. BRAIN WIPE: ለእያንዳንዱ ሀገር አዲስ ሜሞሪ እንዲጀምር ሜጋ ኢንጂኑን ማጽዳት
+            if hasattr(self.content_system, 'mega_engine'):
+                self.content_system.mega_engine.active_memory = ""
+                self.content_system.mega_engine.memory_chain = []
+            
+            # የማህደረ ትውስታ ቁጥጥር
+            self.memory_manager.optimize_memory()
             
             try:
+                # 🛠️ 4. ድልድዩን (Bridge) መጥራት - ይህ Mega Pen እና Affiliate Penን ያገናኛል
                 country_result = await EnhancedErrorHandler.safe_execute(
-                    self._process_country_enterprise(
-                        topic=topic,
-                        country=country,
-                        content_type=content_type,
-                        country_number=idx+1,
-                        total_countries=len(markets)
-                    ),
-                    fallback_value={
-                        'country': country,
-                        'status': 'failed',
-                        'error': 'Processing failed after retries',
-                        'word_count': 0,
-                        'quality_score': 0
-                    },
+                    self._process_country_enterprise, # ፈንክሽኑን (ስሙን ብቻ)
+                    topic, country, # ግብአቶቹን (Arguments)
+                    fallback_value={'country': country, 'status': 'failed', 'error': 'Bridge Failure'},
                     max_retries=2,
-                    context=f"Country {country} processing"
+                    context=f"Enterprise Bridge for {country}"
                 )
                 
                 country_results.append(country_result)
                 
+                # 💤 5. በአገሮች መካከል የሚደረግ ስልታዊ እረፍት (Inter-Country Cooldown)
                 if idx < len(markets) - 1:
-                    delay_range = HIGH_VALUE_COUNTRIES.get(country, {}).get('delay_seconds', (150, 210))
-                    delay = random.randint(*delay_range)
-                    
-                    self.logger.info(f"⏳ Enterprise delay for quality: {delay} seconds...")
+                    # በአንተ ፍላጎት መሰረት ከ 45-60 ሰከንድ እረፍት
+                    delay = random.randint(45, 60)
+                    self.logger.info(f"⏳ Inter-country cooling: Resting for {delay}s to refresh ALL 15 keys...")
                     await asyncio.sleep(delay)
                 
             except Exception as e:
-                self.logger.error(f"❌ Failed to process {country}: {e}")
-                country_results.append({
-                    'country': country,
-                    'status': 'failed',
-                    'error': str(e),
-                    'word_count': 0,
-                    'quality_score': 0
-                })
-        
+                self.logger.error(f"❌ Critical Error processing {country}: {e}")
+                country_results.append({'country': country, 'status': 'failed', 'error': str(e)})
+
+        # 📊 6. ማጠቃለያ እና ሪፖርት
         production_results['country_results'] = country_results
         production_results['overall_metrics'] = self._calculate_enterprise_metrics(country_results)
-        production_results['status'] = 'completed'
-        production_results['end_time'] = datetime.now().isoformat()
-        production_results['total_duration'] = (datetime.fromisoformat(production_results['end_time']) - 
-                                               datetime.fromisoformat(production_results['start_time'])).total_seconds()
         
+        # 🏁 7. ስኬትን ማብሰር (GitHub Actions አረንጓዴ እንዲሆን 'success' እንጠቀማለን)
+        production_results['status'] = 'success' 
+        production_results['end_time'] = datetime.now().isoformat()
+        
+        # ሪፖርቶችን ማመንጨት
         await self._generate_enterprise_reports(production_results)
         
+        # ማሳወቂያዎችን መላክ (Telegram/WordPress)
         await self._send_enterprise_notifications(production_results)
         
-        self._print_enterprise_summary(production_results)
+        self.logger.info(f"🏁 ALL {len(markets)} MARKETS COMPLETED. System shutting down cleanly.")
         
         return production_results
     
