@@ -870,22 +870,26 @@ class HumanLikenessEngine:
 # 🤖 UNSTOPPABLE AI PROVIDER (v29.0 - ENTERPRISE MULTI-KEY RELAY)
 # =========================================================================
 
+# =========================================================================
+# 🤖 UNSTOPPABLE AI PROVIDER (v30.0 - THE 15-KEY ENTERPRISE FORTRESS)
+# =========================================================================
+
 class UnstoppableAIProvider:
     """
-    የዓለማችን እጅግ ጠንካራው AI አቅራቢ - 7 ቁልፎችን በየዙሩ ያፈራርቃል
-    - Strict 7-Key Rotation (አንዱ ሲያልቅ ሌላው)
+    የዓለማችን እጅግ ጠንካራው AI አቅራቢ - 15 ቁልፎችን በየዙሩ ያፈራርቃል
+    - Strict 15-Key Global Rotation (አንድ ቁልፍ በአንድ ሀገር አንድ ጊዜ ብቻ)
     - Auto-Failover (DeepSeek, Gemini v1beta)
-    - Multi-Task Support (Refinement, Audit, Title, Production)
-    - Anti-429 Cooldown (Rate Limit መከላከያ)
+    - Multi-Task Support (Production, Refinement, Audit, Title)
+    - Anti-429 Intelligent Cooldown (Rate Limit መከላከያ)
     """
     
     def __init__(self, config=None):
         self.config = config
         self.logger = logging.getLogger("UnstoppableAI")
         
-        # 🛡️ 7ቱን የግሮቅ ቁልፎች ከ GitHub Secrets መጫን
-        self.groq_pool = self._load_key_pool('GROQ_API_KEY', 7)
-        self.groq_index = 0 # የአሁኑን ተረኛ ቁልፍ መቆጣጠሪያ
+        # 🛡️ 15ቱን የግሮቅ ቁልፎች ከ GitHub Secrets መጫን
+        self.groq_pool = self._load_key_pool('GROQ_API_KEY', 15)
+        self.groq_index = 0 # የአሁኑን ተረኛ ቁልፍ መቆጣጠሪያ (Global)
         
         # መጠባበቂያ ቁልፎች (Failover)
         self.keys = {
@@ -896,46 +900,66 @@ class UnstoppableAIProvider:
         }
         
         self.session = None
-        self.performance_log = []
-        self.key_blacklist = {} # {index: timestamp_to_unblock}
+        self.key_blacklist = {} # {index: timestamp_to_unblock} (Rate limit የተመቱ ቁልፎች)
 
     def _load_key_pool(self, base_name, count):
-        """ከ GitHub Secrets 7ቱንም ቁልፎች ሰብስቦ ይጭናል"""
+        """ከ GitHub Secrets 15ቱንም ቁልፎች ሰብስቦ ይጭናል"""
         keys = []
+        # መጀመሪያ ዋናውን (GROQ_API_KEY) ይፈትሻል
         main_key = os.getenv(base_name)
         if main_key: keys.append(main_key)
+        
+        # በመቀጠል ቁጥር ያላቸውን (GROQ_API_KEY_1...15) ይጭናል
         for i in range(1, count + 1):
             k = os.getenv(f"{base_name}_{i}")
-            if k and k not in keys: keys.append(k)
+            if k and k not in keys:
+                keys.append(k)
+        
+        # 15 ቁልፍ ከሌለህ ያሉትን ደጋግሞ በመጠቀም ክፍተቱን ይሞላል (Error እንዳይፈጠር)
+        if not keys:
+            self.logger.error("❌ CRITICAL: No Groq keys found in environment!")
+            return []
+            
+        while len(keys) < count:
+            keys.append(random.choice(keys))
+            
         return keys
 
     async def generate_content(self, prompt: str, max_tokens: int = 4000) -> str:
         """ለ MegaContentEngine ድልድይ ሆኖ የሚያገለግል ዋና ጥሪ"""
         return await self.process_task(prompt, "production", max_tokens)
 
+    async def generate_with_specific_key(self, prompt: str, key_type: str, worker_idx: int = 0) -> str:
+        """ለተኳሃኝነት የተቀመጠ ጥሪ (በአዲሱ ሎጂክ ውስጥ ያልፋል)"""
+        task_map = {
+            'strategist': 'production',
+            'worker': 'production',
+            'narrator': 'refinement'
+        }
+        return await self.process_task(prompt, task_map.get(key_type, 'production'))
+
     async def process_task(self, prompt: str, task_type: str = "refinement", max_tokens: int = 4000) -> str:
-        """በተከታታይ ቁልፎችን እና ሞዴሎችን የመሞከር ዋና ሎጂክ"""
+        """በተከታታይ 15ቱን ቁልፎች እና ሞዴሎችን የመሞከር ዋና ሎጂክ"""
         now = time.time()
-        self.performance_log = []
         
         if not self.groq_pool:
-            self.logger.error("❌ No Groq keys found in environment!")
+            self.logger.error("❌ Groq key pool is empty!")
         else:
-            # 🔄 ሁሉንም 7 ቁልፎች በየተራ የመሞከር ዑደት (ለ 2 ዙር ይሞክራል)
+            # 🔄 ሁሉንም 15 ቁልፎች በየተራ የመሞከር ዑደት (ለ 2 ዙር ይሞክራል)
             for _ in range(len(self.groq_pool) * 2):
                 idx = self.groq_index % len(self.groq_pool)
                 api_key = self.groq_pool[idx]
                 
-                # 🛑 ወሳኝ፡ ተረኛው ቁልፍ በቅጣት (Blacklist) ላይ ከሆነ እለፈው
+                # 🛑 ተረኛው ቁልፍ በቅጣት (Blacklist) ላይ ከሆነ እለፈው
                 if idx in self.key_blacklist and now < self.key_blacklist[idx]:
                     self.groq_index += 1
                     continue
 
-                # ለቀጣዩ ጥሪ አሁኑኑ ተራውን እናዞራለን (Strict Rotation)
+                # ለቀጣዩ ጥሪ አሁኑኑ ተራውን እናዞራለን (Strict Sequential Rotation)
                 self.groq_index += 1 
 
                 try:
-                    self.logger.info(f"🚀 [GROQ] Using Key #{idx + 1} for {task_type}...")
+                    self.logger.info(f"🚀 [GROQ KEY-{idx + 1}/15] Task: {task_type}")
                     
                     async with httpx.AsyncClient(timeout=160.0) as client:
                         resp = await client.post(
@@ -943,8 +967,10 @@ class UnstoppableAIProvider:
                             headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"},
                             json={
                                 "model": "llama-3.3-70b-versatile",
-                                "messages": [{"role": "system", "content": self._get_system_prompt(task_type)},
-                                             {"role": "user", "content": prompt}],
+                                "messages": [
+                                    {"role": "system", "content": self._get_system_prompt(task_type)},
+                                    {"role": "user", "content": prompt}
+                                ],
                                 "max_tokens": max_tokens,
                                 "temperature": 0.7
                             }
@@ -955,14 +981,16 @@ class UnstoppableAIProvider:
                             # ✅ ስኬታማ ጥሪ ከሆነ ቁልፉን ከጥቁር መዝገብ አውጣው
                             if idx in self.key_blacklist: del self.key_blacklist[idx]
                             
-                            # በአንተ ፍላጎት መሰረት በየዙሩ 10 ሰከንድ እረፍት
-                            await asyncio.sleep(10) 
+                            # በየዙሩ (Phase) መሃል የ 3 ሰከንድ እረፍት
+                            await asyncio.sleep(3) 
                             return str(content)
                         
                         elif resp.status_code == 429:
-                            self.logger.warning(f"⚠️ Key #{idx + 1} Limited. Waiting 60s to recover...")
-                            self.key_blacklist[idx] = now + 60 # ለ 60 ሰከንድ አሳርፈው
-                            await asyncio.sleep(15) # ወደ ቀጣዩ ቁልፍ ከመሄዱ በፊት 15 ሰከንድ ማቆሚያ
+                            self.logger.warning(f"⚠️ Key #{idx + 1} Rate Limited. Cooling down for 90s...")
+                            # 🛑 ቁልፉን ለ 90 ሰከንድ አሳርፈው
+                            self.key_blacklist[idx] = now + 90 
+                            # ወደ ቀጣዩ ቁልፍ ከመሄዱ በፊት 5 ሰከንድ ማቆሚያ
+                            await asyncio.sleep(5) 
                             continue
                         
                         else:
@@ -973,7 +1001,7 @@ class UnstoppableAIProvider:
                     self.logger.error(f"❌ Key #{idx + 1} Network Error: {str(e)[:50]}")
                     continue
 
-        # 🏰 ግሮቅ (7ቱም ቁልፎች) ካልሰሩ ወደ መጠባበቂያዎች (Failover)
+        # 🏰 ግሮቅ (15ቱም ቁልፎች) ካልሰሩ ወደ መጠባበቂያዎች (Failover)
         self.logger.info("🏰 Groq exhausted. Moving to Fallback Engines...")
         
         # 1. DeepSeek (ካለ)
@@ -993,7 +1021,7 @@ class UnstoppableAIProvider:
                         return str(resp.json()['candidates'][0]['content']['parts'][0]['text'])
             except: pass
 
-        return "Error: All AI Systems and 7 Keys are exhausted."
+        return "Error: All 15 Groq Keys and Backup Systems are currently exhausted."
 
     async def _call_api_direct(self, url, key, model, prompt, max_tokens):
         """ለ DeepSeek ወይም OpenAI ቀጥታ ጥሪ"""
@@ -1006,32 +1034,19 @@ class UnstoppableAIProvider:
             raise Exception(f"API Error {resp.status_code}")
 
     def _get_system_prompt(self, task_type: str) -> str:
-        """የተለያዩ የጥራት ስራዎችን ለመስራት የሚያገለግሉ መመሪያዎች"""
+        """የተለያዩ ስራዎችን ለመስራት የሚያገለግሉ መመሪያዎች"""
         prompts = {
-            'production': "You are an Elite Enterprise Content Strategist. Create deep, authoritative, 1500-word content sections.",
-            'refinement': "Refine the content to be professional, human-like, and highly engaging. Keep the meaning intact.",
+            'production': "You are a Fortune 500 Market Strategist. Write authoritative, detailed, 1500-word content sections with HTML structure.",
+            'refinement': "Refine the content to be professional, human-like, and highly engaging. Add cultural nuance.",
             'title_optimization': "Generate 5 SEO-optimized, viral titles for the given content. Maximum 60 characters.",
-            'quality_audit': "Audit the content for clarity, depth, and SEO effectiveness. Give a score from 0-100."
+            'quality_audit': "Audit the content for clarity, depth, and SEO effectiveness. Give a score from 0-100.",
+            'cultural_enrichment': "Add culturally relevant phrases and local idioms to the content for the specified country."
         }
         return prompts.get(task_type, prompts['production'])
 
-    # --- ሌሎች ክፍሎች እንዲጠቀሙባቸው የተቀመጡ ድጋፍ ሰጪዎች ---
-    async def generate_with_specific_key(self, prompt: str, key_type: str, worker_idx: int = 0) -> str:
-        """ለ MegaContentEngine ተኳሃኝነት የተቀመጠ (በአዲሱ ሎጂክ ይሰራል)"""
-        return await self.process_task(prompt, key_type)
-
-    def _log_ai_usage(self, log_entry: Dict):
-        """የ AI አጠቃቀምን መዝገብ ይይዛል"""
-        try:
-            log_dir = Path('ai_usage_logs')
-            log_dir.mkdir(exist_ok=True)
-            log_file = log_dir / f"ai_usage_{datetime.now().strftime('%Y%m%d')}.json"
-            # (መዝገቡን የመጻፍ ሎጂክ...)
-        except: pass
-
     async def close(self):
         if self.session: await self.session.close()
-                
+                        
 # =================== ELITE SMART IMAGE ENGINE (PRODUCTION FIXED) ===================
 
 class SmartImageEngine:
