@@ -1056,81 +1056,83 @@ class ComprehensiveErrorHandler:
             return "🔴 ከፍተኛ ችግር አለ"
 
 # =================== 🔄 TITAN v21.0: THE SEVEN-KEY FORTRESS ===================
-class EnhancedAIFailoverSystem:
-    def __init__(self, config=None):
-        self.config = config
-        # 7ቱንም ቁልፎች ከኢንቫይሮመንት ይሰበስባል
-        self.groq_pool = self._load_key_pool('GROQ_API_KEY', 7)
-        self.groq_index = 0 
-        self.deepseek_key = os.getenv('DEEPSEEK_API_KEY')
-        self.gemini_key = os.getenv('GEMINI_API_KEY')
-        logger.info(f"🛡️ TITAN v22.0 RELAY Ready with {len(self.groq_pool)} Groq keys.")
+class UnstoppableAIProvider:
+    def __init__(self):
+        # 7ቱንም የGroq ቁልፎች እና ሌሎችን መጫን
+        self.keys = {
+            'groq': self._load_keys('GROQ_API_KEY', 7),
+            'deepseek': [os.getenv('DEEPSEEK_API_KEY')],
+            'gemini': [os.getenv('GEMINI_API_KEY')]
+        }
+        self.indices = defaultdict(int)
+        self.blacklist = defaultdict(set)
 
-    def _load_key_pool(self, base_name, count):
+    def _load_keys(self, base, count):
         keys = []
-        # ሁሉንም GROQ_API_KEY, GROQ_API_KEY_1...7 ፈልጎ ይጨምራል
-        names = [base_name] + [f"{base_name}_{i}" for i in range(1, count + 1)]
-        for name in names:
-            k = os.getenv(name)
-            if k and k not in keys:
-                keys.append(k)
+        if os.getenv(base): keys.append(os.getenv(base))
+        for i in range(1, count + 1):
+            k = os.getenv(f"{base}_{i}")
+            if k and k not in keys: keys.append(k)
         return keys
 
     async def generate_content(self, prompt: str, max_tokens: int = 4000) -> str:
-        """በየጥሪው ቁልፍ የሚቀይር (Round-Robin)"""
-        if not self.groq_pool:
-            logger.error("❌ No Groq keys found!")
-        else:
-            # 7ቱንም ቁልፎች በየተራ ይሞክራል
-            for _ in range(len(self.groq_pool)):
-                idx = self.groq_index % len(self.groq_pool)
-                api_key = self.groq_pool[idx]
-                self.groq_index += 1 # ለሚቀጥለው ጥሪ ቁልፍ ይቀይራል
+        # 1. መጀመሪያ በግሮቅ በኩል (7 ቁልፎች በየተራ)
+        for _ in range(len(self.keys['groq'])):
+            idx = self.indices['groq'] % len(self.keys['groq'])
+            key = self.keys['groq'][idx]
+            self.indices['groq'] += 1 
 
-                try:
-                    logger.info(f"🚀 [GROQ] Using Key #{idx + 1}...")
-                    content = await self._execute_api_call('groq', api_key, prompt, max_tokens)
-                    if content and len(str(content)) > 200:
-                        return str(content)
-                except Exception as e:
-                    if "429" in str(e):
-                        logger.warning(f"⚠️ Key #{idx + 1} Limit. Trying next...")
-                        continue
-                    logger.error(f"❌ Key #{idx + 1} error: {e}")
-                    continue
+            if key in self.blacklist['groq']: continue
 
-        # 🏰 FALLBACKS
-        if self.deepseek_key:
             try:
-                return await self._execute_api_call('deepseek', self.deepseek_key, prompt, max_tokens)
-            except: pass
-        if self.gemini_key:
+                async with httpx.AsyncClient(timeout=160.0) as client:
+                    resp = await client.post(
+                        "https://api.groq.com/openai/v1/chat/completions",
+                        headers={"Authorization": f"Bearer {key}"},
+                        json={
+                            "model": "llama-3.3-70b-versatile", 
+                            "messages": [{"role": "user", "content": prompt}], 
+                            "max_tokens": max_tokens,
+                            "temperature": 0.7
+                        }
+                    )
+                    if resp.status_code == 200:
+                        content = resp.json()['choices'][0]['message']['content']
+                        if len(str(content)) > 100: return str(content)
+                    if resp.status_code == 429: self.blacklist['groq'].add(key)
+            except: continue
+
+        # 2. መለዋወጫ DeepSeek (በአንተ ማስተካከያ መሰረት)
+        if self.keys['deepseek'][0]:
             try:
-                return await self._call_gemini(self.gemini_key, prompt)
+                print("🏰 Switching to DEEPSEEK Backup...")
+                async with httpx.AsyncClient(timeout=160.0) as client:
+                    resp = await client.post(
+                        "https://api.deepseek.com/v1/chat/completions", # የተስተካከለ URL
+                        headers={"Authorization": f"Bearer {self.keys['deepseek'][0]}"},
+                        json={
+                            "model": "deepseek-chat", # የተስተካከለ ሞዴል ስም
+                            "messages": [{"role": "user", "content": prompt}], 
+                            "max_tokens": max_tokens
+                        }
+                    )
+                    if resp.status_code == 200:
+                        return str(resp.json()['choices'][0]['message']['content'])
             except: pass
-        
-        return "Error: All AI Systems Exhausted."
 
-    async def _execute_api_call(self, service, key, prompt, max_tokens):
-        url = "https://api.groq.com/openai/v1/chat/completions" if service == 'groq' else "https://api.deepseek.com/chat/completions"
-        model = "llama-3.3-70b-versatile" if service == 'groq' else "deepseek-chat"
-        async with httpx.AsyncClient(timeout=160.0) as client:
-            resp = await client.post(url, 
-                headers={"Authorization": f"Bearer {key}"},
-                json={"model": model, "messages": [{"role": "user", "content": prompt}], "max_tokens": max_tokens, "temperature": 0.7}
-            )
-            if resp.status_code == 200:
-                return resp.json()['choices'][0]['message']['content']
-            raise Exception(f"API {resp.status_code}")
+        # 3. የመጨረሻ መለዋወጫ Gemini (v1beta)
+        if self.keys['gemini'][0]:
+            try:
+                print("🌟 Switching to GEMINI Final Backup...")
+                url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={self.keys['gemini'][0]}"
+                async with httpx.AsyncClient(timeout=120.0) as client:
+                    resp = await client.post(url, json={"contents": [{"parts": [{"text": prompt}]}]})
+                    if resp.status_code == 200:
+                        return str(resp.json()['candidates'][0]['content']['parts'][0]['text'])
+            except: pass
 
-    async def _call_gemini(self, key, prompt):
-        # የጀሚኒ v1 ሊንክ በጣም የተረጋጋ ነው
-        url = f"https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key={key}"
-        async with httpx.AsyncClient(timeout=120.0) as client:
-            resp = await client.post(url, json={"contents": [{"parts": [{"text": prompt}]}]})
-            if resp.status_code == 200:
-                return resp.json()['candidates'][0]['content']['parts'][0]['text']
-            raise Exception("Gemini Error")
+        return "Error: All AI systems failed to respond."
+                
 # =================== 📝 የተሻሻለ የይዘት ጀነሬተር ===================
 
 class ProductionContentGenerator:
