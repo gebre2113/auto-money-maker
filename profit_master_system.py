@@ -4276,8 +4276,8 @@ class MegaContentEngine:
         # ለ 429 ስህተት መከላከያ በራነሩ ተካቷል
         return await self.ai.generate_content(expert_prompt, max_tokens=4000)
 
-    async def produce_sovereign_report(self, topic: str, country: str):
-        """ለአንድ ሀገር 7ቱን ፌዞች በ7 ቁልፍ ማምረት - THE MASTER LOOP"""
+    async def produce_single_country_sovereign_logic(self, topic: str, country: str):
+        """ለአንድ ሀገር 7ቱን async በ7 ቁልፍ ማምረት - THE MASTER LOOP"""
         eco_data = self.economic_indicators.get(country, self.economic_indicators['US'])
         # COUNTRIES ዲክሽነሪ ከግሎባል ስኮፕ መኖሩን ያረጋግጣል
         lang_info = globals().get('COUNTRIES', {}).get(country, {'lang': 'English', 'emoji': '🌍'})
