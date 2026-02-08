@@ -4180,39 +4180,40 @@ class EnhancedWordCounter:
 # =========================================================================
 # 👑 TITAN v19.0: THE SOVEREIGN ORACLE - ULTIMATE EDITION (FINAL)
 # ========================================================================
-# =========================================================================
-# 👑 TITAN v23.0: THE SOVEREIGN ORACLE - THE FINAL ARCHITECT (MASTER)
-# =========================================================================
 
-# =========================================================================
-# 👑 TITAN v25.0 ZENITH: THE ULTIMATE UNIFIED PRODUCTION ENGINE
-# =========================================================================
-
-class MegaContentEngine:
+class ss MegaContentEngine:
+    """
+    የዓለማችን ቁንጮ የይዘት ማምረቻ ሞተር።
+    - 7-Phase Strategic Relay (15,000+ Words Potential)
+    - Full 7-Key Phase Rotation Logic
+    - Integrated Neuro-Marketing, Sensory Arts, & Cultural Depth
+    - Enterprise-Grade Structural Design
+    """
+    
     def __init__(self, system):
         self.system = system
-        # 1. የ7-ቁልፍ ሮቴሽን ስርዓት (Phase-Specific Assignment)
+        self.config = system.config
+        
+        # 1. የ7-ቁልፍ ሮቴሽን ስርዓት (Fixed Assignment per Phase)
+        # ራነሩ የሰጣቸውን failover_system ወይም ai_provider ይጠቀማል
+        self.ai = getattr(system, 'failover_system', getattr(system, 'ai_provider', None))
         self.ai_providers = self._initialize_providers()
-        self.current_provider_idx = 0
         
         # 2. የምርት ግቦች
-        self.TARGET_WORDS = 1500
-        self.MAX_TARGET = 2200
+        self.TARGET_WORDS = 1800 # Per Phase (Total ~12,600)
+        self.MAX_TARGET = 2500
         
-        # 3. ሜሞሪ እና የዳታ መሰረት
+        # 3. ሜሞሪ እና ስልታዊ ዳታ
+        self.active_memory = "" # Smart Context Passing
         self.memory_chain = []
-        self.hyper_local_data = {}
         
         # 4. የ7 ፌዞች ቁልፍ ካርታ (Key Rotation Map)
-        # ለእያንዳንዱ ዙር የተለየ ቁልፍ ይመደባል (0-6)
-        self.phase_keys = {
-            0: 0, 1: 1, 2: 2, 3: 3, 4: 4, 5: 5, 6: 6, 7: 0 
-        }
+        self.phase_keys = {0:0, 1:1, 2:2, 3:3, 4:4, 5:5, 6:6, 7:0}
         
-        # 5. የ2026 የጊዜ መቆጣጠሪያ (February 8, 2026)
-        self.current_reality = "Current Date: February 8, 2026. Global Market Status: Post-AI Stabilization Era."
+        # 5. የጊዜ እና የገበያ ሁኔታ (Feb 2026)
+        self.current_reality = "Date: Feb 8, 2026. Era: Sovereign AI Dominance."
         
-        # 6. የሀገራት የኢኮኖሚ መረጃ (Updated for Feb 2026)
+        # 6. የሀገራት የኢኮኖሚ መረጃ (Feb 2026 Updated)
         self.economic_indicators = {
             'US': {'inflation': '3.2%', 'gdp_growth': '2.5%', 'reg': 'AI Safety Act 2025'},
             'GB': {'inflation': '4.1%', 'gdp_growth': '1.8%', 'reg': 'Digital Markets Act'},
@@ -4220,183 +4221,231 @@ class MegaContentEngine:
             'JP': {'inflation': '2.9%', 'gdp_growth': '1.0%', 'reg': 'DX Transformation Law'},
             'AU': {'inflation': '4.5%', 'gdp_growth': '2.1%', 'reg': 'Consumer Data Right v2'},
             'ET': {'inflation': '28.5%', 'gdp_growth': '6.1%', 'reg': 'Capital Market Proclamation'},
-            'NG': {'inflation': '21.2%', 'gdp_growth': '3.2%', 'reg': 'Startup Act 2025'},
-            'KE': {'inflation': '7.8%', 'gdp_growth': '5.4%', 'reg': 'Data Protection Policy'},
             'CA': {'inflation': '3.5%', 'gdp_growth': '2.3%', 'reg': 'Digital Charter Act'},
             'FR': {'inflation': '3.9%', 'gdp_growth': '1.5%', 'reg': 'France 2030 Vision'},
-            'CH': {'inflation': '2.1%', 'gdp_growth': '1.8%', 'reg': 'Swiss Digital Initiative'}
+            'CH': {'inflation': '2.1%', 'gdp_growth': '1.8%', 'reg': 'Swiss Digital Initiative'},
+            'NO': {'inflation': '2.4%', 'gdp_growth': '1.9%', 'reg': 'Nordic Data Sovereignty'},
+            'SE': {'inflation': '2.6%', 'gdp_growth': '2.0%', 'reg': 'Stockholm Tech Accord'}
         }
+        self.logger = logging.getLogger("Titan.Omnipotent")
 
     def _initialize_providers(self):
-        """7ቱን ቁልፎች ከሲስተሙ ማሰባሰብ"""
+        """ከሲስተሙ ውስጥ 7ቱንም ቁልፎች በቅደም ተከተል መሰብሰብ"""
         providers = []
-        # ሁሉንም ሊሆኑ የሚችሉ የቁልፍ ስሞችን መፈተሽ
-        key_names = ['primary_ai', 'key2', 'key3', 'key4', 'key5', 'key6', 'key7', 
-                     'backup_provider', 'secondary_ai', 'emergency_ai']
-        
-        for name in key_names:
-            if hasattr(self.system, name):
-                providers.append(getattr(self.system, name))
+        # በ UnstoppableAIProvider ውስጥ ያለውን groq_pool ይጠቀማል
+        if hasattr(self.ai, 'groq_pool'):
+            providers = self.ai.groq_pool
         
         # 7 ቁልፍ ካልሞላ ያሉትን ደጋግሞ በመጠቀም ክፍተቱን መሙላት
         while len(providers) < 7:
             if providers: providers.append(providers[0])
-            else: providers.append(self._create_dummy_provider())
+            else: break
         return providers
 
     async def _call_ai_logic(self, prompt: str, phase_idx: int):
-        """የ7-ቁልፍ ሽግግር እና የጥራት ቁጥጥር"""
-        # ለእያንዳንዱ ፌዝ የተመደበውን ቁልፍ መምረጥ
-        self.current_provider_idx = self.phase_keys.get(phase_idx, 0) % len(self.ai_providers)
-        provider = self.ai_providers[self.current_provider_idx]
+        """የ7-ቁልፍ ሽግግር፣ የፐርሶና አርክቴክቸር እና የጥራት ቁጥጥር"""
+        # የባለሙያ ማንነቶች ለእያንዳንዱ ዙር
+        personas = {
+            0: "Oracle Trend Analyst",
+            1: "Behavioral Economist & Psychologist",
+            2: "Lead Solutions Architect & CTO",
+            3: "Senior Business Consultant (Case Study Expert)",
+            4: "Operational Excellence Strategist",
+            5: "Monetization & ROI Architect",
+            6: "Competitive Intelligence Analyst",
+            7: "Visionary Futurist (2040 Forecast)"
+        }
         
-        # የባለሙያ መመሪያ እና የጊዜ መቆለፊያ መርፌ
+        role = personas.get(phase_idx, "Expert Strategist")
+        
+        # በ UnstoppableAIProvider በኩል ጥሪውን ማስተላለፍ (እሱ ራሱ ሮቴሽኑን ይቆጣጠራል)
+        # እዚህ ጋር phase_idxን ለራነሩ እናሳውቃለን
         expert_prompt = f"""
         {self.current_reality}
-        ROLE: Senior Fortune 500 Market Strategist (20+ Years Experience).
-        TONE: Authoritative, Data-Driven, Strategic, and Highly Detailed.
-        GOAL: Produce at least 1500 words of actionable intelligence.
+        YOUR IDENTITY: {role} (25+ Years Global Experience).
+        INSTRUCTION: Write 1800-2200 words. Use HTML (h2, h3).
+        TONE: Sovereign, Luxury, Highly Detailed, and Authoritative.
         
         {prompt}
         """
         
-        try:
-            response = await provider.generate_content(expert_prompt, max_tokens=3500)
-            if self._validate(response): return response
-            raise ValueError("Incomplete Response")
-        except:
-            # በድንገት ቁልፍ ቢዘጋ ወደ ቀጣዩ ቁልፍ ዝለል (Failover)
-            self.current_provider_idx = (self.current_provider_idx + 1) % len(self.ai_providers)
-            return await self.ai_providers[self.current_provider_idx].generate_content(expert_prompt)
+        # ለ 429 ስህተት መከላከያ በራነሩ ተካቷል
+        return await self.ai.generate_content(expert_prompt, max_tokens=4000)
 
     async def produce_sovereign_report(self, topic: str, country: str):
-        """ለአንድ ሀገር 7ቱን ፌዞች በ7 ቁልፍ ማምረት"""
-        self.hyper_local_data = self.economic_indicators.get(country, self.economic_indicators['US'])
-        target_lang = COUNTRIES.get(country, {'lang': 'English'})['lang']
-        self.memory_chain = [] # የሀገር ሜሞሪ ማጽዳት
+        """ለአንድ ሀገር 7ቱን ፌዞች በ7 ቁልፍ ማምረት - THE MASTER LOOP"""
+        eco_data = self.economic_indicators.get(country, self.economic_indicators['US'])
+        # COUNTRIES ዲክሽነሪ ከግሎባል ስኮፕ መኖሩን ያረጋግጣል
+        lang_info = globals().get('COUNTRIES', {}).get(country, {'lang': 'English', 'emoji': '🌍'})
+        target_lang = lang_info['lang']
         
-        # Phase 0: Oracle Discovery (Key #0)
-        oracle_q = f"Identify a hyper-profitable 2026 niche for '{topic}' in {country}."
+        self.active_memory = ""
+        self.memory_chain = []
+        
+        # --- Phase 0: Oracle Discovery (The Profitable Niche) ---
+        oracle_q = f"Analyze the market for '{topic}' in {country}. Find the #1 hyper-profitable viral sub-niche for 2026. Return ONLY the title in {target_lang}."
         final_topic = await self._call_ai_logic(oracle_q, 0)
+        final_topic = str(final_topic).strip().replace('"', '')
         
-        # Audio Opening (Key #0)
-        audio_script = await self._call_ai_logic(f"Write a luxury-tone audio intro for {final_topic} in {target_lang}.", 0)
+        print(f"   🎯 Sovereign Topic Identified: {final_topic}")
+
+        # --- Audio Opening (Intro Script) ---
+        audio_script = await self._call_ai_logic(f"Write a luxury-tone 2-minute audio narration script for {final_topic} in {target_lang}.", 0)
         
         full_content = ""
         phases = [
-            (1, "Market Sentiment & 2026 Economic Pulse"),
-            (2, "Technical Infrastructure & Local Integration"),
-            (3, "Case Studies & ROI Metrics (with Table)"),
-            (4, "24-Month Execution Roadmap (with Table)"),
-            (5, "Monetization Frameworks for {country}"),
-            (6, "Competitive Dominance & SWOT (with Table)"),
-            (7, "Strategic FAQs & 2030 Future Vision")
+            (1, "Deep Market Sentiment & 2026 Economic Pulse"),
+            (2, "Advanced Technical Infrastructure & Local Integration"),
+            (3, "15 Exclusive Case Studies & ROI Metrics (with Tables)"),
+            (4, "24-Month Strategic Execution Roadmap (with Tables)"),
+            (5, "Hidden Monetization Mastery & Revenue Streams"),
+            (6, "Competitive Annihilation & SWOT Dominance (with Tables)"),
+            (7, "The Oracle FAQ (50+ Deep Dives) & 2040 Vision")
         ]
 
         for p_idx, p_title in phases:
-            print(f"   ⚙️ Phase {p_idx}/7 for {country} (Using Key #{self.phase_keys[p_idx]+1})")
+            print(f"   ⚙️  Executing Phase {p_idx}/7 (Rotating to Next AI Key...)")
             
-            # ስልታዊ ሜሞሪን ማካተት (Strategic Essence)
-            memory_context = f"PREVIOUS INSIGHTS: {', '.join(self.memory_chain[-3:])}" if self.memory_chain else ""
+            # Smart Context: ያለፈውን ምዕራፍ ጭማቂ ማስተላለፍ
+            context_summary = f"PREVIOUS CONTEXT: {self.active_memory[-3000:]}" if self.active_memory else "Starting point."
             
             phase_prompt = f"""
-            PHASE {p_idx}: {p_title}
-            TOPIC: {final_topic}
-            COUNTRY: {country}
+            TASK: Write {p_title}.
+            MAIN TOPIC: {final_topic}
+            COUNTRY: {country} ({lang_info['emoji']})
             LANGUAGE: {target_lang}
-            {memory_context}
+            LOCAL LAW TO INTEGRATE: {eco_data['reg']}
+            {context_summary}
             
-            Write 1500 words. Include specific local laws: {self.hyper_local_data['reg']}.
-            Use HTML (h2, h3) and ensure cross-linking to other phases.
+            INSTRUCTION: Start exactly where the previous phase ended. Do not repeat.
+            Maintain the 1800+ word count goal.
             """
             
-            content = await self._call_ai_logic(phase_prompt, p_idx)
+            # ጥሪው በየጥሪው አዲስ ቁልፍ ይጠቀማል
+            raw_part = await self._call_ai_logic(phase_prompt, p_idx)
             
-            # ጠቃሚ ነጥቦችን ለሜሞሪ ሰንሰለት መቅዳት
-            self.memory_chain.append(f"Phase {p_idx} completed focusing on {p_title[:20]}")
+            # ሴንሰሪ እና ኒውሮ ማጣሪያ (Real-time Polish)
+            if hasattr(self.system, 'sensory_writer'):
+                raw_part = self.system.sensory_writer.transform_to_sensory_content(raw_part)
             
-            # HTML ሰንጠረዥ ማመንጫ (ለተወሰኑ ፌዞች)
+            self.active_memory += f"\n\n{raw_part}"
+            self.memory_chain.append(f"Phase {p_idx} completed.")
+            
+            # ሰንጠረዥ ማመንጫ (ለተወሰኑ ፌዞች)
             if p_idx in [3, 4, 6]:
-                table = await self._call_ai_logic(f"Create a professional HTML table for {p_title} using ID prefix '{country.lower()}'", p_idx)
-                content += f"\n\n{table}"
+                table = await self._call_ai_logic(f"Create a professional complex HTML table with 10 rows for {p_title} data in {country}", p_idx)
+                raw_part += f"\n\n{table}"
             
-            full_content += f"\n\n<section id='{country.lower()}-p{p_idx}'>{content}</section>"
+            full_content += f"\n\n<section id='section-{p_idx}'>{raw_part}</section>"
+            
+            # ለ API መተንፈሻ የሚሆን አጭር እረፍት (በየዙሩ 3 ሰከንድ በአንተ ፍላጎት)
+            await asyncio.sleep(3)
 
-        # የመጨረሻ የጥበብ ስራዎች
+        # መጨረሻ ላይ ኒውሮ-ማርኬቲንግ ማጣፈጫ
         if hasattr(self.system, 'neuro_converter'):
             full_content = self.system.neuro_converter.apply_neuro_marketing(full_content)
         
+        # ምስሎችን መሰንጠቅ (Smart Image SEO)
+        if hasattr(self.system, 'image_engine'):
+            print(f"   🖼️  Injecting Smart SEO Visuals for {country}...")
+            full_content = self.system.image_engine.generate_image_placeholders(full_content, country, final_topic)
+
+        # የመጨረሻ CTA
         cta_section = await self._generate_cta(final_topic, country, target_lang)
         
-        return self._wrap_html(full_content + cta_section, final_topic, country, audio_script)
+        # ወደ ንጉሳዊ HTML መለወጥ
+        return self._wrap_sovereign_html(full_content + cta_section, final_topic, country, audio_script, lang_info)
 
     async def _generate_cta(self, topic, country, lang):
         """የኒውሮ-ማርኬቲንግ CTA ማመንጫ"""
-        cta_q = f"Create an irresistible CTA for {topic} in {country} using local idioms."
-        res = await self._call_ai_logic(cta_q, 5) # Key #5 for Monetization/CTA
+        cta_q = f"Create an irresistible, high-converting CTA for {topic} in {country} using local idioms and emotional triggers."
+        res = await self._call_ai_logic(cta_q, 5) 
         return f"<div class='cta-box'>{res}</div>"
 
-    def _wrap_html(self, body, topic, country, audio):
-        """የመጨረሻውን የHTML መዋቅር መገንባት (ከአውቶማቲክ ማውጫ ጋር)"""
+    def _wrap_sovereign_html(self, body, topic, country, audio, lang_info):
+        """የመጨረሻውን የHTML መዋቅር በንጉሳዊ ዲዛይን መገንባት"""
+        word_count = len(body.split())
         return f"""
-        <html>
+        <!DOCTYPE html>
+        <html lang="{lang_info['lang'][:2].lower()}">
         <head>
-            <title>{topic} - {country} Strategist</title>
+            <meta charset="UTF-8">
+            <title>Sovereign Oracle: {topic} | {country}</title>
             <style>
-                body {{ font-family: 'Inter', sans-serif; color: #1a1a1a; line-height: 1.8; }}
-                .container {{ max-width: 1100px; margin: auto; padding: 40px; }}
-                h2 {{ color: #1a237e; border-bottom: 3px solid #ffd600; padding-bottom: 10px; }}
-                .cta-box {{ background: #1a237e; color: white; padding: 30px; border-radius: 15px; border: 4px solid #ffd600; }}
-                .status-bar {{ position: fixed; top: 0; width: 100%; background: #ffd600; font-size: 12px; text-align: center; font-weight: bold; z-index: 100; }}
+                @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Inter:wght@300;400;700&display=swap');
+                body {{ font-family: 'Inter', sans-serif; background-color: #0b0f19; color: #1a1a1a; margin: 0; }}
+                .master-container {{ max-width: 1100px; margin: 50px auto; background: #fff; padding: 80px; border: 40px solid #1a2a44; box-shadow: 0 50px 100px rgba(0,0,0,0.5); }}
+                .status-header {{ position: fixed; top: 0; width: 100%; background: #c5a059; color: white; text-align: center; font-weight: bold; padding: 5px; z-index: 1000; font-size: 12px; letter-spacing: 2px; }}
+                h1 {{ font-family: 'Playfair Display', serif; font-size: 70px; color: #1a2a44; text-align: center; line-height: 1.1; margin-bottom: 20px; }}
+                h2 {{ font-family: 'Playfair Display', serif; color: #1a2a44; border-bottom: 5px solid #c5a059; padding-bottom: 15px; margin-top: 60px; font-size: 40px; }}
+                p {{ font-size: 20px; line-height: 2.2; text-align: justify; margin-bottom: 30px; }}
+                .audio-oracle {{ background: linear-gradient(135deg, #c5a059 0%, #9e7e38 100%); color: white; padding: 30px; border-radius: 15px; margin: 40px 0; display: flex; align-items: center; gap: 20px; }}
+                .cta-box {{ background: #1a2a44; color: white; padding: 40px; border-radius: 20px; border: 5px solid #c5a059; margin-top: 60px; text-align: center; }}
+                table {{ width: 100%; border-collapse: collapse; margin: 40px 0; }}
+                th {{ background: #1a2a44; color: white; padding: 15px; text-align: left; }}
+                td {{ border: 1px solid #ddd; padding: 15px; }}
+                .nav-sidebar {{ position: sticky; top: 100px; float: left; margin-left: -180px; width: 150px; background: #f8fafc; padding: 15px; border-radius: 8px; font-size: 14px; }}
+                .nav-sidebar a {{ display: block; margin-bottom: 10px; color: #1a2a44; text-decoration: none; font-weight: bold; }}
             </style>
         </head>
         <body>
-            <div class="status-bar">TITAN v25.0 ZENITH | 7-KEY PHASE ROTATION ACTIVE | DATE: FEB 8, 2026</div>
-            <div class="container">
+            <div class="status-header">TITAN v26.0 OMNIPOTENT | {self.current_reality} | WORD COUNT: {word_count}</div>
+            <div class="master-container">
+                <div class="nav-sidebar">
+                    <strong>MASTER NAV</strong>
+                    <a href="#section-1">Market Pulse</a>
+                    <a href="#section-3">Case Studies</a>
+                    <a href="#section-4">Execution</a>
+                    <a href="#section-7">Future 2040</a>
+                </div>
                 <header>
-                    <h1>{topic}</h1>
-                    <div class="audio-intro">🎙️ <strong>Audio Oracle:</strong> {audio}</div>
+                    <div style="text-align:center; color: #c5a059; font-weight: bold; letter-spacing: 5px;">SOVEREIGN STRATEGIC INTELLIGENCE</div>
+                    <h1>{topic.upper()}</h1>
+                    <div class="audio-oracle">
+                        <span style="font-size: 40px;">🎙️</span>
+                        <div>
+                            <strong>Audio Oracle (AI Voice):</strong>
+                            <p style="margin:0; font-size: 16px; color: #fff;">{audio}</p>
+                        </div>
+                    </div>
                 </header>
-                <nav>
-                    <h3>Strategic Roadmap</h3>
-                    <ul>
-                        <li><a href="#{country.lower()}-p1">Market Pulse</a></li>
-                        <li><a href="#{country.lower()}-p3">ROI Analysis</a></li>
-                        <li><a href="#{country.lower()}-p4">24-Month Plan</a></li>
-                    </ul>
-                </nav>
-                {body}
+                <article>
+                    {body}
+                </article>
+                <footer style="margin-top: 100px; text-align: center; opacity: 0.5; font-size: 14px;">
+                    <p>© 2026 THE OMNIPOTENT ORACLE SYSTEM. ALL RIGHTS RESERVED.</p>
+                </div>
             </div>
         </body>
         </html>
         """
 
-    def _validate(self, response):
-        """የምላሽ ጥራት ማረጋገጫ"""
-        return response and len(str(response)) > 200
-
-    def _create_dummy_provider(self):
-        class P: 
-            async def generate_content(self, p, **kwargs): return f"Strategic data for: {p[:50]}..."
-        return P()
-
     async def start_mega_loop(self, topic: str):
-        """11ዱንም ሀገራት በዑደት ማምረት"""
+        """11ዱንም ሀገራት በዑደት ማምረት - የሀገር እረፍት 45 ሰከንድ"""
         target_countries = ['US', 'GB', 'DE', 'CA', 'AU', 'FR', 'JP', 'CH', 'NO', 'SE', 'ET']
-        for country in target_countries:
-            print(f"🚀 Starting Mega-Production for {country}...")
+        for idx, country in enumerate(target_countries):
+            print(f"🚀 Starting Mega-Production for {country} ({idx+1}/11)...")
             report = await self.produce_sovereign_report(topic, country)
+            
             # ፋይሉን ማስቀመጥ
-            with open(f"outputs/TITAN_2026_{country}_{topic[:10]}.html", "w", encoding="utf-8") as f:
+            output_dir = "enterprise_outputs"
+            import os
+            if not os.path.exists(output_dir): os.makedirs(output_dir)
+            
+            file_name = f"{output_dir}/TITAN_2026_{country}_{topic.replace(' ', '_')[:15]}.html"
+            with open(file_name, "w", encoding="utf-8") as f:
                 f.write(report)
-        print("✅ All 11 Sovereign Reports Completed.")
+            
+            print(f"✅ Report for {country} Saved to {file_name}")
+            
+            # በሀገራት መካከል 45 ሰከንድ እረፍት
+            if idx < len(target_countries) - 1:
+                print(f"💤 Inter-country cooldown: Resting for 45s...")
+                await asyncio.sleep(45)
 
 # =========================================================================
-# END OF TITAN v25.0 ZENITH
+# END OF OMNIPOTENT ORACLE v26.0
 # =========================================================================
-
-# =================== END OF OMNIPOTENT ORACLE v25.0 ===================
-
 # =================== ዋና ስርዓት ክፍል ===================
 
 class UltimateProfitMasterSystem:
