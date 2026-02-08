@@ -4204,8 +4204,8 @@ class MegaContentEngine:
         self.ai_providers = self._initialize_providers()
         
         # 2. የምርት ግቦች
-        self.TARGET_WORDS = 1800 # Per Phase (Total ~12,600)
-        self.MAX_TARGET = 2500
+        self.TARGET_WORDS = 1300 # Per Phase (Total ~12,600)
+        self.MAX_TARGET = 2100
         
         # 3. ሜሞሪ እና ስልታዊ ዳታ
         self.active_memory = "" # Smart Context Passing
@@ -4343,7 +4343,7 @@ class MegaContentEngine:
             full_content += f"\n\n<section id='section-{p_idx}'>{raw_part}</section>"
             
             # ለ API መተንፈሻ የሚሆን አጭር እረፍት (በየዙሩ 3 ሰከንድ በአንተ ፍላጎት)
-            await asyncio.sleep(3)
+            await asyncio.sleep(7)
 
         # መጨረሻ ላይ ኒውሮ-ማርኬቲንግ ማጣፈጫ
         if hasattr(self.system, 'neuro_converter'):
@@ -4425,7 +4425,7 @@ class MegaContentEngine:
         """
 
     async def start_mega_loop(self, topic: str):
-        """11ዱንም ሀገራት በዑደት ማምረት - የሀገር እረፍት 45 ሰከንድ"""
+        """11ዱንም ሀገራት በዑደት ማምረት - የሀገር እረፍት 79 ሰከንድ"""
         target_countries = ['US', 'GB', 'DE', 'CA', 'AU', 'FR', 'JP', 'CH', 'NO', 'SE', 'ET']
         for idx, country in enumerate(target_countries):
             print(f"🚀 Starting Mega-Production for {country} ({idx+1}/11)...")
@@ -4444,8 +4444,8 @@ class MegaContentEngine:
             
             # በሀገራት መካከል 45 ሰከንድ እረፍት
             if idx < len(target_countries) - 1:
-                print(f"💤 Inter-country cooldown: Resting for 45s...")
-                await asyncio.sleep(45)
+                print(f"💤 Inter-country cooldown: Resting for 79s...")
+                await asyncio.sleep(79)
 
 # =========================================================================
 # END OF OMNIPOTENT ORACLE v26.0
