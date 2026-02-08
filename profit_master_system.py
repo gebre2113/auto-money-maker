@@ -4203,8 +4203,8 @@ class MegaContentEngine:
         self.ai_providers = self._initialize_providers()
         
         # 2. የምርት ግቦች
-        self.TARGET_WORDS = 1300
-        self.MAX_TARGET = 2100
+        self.TARGET_WORDS = 1000
+        self.MAX_TARGET = 1500
         
         # 3. ሜሞሪ እና ስልታዊ ዳታ
         self.active_memory = ""
