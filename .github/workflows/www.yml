@@ -2,7 +2,7 @@ name: 👑 TITAN v22.0 ULTIMATE MULTI-CHANNEL ORACLE
 
 on:
   schedule:
-    - cron: '0 */6 * * *' # በየ 6 ሰዓቱ በራስ-ሰር
+    - cron: '0 */12 * * *' # በየ 6 ሰዓቱ በራስ-ሰር
   workflow_dispatch:
     inputs:
       topic:
