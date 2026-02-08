@@ -39,7 +39,32 @@ from typing import Dict, List, Optional, Any, Tuple, Union
 import textwrap
 import requests
 import base64
+import pytz
+from datetime import datetime
 
+def get_active_prime_time_countries():
+    """አሁን ምርት የሚያስፈልጋቸውን ሀገራት ይለያል"""
+    world_zones = {
+        "US": "America/New_York", "GB": "Europe/London", "CA": "America/Toronto",
+        "AU": "Australia/Sydney", "DE": "Europe/Berlin", "FR": "Europe/Paris",
+        "JP": "Asia/Tokyo", "CH": "Europe/Zurich", "NO": "Europe/Oslo", 
+        "SE": "Europe/Stockholm", "ET": "Africa/Addis_Ababa"
+    }
+
+    # የወርቃማ ሰዓታት (ጧት፣ ምሳ፣ ምሽት)
+    prime_slots = [(7, 10), (12, 14), (19, 22)]
+    
+    active_now = []
+    for code, zone in world_zones.items():
+        try:
+            tz = pytz.timezone(zone)
+            current_hour = datetime.now(tz).hour
+            for start, end in prime_slots:
+                if start <= current_hour <= end:
+                    active_now.append(code)
+                    break
+        except: continue
+    return active_now
 # Suppress warnings
 warnings.filterwarnings('ignore')
 
