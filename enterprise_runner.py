@@ -3419,9 +3419,11 @@ class EnterpriseProductionOrchestrator:
                                         content_type: str, country_number: int,
                                         total_countries: int) -> Dict:
         """
-        🚀 THE SOVEREIGN BRIDGE v2.0 (FINAL & FLAWLESS)
-        ይህ ፈንክሽን ራነሩን ከ Mega Pen (v18.1) እና Affiliate Pen (v13.0) ጋር በጽኑ ያገናኛል
+        🚀 THE SOVEREIGN BRIDGE v2.2 (FINAL & FLAWLESS)
         """
+        # የ production_id ከክላሱ (self) ወይም ከውጭ መምጣቱን እርግጠኛ ሁን
+        production_id = f"ent_{int(time.time())}_{country[:3].lower()}"
+        
         country_result = {
             'country': country,
             'status': 'processing',
@@ -3438,16 +3440,15 @@ class EnterpriseProductionOrchestrator:
         }
 
         try:
-            # 1. የመጀመሪያው ግዙፍ እስክሪብቶ (v18.1 Mega Pen) - ይዘት ማምረት
-            self.logger.info(f"👑 CALLING MEGA-PEN (v18.1): Generating sovereign content for {country}")
+            # 1. Mega Pen (v18.1)
+            self.logger.info(f"👑 CALLING MEGA-PEN (v18.1) for {country}")
             mega_content = await self.content_system.mega_engine.produce_single_country_sovereign_logic(topic, country)
             
             if not mega_content or len(str(mega_content).split()) < 500:
                 raise Exception("Mega Pen failed to produce substantial content")
 
-            # 2. ሁለተኛው ግዙፍ እስክሪብቶ (v13.0 Ultra Affiliate Manager) - ገቢ ማመንጫዎችን መሰንጠቅ
-            self.logger.info(f"💰 CALLING AFFILIATE-PEN (v13.0): Injecting high-conversion elements")
-            # ማሳሰቢያ፡ inject_affiliate_links ሁለቱንም (content እና report) ይመልሳል
+            # 2. Affiliate Pen (v13.0)
+            self.logger.info(f"💰 CALLING AFFILIATE-PEN (v13.0)")
             final_injected_content, aff_report = await self.affiliate_manager.inject_affiliate_links(
                 content=mega_content,
                 topic=topic,
@@ -3455,28 +3456,20 @@ class EnterpriseProductionOrchestrator:
                 user_journey_stage="decision"
             )
 
-            # 3. የራነሩ (v8.2) የማሳመሪያ ስራዎች (Polishing)
-            self.logger.info(f"✨ POLISHING: Adding Human-Likeness and Smart Images")
-            
-            # የሰው ልጅ ንክኪ ማከል
+            # 3. Polishing (v8.2)
             humanized = await self.human_engine.inject_human_elements(final_injected_content, country, topic)
             human_metrics = self.human_engine.calculate_human_score(humanized)
-            
-            # ምስሎችን ማስገባት
             content_with_images = self.image_engine.generate_image_placeholders(humanized, country, topic)
             image_count = content_with_images.count('<img')
             
-            # 4. የገቢ ትንበያውን ከ Affiliate Report ማውጣት (ይህ ነው Revenue $0.00 የነበረውን የሚፈታው)
+            # 4. Revenue Calculation
             predicted_revenue = aff_report.get('predicted_total_revenue', 0.0)
             if predicted_revenue == 0:
-                # ሪፖርቱ ውስጥ ከሌለ በራነሩ ሎጂክ አስላው
                 word_factor = len(content_with_images.split()) / 1000
-                predicted_revenue = word_factor * HIGH_VALUE_COUNTRIES.get(country, {'avg_commission': 50})['avg_commission'] * 2.5
+                predicted_revenue = word_factor * 125.0 # Fallback revenue estimate
 
-            # 5. ጥራት ኦዲት
+            # 5. Metrics Assembly
             ai_audit = await self.ai_quality_auditor.audit_content(content_with_images, country)
-            
-            # 6. ሁሉንም መረጃዎች ወደ Metrics ማሸግ (ለማጠቃለያ ሪፖርቱ ወሳኝ ነው)
             country_result['content'] = content_with_images
             country_result['metrics'] = {
                 'final_word_count': len(content_with_images.split()),
@@ -3486,17 +3479,28 @@ class EnterpriseProductionOrchestrator:
                 'cultural_depth': aff_report.get('ethical_score', 90)
             }
             country_result['revenue_forecast'] = {'estimated_revenue_usd': predicted_revenue}
-            country_result['affiliate_report'] = aff_report
-            country_result['enhancements'] = {
-                'human_score': human_metrics,
-                'seo_impact': {'image_count': image_count}
-            }
+            country_result['enhancements'] = {'human_score': human_metrics, 'seo_impact': {'image_count': image_count}}
             
-            # 7. ስኬትን ማረጋገጥ (GitHub Actions አረንጓዴ እንዲሆን 'success' መሆን አለበት)
+            # 6. Finalizing Status (እነዚህ መስመሮች በትክክል ገባ ማለት አለባቸው)
             country_result['status'] = 'success' 
             country_result['end_time'] = datetime.now().isoformat()
             
-            self.logger.info(f"✅ {country} Production Complete: {country_result['metrics']['final_word_count']} words | Revenue: ${predicted_revenue:.2f}")
+            # 7. 🚀 MULTI-CHANNEL DISPATCH (Real-time)
+            try:
+                self.logger.info(f"📤 Dispatching {country} to WP & Telegram...")
+                dispatch_package = {
+                    'production_id': production_id,
+                    'topic': topic,
+                    'target_countries': [country],
+                    'overall_metrics': country_result['metrics'],
+                    'country_results': [country_result]
+                }
+                await self.social_manager.send_production_notification(dispatch_package)
+                self.logger.info(f"✅ Real-time dispatch successful for {country}")
+            except Exception as dispatch_err:
+                self.logger.warning(f"⚠️ Dispatch failed, continuing: {dispatch_err}")
+
+            self.logger.info(f"✅ {country} Production Complete: ${predicted_revenue:.2f}")
 
         except Exception as e:
             self.logger.error(f"❌ BRIDGE FAILURE for {country}: {str(e)}")
