@@ -1,0 +1,61 @@
+{
+  "production_id": "enterprise_d1eb877e09ed",
+  "topic": "Enterprise AI Implementation Strategies 2026",
+  "target_countries": [
+    "US",
+    "GB",
+    "CA",
+    "AU",
+    "DE",
+    "FR",
+    "JP",
+    "CH",
+    "NO",
+    "SE",
+    "ET"
+  ],
+  "content_type": "enterprise_guide",
+  "enterprise_standards": {
+    "min_words": 3000,
+    "min_quality": 88,
+    "min_cultural_depth": 85,
+    "min_compliance_score": 95,
+    "sequential_processing": true,
+    "intelligent_delays": true,
+    "quality_guarantee": true
+  },
+  "status": "failed",
+  "start_time": "2026-02-08T21:16:22.670470",
+  "performance_monitoring": true,
+  "country_results": [],
+  "overall_metrics": {},
+  "enhancement_reports": {},
+  "error": "Production failed",
+  "performance_report": {
+    "profile_output": "         36802 function calls (36600 primitive calls) in 5.039 seconds\n\n   Ordered by: cumulative time, internal time\n   List reduced from 227 to 30 due to restriction <30>\n\n   ncalls  tottime  percall  cumtime  percall filename:lineno(function)\n        2    0.000    0.000    5.006    2.503 /opt/hostedtoolcache/Python/3.12.12/x64/lib/python3.12/asyncio/base_events.py:1922(_run_once)\n        2    0.000    0.000    5.005    2.503 /opt/hostedtoolcache/Python/3.12.12/x64/lib/python3.12/selectors.py:451(select)\n        2    5.005    2.503    5.005    2.503 {method 'poll' of 'select.epoll' objects}\n        2    0.000    0.000    0.033    0.016 /home/runner/work/auto-money-maker/auto-money-maker/enterprise_runner.py:179(safe_execute)\n        1    0.000    0.000    0.032    0.032 /home/runner/work/auto-money-maker/auto-money-maker/enterprise_runner.py:3197(run_enterprise_production)\n        1    0.000    0.000    0.024    0.024 /home/runner/work/auto-money-maker/auto-money-maker/enterprise_runner.py:45(get_active_prime_time_countries)\n       11    0.000    0.000    0.024    0.002 /opt/hostedtoolcache/Python/3.12.12/x64/lib/python3.12/site-packages/pytz/__init__.py:130(timezone)\n        1    0.000    0.000    0.019    0.019 /opt/hostedtoolcache/Python/3.12.12/x64/lib/python3.12/site-packages/pytz/lazy.py:150(_lazy)\n        1    0.000    0.000    0.018    0.018 /opt/hostedtoolcache/Python/3.12.12/x64/lib/python3.12/site-packages/pytz/lazy.py:97(_lazy)\n        4    0.000    0.000    0.018    0.005 {function LazyList.__new__.<locals>.lazy.<locals>._lazy at 0x7fcfa451ab60}\n      598    0.000    0.000    0.018    0.000 /opt/hostedtoolcache/Python/3.12.12/x64/lib/python3.12/site-packages/pytz/__init__.py:1115(<genexpr>)\n      597    0.001    0.000    0.018    0.000 /opt/hostedtoolcache/Python/3.12.12/x64/lib/python3.12/site-packages/pytz/__init__.py:111(resource_exists)\n      608    0.002    0.000    0.015    0.000 /opt/hostedtoolcache/Python/3.12.12/x64/lib/python3.12/site-packages/pytz/__init__.py:78(open_resource)\n       40    0.000    0.000    0.006    0.000 /opt/hostedtoolcache/Python/3.12.12/x64/lib/python3.12/logging/__init__.py:1660(_log)\n      634    0.005    0.000    0.005    0.000 {built-in method _io.open}\n       11    0.003    0.000    0.005    0.000 /opt/hostedtoolcache/Python/3.12.12/x64/lib/python3.12/site-packages/pytz/tzfile.py:24(build_tzinfo)\n       40    0.000    0.000    0.005    0.000 /opt/hostedtoolcache/Python/3.12.12/x64/lib/python3.12/logging/__init__.py:1686(handle)\n       40    0.000    0.000    0.004    0.000 /opt/hostedtoolcache/Python/3.12.12/x64/lib/python3.12/logging/__init__.py:1746(callHandlers)\n       30    0.000    0.000    0.004    0.000 /opt/hostedtoolcache/Python/3.12.12/x64/lib/python3.12/logging/__init__.py:1529(info)\n      121    0.000    0.000    0.004    0.000 /opt/hostedtoolcache/Python/3.12.12/x64/lib/python3.12/logging/__init__.py:1011(handle)\n      121    0.000    0.000    0.004    0.000 /opt/hostedtoolcache/Python/3.12.12/x64/lib/python3.12/logging/__init__.py:1148(emit)\n     1205    0.001    0.000    0.003    0.000 <frozen _collections_abc>:804(get)\n      611    0.002    0.000    0.003    0.000 <frozen posixpath>:71(join)\n      608    0.000    0.000    0.003    0.000 <frozen genericpath>:16(exists)\n      609    0.002    0.000    0.002    0.000 {built-in method posix.stat}\n      121    0.000    0.000    0.002    0.000 /opt/hostedtoolcache/Python/3.12.12/x64/lib/python3.12/logging/__init__.py:988(format)\n     1205    0.001    0.000    0.002    0.000 <frozen os>:709(__getitem__)\n      121    0.000    0.000    0.002    0.000 /opt/hostedtoolcache/Python/3.12.12/x64/lib/python3.12/logging/__init__.py:690(format)\n      608    0.001    0.000    0.002    0.000 <frozen posixpath>:179(dirname)\n        8    0.000    0.000    0.002    0.000 /opt/hostedtoolcache/Python/3.12.12/x64/lib/python3.12/logging/__init__.py:1558(error)\n\n\n",
+    "elapsed_time_seconds": 5.141864061355591,
+    "memory_report": {
+      "rss_mb": 125.2578125,
+      "vms_mb": 390.91796875,
+      "percent": 0.7831112124889461,
+      "available_system_mb": 15052.27734375,
+      "cpu_percent": 0.0
+    },
+    "peak_memory_mb": 0
+  },
+  "system_status": {
+    "memory": {
+      "total_mb": 15994.89453125,
+      "available_mb": 15052.2265625,
+      "percent_used": 5.9,
+      "swap_mb": 0.0
+    },
+    "cpu": {
+      "percent": 0.0,
+      "count": 4
+    },
+    "disk": {
+      "free_gb": 20.682723999023438
+    }
+  }
+}
