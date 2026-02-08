@@ -2,7 +2,9 @@ name: 👑 TITAN v22.0 ULTIMATE MULTI-CHANNEL ORACLE
 
 on:
   schedule:
-    - cron: '0 */12 * * *' # በየ 6 ሰዓቱ በራስ-ሰር
+    # በየ 30 ደቂቃው እንዲነሳ ተስተካክሏል (00 እና 30 ደቂቃ ላይ)
+    # ይህ ማሽኑ በየሀገሩ ያለውን "Prime Time" በንቃት እንዲከታተል ይረዳዋል
+    - cron: '0,30 * * * *' 
   workflow_dispatch:
     inputs:
       topic:
@@ -39,23 +41,24 @@ jobs:
     - name: 🛠️ Install Essential System Tools
       run: |
         sudo apt-get update
-        sudo apt-get install -y ffmpeg  # ለቪዲዮ/ድምፅ ሥራ ብቻ
+        sudo apt-get install -y ffmpeg
 
     - name: 📦 Install Python Dependencies
       run: |
         python -m pip install --upgrade pip setuptools wheel
+        # pytz እዚህ ጋር ተጨምሯል (ለሀገራት ሰዓት ስሌት ወሳኝ ነው)
         pip install tenacity requests psutil python-dotenv pyyaml aiohttp \
-                    google-generativeai groq openai \
+                    google-generativeai groq openai pytz \
                     beautifulsoup4 pandas jinja2 lxml \
                     textblob nltk numpy redis \
                     python-wordpress-xmlrpc facebook-sdk tweepy pydantic[email] httpx
 
-        # የቋንቋ ማቀነባበሪያ ዳታዎችን በፍጥነት መጫን
         python -m nltk.downloader punkt stopwords wordnet averaged_perceptron_tagger_eng
         
     - name: 👑 Run Unified Sovereign Engine
       env:
-        # --- AI API KEYS (7-KEY ROTATION) ---
+        # --- AI API KEYS (15-KEY ROTATION & BACKUP) ---
+        # አሁን ባለንበት ስልት 15ቱንም ቁልፎች እዚህ መዘርዘር አለብን
         GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
         GROQ_API_KEY_1: ${{ secrets.GROQ_API_KEY_1 }}
         GROQ_API_KEY_2: ${{ secrets.GROQ_API_KEY_2 }}
@@ -64,6 +67,14 @@ jobs:
         GROQ_API_KEY_5: ${{ secrets.GROQ_API_KEY_5 }}
         GROQ_API_KEY_6: ${{ secrets.GROQ_API_KEY_6 }}
         GROQ_API_KEY_7: ${{ secrets.GROQ_API_KEY_7 }}
+        GROQ_API_KEY_8: ${{ secrets.GROQ_API_KEY_8 }}
+        GROQ_API_KEY_9: ${{ secrets.GROQ_API_KEY_9 }}
+        GROQ_API_KEY_10: ${{ secrets.GROQ_API_KEY_10 }}
+        GROQ_API_KEY_11: ${{ secrets.GROQ_API_KEY_11 }}
+        GROQ_API_KEY_12: ${{ secrets.GROQ_API_KEY_12 }}
+        GROQ_API_KEY_13: ${{ secrets.GROQ_API_KEY_13 }}
+        GROQ_API_KEY_14: ${{ secrets.GROQ_API_KEY_14 }}
+        GROQ_API_KEY_15: ${{ secrets.GROQ_API_KEY_15 }}
         
         # --- OTHER AI PROVIDERS ---
         GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
@@ -93,10 +104,10 @@ jobs:
         GITHUB_ACTIONS: "true"
         PYTHONUNBUFFERED: 1
       run: |
-        echo "🚀 Starting Unified Sovereign Engine..."
-        # ራነሩን ማስጀመር - የ 10 ቁጥር ምርጫን እና ርዕስን በራስ ሰር ይልካል
+        echo "🚀 Starting Unified Sovereign Engine with Time-Zone Optimization..."
+        # ራነሩ አሁን 15,000 ቃላትን እና የሰዓት ሎጂክን እንዲያስተናግድ ተደርጓል
         python enterprise_runner.py <<EOF
-        10
+        15
         $INPUT_TOPIC
         EOF
 
@@ -104,11 +115,11 @@ jobs:
       if: success()
       run: |
         TIMESTAMP=$(date '+%Y-%m-%d %H:%M:%S')
-        TOPIC="${{ github.event.inputs.topic || 'Automated Run' }}"
+        TOPIC="${{ github.event.inputs.topic || 'Automated Time-Sensitive Run' }}"
         curl -X POST \
           -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
           -H "Accept: application/vnd.github.v3+json" \
-          -d "{\"title\": \"✅ Production: $TOPIC [$TIMESTAMP]\", \"body\": \"Production finished successfully. 11 Countries processed with 7,000+ words each. Check enterprise_outputs for details.\"}" \
+          -d "{\"title\": \"✅ Production: $TOPIC [$TIMESTAMP]\", \"body\": \"Production finished. Time-zone filtering applied. Check logs for active country list.\"}" \
           "https://api.github.com/repos/${{ github.repository }}/issues"
 
     - name: 📤 Sync & Push to GitHub
@@ -121,8 +132,7 @@ jobs:
         if git diff --staged --quiet; then
           echo "🚫 No changes to commit."
         else
-          echo "✅ Changes detected. Pushing to repository..."
-          git commit -m "👑 Sovereign Output: [Run ${{ github.run_number }}]"
+          git commit -m "👑 Sovereign Output [Run ${{ github.run_number }}] - Time-Zone Optimized"
           git pull --rebase origin main
           git push origin main
         fi
