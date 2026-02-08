@@ -4238,36 +4238,44 @@ class MegaContentEngine:
     """
     
     def __init__(self, system):
+        # 1. መጀመሪያ ሎገሩን እንገልጻለን (ይህ ካልቀደመ 'AttributeError' ይፈጠራል)
+        self.logger = logging.getLogger("MegaJournalist")
         self.system = system
+        
+        # 2. የ AI አቅራቢውን መለየት
         self.ai = getattr(system, 'failover_system', getattr(system, 'ai_provider', None))
         
-        # 1. የቃል ግብ
-        self.TARGET_WORDS = 15000
-        
-        # 2. የ15 መጠባበቂያ ቁልፎች ስርዓት
+        # 3. የ15 መጠባበቂያ ቁልፎች ስርዓት (አሁን ሎገሩ ስለተፈጠረ በሰላም ይባላል)
         self.ai_providers = self._initialize_15_fallback_keys()
         
-        # 3. የሀገር የሰዓት ዞኖች
+        # 4. የምርት ግቦች
+        self.TARGET_WORDS = 15000
+        
+        # 5. የሀገር የሰዓት ዞኖች (ለገበያ ሰዓት ብልህነት)
         self.country_timezones = {
-            'US': 'America/New_York',
-            'GB': 'Europe/London',
-            'DE': 'Europe/Berlin',
-            'JP': 'Asia/Tokyo',
-            'AU': 'Australia/Sydney',
-            'ET': 'Africa/Addis_Ababa',
-            'CA': 'America/Toronto',
-            'FR': 'Europe/Paris',
-            'CH': 'Europe/Zurich',
-            'NO': 'Europe/Oslo',
-            'SE': 'Europe/Stockholm'
+            'US': 'America/New_York', 'GB': 'Europe/London', 'DE': 'Europe/Berlin',
+            'JP': 'Asia/Tokyo', 'AU': 'Australia/Sydney', 'ET': 'Africa/Addis_Ababa',
+            'CA': 'America/Toronto', 'FR': 'Europe/Paris', 'CH': 'Europe/Zurich',
+            'NO': 'Europe/Oslo', 'SE': 'Europe/Stockholm'
         }
         
-        # 4. የገበያ ትኩረት ሰዓቶች
-        self.hot_hours = range(2, 12)
+        # 6. የገበያ ትኩረት ሰዓቶች (ጠዋት ሰዓታት)
+        self.hot_hours = range(2, 13)
         
-        # 5. የምርት ሁኔታ
+        # 7. የምርት ሁኔታ እና የገቢ ትንበያ መያዣዎች
         self.production_status = {}
-        self.logger = logging.getLogger("MegaJournalist")
+        self.revenue_predictions = {}
+        
+        # 8. የሀገራት ኢኮኖሚ መረጃ (ለFeb 2026 የተመቻቸ)
+        self.economic_indicators = {
+            'US': {'inflation': '3.2%', 'reg': 'AI Safety Act 2025'},
+            'GB': {'inflation': '4.1%', 'reg': 'Digital Markets Act'},
+            'ET': {'inflation': '28.5%', 'reg': 'Capital Market Proclamation'}
+        }
+        
+        # 9. የሜሞሪ ጽዳት
+        self.active_memory = ""
+        self.logger.info("✅ MegaContentEngine v37.0 Initialized Successfully")
         
         # 6. የሀገራት ኢኮኖሚ መረጃ
         self.economic_indicators = {
