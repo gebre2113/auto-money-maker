@@ -3141,10 +3141,12 @@ class EnterpriseProductionOrchestrator:
         }
         
         try:
-            # 🛑 ወሳኝ ማስተካከያ፦ ግብዓቶቹን (args) በዝርዝር መልክ ለብቻ እንልካለን
+            # 🚀 ቋሚ ማስተካከያ፦ ሁሉንም ግብዓቶች በስም (Keyword) በመጥራት ግጭቱን ማስወገድ
             result = await EnhancedErrorHandler.safe_execute(
-                self.run_enterprise_production, 
-                [topic, markets, content_type], # ✅ ግብዓቶቹን እዚህ በዝርዝር [] ውስጥ ሰብስብ
+                func=self.run_enterprise_production, 
+                topic=topic,
+                markets=markets,
+                content_type=content_type,
                 fallback_value={'status': 'failed', 'country_results': [], 'error': 'Production failed'},
                 max_retries=2,
                 retry_delay=5.0,
