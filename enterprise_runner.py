@@ -3141,9 +3141,9 @@ class EnterpriseProductionOrchestrator:
         }
         
         try:
-            # 🚀 ቋሚ ማስተካከያ፦ ሁሉንም ግብዓቶች በስም (Keyword) በመጥራት ግጭቱን ማስወገድ
+            # 🚀 ቋሚ ማስተካከያ፦ ፈንክሽኑን (self.run_enterprise_production) በመጀመሪያ ግቤትነት መላክ
             result = await EnhancedErrorHandler.safe_execute(
-                func=self.run_enterprise_production, 
+                self.run_enterprise_production, # ✅ ያለ 'func=' በቀጥታ ፈንክሽኑን ብቻ
                 topic=topic,
                 markets=markets,
                 content_type=content_type,
