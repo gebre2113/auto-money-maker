@@ -1056,62 +1056,63 @@ class ComprehensiveErrorHandler:
             return "🔴 ከፍተኛ ችግር አለ"
 
 # =================== 🔄 TITAN v21.0: THE SEVEN-KEY FORTRESS ===================
-# =================== 🔄 TITAN v31.0: THE UNSTOPPABLE 15-KEY RELAY ===================
-# =================== 🔄 TITAN v33.0: THE 15-KEY RELAY FORTRESS ===================
+# =================== 🔄 TITAN v34.0: THE SLOW-BURN 15-KEY RELAY ===================
 class EnhancedAIFailoverSystem:
     def __init__(self, config=None):
         self.config = config
         self.logger = logging.getLogger("Titan.Failover")
         
-        # 🛡️ 15ቱንም የግሮቅ ቁልፎች ከ Secrets መጫን
+        # 🛡️ 15ቱንም የግሮቅ ቁልፎች በሥርዓት መጫን
         self.groq_pool = self._load_key_pool('GROQ_API_KEY', 15)
-        self.groq_index = 0 # ግሎባል ጠቋሚ - በምርት ሂደቱ በሙሉ አይቆምም
+        self.groq_index = 0 # ግሎባል ጠቋሚ
         
         self.key_blacklist = {} # {index: timestamp_to_unblock}
         self.backups = {
             'gemini': os.getenv('GEMINI_API_KEY')
         }
         
-        self.logger.info(f"🛡️ TITAN v33.0 READY: {len(self.groq_pool)} Keys with Strict Relay Logic.")
+        self.logger.info(f"🛡️ TITAN v34.0 READY: {len(self.groq_pool)} Keys. Strict Relay Active.")
 
     def _load_key_pool(self, base_name, count):
-        """15ቱን ቁልፎች በሥርዓት ሰብስቦ ይጭናል"""
+        """ከ Secrets ውስጥ 15ቱንም ቁልፎች ሰብስቦ ይጭናል"""
         keys = []
+        # መጀመሪያ ዋናውን (GROQ_API_KEY) ይፈትሻል
         main_key = os.getenv(base_name)
         if main_key: keys.append(main_key)
+        
+        # በመቀጠል ቁጥር ያላቸውን (GROQ_API_KEY_1...15) ይጭናል
         for i in range(1, count + 1):
             k = os.getenv(f"{base_name}_{i}")
-            if k and k not in keys: keys.append(k)
+            if k and k not in keys:
+                keys.append(k)
         
-        # 15 ቁልፍ ከሌለህ ያሉትን ደጋግሞ በመጠቀም ክፍተቱን ይሞላል
         if not keys:
-            self.logger.error("❌ CRITICAL: No Groq keys found!")
+            self.logger.error("❌ CRITICAL: No Groq keys found in Secrets!")
             return []
-        while len(keys) < count:
-            keys.append(random.choice(keys))
         return keys
 
     async def process_task(self, prompt: str, task_type: str = "production", max_tokens: int = 4000) -> str:
         """
-        🔄 STRICT RELAY LOGIC:
-        አንዱ ቁልፍ ስራውን ሲጨርስ ለቀጣዩ ያስረክባል + 3 ሰከንድ የግዴታ እረፍት።
+        🔄 SLOW-BURN RELAY:
+        በየጥሪው ቁልፍ ይቀይራል፣ ስህተት ካጋጠመ ደግሞ ቆም ብሎ ቀጣዩን ይሞክራል።
         """
         now = time.time()
         
-        # 🔄 ሁሉንም 15 ቁልፎች ለመሞከር (ለ 2 ዙር ዑደት)
+        # ሁሉንም 15 ቁልፎች የመሞከር ዑደት (ለ 2 ዙር)
         for _ in range(len(self.groq_pool) * 2):
             idx = self.groq_index % len(self.groq_pool)
             api_key = self.groq_pool[idx]
             
-            # ለቀጣዩ ጥሪ አሁኑኑ ተራውን እናዞራለን (Strict Rotation)
-            self.groq_index += 1 
-
-            # ቁልፉ በቅጣት (429) ላይ ከሆነ እለፈው
+            # ተረኛው ቁልፍ በቅጣት ላይ ከሆነ እለፈው
             if idx in self.key_blacklist and now < self.key_blacklist[idx]:
+                self.groq_index += 1
                 continue
 
+            # 🛑 ወሳኝ፦ ለቀጣዩ ጥሪ አሁኑኑ ተራውን እናዞራለን
+            self.groq_index += 1 
+
             try:
-                self.logger.info(f"🚀 [KEY-{idx + 1}/15] Handling Phase... (Mode: {task_type})")
+                self.logger.info(f"🚀 [KEY-{idx + 1}/15] Attempting phase... (Mode: {task_type})")
                 
                 async with httpx.AsyncClient(timeout=160.0) as client:
                     resp = await client.post(
@@ -1129,39 +1130,38 @@ class EnhancedAIFailoverSystem:
                     if resp.status_code == 200:
                         if idx in self.key_blacklist: del self.key_blacklist[idx]
                         
-                        # 💤 ወሳኝ፦ አንዱ ቁልፍ ሲጨርስ ለቀጣዩ ከማስተላለፉ በፊት 3 ሰከንድ እረፍት
-                        self.logger.info(f"✅ Key-{idx + 1} Succeeded. Resting 3s for Relay...")
+                        # 💤 ለ 3 ሰከንድ አርፎ ለቀጣዩ ቁልፍ ያስረክባል
                         await asyncio.sleep(3) 
-                        
                         return str(resp.json()['choices'][0]['message']['content'])
                     
-                    # ⚠️ Rate Limit (429) ካጋጠመ ለ 90 ሰከንድ አሳርፈው
+                    # ⚠️ Rate Limit (429) - ቁልፉን ለ 120 ሰከንድ አግድ
                     elif resp.status_code == 429:
-                        self.logger.warning(f"⚠️ Key #{idx + 1} Limited. Penalty: 90s.")
-                        self.key_blacklist[idx] = now + 90
-                        await asyncio.sleep(5) # ወደ ቀጣዩ ከመሄድ በፊት ትንሽ መተንፈሻ
+                        self.logger.warning(f"⚠️ Key #{idx + 1} hit Rate Limit. Penalty: 120s.")
+                        self.key_blacklist[idx] = now + 120
+                        # 🛑 ወሳኝ፦ ወደ ቀጣዩ ቁልፍ ከመሄድ በፊት 10 ሰከንድ የግዴታ እረፍት
+                        await asyncio.sleep(10)
                         continue
                     
                     else:
-                        self.logger.error(f"❌ Key #{idx + 1} HTTP {resp.status_code}. Rotating...")
+                        self.logger.error(f"❌ Key #{idx + 1} Error: HTTP {resp.status_code}. Pausing 5s...")
                         await asyncio.sleep(5)
                         continue
 
             except Exception as e:
-                self.logger.warning(f"📡 Network Error Key #{idx + 1}. Rotating...")
+                self.logger.warning(f"📡 Connection Error with Key #{idx + 1}. Pausing 5s...")
                 await asyncio.sleep(5)
                 continue
 
-        # 🏰 ሁሉም የ Groq ቁልፎች ቢዝሉ ወደ Gemini
+        # 🏰 ሁሉም ግሮቅ ካልሰሩ ወደ Gemini
         if self.backups['gemini']:
             try:
                 self.logger.info("🌟 Groq Pool exhausted. Using Gemini Backup...")
                 return await self._call_gemini_backup(prompt)
             except: pass
 
-        return "Error: All 15 keys and backups exhausted."
+        raise Exception("🚨 CRITICAL: 15/15 Keys Exhausted even after cooling. Check Key Validity.")
 
-    # --- 🔗 ሌሎች ክፍሎች የሚጠሩባቸው ስሞች (Aliases) ---
+    # --- 🔗 ለሌሎች ክፍሎች ድጋፍ ሰጪ ስሞች (Aliases) ---
     async def generate_content(self, prompt: str, max_tokens: int = 4000, **kwargs) -> str:
         return await self.process_task(prompt, "production", max_tokens)
 
