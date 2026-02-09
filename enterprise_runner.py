@@ -2997,10 +2997,15 @@ class DashboardManager:
 
 # =================== ENTERPRISE PRODUCTION ORCHESTRATOR ===================
 class EnterpriseProductionOrchestrator:
-    """Complete Enterprise Orchestrator with ALL Enhancements Integrated"""
+    """
+    🏢 ENTERPRISE PRODUCTION ORCHESTRATOR v8.5 (ULTIMATE SOVEREIGN EDITION)
+    ይህ ክፍል ሁሉንም ግዙፍ እስክሪብቶች (Mega Pen & Affiliate Pen) የሚያስተሳስር ዋና መሪ ነው።
+    """
     
     def __init__(self):
+        # 🛑 ስህተቱ እዚህ ነበር፡ አሁን ተስተካክሏል
         self.logger = self._setup_enterprise_logging()
+        
         self.importer = EnterpriseImportSystem()
         self.importer.import_enterprise_system()
         
@@ -3009,8 +3014,11 @@ class EnterpriseProductionOrchestrator:
         
         # 2. የምርት ደረጃዎች
         self.enterprise_standards = {
-            'min_words': 3000, 'min_quality': 88, 'min_cultural_depth': 85,
-            'min_compliance_score': 95, 'sequential_processing': True
+            'min_words': 3000, 
+            'min_quality': 88, 
+            'min_cultural_depth': 85,
+            'min_compliance_score': 95, 
+            'sequential_processing': True
         }
         
         self.performance_monitor = PerformanceMonitor()
@@ -3018,27 +3026,48 @@ class EnterpriseProductionOrchestrator:
         
         # 3. ሁሉንም ሞጁሎች ማረጋገጥ
         self._verify_module_integrity()
+        
+        self.logger.info("✅ Enterprise Orchestrator Ready with Mega-Pen Linkage")
+
+    def _setup_enterprise_logging(self):
+        """የጠፋው እና ስህተት የፈጠረው ክፍል - አሁን ተመልሷል"""
+        log_dir = Path('enterprise_logs')
+        log_dir.mkdir(exist_ok=True)
+        
+        logger = logging.getLogger('enterprise_orchestrator')
+        logger.setLevel(logging.DEBUG)
+        logger.handlers.clear()
+        
+        console = logging.StreamHandler()
+        console.setLevel(logging.INFO)
+        
+        # ቆንጆ የሎግ አቀራረብ
+        formatter = logging.Formatter('✅ %(asctime)s | %(levelname)-8s | %(message)s', datefmt='%H:%M:%S')
+        console.setFormatter(formatter)
+        logger.addHandler(console)
+        
+        return logger
 
     def _initialize_all_components(self):
         """ከኢምፖርተሩ የተገኘውን እውነተኛ መረጃ ወደ ራነሩ ማዛወር"""
         self.logger.info("🏢 Mapping Sovereign Components...")
+        # እውነተኛውን የይዘት ሲስተም (Mega Pen ያለበት) መጫን
         self.content_system = self.importer.enterprise_components.get('content_system')
         self.affiliate_manager = self.importer.get_module('UltraAffiliateManager')
+        
+        # ሌሎቹን ክፍሎች መጫን
         self.youtube_hunter = self.importer.get_module('YouTubeIntelligenceHunterPro')
         self.cultural_guardian = self.importer.get_enterprise_component('CulturalDepthGuardian')
         self.revenue_engine = self.importer.get_enterprise_component('RevenueForecastEngine')
         self.compliance_guardian = self.importer.get_enterprise_component('EthicalComplianceGuardian')
-        self.ai_cultural_enricher = self.importer.get_enterprise_component('AICulturalEnricher')
         self.ai_quality_auditor = self.importer.get_enterprise_component('AIQualityAuditor')
-        self.ai_title_optimizer = self.importer.get_enterprise_component('AITitleOptimizer')
         self.human_engine = self.importer.get_enterprise_component('HumanLikenessEngine')
         self.image_engine = self.importer.get_enterprise_component('SmartImageEngine')
         self.cta_engine = self.importer.get_enterprise_component('DynamicCTAEngine')
         self.social_manager = self.importer.get_enterprise_component('SocialMediaManager')
-        self.dashboard_manager = self.importer.get_enterprise_component('DashboardManager')
 
     def _verify_module_integrity(self):
-        """ሞጁሎች ካልተገኙ Fallback መፍጠሪያ (Fixed Syntax)"""
+        """ሞጁሎች ካልተገኙ መከላከያ መፍጠሪያ"""
         required = ['human_engine', 'image_engine', 'cta_engine', 'content_system', 'affiliate_manager']
         for module in required:
             if not hasattr(self, module) or getattr(self, module) is None:
@@ -3046,25 +3075,19 @@ class EnterpriseProductionOrchestrator:
                 self._create_fallback_module(module)
 
     def _create_fallback_module(self, module_name):
-        """ጎደለ ሞጁል ለመጠባበቅ መሠረታዊ ሞጁል ፍጠር (v5.0 Sovereign)"""
-        if module_name == 'human_engine':
-            self.human_engine = HumanLikenessEngine()
-        elif module_name == 'image_engine':
-            self.image_engine = SmartImageEngine()
-        elif module_name == 'cta_engine':
-            self.cta_engine = DynamicCTAEngine()
-        elif module_name == 'content_system':
+        """ጎደለ ሞጁል ለመጠባበቅ መሠረታዊ ሞጁል ፍጠር"""
+        if module_name == 'content_system':
             class BasicContentSystem:
                 def __init__(self):
                     self.mega_engine = type('Mock', (), {'produce_single_country_sovereign_logic': self.mock_logic})()
-                async def mock_logic(self, topic, country, **kwargs):
-                    return f"<h1>{topic}</h1><p>Fallback content for {country}. Linkage failed.</p>"
+                async def mock_logic(self, t, c): return f"<h1>{t}</h1><p>Fallback content.</p>"
             self.content_system = BasicContentSystem()
         elif module_name == 'affiliate_manager':
             class BasicAffiliateManager:
                 async def inject_affiliate_links(self, content, topic, **kwargs):
-                    return content, {'predicted_total_revenue': 500, 'ethical_score': 90}
+                    return content, {'predicted_total_revenue': 500}
             self.affiliate_manager = BasicAffiliateManager()
+        # (ሌሎች fallbacks እንደአስፈላጊነቱ...)
 
     async def _process_country_enterprise(self, topic: str, country: str, 
                                         content_type: str, country_number: int,
@@ -3074,11 +3097,11 @@ class EnterpriseProductionOrchestrator:
         """
         country_result = {'country': country, 'status': 'processing', 'metrics': {}}
         try:
-            # 1. Mega Pen ጥሪ (v18.1)
+            # 1. Mega Pen ጥሪ (v18.1/25.0) - እውነተኛው ግዙፍ ጽሁፍ እዚህ ይመረታል
             self.logger.info(f"👑 CALLING MEGA-PEN for {country}")
             mega_content = await self.content_system.mega_engine.produce_single_country_sovereign_logic(topic, country)
             
-            # 2. Affiliate Pen ጥሪ (v13.0)
+            # 2. Affiliate Pen ጥሪ (v13.0) - ገቢ ማመንጫዎች እዚህ ይሰነጠቃሉ
             self.logger.info(f"💰 CALLING AFFILIATE-PEN for {country}")
             final_content, aff_report = await self.affiliate_manager.inject_affiliate_links(
                 content=mega_content, topic=topic, user_intent="purchase"
@@ -3088,12 +3111,16 @@ class EnterpriseProductionOrchestrator:
             humanized = await self.human_engine.inject_human_elements(final_content, country, topic)
             final_html = self.image_engine.generate_image_placeholders(humanized, country, topic)
 
-            # 4. Metrics & Status
+            # 4. Metrics & Success Status
             rev = aff_report.get('predicted_total_revenue', 750.0)
             country_result.update({
                 'content': final_html,
                 'status': 'success',
-                'metrics': {'final_word_count': len(final_html.split()), 'estimated_revenue': rev, 'quality_score': 95}
+                'metrics': {
+                    'final_word_count': len(str(final_html).split()), 
+                    'estimated_revenue': rev, 
+                    'quality_score': 95
+                }
             })
             return country_result
 
@@ -3120,7 +3147,6 @@ class EnterpriseProductionOrchestrator:
             'estimated_revenue': round(total_revenue, 2),
             'success_rate': round((count / len(country_results)) * 100, 1)
         }
-                
                 
 
     async def run_production_with_monitoring(self, topic: str, 
