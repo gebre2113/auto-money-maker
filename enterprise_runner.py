@@ -3293,13 +3293,15 @@ class EnterpriseProductionOrchestrator:
             self.memory_manager.optimize_memory()
             
             try:
-                # 🛠️ 4. ድልድዩን (Bridge) መጥራት - ይህ Mega Pen እና Affiliate Penን ያገናኛል
+                # 🛠️ ድልድዩን (Bridge) መጥራት
+                # self._process_country_enterprise የሚለው ያለ ቅንፍ መሆኑን አረጋግጥ
                 country_result = await EnhancedErrorHandler.safe_execute(
-                    self._process_country_enterprise, # ፈንክሽኑን (ስሙን ብቻ)
-                    topic, country, # ግብአቶቹን (Arguments)
-                    fallback_value={'country': country, 'status': 'failed', 'error': 'Bridge Failure'},
+                    self._process_country_enterprise, # ✅ ፈንክሽኑን ብቻ
+                    topic,                            # arg 1
+                    country,                          # arg 2
+                    fallback_value={'country': country, 'status': 'failed', 'metrics': {}},
                     max_retries=2,
-                    context=f"Enterprise Bridge for {country}"
+                    context=f"Bridge call for {country}"
                 )
                 
                 country_results.append(country_result)
