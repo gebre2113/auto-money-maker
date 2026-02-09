@@ -3282,11 +3282,10 @@ class EnterpriseProductionOrchestrator:
                                           content_type: str = "enterprise_guide") -> Dict:
         """
         🚀 ULTIMATE SOVEREIGN RUNNER v38.0
-        - የ 15 ቁልፎችን የጋራ መቆለፊያ (Global Lock) ያከብራል
-        - 15,000 ቃላትን በ 7 ዙር ርክክብ (Relay) ያስፈጽማል
-        - የዜና ሰዓት እና የድግግሞሽ መቆጣጠሪያው 100% የጸና ነው
+        - ቁልፎችን መጠበቅ + ጥራቱን የጠበቀ 15,000 ቃላት ማምረት
+        - 15ቱን ቁልፎች በሰልፍ (Sequential) እና በዙር (Relay) መጠቀም
         """
-        # 1. የሰዓት እና የድግግሞሽ ማጣሪያ
+        # 1. የሰዓት እና የድግግሞሽ ማጣሪያ (Tracker)
         all_prime_markets = get_active_prime_time_countries()
         tracker = DailyProductionTracker()
         
@@ -3302,43 +3301,42 @@ class EnterpriseProductionOrchestrator:
 
         if not to_process:
             self.logger.info("😴 System Idle: No active markets found.")
-            return {'status': 'success', 'message': 'All quiet on the global front.'}
+            return {'status': 'success', 'message': 'All markets up to date.'}
 
-        # 🔄 የሀገራት ሉፕ - እውነተኛው "ተከታታይ" (Sequential) አሠራር
+        # 🔄 የሀገራት ሉፕ - አንዱ ሀገር ሳይጨርስ ሌላው አይጀመርም (Strictly Sequential)
         country_results = []
         for idx, country in enumerate(to_process):
-            self.logger.info(f"\n👑 [MASTER RELAY] Processing {country} ({idx+1}/{len(to_process)})")
+            self.logger.info(f"\n{'━'*60}\n👑 [MASTER RELAY] Processing {country} ({idx+1}/{len(to_process)})\n{'━'*40}")
             
-            # 🧠 BRAIN WIPE - የማስታወስ ችሎታን ማጽዳት (Context መደጋገም እንዳይመጣ)
+            # 🧠 BRAIN WIPE: ለእያንዳንዱ ሀገር ንጹህ ማህደረ ትውስታ
             if hasattr(self.content_system, 'mega_engine'):
                 self.content_system.mega_engine.active_memory = ""
-                # 🛡️ መቆለፊያውን እዚህ ጋር እናረጋግጣለን (ለ 15ቱ ቁልፎች)
             
             try:
-                # 🚀 ጥሪው አሁን በቀጥታ ወደ ሜጋ ኢንጂን ይሄዳል
-                # 'await' ስላለ ይህ ሀገር ሳይጨርስ ቀጣዩ ሀገር አይነካም
+                # 🚀 ጥሪው ወደ ዋናው አምራች (Mega-Pen)
+                # እዚህ ጋር 7ቱም ዙሮች (Phases) በጥንቃቄ ይከናወናሉ
                 country_result = await self._process_country_enterprise(
                     topic, country, content_type, idx + 1, len(to_process)
                 )
                 
+                # 7. ስኬትን መመዝገብ
                 if country_result.get('status') == 'success':
                     tracker.mark_as_done(country, topic)
-                    self.logger.info(f"✅ {country} Production Verified & Logged.")
+                    self.logger.info(f"✅ {country} Production Finalized & Logged.")
                 
                 country_results.append(country_result)
 
-                # 💤 ስልታዊ የ 60 ሰከንድ እረፍት (Inter-Country Cooldown)
-                # ይህ እረፍት 15ቱ ቁልፎች ሙሉ በሙሉ ሰላም እንዲያገኙ ያደርጋል
+                # 💤 የ 60 ሰከንድ "ንጉሳዊ እረፍት" - 15ቱ ቁልፎች ሙሉ በሙሉ እንዲያገግሙ
                 if idx < len(to_process) - 1:
-                    self.logger.info(f"⏳ Cooling down for 60s before next sovereign...")
+                    self.logger.info(f"⏳ Cooling down for 60s to refresh API Gateway...")
                     await asyncio.sleep(60)
 
             except Exception as e:
-                self.logger.error(f"❌ Bridge Failure for {country}: {e}")
+                self.logger.error(f"❌ Critical Failure for {country}: {e}")
                 continue
 
         return {'status': 'success', 'results': country_results}
-    
+                                               
     async def _process_country_enterprise(self, topic: str, country: str, 
                                         content_type: str, country_number: int,
                                         total_countries: int) -> Dict:
