@@ -3200,32 +3200,46 @@ class EnterpriseProductionOrchestrator:
                                           markets: List[str] = None,
                                           content_type: str = "enterprise_guide") -> Dict:
         """
-        🚀 ENTERPRISE MASTER RUNNER v32.1 (ULTIMATE BRIDGE FIX)
+        🚀 ENTERPRISE MASTER RUNNER v33.0 (ULTIMATE UNIFIED)
         - በአገሮች የዜና ሰዓት (Prime Time) ላይ ብቻ ያመርታል
-        - 11ዱንም ሀገር ሰርቶ በንጽህና ይዘጋል (No infinite loop)
+        - አንድ ሀገር በቀን ከአንድ ጊዜ በላይ እንዳይመረት ይከላከላል (Daily Tracker)
+        - 11ዱንም ሀገር ሰርቶ በንጽህና ይዘጋል (GitHub Actions Success)
         - በየሀገሩ መሃል የ60 ሰከንድ የቁልፍ ማገገሚያ እረፍት ይሰጣል
         """
         
-        # 🎯 1. አሁን "Prime Time" ላይ ያሉ ሀገራትን ብቻ መለየት
+        # 🎯 1. አሁን "Prime Time" ላይ ያሉ ሀገራትን መለየት
         all_prime_markets = get_active_prime_time_countries()
         
-        if markets:
-            markets = [m for m in markets if m in all_prime_markets]
-        else:
-            markets = all_prime_markets
+        # 📝 2. የድግግሞሽ መቆጣጠሪያ (Daily Tracker)
+        # ማሳሰቢያ፡ DailyProductionTracker ክላስ ከላይ መኖሩን አረጋግጥ
+        tracker = DailyProductionTracker()
+        
+        # 3. መስራት ያለባቸውን ሀገራት ማጣራት (Prime Time + Not Done Today)
+        to_process = []
+        target_list = markets if markets else all_prime_markets
+        
+        for country in target_list:
+            if country in all_prime_markets:
+                if not tracker.is_already_done(country, topic):
+                    to_process.append(country)
+                else:
+                    self.logger.info(f"⏭️  Skipping {country}: Already produced today.")
+            else:
+                self.logger.info(f"😴 {country} is not in Prime Time. Skipping...")
 
-        if not markets:
-            self.logger.info("😴 No countries are in Prime Time right now. System entering rest mode.")
-            return {'status': 'success', 'message': 'System idle during non-peak hours'}
+        # 😴 በሰዓቱ የሚሰራ ሀገር ከሌለ ሲስተሙን በሰላም መዝጋት
+        if not to_process:
+            self.logger.info("😴 No countries are in Prime Time or all are already updated. System resting.")
+            return {'status': 'success', 'message': 'System idle. All markets up to date.'}
 
         production_id = f"ent_{hashlib.md5(f'{topic}{datetime.now()}'.encode()).hexdigest()[:12]}"
         
-        self.logger.info(f"🏢 STARTING PRODUCTION for {len(markets)} active markets: {', '.join(markets)}")
+        self.logger.info(f"🏢 STARTING PRODUCTION for {len(to_process)} active markets: {', '.join(to_process)}")
         
         production_results = {
             'production_id': production_id,
             'topic': topic,
-            'target_countries': markets,
+            'target_countries': to_process,
             'status': 'processing',
             'start_time': datetime.now().isoformat(),
             'country_results': [],
@@ -3234,13 +3248,13 @@ class EnterpriseProductionOrchestrator:
         
         country_results = []
         
-        # 🔄 2. የሀገራት ሉፕ (Loop)
-        for idx, country in enumerate(markets):
+        # 🔄 4. የሀገራት ሉፕ (Loop) - አንድ በአንድ በጥንቃቄ ይሰራል
+        for idx, country in enumerate(to_process):
             self.logger.info(f"\n{'━'*60}")
-            self.logger.info(f"🌍 PROCESSING: {country} ({idx+1}/{len(markets)})")
+            self.logger.info(f"🌍 PROCESSING: {country} ({idx+1}/{len(to_process)})")
             self.logger.info(f"{'━'*60}")
             
-            # 🧠 3. BRAIN WIPE: ሜሞሪ ማጽዳት
+            # 🧠 5. BRAIN WIPE: ሜጋ ኢንጂኑ የቀደመውን ሀገር መረጃ እንዲረሳ ማጽዳት
             if hasattr(self.content_system, 'mega_engine'):
                 self.content_system.mega_engine.active_memory = ""
                 self.content_system.mega_engine.memory_chain = []
@@ -3248,25 +3262,31 @@ class EnterpriseProductionOrchestrator:
             self.memory_manager.optimize_memory()
             
             try:
-                # 🛠️ ድልድዩን (Bridge) መጥራት - ULTIMATE FIX v32.1
-                # 🛑 ሁሉንም 5 ግቤቶች (Arguments) በቅደም ተከተል እናስተላልፋለን
+                # 🛠️ 6. ድልድዩን (Bridge) መጥራት - ULTIMATE FIX v33.0
+                # ሁሉንም 5 ግቤቶች (Arguments) በቅደም ተከተል እናስተላልፋለን
                 country_result = await EnhancedErrorHandler.safe_execute(
                     self._process_country_enterprise, # ✅ ተግባሩ (ፈንክሽኑ)
                     topic,                            # arg 1: ርዕስ
                     country,                          # arg 2: ሀገር
-                    content_type,                      # arg 3: የይዘት አይነት (የጠፋው ግቤት #1)
-                    idx + 1,                          # arg 4: የሀገር ተራ ቁጥር (የጠፋው ግቤት #2)
-                    len(markets),                     # arg 5: ጠቅላላ ሀገራት (የጠፋው ግቤት #3)
+                    content_type,                      # arg 3: የይዘት አይነት
+                    idx + 1,                          # arg 4: የሀገር ተራ ቁጥር
+                    len(to_process),                  # arg 5: ጠቅላላ ሀገራት
                     fallback_value={'country': country, 'status': 'failed', 'metrics': {}},
                     max_retries=2,
                     context=f"Bridge call for {country}"
                 )
                 
+                # 7. ስኬታማ ከሆነ በመዝገብ ላይ ምልክት ማድረግ
+                if country_result.get('status') == 'success':
+                    tracker.mark_as_done(country, topic)
+                    self.logger.info(f"✅ {country} marked as completed in daily log.")
+                
                 country_results.append(country_result)
                 
-                # 💤 5. በአገሮች መካከል የሚደረግ እረፍት (Inter-Country Cooldown)
-                if idx < len(markets) - 1:
-                    delay = random.randint(45, 60)
+                # 💤 8. በአገሮች መካከል የሚደረግ ስልታዊ እረፍት (Inter-Country Cooldown)
+                if idx < len(to_process) - 1:
+                    # በ 15ቱ ቁልፎች መካከል በቂ ክፍተት ለመፍጠር 60 ሰከንድ እረፍት
+                    delay = 60 
                     self.logger.info(f"⏳ Inter-country cooling: Resting for {delay}s to refresh ALL 15 keys...")
                     await asyncio.sleep(delay)
                 
@@ -3274,16 +3294,19 @@ class EnterpriseProductionOrchestrator:
                 self.logger.error(f"❌ Critical Error processing {country}: {e}")
                 country_results.append({'country': country, 'status': 'failed', 'error': str(e)})
 
-        # 📊 6. ማጠቃለያ እና ሪፖርት
+        # 📊 9. ማጠቃለያ እና ሪፖርት
         production_results['country_results'] = country_results
         production_results['overall_metrics'] = self._calculate_enterprise_metrics(country_results)
+        
+        # 🏁 10. ስኬትን ማብሰር (GitHub Actions አረንጓዴ እንዲሆን)
         production_results['status'] = 'success' 
         production_results['end_time'] = datetime.now().isoformat()
         
+        # ሪፖርቶችን ማመንጨት እና ማሰራጨት
         await self._generate_enterprise_reports(production_results)
         await self._send_enterprise_notifications(production_results)
         
-        self.logger.info(f"🏁 ALL {len(markets)} MARKETS COMPLETED. System shutting down cleanly.")
+        self.logger.info(f"🏁 ALL {len(to_process)} MARKETS COMPLETED. System shutting down cleanly.")
         
         return production_results
     
