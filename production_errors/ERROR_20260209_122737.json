@@ -1,0 +1,6 @@
+{
+  "error": "Required module content_system not initialized.",
+  "traceback": "Traceback (most recent call last):\n  File \"/home/runner/work/auto-money-maker/auto-money-maker/enterprise_runner.py\", line 4492, in main_execution\n    orchestrator = EnterpriseProductionOrchestrator()\n                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/runner/work/auto-money-maker/auto-money-maker/enterprise_runner.py\", line 3044, in __init__\n    self._verify_module_integrity()\n  File \"/home/runner/work/auto-money-maker/auto-money-maker/enterprise_runner.py\", line 3121, in _verify_module_integrity\n    raise Exception(f\"Required module {module} not initialized.\")\nException: Required module content_system not initialized.\n",
+  "timestamp": "2026-02-09T12:27:37.979257",
+  "topic": "Unknown"
+}
