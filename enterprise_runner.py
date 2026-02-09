@@ -922,30 +922,17 @@ class HumanLikenessEngine:
 
 # =========================================================================
 # 🤖 UNSTOPPABLE AI PROVIDER (v29.0 - ENTERPRISE MULTI-KEY RELAY)
-# =========================================================================
+# ========================================================================
+
 class UnstoppableAIProvider:
-    """
-    የዓለማችን እጅግ ጠንካራው AI አቅራቢ - 15 ቁልፎችን በየዙሩ ያፈራርቃል
-    - ራነሩ ስራውን ሲጨርስ በንጽህና እንዲዘጋ ተደርጎ የተገነባ
-    - የ 7 ሰከንድ የ "Cool-down" ሲስተም ተካቷል
-    """
-    
     def __init__(self, config=None):
         self.config = config
-        self.logger = logging.getLogger("UnstoppableAI")
-        
-        # 🛡️ 15ቱን የግሮቅ ቁልፎች መጫን
+        # 15ቱን ቁልፎች በዝርዝር ይጭናል (ከ .env ፋይል)
         self.groq_pool = self._load_key_pool('GROQ_API_KEY', 15)
-        self.groq_index = 0 
-        
-        self.keys = {
-            'gemini': os.getenv('GEMINI_API_KEY') or os.getenv('AI_CULTURAL_API_KEY'),
-            'deepseek': os.getenv('DEEPSEEK_API_KEY'),
-            'openai': os.getenv('OPENAI_API_KEY')
-        }
-        
-        self.key_blacklist = {} 
-        self.is_running = True
+        self.groq_index = 0  # ግሎባል ጠቋሚ - አይቆምም
+        self.logger = logging.getLogger("AIProvider")
+        # 🛡️ መቆለፊያ - ብዙ ተግባራት በአንድ ጊዜ እንዳይገቡ
+        self._lock = asyncio.Lock()
 
     def _load_key_pool(self, base_name, count):
         keys = []
@@ -953,109 +940,52 @@ class UnstoppableAIProvider:
         if main_key: keys.append(main_key)
         for i in range(1, count + 1):
             k = os.getenv(f"{base_name}_{i}")
-            if k and k not in keys: keys.append(k)
-        
-        if not keys:
-            self.logger.error("❌ CRITICAL: No Groq keys found!")
-            return []
-            
-        while len(keys) < count:
-            keys.append(random.choice(keys))
+            if k: keys.append(k)
         return keys
 
-    async def process_task(self, prompt: str, task_type: str = "production", max_tokens: int = 4000) -> str:
-        if not self.is_running:
-            return "System shutting down..."
+    async def generate_content(self, prompt: str, max_tokens: int = 4000) -> str:
+        """STRICT SEQUENTIAL RELAY: አንዱ ጥሪ ሲያልቅ ለቀጣዩ አዲስ ቁልፍ ብቻ ያነሳል"""
+        if not self.groq_pool:
+            raise Exception("No Keys Found!")
 
-        now = time.time()
-        # 🔄 15ቱንም ቁልፎች ሁለት ዙር የመሞከር አቅም (Redundancy)
-        for _ in range(len(self.groq_pool) * 2):
+        # 🔒 LOCK ACTIVE: አንዱ ሯጭ ሳይጨርስ ሌላኛው ሯጭ አይነሳም
+        async with self._lock:
             idx = self.groq_index % len(self.groq_pool)
             api_key = self.groq_pool[idx]
             
-            # ብላክሊስት የተደረገ ቁልፍ ከሆነ እለፈው
-            if idx in self.key_blacklist and now < self.key_blacklist[idx]:
-                self.groq_index += 1
-                continue
-
+            # ለሚቀጥለው ጥያቄ አሁኑኑ ተራውን ያዙራል
             self.groq_index += 1 
 
             try:
-                self.logger.info(f"🚀 [GROQ KEY-{idx + 1}/15] Task: {task_type}")
+                self.logger.info(f"🔄 [RELAY] Key #{idx + 1} is taking the lead at {datetime.now().strftime('%H:%M:%S')}")
+                
                 async with httpx.AsyncClient(timeout=160.0) as client:
                     resp = await client.post(
                         "https://api.groq.com/openai/v1/chat/completions",
                         headers={"Authorization": f"Bearer {api_key}"},
                         json={
                             "model": "llama-3.3-70b-versatile",
-                            "messages": [
-                                {"role": "system", "content": self._get_system_prompt(task_type)},
-                                {"role": "user", "content": prompt}
-                            ],
+                            "messages": [{"role": "user", "content": prompt}],
                             "max_tokens": max_tokens,
                             "temperature": 0.7
                         }
                     )
                     
                     if resp.status_code == 200:
-                        if idx in self.key_blacklist: del self.key_blacklist[idx]
-                        # ስኬታማ ከሆነ ፍጥነቱን ለመቆጣጠር 2 ሰከንድ ይበቃል
-                        await asyncio.sleep(2) 
+                        # ✅ ስኬታማ ከሆነ ለ 5 ሰከንድ አርፎ ለቀጣዩ ቁልፍ ያስረክባል
+                        await asyncio.sleep(5) 
                         return str(resp.json()['choices'][0]['message']['content'])
-                    
-                    # ⚠️ የ Rate Limit (429) ስህተት ካጋጠመ
-                    if resp.status_code == 429:
-                        self.logger.warning(f"⚠️ Key #{idx + 1} Limited. Cooling down 90s...")
-                        self.key_blacklist[idx] = now + 90 
-                        await asyncio.sleep(7) # 🛡️ ስልታዊ የ 7 ሰከንድ እረፍት
-                        continue
-                    
-                    # ❌ ሌላ የ HTTP ስህተት ካጋጠመ
-                    else:
-                        self.logger.error(f"❌ Key #{idx + 1} Failed: HTTP {resp.status_code}. Waiting 7s...")
-                        await asyncio.sleep(7) # 🛡️ ስልታዊ የ 7 ሰከንድ እረፍት
-                        continue
+                        
+                    elif resp.status_code == 429:
+                        self.logger.warning(f"⚠️ Key #{idx+1} hit limit. Waiting 10s...")
+                        await asyncio.sleep(10)
+                        # ቁልፉ ካለቀበት በራሱ ተራውን ጠብቆ በሌላ ቁልፍ እንዲሞክር ያደርጋል
+                        return await self.generate_content(prompt, max_tokens)
 
             except Exception as e:
-                # 🌐 የኔትወርክ ወይም የግንኙነት ስህተት
-                self.logger.warning(f"⚠️ Connection Error Key #{idx + 1}: {str(e)[:50]}. Waiting 7s...")
-                await asyncio.sleep(7) # 🛡️ ስልታዊ የ 7 ሰከንድ እረፍት
-                continue
-
-        # --- 🛡️ FALLBACKS (ሁሉንም የ Groq ቁልፎች ሞክሮ ካልተሳካ) ---
-        self.logger.info("📡 Groq exhausted. Switching to Fallback Providers...")
-
-        if self.keys['deepseek']:
-            try: 
-                return await self._call_api_direct("https://api.deepseek.com/chat/completions", self.keys['deepseek'], "deepseek-chat", prompt, max_tokens)
-            except: pass
-            
-        if self.keys['gemini']:
-            try:
-                url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={self.keys['gemini']}"
-                async with httpx.AsyncClient(timeout=160.0) as client:
-                    resp = await client.post(url, json={"contents": [{"parts": [{"text": prompt}]}]})
-                    return str(resp.json()['candidates'][0]['content']['parts'][0]['text'])
-            except: pass
-
-        return "Error: System Overloaded. All 15 keys and fallbacks failed."
-
-    def _get_system_prompt(self, task_type: str) -> str:
-        prompts = {
-            'production': "You are an Elite Enterprise Content Strategist. Write authoritative, 1500-word sections.",
-            'refinement': "Refine the content to be professional and human-like.",
-            'title_optimization': "Generate 5 SEO-optimized titles.",
-            'quality_audit': "Audit for clarity and depth."
-        }
-        return prompts.get(task_type, prompts['production'])
-
-    async def generate_content(self, prompt: str, max_tokens: int = 4000) -> str:
-        return await self.process_task(prompt, "production", max_tokens)
-
-    def stop_provider(self):
-        """ራነሩ ሲጨርስ AI ጥያቄዎችን እንዲያቆም"""
-        self.is_running = False
-        self.logger.info("🛑 AI Provider stopping...")
+                self.logger.error(f"❌ Error with Key #{idx+1}: {str(e)}")
+                await asyncio.sleep(2)
+                return await self.generate_content(prompt, max_tokens)
 
 # =================== ELITE SMART IMAGE ENGINE (PRODUCTION FIXED) ===================
 
