@@ -1,0 +1,34 @@
+{
+  "production_id": "enterprise_922cd330e521",
+  "topic": "Enterprise AI Implementation Strategies 2026",
+  "target_countries": [
+    "US",
+    "GB",
+    "CA",
+    "AU",
+    "DE",
+    "FR",
+    "JP",
+    "CH",
+    "NO",
+    "SE",
+    "ET"
+  ],
+  "content_type": "enterprise_guide",
+  "enterprise_standards": {
+    "min_words": 3000,
+    "min_quality": 88,
+    "min_cultural_depth": 85,
+    "min_compliance_score": 95,
+    "sequential_processing": true,
+    "intelligent_delays": true,
+    "quality_guarantee": true
+  },
+  "status": "failed",
+  "start_time": "2026-02-09T04:40:37.291780",
+  "performance_monitoring": true,
+  "country_results": [],
+  "overall_metrics": {},
+  "enhancement_reports": {},
+  "error": "EnhancedErrorHandler.safe_execute() got an unexpected keyword argument 'func'"
+}
