@@ -924,15 +924,21 @@ class HumanLikenessEngine:
 # 🤖 UNSTOPPABLE AI PROVIDER (v29.0 - ENTERPRISE MULTI-KEY RELAY)
 # ========================================================================
 
+# =========================================================================
+# 🤖 UNSTOPPABLE AI PROVIDER (v38.0 - THE IRON LOCK)
+# =========================================================================
+
 class UnstoppableAIProvider:
     def __init__(self, config=None):
         self.config = config
-        # 15ቱን ቁልፎች በዝርዝር ይጭናል (ከ .env ፋይል)
+        self.logger = logging.getLogger("IronLockAI")
+        # 🛡️ 15 የግሮቅ ቁልፎችን መጫን
         self.groq_pool = self._load_key_pool('GROQ_API_KEY', 15)
-        self.groq_index = 0  # ግሎባል ጠቋሚ - አይቆምም
-        self.logger = logging.getLogger("AIProvider")
-        # 🛡️ መቆለፊያ - ብዙ ተግባራት በአንድ ጊዜ እንዳይገቡ
-        self._lock = asyncio.Lock()
+        self.groq_idx = 0 
+        # 🛑 የብረት መቆለፊያ (Lock) - በአንድ ጊዜ አንድ ጥሪ ብቻ!
+        self.lock = asyncio.Lock() 
+        self.key_blacklist = {} 
+        self.backups = {'gemini': os.getenv('GEMINI_API_KEY')}
 
     def _load_key_pool(self, base_name, count):
         keys = []
@@ -940,53 +946,57 @@ class UnstoppableAIProvider:
         if main_key: keys.append(main_key)
         for i in range(1, count + 1):
             k = os.getenv(f"{base_name}_{i}")
-            if k: keys.append(k)
+            if k and k not in keys: keys.append(k)
+        while len(keys) < 15 and keys: keys.append(random.choice(keys))
         return keys
 
     async def generate_content(self, prompt: str, max_tokens: int = 4000) -> str:
-        """STRICT SEQUENTIAL RELAY: አንዱ ጥሪ ሲያልቅ ለቀጣዩ አዲስ ቁልፍ ብቻ ያነሳል"""
-        if not self.groq_pool:
-            raise Exception("No Keys Found!")
+        """ይህ ዘዴ በ Lock ምክንያት ቁልፎችን አንድ በአንድ ብቻ ያስራቸዋል"""
+        async with self.lock: # 🛑 ሰልፍ አስያዥ
+            now = time.time()
+            for _ in range(len(self.groq_pool) * 2):
+                idx = self.groq_idx % len(self.groq_pool)
+                api_key = self.groq_pool[idx]
+                self.groq_idx += 1 
 
-        # 🔒 LOCK ACTIVE: አንዱ ሯጭ ሳይጨርስ ሌላኛው ሯጭ አይነሳም
-        async with self._lock:
-            idx = self.groq_index % len(self.groq_pool)
-            api_key = self.groq_pool[idx]
-            
-            # ለሚቀጥለው ጥያቄ አሁኑኑ ተራውን ያዙራል
-            self.groq_index += 1 
+                if idx in self.key_blacklist and now < self.key_blacklist[idx]:
+                    continue
 
-            try:
-                self.logger.info(f"🔄 [RELAY] Key #{idx + 1} is taking the lead at {datetime.now().strftime('%H:%M:%S')}")
-                
-                async with httpx.AsyncClient(timeout=160.0) as client:
-                    resp = await client.post(
-                        "https://api.groq.com/openai/v1/chat/completions",
-                        headers={"Authorization": f"Bearer {api_key}"},
-                        json={
-                            "model": "llama-3.3-70b-versatile",
-                            "messages": [{"role": "user", "content": prompt}],
-                            "max_tokens": max_tokens,
-                            "temperature": 0.7
-                        }
-                    )
-                    
-                    if resp.status_code == 200:
-                        # ✅ ስኬታማ ከሆነ ለ 5 ሰከንድ አርፎ ለቀጣዩ ቁልፍ ያስረክባል
-                        await asyncio.sleep(5) 
-                        return str(resp.json()['choices'][0]['message']['content'])
+                try:
+                    self.logger.info(f"🚀 [KEY-{idx + 1}/15] Safe Call Initiated...")
+                    async with httpx.AsyncClient(timeout=160.0) as client:
+                        resp = await client.post(
+                            "https://api.groq.com/openai/v1/chat/completions",
+                            headers={"Authorization": f"Bearer {api_key}"},
+                            json={"model": "llama-3.3-70b-versatile", "messages": [{"role": "user", "content": prompt}], "max_tokens": max_tokens, "temperature": 0.7}
+                        )
                         
-                    elif resp.status_code == 429:
-                        self.logger.warning(f"⚠️ Key #{idx+1} hit limit. Waiting 10s...")
+                        if resp.status_code == 200:
+                            if idx in self.key_blacklist: del self.key_blacklist[idx]
+                            # 💤 ከስኬት በኋላ ለ 15 ሰከንድ የግዴታ እረፍት (Throttling)
+                            await asyncio.sleep(15) 
+                            return str(resp.json()['choices'][0]['message']['content'])
+                        
+                        if resp.status_code == 429:
+                            self.logger.warning(f"⚠️ Key #{idx + 1} Limit. Waiting 30s before trying next...")
+                            self.key_blacklist[idx] = now + 120
+                            await asyncio.sleep(30) # 🛑 ቀጣዩ ቁልፍ ከመጠራቱ በፊት የ 30 ሰከንድ ብሬክ
+                            continue
+                except:
+                    await asyncio.sleep(10)
+                    continue
+
+            # Fallback to Gemini
+            if self.backups['gemini']:
+                try:
+                    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={self.backups['gemini']}"
+                    async with httpx.AsyncClient(timeout=120.0) as client:
+                        resp = await client.post(url, json={"contents": [{"parts": [{"text": prompt}]}]})
                         await asyncio.sleep(10)
-                        # ቁልፉ ካለቀበት በራሱ ተራውን ጠብቆ በሌላ ቁልፍ እንዲሞክር ያደርጋል
-                        return await self.generate_content(prompt, max_tokens)
-
-            except Exception as e:
-                self.logger.error(f"❌ Error with Key #{idx+1}: {str(e)}")
-                await asyncio.sleep(2)
-                return await self.generate_content(prompt, max_tokens)
-
+                        return str(resp.json()['candidates'][0]['content']['parts'][0]['text'])
+                except: pass
+        return "Error: System Throttled."
+    
 # =================== ELITE SMART IMAGE ENGINE (PRODUCTION FIXED) ===================
 
 class SmartImageEngine:
