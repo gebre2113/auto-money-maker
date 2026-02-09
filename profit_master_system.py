@@ -4917,26 +4917,27 @@ class MegaContentEngine:
         """
 
     async def produce_single_country_sovereign_logic(self, topic: str, country: str) -> str:
-        """የአንድ ሀገር 15,400 ቃላት የሚደርስ የዜና ጽሁፍ ማምረቻ"""
+        """የአንድ ሀገር 15,400 ቃላት የሚደርስ የዜና ጽሁፍ ማምረቻ - በቁልፍ ጥበቃ የታጀበ"""
         self.logger.info(f"📰 Starting Mega Journalist Production for {country}")
         
         # የሀገር መረጃ
         info = globals().get('COUNTRIES', {}).get(country, {'lang': 'English', 'emoji': '🌍'})
         lang = info['lang']
         
-        # 🟢 ደረጃ 0: ወቅታዊ ርዕስ መረጣ
+        # 🟢 ደረጃ 0: ወቅታዊ ርዕስ መረጣ (በመጀመሪያው ቁልፍ)
         topic_q = f"""
         Identify the #1 trending viral sub-niche for '{topic}' in {country} for Feb 2026.
         Focus on immediate business opportunities that are trending RIGHT NOW.
         Reply ONLY with title in {lang}.
         """
         
-        final_topic = await self._call_ai_with_fallback(topic_q, max_tokens=200, phase_idx=0)
+        # 🛡️ እዚህ ጋር AI ጠሪው አዲሱን የቁልፍ መቀያየሪያ (Rotation) ይጠቀማል
+        final_topic = await self.ai_provider.generate_content(topic_q, max_tokens=200)
         final_topic = str(final_topic).strip().replace('"', '').replace("'", "")
         
         self.logger.info(f"🎯 Hot Topic Identified: {final_topic}")
 
-        # የ7 ምዕራፎች ተግባራት - እያንዳንዳቸው 2200 ቃላት
+        # ያንተ ኦሪጅናል 7 ምዕራፎች - 15,400 ቃላት ታርጌት
         tasks = [
             (1, "Master Introduction & 2026 Market Psychology", 2200),
             (2, "Technical Deep-Dive & Global Infrastructure", 2200),
@@ -4950,21 +4951,20 @@ class MegaContentEngine:
         full_content_html = ""
         total_words = 0
         
+        # 🔄 የዙር ሽክርክሪት (Sequential Relay)
         for idx, (phase_num, name, target_words) in enumerate(tasks):
-            self.logger.info(f"⚙️  Producing {name} for {country} (Phase {phase_num}/7)...")
+            self.logger.info(f"⚙️  Executing Step {phase_num}/7 [Next Key Priority] for {country}...")
             
             # የሂሳብ ኮንቴክስት
-            context = str(full_content_html)[-4000:] if full_content_html else ""
+            context = str(full_content_html)[-8000:] if full_content_html else ""
             
             # የኢኮኖሚ መረጃ ማስገባት
             eco_data = self.economic_indicators.get(country, self.economic_indicators['US'])
             
-            # የጥሪ ፕሮምፕት
+            # ያንተ ኦሪጅናል ጥብቅ ፕሮምፕት (Requirements ሳይቀነሱ)
             prompt = f"""
             CONTEXT: {context}
-            
             STRICT TASK: Write the '{name}' section for '{final_topic}' in {country}.
-            
             CRITICAL REQUIREMENTS:
             1. MUST BE EXACTLY {target_words} words (±50 words)
             2. Use {lang} language with local cultural references
@@ -4973,160 +4973,73 @@ class MegaContentEngine:
             5. DO NOT repeat ideas from previous sections
             6. Include at least 3 data tables for this section
             7. Make it URGENT - this is breaking news for {country}
-            
             SECTION SPECIFIC: {name}
             """
             
-            # በ15 ቁልፎች ዑደት ውስጥ ጥሪውን ማከናወን
-            new_part = await self._call_ai_with_fallback(prompt, max_tokens=4000, phase_idx=phase_num)
+            # 🚀 ጥሪው ወደ UnstoppableAIProvider ይሄዳል (15ቱን ቁልፎች በየተራ የሚጠቀምበት)
+            new_part = await self.ai_provider.generate_content(prompt, max_tokens=4000)
             
             # የቃላት ቁጥር ማስላት
             word_count = len(str(new_part).split())
             total_words += word_count
             
-            # ሂፕኖቲክ አውዲዮ ቁልፍ
+            # 🎨 ያንተ ኦሪጅናል ዲዛይኖች (Audio, Table, YouTube)
             audio_btn = self._build_hypnotic_audio_button(name, lang, country, phase_num)
-            
-            # የሰንጠረዥ ማስገባት
             tables_html = await self._generate_section_tables(phase_num, country, lang, final_topic)
             
-            # በ Phase 3 ላይ YouTube ቪዲዮዎችን ማስገባት
             youtube_videos = ""
             if phase_num == 3:
                 youtube_videos = await self._inject_authority_videos(final_topic, country)
             
-            # ሙሉውን ክፍል ማዋሃድ
+            # ሙሉውን ክፍል ማዋሃድ (ያንተ ኦሪጅናል HTML Structure)
             section_html = f"""
             <section id='{country}-phase-{phase_num}' class='hypnotic-section' data-wordcount='{word_count}'>
-                <div class='section-header' style='
-                    margin-bottom: 40px;
-                '>
-                    <div style='
-                        display: flex;
-                        align-items: center;
-                        gap: 20px;
-                        margin-bottom: 20px;
-                    '>
-                        <div style='
-                            background: linear-gradient(135deg, #c5a059 0%, #9e7e38 100%);
-                            color: #0f172a;
-                            width: 60px;
-                            height: 60px;
-                            border-radius: 50%;
-                            display: flex;
-                            align-items: center;
-                            justify-content: center;
-                            font-size: 24px;
-                            font-weight: bold;
-                            box-shadow: 0 10px 20px rgba(197, 160, 89, 0.3);
-                        '>
+                <div class='section-header' style='margin-bottom: 40px;'>
+                    <div style='display: flex; align-items: center; gap: 20px; margin-bottom: 20px;'>
+                        <div style='background: linear-gradient(135deg, #c5a059 0%, #9e7e38 100%); color: #0f172a; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: bold; box-shadow: 0 10px 20px rgba(197, 160, 89, 0.3);'>
                             {phase_num}
                         </div>
-                        <h2 style='
-                            font-family: "Playfair Display", serif;
-                            color: #1a2a44;
-                            font-size: 42px;
-                            margin: 0;
-                            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
-                        '>
-                            {name}
-                        </h2>
+                        <h2 style='font-family: "Playfair Display", serif; color: #1a2a44; font-size: 42px; margin: 0;'>{name}</h2>
                     </div>
-                    
-                    <div style='
-                        display: flex;
-                        gap: 20px;
-                        margin-bottom: 30px;
-                        flex-wrap: wrap;
-                    '>
-                        <span style='
-                            background: rgba(30, 58, 138, 0.1);
-                            color: #1e3a8a;
-                            padding: 8px 20px;
-                            border-radius: 20px;
-                            font-size: 14px;
-                            font-weight: bold;
-                            border: 1px solid rgba(30, 58, 138, 0.3);
-                        '>
-                            🕐 {datetime.now().strftime('%Y-%m-%d %H:%M')}
-                        </span>
-                        <span style='
-                            background: rgba(16, 185, 129, 0.1);
-                            color: #10b981;
-                            padding: 8px 20px;
-                            border-radius: 20px;
-                            font-size: 14px;
-                            font-weight: bold;
-                            border: 1px solid rgba(16, 185, 129, 0.3);
-                        '>
-                            📝 {word_count} Words
-                        </span>
-                        <span style='
-                            background: rgba(197, 160, 89, 0.1);
-                            color: #c5a059;
-                            padding: 8px 20px;
-                            border-radius: 20px;
-                            font-size: 14px;
-                            font-weight: bold;
-                            border: 1px solid rgba(197, 160, 89, 0.3);
-                        '>
-                            🎯 {country} Exclusive
-                        </span>
+                    <div style='display: flex; gap: 20px; margin-bottom: 30px; flex-wrap: wrap;'>
+                        <span style='background: rgba(30, 58, 138, 0.1); color: #1e3a8a; padding: 8px 20px; border-radius: 20px; font-size: 14px; font-weight: bold;'>🕐 {datetime.now().strftime('%H:%M')}</span>
+                        <span style='background: rgba(16, 185, 129, 0.1); color: #10b981; padding: 8px 20px; border-radius: 20px; font-size: 14px; font-weight: bold;'>📝 {word_count} Words</span>
                     </div>
                 </div>
-                
                 {audio_btn}
-                
                 {youtube_videos}
-                
-                <div class='section-content' style='
-                    font-family: "Lora", serif;
-                    font-size: 19px;
-                    line-height: 2.2;
-                    color: #2d3748;
-                    margin: 40px 0;
-                '>
+                <div class='section-content' style='font-family: "Lora", serif; font-size: 19px; line-height: 2.2; color: #2d3748; margin: 40px 0;'>
                     {new_part}
                 </div>
-                
                 {tables_html}
             </section>
             """
             
             full_content_html += section_html
             
-            # API እረፍት
-            self.logger.info(f"⏸️  Pausing 10 seconds for API breathing...")
+            # 💤 --- ወሳኝ እረፍት (API Breathing) ---
+            # በእያንዳንዱ ዙር መካከል 10 ሰከንድ እረፍት ቁልፎቹ እንዲቀዘቅዙ ያደርጋል
+            self.logger.info(f"⏸️  Pausing 10 seconds for key recovery...")
             await asyncio.sleep(10)
         
-        self.logger.info(f"📊 Total Words for {country}: {total_words} (Target: 15,400)")
-        
-        # 🎨 ማሳመሪያዎች
+        # 📊 የመጨረሻ ፖሊሽ እና Affiliate Injection
         if hasattr(self.system, 'sensory_writer'):
             full_content_html = self.system.sensory_writer.transform_to_sensory_content(full_content_html)
         
         if hasattr(self.system, 'neuro_converter'):
             full_content_html = self.system.neuro_converter.apply_neuro_marketing(full_content_html)
-        
-        # 💰 ለ Ultra-Affiliate ማስገቢያ
+            
         predicted_revenue = 0.0
         if hasattr(self.system, 'affiliate_manager'):
-            self.logger.info(f"💰 CALLING ULTRA-AFFILIATE (v13.0): Injecting for {country}")
             try:
                 final_monetized_content, aff_report = await self.system.affiliate_manager.inject_affiliate_links(
-                    content=full_content_html,
-                    topic=final_topic,
-                    user_intent="purchase",
-                    user_journey_stage="decision"
+                    content=full_content_html, topic=final_topic, user_intent="purchase"
                 )
                 full_content_html = final_monetized_content
                 predicted_revenue = aff_report.get('predicted_total_revenue', 0.0)
-                self.revenue_predictions[country] = predicted_revenue
-                self.logger.info(f"💰 Predicted Revenue for {country}: ${predicted_revenue:.2f}")
-            except Exception as e:
-                self.logger.error(f"❌ Affiliate injection failed: {e}")
-        
-        # የመጨረሻ መዋቅር ገንባት
+            exceptException as e: self.logger.error(f"Affiliate error: {e}")
+
+        # የመጨረሻው የ Zenith ዲዛይን
         return self._build_zenith_design(full_content_html, final_topic, country, lang, total_words, predicted_revenue)
 
     def _build_zenith_design(self, content, topic, country, lang, word_count, predicted_revenue):
