@@ -39,11 +39,10 @@ try:
     from jinja2 import Template
     import pandas as pd
     import psutil
+    import pytz
+    from datetime import datetime
 except ImportError as e:
     print(f"⚠️  WARNING: Missing dependency: {e}")
-    import pytz
-from datetime import datetime
-
 def get_active_prime_time_countries():
     """በየሀገሩ ያለውን Standard Time አይቶ 'ወርቃማ' የዜና ሰዓቶችን ይለያል"""
     world_zones = {
