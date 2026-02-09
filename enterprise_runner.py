@@ -3006,9 +3006,17 @@ class DashboardManager:
 # =================== ENTERPRISE PRODUCTION ORCHESTRATOR ===================
 
 class EnterpriseProductionOrchestrator:
-    def __init__(self):
+        def __init__(self):
         self.logger = self._setup_enterprise_logging()
-        self.config = PremiumConfig()
+        
+        # 🛠️ በቀጥታ ኮንፊገሬሽኑን እዚሁ መግለጽ (NameErrorን ይፈታል)
+        self.config = {
+            'min_word_count': 15400,
+            'quality_threshold': 88,
+            'cultural_depth_target': 85,
+            'key_shield_active': True,
+            'sequential_processing': True
+        }
         
         # 1. AI Provider (ይህ የግድ 'ai_provider' መባል አለበት)
         self.ai_provider = UnstoppableAIProvider()
