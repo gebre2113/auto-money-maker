@@ -4337,38 +4337,47 @@ class EnhancedWordCounter:
 class MegaContentEngine:
     """
     የዓለማችን ቁንጮ የይዘት ማምረቻ ሞተር።
-    v37.1 - Optimized Key Management System
+    - 15,000+ Words በምዕራፍ (15,400 ቃላት የሚደርስ)
+    - 7-ቁልፍ ሮቴሽን ከ15 መጠባበቂያ ቁልፎች ጋር
+    - YouTube Authority Integration
+    - Ultra-Affiliate Monetization (v13.0)
+    - Hypnotic Fashion Design
+    - Market Timing Intelligence
     """
     
     def __init__(self, system):
-        # 1. መጀመሪያ ሎገሩን እንገልጻለን
-        self.logger = logging.getLogger("MegaJournalist")
         self.system = system
-        
-        # 2. የ AI አቅራቢውን መለየት
         self.ai = getattr(system, 'failover_system', getattr(system, 'ai_provider', None))
         
-        # 3. የ15 መጠባበቂያ ቁልፎች ስርዓት (በተከታታይ እንዲሰሩ ተደርገው የተገነቡ)
-        self.ai_providers = self._initialize_15_fallback_keys()
-        
-        # 4. የምርት ግቦች
+        # 1. የቃል ግብ
         self.TARGET_WORDS = 15000
         
-        # 5. የሀገር የሰዓት ዞኖች
+        # 2. የ15 መጠባበቂያ ቁልፎች ስርዓት
+        self.ai_providers = self._initialize_15_fallback_keys()
+        
+        # 3. የሀገር የሰዓት ዞኖች
         self.country_timezones = {
-            'US': 'America/New_York', 'GB': 'Europe/London', 'DE': 'Europe/Berlin',
-            'JP': 'Asia/Tokyo', 'AU': 'Australia/Sydney', 'ET': 'Africa/Addis_Ababa',
-            'CA': 'America/Toronto', 'FR': 'Europe/Paris', 'CH': 'Europe/Zurich',
-            'NO': 'Europe/Oslo', 'SE': 'Europe/Stockholm'
+            'US': 'America/New_York',
+            'GB': 'Europe/London',
+            'DE': 'Europe/Berlin',
+            'JP': 'Asia/Tokyo',
+            'AU': 'Australia/Sydney',
+            'ET': 'Africa/Addis_Ababa',
+            'CA': 'America/Toronto',
+            'FR': 'Europe/Paris',
+            'CH': 'Europe/Zurich',
+            'NO': 'Europe/Oslo',
+            'SE': 'Europe/Stockholm'
         }
         
-        # 6. የገበያ ትኩረት ሰዓቶች (ጠዋት ሰዓታት)
-        self.hot_hours = range(2, 13)
+        # 4. የገበያ ትኩረት ሰዓቶች
+        self.hot_hours = range(2, 12)
         
-        # 7. የምርት ሁኔታ እና የገቢ ትንበያ መያዣዎች
+        # 5. የምርት ሁኔታ
         self.production_status = {}
+        self.logger = logging.getLogger("MegaJournalist")
         
-        # 8. የሀገራት ኢኮኖሚ መረጃ (ለFeb 2026 የተመቻቸ)
+        # 6. የሀገራት ኢኮኖሚ መረጃ
         self.economic_indicators = {
             'US': {'inflation': '3.2%', 'gdp_growth': '2.5%', 'reg': 'AI Safety Act 2025'},
             'GB': {'inflation': '4.1%', 'gdp_growth': '1.8%', 'reg': 'Digital Markets Act'},
@@ -4383,104 +4392,71 @@ class MegaContentEngine:
             'SE': {'inflation': '2.6%', 'gdp_growth': '2.0%', 'reg': 'Stockholm Tech Accord'}
         }
         
+        # 7. የገቢ ትንበያ መረጃ
         self.revenue_predictions = {}
-        self.active_memory = ""
-        self.logger.info("✅ MegaContentEngine v37.1 Patched & Initialized Successfully")
 
     def _initialize_15_fallback_keys(self):
-        """15 መጠባበቂያ ቁልፎችን በተለየ ሁኔታ ማስጀመር"""
-        raw_providers = []
+        """15 መጠባበቂያ ቁልፎችን ማስጀመር"""
+        providers = []
         
         if hasattr(self.ai, 'groq_pool'):
-            raw_providers.extend(self.ai.groq_pool)
+            providers.extend(self.ai.groq_pool)
         
         if hasattr(self.system, 'backup_providers'):
-            raw_providers.extend(self.system.backup_providers)
+            providers.extend(self.system.backup_providers)
         
-        if not raw_providers:
-            raw_providers.append(self.ai)
-
-        # ልዩ የሆኑ 15 ቁልፎችን መለየት
-        self.ai_providers = raw_providers[:15]
+        while len(providers) < 15:
+            if providers:
+                providers.append(providers[0])
+            else:
+                providers.append(self.ai)
+                break
         
-        # የቁልፎቹን ጤንነት መከታተያ (የማይሰራ ቁልፍ 'False' ይሆናል)
-        self.provider_status = [True] * len(self.ai_providers)
-        
-        # በአሁኑ ሰዓት በስራ ላይ ያለውን ቁልፍ ጠቋሚ
-        self.current_provider_idx = 0
+        self.logger.info(f"✅ 15 Fallback Keys Initialized: {len(providers)} providers available")
+        return providers
 
-        self.logger.info(f"🛡️ Unique Key Registry: {len(self.ai_providers)} verified keys online.")
-        return self.ai_providers
-
-    async def _call_ai_with_fallback(self, prompt, max_tokens=4000, phase_idx=0):
-        """
-        የተረጋጋ እና ተከታታይ ጠሪ (Throttled Sequential Invoker)
-        ከ Global Lock ጋር - የዜና ሰዓት ሳይነካ ቁልፎችን በአንድ ጊዜ ከመጨናነቅ ይከላከላል።
-        """
-        # 🛡️ መቆለፊያውን ማረጋገጥ (ይህ ለሁሉም ሀገራት አንድ መቆለፊያ ነው)
-        if not hasattr(self, '_global_key_lock'):
-            self._global_key_lock = asyncio.Lock()
-
-        # 🔒 LOCK ACTIVE: አንዱ ሀገር (ለምሳሌ GB) ቁልፍ ይዞ ሳይጨርስ ሌላው (ለምሳሌ US) አይገባም
-        # ይህ የዜና ሰዓትን አይቀይርም፣ ይልቁንም በሰልፍ (Queue) ያስይዛቸዋል
-        async with self._global_key_lock:
-            num_providers = len(self.ai_providers)
-            
-            for attempt in range(num_providers):
-                idx = (self.current_provider_idx + attempt) % num_providers
-                
-                if not self.provider_status[idx]:
-                    continue
-                    
-                provider = self.ai_providers[idx]
-                
-                try:
-                    # 🕒 ትክክለኛው ሰዓት በሎግ ላይ
-                    current_time = datetime.now().strftime('%H:%M:%S')
-                    self.logger.info(f"🚀 [KEY LOCK] Attempting Key #{idx + 1} | Time: {current_time}")
-                    
-                    if hasattr(provider, 'generate_content'):
-                        # AIው መልስ እስኪሰጥ 'await' ተደርጎ ይቆያል
-                        result = await provider.generate_content(prompt, max_tokens=max_tokens)
-                        
-                        if result:
-                            self.current_provider_idx = (idx + 1) % num_providers
-                            self.logger.info(f"✅ Key #{idx + 1} Succeeded!")
-                            
-                            # ⏳ ከስኬት በኋላ ለ 3 ሰከንድ Cooldown (ቁልፎቹ እንዲያገግሙ)
-                            await asyncio.sleep(3) 
-                            return result
-                            
-                except Exception as e:
-                    error_msg = str(e).lower()
-                    self.logger.warning(f"⚠️ Key #{idx + 1} failed: {error_msg[:50]}")
-                    
-                    # 🛑 'Rate limit' ከሆነ ቁልፉን ለ 2 ሰከንድ አሰናክለው
-                    if "rate_limit" in error_msg or "429" in error_msg:
-                        self.provider_status[idx] = False
-                    
-                    # ⏳ ቀጣዩን ቁልፍ ከመጥራታችን በፊት 2 ሰከንድ እረፍት
-                    await asyncio.sleep(2)
-                    continue 
-
-            # ሁሉም ካልሰሩ ወደ ቀጣዩ ሀገር ከመሄዱ በፊት ረዘም ያለ እረፍት
-            self.logger.error("🚨 All 15 keys failed. Entering emergency cooling...")
-            await asyncio.sleep(10)
-            raise Exception("🚨 CRITICAL: 15/15 Keys Exhausted.")
-            
     def _is_hot_country_time(self, country):
         """ሀገሩ በገበያ ትኩረት ሰዓት ላይ መሆኑን ማረጋገጥ"""
         if country not in self.country_timezones:
             return False
+        
         try:
             country_tz = pytz.timezone(self.country_timezones[country])
             country_time = datetime.now(country_tz)
-            is_hot_time = country_time.hour in self.hot_hours
-            self.logger.info(f"⏰ {country} Time: {country_time.strftime('%I:%M %p')} | Hot: {is_hot_time}")
+            current_hour = country_time.hour
+            
+            is_hot_time = current_hour in self.hot_hours
+            
+            self.logger.info(f"⏰ {country} Time: {country_time.strftime('%I:%M %p')} | "
+                           f"Hot Time: {is_hot_time} | Current Hour: {current_hour}")
+            
             return is_hot_time
+            
         except Exception as e:
             self.logger.error(f"Error checking time for {country}: {e}")
             return False
+
+    async def _call_ai_with_fallback(self, prompt, max_tokens=4000, phase_idx=0):
+        """15 ቁልፎችን በመጠቀም ጥሪውን ማከናወን"""
+        providers_count = len(self.ai_providers)
+        
+        for i in range(providers_count):
+            provider_idx = (phase_idx + i) % providers_count
+            provider = self.ai_providers[provider_idx]
+            
+            try:
+                self.logger.info(f"🔄 Using Provider {provider_idx+1}/{providers_count} for Phase {phase_idx+1}")
+                
+                if hasattr(provider, 'generate_content'):
+                    result = await provider.generate_content(prompt, max_tokens=max_tokens)
+                    self.logger.info(f"✅ Provider {provider_idx+1} succeeded")
+                    return result
+                    
+            except Exception as e:
+                self.logger.warning(f"⚠️ Provider {provider_idx+1} failed: {str(e)[:100]}")
+                continue
+        
+        raise Exception("All 15 fallback keys failed")
 
     async def _inject_authority_videos(self, topic: str, country: str):
         """የዩቲዩብ ቪዲዮዎችን አድኖ በውብ ዲዛይን ያዘጋጃል"""
@@ -4917,27 +4893,26 @@ class MegaContentEngine:
         """
 
     async def produce_single_country_sovereign_logic(self, topic: str, country: str) -> str:
-        """የአንድ ሀገር 15,400 ቃላት የሚደርስ የዜና ጽሁፍ ማምረቻ - በቁልፍ ጥበቃ የታጀበ"""
+        """የአንድ ሀገር 15,400 ቃላት የሚደርስ የዜና ጽሁፍ ማምረቻ"""
         self.logger.info(f"📰 Starting Mega Journalist Production for {country}")
         
         # የሀገር መረጃ
         info = globals().get('COUNTRIES', {}).get(country, {'lang': 'English', 'emoji': '🌍'})
         lang = info['lang']
         
-        # 🟢 ደረጃ 0: ወቅታዊ ርዕስ መረጣ (በመጀመሪያው ቁልፍ)
+        # 🟢 ደረጃ 0: ወቅታዊ ርዕስ መረጣ
         topic_q = f"""
         Identify the #1 trending viral sub-niche for '{topic}' in {country} for Feb 2026.
         Focus on immediate business opportunities that are trending RIGHT NOW.
         Reply ONLY with title in {lang}.
         """
         
-        # 🛡️ እዚህ ጋር AI ጠሪው አዲሱን የቁልፍ መቀያየሪያ (Rotation) ይጠቀማል
-        final_topic = await self.ai_provider.generate_content(topic_q, max_tokens=200)
+        final_topic = await self._call_ai_with_fallback(topic_q, max_tokens=200, phase_idx=0)
         final_topic = str(final_topic).strip().replace('"', '').replace("'", "")
         
         self.logger.info(f"🎯 Hot Topic Identified: {final_topic}")
 
-        # ያንተ ኦሪጅናል 7 ምዕራፎች - 15,400 ቃላት ታርጌት
+        # የ7 ምዕራፎች ተግባራት - እያንዳንዳቸው 2200 ቃላት
         tasks = [
             (1, "Master Introduction & 2026 Market Psychology", 2200),
             (2, "Technical Deep-Dive & Global Infrastructure", 2200),
@@ -4951,20 +4926,21 @@ class MegaContentEngine:
         full_content_html = ""
         total_words = 0
         
-        # 🔄 የዙር ሽክርክሪት (Sequential Relay)
         for idx, (phase_num, name, target_words) in enumerate(tasks):
-            self.logger.info(f"⚙️  Executing Step {phase_num}/7 [Next Key Priority] for {country}...")
+            self.logger.info(f"⚙️  Producing {name} for {country} (Phase {phase_num}/7)...")
             
             # የሂሳብ ኮንቴክስት
-            context = str(full_content_html)[-8000:] if full_content_html else ""
+            context = str(full_content_html)[-4000:] if full_content_html else ""
             
             # የኢኮኖሚ መረጃ ማስገባት
             eco_data = self.economic_indicators.get(country, self.economic_indicators['US'])
             
-            # ያንተ ኦሪጅናል ጥብቅ ፕሮምፕት (Requirements ሳይቀነሱ)
+            # የጥሪ ፕሮምፕት
             prompt = f"""
             CONTEXT: {context}
+            
             STRICT TASK: Write the '{name}' section for '{final_topic}' in {country}.
+            
             CRITICAL REQUIREMENTS:
             1. MUST BE EXACTLY {target_words} words (±50 words)
             2. Use {lang} language with local cultural references
@@ -4973,73 +4949,160 @@ class MegaContentEngine:
             5. DO NOT repeat ideas from previous sections
             6. Include at least 3 data tables for this section
             7. Make it URGENT - this is breaking news for {country}
+            
             SECTION SPECIFIC: {name}
             """
             
-            # 🚀 ጥሪው ወደ UnstoppableAIProvider ይሄዳል (15ቱን ቁልፎች በየተራ የሚጠቀምበት)
-            new_part = await self.ai_provider.generate_content(prompt, max_tokens=4000)
+            # በ15 ቁልፎች ዑደት ውስጥ ጥሪውን ማከናወን
+            new_part = await self._call_ai_with_fallback(prompt, max_tokens=4000, phase_idx=phase_num)
             
             # የቃላት ቁጥር ማስላት
             word_count = len(str(new_part).split())
             total_words += word_count
             
-            # 🎨 ያንተ ኦሪጅናል ዲዛይኖች (Audio, Table, YouTube)
+            # ሂፕኖቲክ አውዲዮ ቁልፍ
             audio_btn = self._build_hypnotic_audio_button(name, lang, country, phase_num)
+            
+            # የሰንጠረዥ ማስገባት
             tables_html = await self._generate_section_tables(phase_num, country, lang, final_topic)
             
+            # በ Phase 3 ላይ YouTube ቪዲዮዎችን ማስገባት
             youtube_videos = ""
             if phase_num == 3:
                 youtube_videos = await self._inject_authority_videos(final_topic, country)
             
-            # ሙሉውን ክፍል ማዋሃድ (ያንተ ኦሪጅናል HTML Structure)
+            # ሙሉውን ክፍል ማዋሃድ
             section_html = f"""
             <section id='{country}-phase-{phase_num}' class='hypnotic-section' data-wordcount='{word_count}'>
-                <div class='section-header' style='margin-bottom: 40px;'>
-                    <div style='display: flex; align-items: center; gap: 20px; margin-bottom: 20px;'>
-                        <div style='background: linear-gradient(135deg, #c5a059 0%, #9e7e38 100%); color: #0f172a; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: bold; box-shadow: 0 10px 20px rgba(197, 160, 89, 0.3);'>
+                <div class='section-header' style='
+                    margin-bottom: 40px;
+                '>
+                    <div style='
+                        display: flex;
+                        align-items: center;
+                        gap: 20px;
+                        margin-bottom: 20px;
+                    '>
+                        <div style='
+                            background: linear-gradient(135deg, #c5a059 0%, #9e7e38 100%);
+                            color: #0f172a;
+                            width: 60px;
+                            height: 60px;
+                            border-radius: 50%;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            font-size: 24px;
+                            font-weight: bold;
+                            box-shadow: 0 10px 20px rgba(197, 160, 89, 0.3);
+                        '>
                             {phase_num}
                         </div>
-                        <h2 style='font-family: "Playfair Display", serif; color: #1a2a44; font-size: 42px; margin: 0;'>{name}</h2>
+                        <h2 style='
+                            font-family: "Playfair Display", serif;
+                            color: #1a2a44;
+                            font-size: 42px;
+                            margin: 0;
+                            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+                        '>
+                            {name}
+                        </h2>
                     </div>
-                    <div style='display: flex; gap: 20px; margin-bottom: 30px; flex-wrap: wrap;'>
-                        <span style='background: rgba(30, 58, 138, 0.1); color: #1e3a8a; padding: 8px 20px; border-radius: 20px; font-size: 14px; font-weight: bold;'>🕐 {datetime.now().strftime('%H:%M')}</span>
-                        <span style='background: rgba(16, 185, 129, 0.1); color: #10b981; padding: 8px 20px; border-radius: 20px; font-size: 14px; font-weight: bold;'>📝 {word_count} Words</span>
+                    
+                    <div style='
+                        display: flex;
+                        gap: 20px;
+                        margin-bottom: 30px;
+                        flex-wrap: wrap;
+                    '>
+                        <span style='
+                            background: rgba(30, 58, 138, 0.1);
+                            color: #1e3a8a;
+                            padding: 8px 20px;
+                            border-radius: 20px;
+                            font-size: 14px;
+                            font-weight: bold;
+                            border: 1px solid rgba(30, 58, 138, 0.3);
+                        '>
+                            🕐 {datetime.now().strftime('%Y-%m-%d %H:%M')}
+                        </span>
+                        <span style='
+                            background: rgba(16, 185, 129, 0.1);
+                            color: #10b981;
+                            padding: 8px 20px;
+                            border-radius: 20px;
+                            font-size: 14px;
+                            font-weight: bold;
+                            border: 1px solid rgba(16, 185, 129, 0.3);
+                        '>
+                            📝 {word_count} Words
+                        </span>
+                        <span style='
+                            background: rgba(197, 160, 89, 0.1);
+                            color: #c5a059;
+                            padding: 8px 20px;
+                            border-radius: 20px;
+                            font-size: 14px;
+                            font-weight: bold;
+                            border: 1px solid rgba(197, 160, 89, 0.3);
+                        '>
+                            🎯 {country} Exclusive
+                        </span>
                     </div>
                 </div>
+                
                 {audio_btn}
+                
                 {youtube_videos}
-                <div class='section-content' style='font-family: "Lora", serif; font-size: 19px; line-height: 2.2; color: #2d3748; margin: 40px 0;'>
+                
+                <div class='section-content' style='
+                    font-family: "Lora", serif;
+                    font-size: 19px;
+                    line-height: 2.2;
+                    color: #2d3748;
+                    margin: 40px 0;
+                '>
                     {new_part}
                 </div>
+                
                 {tables_html}
             </section>
             """
             
             full_content_html += section_html
             
-            # 💤 --- ወሳኝ እረፍት (API Breathing) ---
-            # በእያንዳንዱ ዙር መካከል 10 ሰከንድ እረፍት ቁልፎቹ እንዲቀዘቅዙ ያደርጋል
-            self.logger.info(f"⏸️  Pausing 10 seconds for key recovery...")
+            # API እረፍት
+            self.logger.info(f"⏸️  Pausing 10 seconds for API breathing...")
             await asyncio.sleep(10)
         
-        # 📊 የመጨረሻ ፖሊሽ እና Affiliate Injection
+        self.logger.info(f"📊 Total Words for {country}: {total_words} (Target: 15,400)")
+        
+        # 🎨 ማሳመሪያዎች
         if hasattr(self.system, 'sensory_writer'):
             full_content_html = self.system.sensory_writer.transform_to_sensory_content(full_content_html)
         
         if hasattr(self.system, 'neuro_converter'):
             full_content_html = self.system.neuro_converter.apply_neuro_marketing(full_content_html)
-            
+        
+        # 💰 ለ Ultra-Affiliate ማስገቢያ
         predicted_revenue = 0.0
         if hasattr(self.system, 'affiliate_manager'):
+            self.logger.info(f"💰 CALLING ULTRA-AFFILIATE (v13.0): Injecting for {country}")
             try:
                 final_monetized_content, aff_report = await self.system.affiliate_manager.inject_affiliate_links(
-                    content=full_content_html, topic=final_topic, user_intent="purchase"
+                    content=full_content_html,
+                    topic=final_topic,
+                    user_intent="purchase",
+                    user_journey_stage="decision"
                 )
                 full_content_html = final_monetized_content
                 predicted_revenue = aff_report.get('predicted_total_revenue', 0.0)
-            exceptException as e: self.logger.error(f"Affiliate error: {e}")
-
-        # የመጨረሻው የ Zenith ዲዛይን
+                self.revenue_predictions[country] = predicted_revenue
+                self.logger.info(f"💰 Predicted Revenue for {country}: ${predicted_revenue:.2f}")
+            except Exception as e:
+                self.logger.error(f"❌ Affiliate injection failed: {e}")
+        
+        # የመጨረሻ መዋቅር ገንባት
         return self._build_zenith_design(full_content_html, final_topic, country, lang, total_words, predicted_revenue)
 
     def _build_zenith_design(self, content, topic, country, lang, word_count, predicted_revenue):
@@ -5577,6 +5640,7 @@ class MegaContentEngine:
             else:
                 self.logger.info("😴 No countries in hot time - Sleeping for 1 second...")
                 await asyncio.sleep(1)
+                            
 # =========================================================================
 # END OF OMNIPOTENT ORACLE v26.0
 # =========================================================================
