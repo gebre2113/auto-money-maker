@@ -3005,59 +3005,95 @@ class DashboardManager:
 
 # =================== ENTERPRISE PRODUCTION ORCHESTRATOR ===================
 
+class PremiumConfig:
+    """Enterprise Level Configuration Settings for TITAN v22.0"""
+    def __init__(self):
+        self.min_word_count = 15400
+        self.quality_threshold = 88
+        self.cultural_depth_target = 85
+        self.ai_detection_threshold = 0.05  # 95% Human-like
+        self.seo_boost_enabled = True
+        self.market_expansion = True
+        self.key_shield_active = True
+        self.sequential_processing = True
+
 class EnterpriseProductionOrchestrator:
-        def __init__(self):
+    """Complete Enterprise Orchestrator with ALL Enhancements"""
+    
+    def __init__(self):
+        # 1. ሎጊንግ እና ኮንፊገሬሽን (Config መጀመሪያ መነሳት አለበት)
         self.logger = self._setup_enterprise_logging()
+        self.config = PremiumConfig()  # ✅ አሁን ስሙ ተለይቷል (No NameError)
         
-        # 🛠️ በቀጥታ ኮንፊገሬሽኑን እዚሁ መግለጽ (NameErrorን ይፈታል)
-        self.config = {
-            'min_word_count': 15400,
-            'quality_threshold': 88,
-            'cultural_depth_target': 85,
-            'key_shield_active': True,
-            'sequential_processing': True
-        }
+        # 2. ሲስተሞችን ማስገባት
+        self.importer = EnterpriseImportSystem()
+        self.importer.import_enterprise_system()
         
-        # 1. AI Provider (ይህ የግድ 'ai_provider' መባል አለበት)
+        # 3. 🛡️ AI Provider (15 ቁልፎችን የሚይዘው)
         self.ai_provider = UnstoppableAIProvider()
         
-        # 2. የጥበብ ሞተሮች
-        self.sensory_writer = SensoryWritingEngine()
-        self.neuro_converter = NeuroConversionEngine()
-        self.image_engine = SmartImageEngine()
-        self.cta_engine = DynamicCTAEngine()
+        # 4. 📰 Content System (ስሙ 'content_system' መሆኑ ተረጋግጧል)
+        self.content_system = MegaContentEngine(self) 
         
-        # 3. የይዘት ማምረቻ (ለራነሩ 'content_system' ተብሎ ተሰይሟል)
-        self.content_system = MegaContentEngine(self)
-        self.mega_engine = self.content_system # ለሁለቱም ስም እንዲሰራ
+        # 5. ሁሉንም ሰብስቲሞች ማስነሳት
+        self._initialize_all_components()
         
-        # 4. ሌሎች አስፈላጊ ክፍሎች
-        self.cultural_guardian = CulturalDepthGuardian()
-        self.revenue_engine = RevenueForecastEngine()
-        self.compliance_guardian = EthicalComplianceGuardian()
-        self.social_manager = SocialMediaManager()
-        self.dashboard_manager = DashboardManager()
-        self.error_handler = ComprehensiveErrorHandler()
+        self.enterprise_standards = {
+            'min_words': self.config.min_word_count,
+            'min_quality': self.config.quality_threshold,
+            'sequential_processing': self.config.sequential_processing,
+            'intelligent_delays': True,
+            'quality_guarantee': True
+        }
+        
         self.performance_monitor = PerformanceMonitor()
         self.memory_manager = MemoryManager()
-
-        # የሞጁሎችን ትክክለኛነት ማረጋገጫ
+        
+        # ማሳወቂያዎች
+        self._print_startup_banner()
+        
+        # 6. ✅ ፍተሻ (Module Integrity Check)
         self._verify_module_integrity()
-        self.logger.info("✅ Enterprise Orchestrator: All modules synced and initialized.")
+
+    def _initialize_all_components(self):
+        """ሁሉንም ሰብስቲሞች በትክክል ስም ሰጥቶ ማስነሳት"""
+        try:
+            self.economic_indicators = EconomicDataVault()
+            self.social_manager = SocialMediaManager()
+            self.dashboard = DashboardManager()
+            self.affiliate_manager = AffiliateManager()
+            self.sensory_writer = SensoryWriter()
+            self.neuro_converter = NeuroMarketingConverter()
+            
+            # content_system መኖሩን በድጋሚ ማረጋገጥ
+            if not hasattr(self, 'content_system'):
+                self.content_system = MegaContentEngine(self)
+                
+            self.logger.info("✅ All core modules assigned to orchestrator.")
+        except Exception as e:
+            self.logger.error(f"❌ Initialization Error: {e}")
+            raise
 
     def _verify_module_integrity(self):
-        """ራነሩ የሚፈልጋቸው ስሞች መኖራቸውን ያረጋግጣል"""
-        required = ['ai_provider', 'content_system', 'sensory_writer', 'neuro_converter']
-        for module in required:
-            if not hasattr(self, module):
+        """የሞጁሎችን ዝግጁነት ማረጋገጫ"""
+        required_modules = [
+            'ai_provider', 
+            'content_system', 
+            'economic_indicators', 
+            'affiliate_manager'
+        ]
+        for module in required_modules:
+            if not hasattr(self, module) or getattr(self, module) is None:
                 raise Exception(f"Required module {module} not initialized.")
+        self.logger.info("🛡️ Module integrity verified. System is bulletproof.")
 
-    def _setup_enterprise_logging(self):
-        log_dir = Path('enterprise_logs')
-        log_dir.mkdir(exist_ok=True)
-        logger = logging.getLogger('enterprise_orchestrator')
-        logger.setLevel(logging.INFO)
-        return logger
+    def _print_startup_banner(self):
+        self.logger.info("="*80)
+        self.logger.info("🏢 ENTERPRISE PRODUCTION ORCHESTRATOR v8.2 INITIALIZED")
+        self.logger.info(f"💎 TARGET: {self.config.min_word_count} WORDS | QUALITY: {self.config.quality_threshold}%")
+        self.logger.info("🛡️ KEY-SHIELD: 15 GROQ KEYS ROTATING SEQUENTIALLY")
+        self.logger.info("🌍 10+ HIGH-VALUE MARKETS READY")
+        self.logger.info("="*80)
 
     # እዚህ ጋር የተቀሩት የ run_production_with_monitoring እና ሌሎች ሜተዶች ይቀጥላሉ...
         class EnterpriseFormatter(logging.Formatter):
