@@ -1011,7 +1011,7 @@ class HumanLikenessEngine:
 
 class UnstoppableAIProvider:
     def __init__(self):
-        # 15ቱን የGroq ቁልፎች ይጭናል
+        # 15ቱን የGroq ቁalፎች እና ሌሎችን መጫን
         self.keys = self._load_key_pool('GROQ_API_KEY', 15)
         self.indices = {'groq': 0}
         self.gemini_key = os.getenv('GEMINI_API_KEY')
@@ -1028,18 +1028,14 @@ class UnstoppableAIProvider:
         return keys
 
     async def generate_content(self, prompt: str, max_tokens: int = 4000) -> str:
-        """በየጥሪው ቁልፍ እየቀያየረ (Round-Robin) ይሰራል"""
         if self.keys:
-            # ያሉትን 15 ቁልፎች በየተራ ለመሞከር
             for _ in range(len(self.keys)):
                 idx = self.indices['groq'] % len(self.keys)
                 key = self.keys[idx]
-                
-                # ለቀጣዩ ጥሪ ኢንዴክሱን ወዲያውኑ እንጨምራለን
                 self.indices['groq'] += 1 
 
                 try:
-                    logger.info(f"🚀 [KEY LOCK] Using Key #{idx + 1} for this phase...")
+                    logger.info(f"🚀 [KEY LOCK] Using Key #{idx + 1}...")
                     async with httpx.AsyncClient(timeout=160.0) as client:
                         resp = await client.post(
                             "https://api.groq.com/openai/v1/chat/completions",
@@ -1047,52 +1043,26 @@ class UnstoppableAIProvider:
                             json={
                                 "model": "llama-3.3-70b-versatile", 
                                 "messages": [{"role": "user", "content": prompt}], 
-                                "max_tokens": max_tokens,
-                                "temperature": 0.7
+                                "max_tokens": max_tokens, "temperature": 0.7
                             }
                         )
-                        
                         if resp.status_code == 200:
                             return str(resp.json()['choices'][0]['message']['content'])
-                        
                         if resp.status_code == 429:
-                            logger.warning(f"⚠️ Key #{idx + 1} hit Rate Limit. Sleeping 10s to clear gateway...")
-                            await asyncio.sleep(10) # ሪሚት ሲመታ 10 ሰከንድ እረፍት
-                            continue # ወደ ቀጣዩ ቁልፍ ይዘልላል
-                            
-                except Exception as e:
-                    logger.error(f"❌ Key #{idx + 1} error: {str(e)[:50]}")
-                    await asyncio.sleep(2)
-                    continue
+                            logger.warning(f"⚠️ Key #{idx + 1} hit limit. Waiting 10s...")
+                            await asyncio.sleep(10)
+                            continue
+                except: continue
 
-        # 🏰 FALLBACKS (ግሮክ ካለቀ)
-        if self.deepseek_key:
-            try:
-                logger.info("🏰 DeepSeek Fallback Activated...")
-                return await self._call_deepseek(prompt, max_tokens)
-            except: pass
-            
+        # Fallbacks
         if self.gemini_key:
             try:
-                logger.info("🌟 Gemini Fallback Activated...")
-                return await self._call_gemini(prompt, max_tokens)
+                url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={self.gemini_key}"
+                async with httpx.AsyncClient(timeout=120.0) as client:
+                    resp = await client.post(url, json={"contents": [{"parts": [{"text": prompt}]}]})
+                    return str(resp.json()['candidates'][0]['content']['parts'][0]['text'])
             except: pass
-        
-        return "Error: All 15 Keys and Backups Exhausted."
-
-    async def _call_deepseek(self, prompt, max_tokens):
-        async with httpx.AsyncClient(timeout=120.0) as client:
-            resp = await client.post("https://api.deepseek.com/v1/chat/completions",
-                headers={"Authorization": f"Bearer {self.deepseek_key}"},
-                json={"model": "deepseek-chat", "messages": [{"role": "user", "content": prompt}], "max_tokens": max_tokens})
-            return str(resp.json()['choices'][0]['message']['content'])
-
-    async def _call_gemini(self, prompt, max_tokens):
-        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={self.gemini_key}"
-        async with httpx.AsyncClient(timeout=120.0) as client:
-            resp = await client.post(url, json={"contents": [{"parts": [{"text": prompt}]}]})
-            return str(resp.json()['candidates'][0]['content']['parts'][0]['text'])
-    
+        return "Error: All AI Systems Exhausted."
 # =================== ELITE SMART IMAGE ENGINE (PRODUCTION FIXED) ===================
 
 class SmartImageEngine:
