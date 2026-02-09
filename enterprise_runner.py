@@ -3141,13 +3141,12 @@ class EnterpriseProductionOrchestrator:
         }
         
         try:
-            # 🛑 ወሳኝ ማስተካከያ፡ ፈንክሽኑን (self.run_enterprise_production) ያለ ቅንፍ ነው የምንልከው
-            # ግብዓቶቹን (topic, markets, content_type) ደግሞ ለብቻቸው እንሰጠዋለን
+            # 🛑 ወሳኝ ማስተካከያ፡ ፈንክሽኑን ያለ ቅንፍ እና ግብዓቶቹን ለብቻ እንልካለን
             result = await EnhancedErrorHandler.safe_execute(
-                self.run_enterprise_production, # ✅ ፈንክሽኑን ብቻ (ያለ ቅንፍ)
-                topic,                          # arg 1
-                markets,                        # arg 2
-                content_type,                   # arg 3
+                self.run_enterprise_production, 
+                topic,                          
+                markets,                        
+                content_type,                   
                 fallback_value={'status': 'failed', 'country_results': [], 'error': 'Production failed'},
                 max_retries=2,
                 retry_delay=5.0,
@@ -3164,6 +3163,7 @@ class EnterpriseProductionOrchestrator:
             production_results['performance_report'] = performance_report
             production_results['system_status'] = self.memory_manager.get_system_status()
 
+            # 🛠️ የደህንነት ማረጋገጫ እና ባክአፕ ስራ
             for country_result in result.get('country_results', []):
                 if country_result.get('content'):
                     safety_check = ProductionSafetyFeatures.validate_content_safety(
@@ -3180,9 +3180,15 @@ class EnterpriseProductionOrchestrator:
                             'word_count': len(country_result['content'].split())
                         }
                     )
-                    
-                 self.logger.info(f"💾 Safety backup created: {backup_file} ({safety_check['safety_score']}% safety score)")
+                    # ✅ ስህተቱ እዚህ ጋር ታርሟል (try ተወግዷል)
+                    self.logger.info(f"💾 Safety backup created: {backup_file} ({safety_check['safety_score']}% safety score)")
             
+            return production_results
+
+        except Exception as e:
+            self.logger.error(f"❌ Critical error in sovereign execution: {str(e)}")
+            production_results['status'] = 'failed'
+            production_results['error'] = str(e)
             return production_results
             
         except Exception as e:
