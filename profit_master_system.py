@@ -4300,38 +4300,49 @@ class MegaContentEngine:
 
     async def _call_ai_with_fallback(self, prompt, max_tokens=4000, phase_idx=0):
         """
-        ብቸኛ ተከታታይ ጠሪ (Sequential Invoker)።
-        አንዱ ቁልፍ ምላሽ ሳይሰጥ ሌላኛው እንዳይጠራ በማድረግ ድግግሞሽን ያስቀራል።
+        የተረጋጋ እና ተከታታይ ጠሪ (Throttled Sequential Invoker)
         """
         num_providers = len(self.ai_providers)
         
         for attempt in range(num_providers):
-            # በቅደም ተከተል ለመሄድ ጠቋሚውን እንጠቀማለን
             idx = (self.current_provider_idx + attempt) % num_providers
             
+            # ቁልፉ ቀደም ብሎ ከከሸፈ ዝለለው
             if not self.provider_status[idx]:
                 continue
                 
             provider = self.ai_providers[idx]
             
             try:
-                self.logger.info(f"🎯 Attempting Key #{idx + 1}/{num_providers} (Phase {phase_idx + 1})")
+                # 📢 በሎጉ ላይ ግልጽ እንዲሆን ሰዓቱን እና ሙከራውን እናሳያለን
+                self.logger.info(f"🚀 Attempting Key #{idx + 1} | Time: {datetime.now().strftime('%H:%M:%S')}")
                 
                 if hasattr(provider, 'generate_content'):
-                    # የአንዱ ስራ ሳይጠናቀቅ ሌላው አይገባም (await)
+                    # 🛡️ ወሳኝ፦ ጥሪው እስኪመለስ በ 'await' እንጠብቃለን
                     result = await provider.generate_content(prompt, max_tokens=max_tokens)
                     
-                    # ስኬታማ ከሆነ ጠቋሚውን ለቀጣዩ ዙር እናዙረው
-                    self.current_provider_idx = (idx + 1) % num_providers
-                    self.logger.info(f"✅ Key #{idx + 1} succeeded.")
-                    return result
-                    
+                    if result:
+                        self.current_provider_idx = (idx + 1) % num_providers
+                        self.logger.info(f"✅ Key #{idx + 1} Succeeded!")
+                        return result
+                        
             except Exception as e:
-                self.logger.warning(f"🚫 Key #{idx + 1} Failed. Blacklisting... Error: {str(e)[:50]}")
-                self.provider_status[idx] = False # ቁልፉን ማሰናከል
+                error_msg = str(e).lower()
+                self.logger.warning(f"⚠️ Key #{idx + 1} failed: {error_msg[:100]}")
+                
+                # 🛑 'Rate limit' ከሆነ ቁልፉን ለተወሰነ ጊዜ አሰናክለው
+                if "rate_limit" in error_msg or "429" in error_msg:
+                    self.provider_status[idx] = False
+                
+                # ⏳ ቀጣዩን ቁልፍ ከመጥራታችን በፊት ሲስተሙን ትንሽ እናሳርፈው (2 ሰከንድ)
+                # ይህ 'Race Condition'ን ይከላከላል
+                await asyncio.sleep(2)
                 continue 
-        
-        raise Exception("🚨 CRITICAL: All 15 fallback keys have been exhausted!")
+
+        # ሁሉም ካልሰሩ ወደ ቀጣዩ ሀገር ከመሄዱ በፊት ረዘም ያለ እረፍት
+        self.logger.error("🚨 All keys failed. Entering emergency cooling...")
+        await asyncio.sleep(10)
+        raise Exception("🚨 CRITICAL: 15/15 Keys Exhausted.")
 
     def _is_hot_country_time(self, country):
         """ሀገሩ በገበያ ትኩረት ሰዓት ላይ መሆኑን ማረጋገጥ"""
