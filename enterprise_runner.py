@@ -3122,51 +3122,22 @@ class EnterpriseProductionOrchestrator:
                 self._create_fallback_module(module)
     
     def _create_fallback_module(self, module_name):
-        """ጎደለ ሞጁል ለመጠባበቅ መሠረታዊ ሞጁል ፍጠር"""
-        if module_name == 'human_engine':
-            self.human_engine = HumanLikenessEngine()
-        elif module_name == 'image_engine':
-            self.image_engine = SmartImageEngine()
-        elif module_name == 'cta_engine':
-            self.cta_engine = DynamicCTAEngine()
-        elif module_name == 'cultural_guardian':
-            self.cultural_guardian = CulturalDepthGuardian()
-        elif module_name == 'revenue_engine':
-            self.revenue_engine = RevenueForecastEngine()
-        elif module_name == 'compliance_guardian':
-            self.compliance_guardian = EthicalComplianceGuardian()
-        elif module_name == 'ai_cultural_enricher':
-            self.ai_cultural_enricher = AICulturalEnricher(api_key=None)
-        elif module_name == 'ai_quality_auditor':
-            self.ai_quality_auditor = AIQualityAuditor(api_key=None)
-        elif module_name == 'ai_title_optimizer':
-            self.ai_title_optimizer = AITitleOptimizer(api_key=None)
-        elif module_name == 'youtube_hunter':
-            # Create basic mock
-            class BasicYouTubeHunter:
-                async def find_relevant_videos(self, topic, country, max_results=5):
-                    await asyncio.sleep(1.0)
-                    return []
-            self.youtube_hunter = BasicYouTubeHunter()
-        elif module_name == 'affiliate_manager':
-            # Create basic mock
-            class BasicAffiliateManager:
-                async def get_best_product(self, topic, country):
-                    await asyncio.sleep(0.5)
-                    return None
-            self.affiliate_manager = BasicAffiliateManager()
+        """ጎደለ ሞጁል ለመጠባበቅ መሠረታዊ ሞጁል ፍጠር (Fixed for Bridge)"""
+        # ... (ሌሎቹ እንዳሉ ሆነው) ...
+        
         elif module_name == 'content_system':
-            # Create basic mock
+            # 🛑 እዚህ ጋር ነው ማስተካከያው - 'mega_engine' መጨመር አለበት
             class BasicContentSystem:
+                def __init__(self):
+                    # ድልድዩ እንዲሰራ ይህ የግድ ያስፈልጋል
+                    self.mega_engine = type('Mock', (), {'produce_single_country_sovereign_logic': self.mock_logic})()
+
+                async def mock_logic(self, topic, country):
+                    return f"<h1>{topic}</h1><p>Fallback content for {country}. Please check module loading.</p>"
+
                 async def generate_deep_content(self, topic, country, video_research, affiliate_product):
-                    await asyncio.sleep(2.0)
-                    return {
-                        'content': f"# Basic Content for {topic} - {country}\n\nBasic content placeholder.",
-                        'word_count': 1500,
-                        'quality_score': 70
-                    }
-                async def refine_and_expand(self, content, target_words):
-                    return content + "\n\n" + ("Expanded content. " * 50)
+                    return {'content': "Fallback content", 'word_count': 1000, 'quality_score': 70}
+            
             self.content_system = BasicContentSystem()
 
             
