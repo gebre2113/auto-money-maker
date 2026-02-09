@@ -173,30 +173,33 @@ class MemoryManager:
             }
         }
 
-class EnhancedErrorHandler:
-    """የምርት ደረጃ የስህተት መቆጣጠሪያ እና ድጋሚ ሙከራ"""
-    
-    @staticmethod
-    async def safe_execute(coroutine, fallback_value=None, max_retries: int = 3, 
-                          retry_delay: float = 1.0, context: str = ""):
-        """የአስተማማኝ ፕሮሰሲንግ ዘዴ"""
-        for attempt in range(max_retries):
-            try:
-                result = await coroutine
-                if attempt > 0:
-                    logging.info(f"✅ {context} succeeded on attempt {attempt + 1}")
-                return result
-            except Exception as e:
-                logging.warning(f"⚠️ {context} attempt {attempt + 1} failed: {str(e)[:100]}")
-                
-                if attempt == max_retries - 1:
-                    logging.error(f"❌ {context} failed after {max_retries} attempts")
-                    return fallback_value
-                
-                delay = retry_delay * (2 ** attempt)
-                await asyncio.sleep(delay)
+@staticmethod
+    async def safe_execute(func, *args, **kwargs):
+        """
+        የተስተካከለ የአስተማማኝ ፕሮሰሲንግ ዘዴ v5.0 (ULTIMATE FIX)
+        ይህ ዘዴ 'Multiple values for argument' ስህተትን ለዘላለም ይፈታል።
+        """
+        # መቆጣጠሪያዎቹን ከ kwargs ውስጥ በ pop እናወጣቸዋለን
+        # ለውስጥ አገልግሎት ብቻ እንዲውሉ ስማቸውን ቀይረነዋል (_internal_)
+        _fallback = kwargs.pop('fallback_value', None)
+        _retries = kwargs.pop('max_retries', 3)
+        _delay = kwargs.pop('retry_delay', 1.0)
+        _ctx = kwargs.pop('context', "Operation")
         
-        return fallback_value
+        for attempt in range(_retries):
+            try:
+                # 🛠️ እዚህ ጋር ነው ትክክለኛውን ስራ የምንጀምረው
+                if callable(func):
+                    return await func(*args, **kwargs)
+                return await func
+            except Exception as e:
+                logging.warning(f"⚠️ {_ctx} attempt {attempt + 1} failed: {str(e)}")
+                if attempt == _retries - 1:
+                    logging.error(f"❌ {_ctx} finally failed after {_retries} attempts")
+                    return _fallback
+                # የእረፍት ጊዜ (Exponential Backoff)
+                await asyncio.sleep(_delay * (2 ** attempt))
+        return _fallback
     
     @staticmethod
     def create_fallback_response(operation: str, error: Exception) -> Dict:
