@@ -1009,60 +1009,82 @@ class HumanLikenessEngine:
 # 🤖 UNSTOPPABLE AI PROVIDER (v38.0 - THE IRON LOCK)
 # =========================================================================
 
+# =========================================================================
+# 🤖 UNSTOPPABLE AI PROVIDER (v39.0 - PERSISTENT RELAY)
+# =========================================================================
+
 class UnstoppableAIProvider:
-    def __init__(self):
-        # 15ቱን የGroq ቁalፎች እና ሌሎችን መጫን
-        self.keys = self._load_key_pool('GROQ_API_KEY', 15)
-        self.indices = {'groq': 0}
-        self.gemini_key = os.getenv('GEMINI_API_KEY')
-        self.deepseek_key = os.getenv('DEEPSEEK_API_KEY')
-        logger.info(f"🛡️ TITAN v23.0 RELAY: {len(self.keys)} Groq keys active.")
+    # 🛑 ወሳኝ፡ ይህ ጠቋሚ ከክፍሉ ውጭ (Static) መሆን አለበት ሀገር ሲቀየር ወደ 0 እንዳይመለስ
+    _global_groq_idx = 0 
+
+    def __init__(self, config=None):
+        self.config = config
+        self.logger = logging.getLogger("IronLockAI")
+        self.groq_pool = self._load_key_pool('GROQ_API_KEY', 15)
+        self.lock = asyncio.sleep(0) # Placeholder
+        self.key_blacklist = {} 
+        self.backups = {'gemini': os.getenv('GEMINI_API_KEY')}
 
     def _load_key_pool(self, base_name, count):
         keys = []
-        names = [base_name] + [f"{base_name}_{i}" for i in range(1, count + 1)]
-        for name in names:
-            k = os.getenv(name)
-            if k and k not in keys:
-                keys.append(k)
+        main_key = os.getenv(base_name)
+        if main_key: keys.append(main_key)
+        for i in range(1, count + 1):
+            k = os.getenv(f"{base_name}_{i}")
+            if k and k not in keys: keys.append(k)
+        while len(keys) < 15 and keys: keys.append(random.choice(keys))
         return keys
 
     async def generate_content(self, prompt: str, max_tokens: int = 4000) -> str:
-        if self.keys:
-            for _ in range(len(self.keys)):
-                idx = self.indices['groq'] % len(self.keys)
-                key = self.keys[idx]
-                self.indices['groq'] += 1 
+        """GLOBAL PERSISTENT ROTATION: ቁልፎች በሀገራት መካከል በፍጹም አይደገሙም"""
+        now = time.time()
+        
+        # ሁሉንም 15 ቁልፎች ይፈትሻል
+        for _ in range(len(self.groq_pool)):
+            # 🛑 ቋሚውን ጠቋሚ እንጠቀማለን
+            idx = UnstoppableAIProvider._global_groq_idx % len(self.groq_pool)
+            api_key = self.groq_pool[idx]
+            UnstoppableAIProvider._global_groq_idx += 1 
 
-                try:
-                    logger.info(f"🚀 [KEY LOCK] Using Key #{idx + 1}...")
-                    async with httpx.AsyncClient(timeout=160.0) as client:
-                        resp = await client.post(
-                            "https://api.groq.com/openai/v1/chat/completions",
-                            headers={"Authorization": f"Bearer {key}"},
-                            json={
-                                "model": "llama-3.3-70b-versatile", 
-                                "messages": [{"role": "user", "content": prompt}], 
-                                "max_tokens": max_tokens, "temperature": 0.7
-                            }
-                        )
-                        if resp.status_code == 200:
-                            return str(resp.json()['choices'][0]['message']['content'])
-                        if resp.status_code == 429:
-                            logger.warning(f"⚠️ Key #{idx + 1} hit limit. Waiting 10s...")
-                            await asyncio.sleep(10)
-                            continue
-                except: continue
+            if idx in self.key_blacklist and now < self.key_blacklist[idx]:
+                continue
 
-        # Fallbacks
-        if self.gemini_key:
             try:
-                url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={self.gemini_key}"
+                self.logger.info(f"🚀 [KEY-{idx + 1}/15] Sequential Call...")
+                async with httpx.AsyncClient(timeout=160.0) as client:
+                    resp = await client.post(
+                        "https://api.groq.com/openai/v1/chat/completions",
+                        headers={"Authorization": f"Bearer {api_key}"},
+                        json={"model": "llama-3.3-70b-versatile", "messages": [{"role": "user", "content": prompt}], "max_tokens": max_tokens, "temperature": 0.7}
+                    )
+                    
+                    if resp.status_code == 200:
+                        if idx in self.key_blacklist: del self.key_blacklist[idx]
+                        await asyncio.sleep(10) # 💤 ለ 10 ሰከንድ አርፍ
+                        return str(resp.json()['choices'][0]['message']['content'])
+                    
+                    if resp.status_code == 429:
+                        self.logger.warning(f"⚠️ Key #{idx + 1} Limit. Penalty: 120s.")
+                        self.key_blacklist[idx] = now + 120
+                        await asyncio.sleep(20) # 🛑 ወደ ቀጣዩ ከመሄድ በፊት 20 ሰከንድ እረፍት
+                        continue
+            except:
+                await asyncio.sleep(5)
+                continue
+
+        # 🏰 ግሮቅ ካለቀ ወደ ጀሚኒ
+        if self.backups['gemini']:
+            try:
+                url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={self.backups['gemini']}"
                 async with httpx.AsyncClient(timeout=120.0) as client:
                     resp = await client.post(url, json={"contents": [{"parts": [{"text": prompt}]}]})
                     return str(resp.json()['candidates'][0]['content']['parts'][0]['text'])
             except: pass
-        return "Error: All AI Systems Exhausted."
+        
+        return "Error: System exhausted."
+
+    async def process_task(self, prompt, **kwargs):
+        return await self.generate_content(prompt)
 # =================== ELITE SMART IMAGE ENGINE (PRODUCTION FIXED) ===================
 
 class SmartImageEngine:
