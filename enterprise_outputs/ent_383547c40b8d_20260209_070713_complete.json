@@ -1,0 +1,151 @@
+{
+  "production_id": "ent_383547c40b8d",
+  "topic": "Enterprise AI Implementation Strategies 2026",
+  "target_countries": [
+    "GB",
+    "DE",
+    "FR",
+    "CH",
+    "NO",
+    "SE",
+    "ET"
+  ],
+  "status": "success",
+  "start_time": "2026-02-09T07:02:03.045350",
+  "country_results": [
+    {
+      "country": "GB",
+      "status": "failed",
+      "metrics": {
+        "estimated_revenue": 0.0,
+        "final_word_count": 0,
+        "quality_score": 0,
+        "human_score": 0,
+        "cultural_depth": 0
+      },
+      "start_time": "2026-02-09T07:02:03.046124",
+      "ai_enhancements": {},
+      "enhancements": {},
+      "error": "All 15 fallback keys failed"
+    },
+    {
+      "country": "DE",
+      "status": "failed",
+      "metrics": {
+        "estimated_revenue": 0.0,
+        "final_word_count": 0,
+        "quality_score": 0,
+        "human_score": 0,
+        "cultural_depth": 0
+      },
+      "start_time": "2026-02-09T07:02:48.094267",
+      "ai_enhancements": {},
+      "enhancements": {},
+      "error": "All 15 fallback keys failed"
+    },
+    {
+      "country": "FR",
+      "status": "failed",
+      "metrics": {
+        "estimated_revenue": 0.0,
+        "final_word_count": 0,
+        "quality_score": 0,
+        "human_score": 0,
+        "cultural_depth": 0
+      },
+      "start_time": "2026-02-09T07:03:33.141600",
+      "ai_enhancements": {},
+      "enhancements": {},
+      "error": "All 15 fallback keys failed"
+    },
+    {
+      "country": "CH",
+      "status": "failed",
+      "metrics": {
+        "estimated_revenue": 0.0,
+        "final_word_count": 0,
+        "quality_score": 0,
+        "human_score": 0,
+        "cultural_depth": 0
+      },
+      "start_time": "2026-02-09T07:04:25.183713",
+      "ai_enhancements": {},
+      "enhancements": {},
+      "error": "All 15 fallback keys failed"
+    },
+    {
+      "country": "NO",
+      "status": "failed",
+      "metrics": {
+        "estimated_revenue": 0.0,
+        "final_word_count": 0,
+        "quality_score": 0,
+        "human_score": 0,
+        "cultural_depth": 0
+      },
+      "start_time": "2026-02-09T07:05:21.193684",
+      "ai_enhancements": {},
+      "enhancements": {},
+      "error": "All 15 fallback keys failed"
+    },
+    {
+      "country": "SE",
+      "status": "failed",
+      "metrics": {
+        "estimated_revenue": 0.0,
+        "final_word_count": 0,
+        "quality_score": 0,
+        "human_score": 0,
+        "cultural_depth": 0
+      },
+      "start_time": "2026-02-09T07:06:15.215632",
+      "ai_enhancements": {},
+      "enhancements": {},
+      "error": "All 15 fallback keys failed"
+    },
+    {
+      "country": "ET",
+      "status": "failed",
+      "metrics": {
+        "estimated_revenue": 0.0,
+        "final_word_count": 0,
+        "quality_score": 0,
+        "human_score": 0,
+        "cultural_depth": 0
+      },
+      "start_time": "2026-02-09T07:07:13.247606",
+      "ai_enhancements": {},
+      "enhancements": {},
+      "error": "All 15 fallback keys failed"
+    }
+  ],
+  "overall_metrics": {
+    "total_countries": 7,
+    "completed_countries": 0,
+    "avg_word_count": 0,
+    "avg_quality": 0,
+    "avg_cultural_depth": 0,
+    "avg_human_score": 0,
+    "total_words": 0,
+    "estimated_revenue": 0.0,
+    "success_rate": 0.0,
+    "enterprise_standards_met": 0,
+    "enterprise_standards_rate": 0.0,
+    "quality_success_rate": 0.0,
+    "safety_success_rate": 0.0,
+    "avg_compliance_score": 0.0,
+    "ai_enhancements": {
+      "ai_title_optimized_count": 0,
+      "ai_title_optimized_rate": 0,
+      "ai_audit_performed_count": 0,
+      "ai_audit_performed_rate": 0,
+      "avg_ai_title_seo_score": 0,
+      "avg_ai_audit_score": 0
+    },
+    "enhancements_summary": {
+      "ai_detection_risk_low_count": 0,
+      "avg_seo_boost": 0
+    }
+  },
+  "end_time": "2026-02-09T07:07:13.249409"
+}
