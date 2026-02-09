@@ -3141,12 +3141,10 @@ class EnterpriseProductionOrchestrator:
         }
         
         try:
-            # 🚀 ቋሚ ማስተካከያ፦ ፈንክሽኑን (self.run_enterprise_production) በመጀመሪያ ግቤትነት መላክ
+            # 🚀 ቋሚ መፍትሄ፦ ግቤቶችን (Arguments) በዝርዝር (List) መልክ መላክ
             result = await EnhancedErrorHandler.safe_execute(
-                self.run_enterprise_production, # ✅ ያለ 'func=' በቀጥታ ፈንክሽኑን ብቻ
-                topic=topic,
-                markets=markets,
-                content_type=content_type,
+                self.run_enterprise_production,       # 1. የሚሰራው ተግባር
+                [topic, markets, content_type],       # 2. ግቤቶቹ (በዝርዝር [] ውስጥ)
                 fallback_value={'status': 'failed', 'country_results': [], 'error': 'Production failed'},
                 max_retries=2,
                 retry_delay=5.0,
