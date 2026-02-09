@@ -1,0 +1,61 @@
+{
+  "production_id": "enterprise_640c8dff9b80",
+  "topic": "Enterprise AI Implementation Strategies 2026",
+  "target_countries": [
+    "US",
+    "GB",
+    "CA",
+    "AU",
+    "DE",
+    "FR",
+    "JP",
+    "CH",
+    "NO",
+    "SE",
+    "ET"
+  ],
+  "content_type": "enterprise_guide",
+  "enterprise_standards": {
+    "min_words": 3000,
+    "min_quality": 88,
+    "min_cultural_depth": 85,
+    "min_compliance_score": 95,
+    "sequential_processing": true,
+    "intelligent_delays": true,
+    "quality_guarantee": true
+  },
+  "status": "failed",
+  "start_time": "2026-02-09T08:36:53.139916",
+  "performance_monitoring": true,
+  "country_results": [],
+  "overall_metrics": {},
+  "enhancement_reports": {},
+  "error": "Production failed",
+  "performance_report": {
+    "profile_output": "         71497 function calls (69980 primitive calls) in 798.728 seconds\n\n   Ordered by: cumulative time, internal time\n   List reduced from 239 to 30 due to restriction <30>\n\n   ncalls  tottime  percall  cumtime  percall filename:lineno(function)\n       54    0.001    0.000  798.700   14.791 /opt/hostedtoolcache/Python/3.12.12/x64/lib/python3.12/asyncio/base_events.py:1922(_run_once)\n       54    0.000    0.000  798.649   14.790 /opt/hostedtoolcache/Python/3.12.12/x64/lib/python3.12/selectors.py:451(select)\n       54  798.648   14.790  798.648   14.790 {method 'poll' of 'select.epoll' objects}\n    56/28    0.000    0.000    0.076    0.003 /home/runner/work/auto-money-maker/auto-money-maker/enterprise_runner.py:182(safe_execute)\n       28    0.001    0.000    0.075    0.003 /home/runner/work/auto-money-maker/auto-money-maker/enterprise_runner.py:3259(run_enterprise_production)\n       54    0.000    0.000    0.050    0.001 /opt/hostedtoolcache/Python/3.12.12/x64/lib/python3.12/asyncio/events.py:86(_run)\n       54    0.000    0.000    0.049    0.001 {method 'run' of '_contextvars.Context' objects}\n       27    0.000    0.000    0.049    0.002 /home/runner/work/auto-money-maker/auto-money-maker/enterprise_runner.py:4436(main_execution)\n       27    0.000    0.000    0.048    0.002 /home/runner/work/auto-money-maker/auto-money-maker/enterprise_runner.py:3155(run_production_with_monitoring)\n      335    0.001    0.000    0.037    0.000 /opt/hostedtoolcache/Python/3.12.12/x64/lib/python3.12/logging/__init__.py:1660(_log)\n      302    0.001    0.000    0.032    0.000 /opt/hostedtoolcache/Python/3.12.12/x64/lib/python3.12/logging/__init__.py:1529(info)\n       28    0.000    0.000    0.028    0.001 /home/runner/work/auto-money-maker/auto-money-maker/enterprise_runner.py:3350(_process_country_enterprise)\n      335    0.000    0.000    0.025    0.000 /opt/hostedtoolcache/Python/3.12.12/x64/lib/python3.12/logging/__init__.py:1686(handle)\n        2    0.000    0.000    0.025    0.012 /home/runner/work/auto-money-maker/auto-money-maker/enterprise_runner.py:45(get_active_prime_time_countries)\n       22    0.000    0.000    0.024    0.001 /opt/hostedtoolcache/Python/3.12.12/x64/lib/python3.12/site-packages/pytz/__init__.py:130(timezone)\n      335    0.001    0.000    0.024    0.000 /opt/hostedtoolcache/Python/3.12.12/x64/lib/python3.12/logging/__init__.py:1746(callHandlers)\n      537    0.001    0.000    0.023    0.000 /opt/hostedtoolcache/Python/3.12.12/x64/lib/python3.12/logging/__init__.py:1011(handle)\n      537    0.001    0.000    0.020    0.000 /opt/hostedtoolcache/Python/3.12.12/x64/lib/python3.12/logging/__init__.py:1148(emit)\n       28    0.000    0.000    0.020    0.001 /home/runner/work/auto-money-maker/auto-money-maker/profit_master_system.py:4795(produce_single_country_sovereign_logic)\n       28    0.001    0.000    0.019    0.001 /home/runner/work/auto-money-maker/auto-money-maker/profit_master_system.py:4301(_call_ai_with_fallback)\n        1    0.000    0.000    0.019    0.019 /opt/hostedtoolcache/Python/3.12.12/x64/lib/python3.12/site-packages/pytz/lazy.py:150(_lazy)\n        1    0.000    0.000    0.018    0.018 /opt/hostedtoolcache/Python/3.12.12/x64/lib/python3.12/site-packages/pytz/lazy.py:97(_lazy)\n        7    0.000    0.000    0.018    0.003 {function LazyList.__new__.<locals>.lazy.<locals>._lazy at 0x7f1d301aac00}\n      598    0.000    0.000    0.018    0.000 /opt/hostedtoolcache/Python/3.12.12/x64/lib/python3.12/site-packages/pytz/__init__.py:1115(<genexpr>)\n      597    0.001    0.000    0.018    0.000 /opt/hostedtoolcache/Python/3.12.12/x64/lib/python3.12/site-packages/pytz/__init__.py:111(resource_exists)\n      608    0.002    0.000    0.015    0.000 /opt/hostedtoolcache/Python/3.12.12/x64/lib/python3.12/site-packages/pytz/__init__.py:78(open_resource)\n      537    0.000    0.000    0.011    0.000 /opt/hostedtoolcache/Python/3.12.12/x64/lib/python3.12/logging/__init__.py:988(format)\n      537    0.002    0.000    0.009    0.000 /opt/hostedtoolcache/Python/3.12.12/x64/lib/python3.12/logging/__init__.py:690(format)\n      335    0.001    0.000    0.008    0.000 /opt/hostedtoolcache/Python/3.12.12/x64/lib/python3.12/logging/__init__.py:1645(makeRecord)\n      335    0.003    0.000    0.008    0.000 /opt/hostedtoolcache/Python/3.12.12/x64/lib/python3.12/logging/__init__.py:298(__init__)\n\n\n",
+    "elapsed_time_seconds": 798.8312408924103,
+    "memory_report": {
+      "rss_mb": 125.8125,
+      "vms_mb": 391.08203125,
+      "percent": 0.7865793080407514,
+      "available_system_mb": 15026.39453125,
+      "cpu_percent": 0.0
+    },
+    "peak_memory_mb": 0
+  },
+  "system_status": {
+    "memory": {
+      "total_mb": 15994.890625,
+      "available_mb": 15026.40625,
+      "percent_used": 6.1,
+      "swap_mb": 0.0
+    },
+    "cpu": {
+      "percent": 0.0,
+      "count": 4
+    },
+    "disk": {
+      "free_gb": 20.683753967285156
+    }
+  }
+}
