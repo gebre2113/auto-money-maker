@@ -173,32 +173,58 @@ class MemoryManager:
             }
         }
 
-@staticmethod
+class EnhancedErrorHandler:
+    """
+    የምርት ደረጃ የስህተት መቆጣጠሪያ እና ድጋሚ ሙከራ v5.0 (Sovereign Edition)
+    ይህ ክላስ በማናቸውም ግቤቶች (Arguments) መካከል ግጭት እንዳይፈጠር ተደርጎ የተገነባ ነው።
+    """
+    
+    @staticmethod
     async def safe_execute(func, *args, **kwargs):
         """
-        የተስተካከለ የአስተማማኝ ፕሮሰሲንግ ዘዴ v5.0 (ULTIMATE FIX)
-        ይህ ዘዴ 'Multiple values for argument' ስህተትን ለዘላለም ይፈታል።
+        የተስተካከለ የአስተማማኝ ፕሮሰሲንግ ዘዴ።
+        - func: የሚሰራው ተግባር (ያለ ቅንፍ መላክ አለበት)
+        - *args: ለተግባሩ የሚላኩ ተከታታይ ግቤቶች
+        - **kwargs: ለተግባሩ የሚላኩ በስም የተለዩ ግቤቶች እና የሪትራይ መቆጣጠሪያዎች
         """
-        # መቆጣጠሪያዎቹን ከ kwargs ውስጥ በ pop እናወጣቸዋለን
-        # ለውስጥ አገልግሎት ብቻ እንዲውሉ ስማቸውን ቀይረነዋል (_internal_)
+        
+        # 1. የሪትራይ መቆጣጠሪያዎቹን ከ kwargs ውስጥ ነጥሎ ማውጣት (Pop)
+        # ይህ ካልተደረገ 'Multiple values for argument' ስህተት ይፈጠራል
         _fallback = kwargs.pop('fallback_value', None)
         _retries = kwargs.pop('max_retries', 3)
         _delay = kwargs.pop('retry_delay', 1.0)
         _ctx = kwargs.pop('context', "Operation")
-        
+
         for attempt in range(_retries):
             try:
-                # 🛠️ እዚህ ጋር ነው ትክክለኛውን ስራ የምንጀምረው
+                # 2. ተግባሩን መጥራት (Execute)
+                # ተግባሩ 'coroutine' ከሆነ ወይም 'callable' ከሆነ በትክክል ያስኬደዋል
                 if callable(func):
-                    return await func(*args, **kwargs)
-                return await func
+                    # እዚህ ጋር ነው ትክክለኛው ስራ የሚጀመረው
+                    result = await func(*args, **kwargs)
+                else:
+                    # ቀድሞ 'await' የተደረገ ኮሩቲን ከሆነ (ለጥንቃቄ ብቻ)
+                    result = await func
+                
+                if attempt > 0:
+                    logging.info(f"✅ {_ctx} succeeded on attempt {attempt + 1}")
+                return result
+
             except Exception as e:
-                logging.warning(f"⚠️ {_ctx} attempt {attempt + 1} failed: {str(e)}")
+                # 3. ስህተት ሲፈጠር የሚወሰድ እርምጃ
+                error_msg = str(e)[:150] # የመጀመሪያዎቹን 150 ፊደላት ብቻ ለሎግ መውሰድ
+                logging.warning(f"⚠️ {_ctx} attempt {attempt + 1} failed: {error_msg}")
+                
+                # የመጨረሻው ሙከራ ካለቀ የ fallback ውጤቱን መመለስ
                 if attempt == _retries - 1:
                     logging.error(f"❌ {_ctx} finally failed after {_retries} attempts")
                     return _fallback
-                # የእረፍት ጊዜ (Exponential Backoff)
-                await asyncio.sleep(_delay * (2 ** attempt))
+                
+                # 4. ድጋሚ ከመሞከር በፊት ማረፍ (Exponential Backoff)
+                # በእያንዳንዱ ሙከራ የእረፍት ጊዜው እጥፍ እየሆነ ይሄዳል
+                wait_time = _delay * (2 ** attempt)
+                await asyncio.sleep(wait_time)
+        
         return _fallback
     
     @staticmethod
