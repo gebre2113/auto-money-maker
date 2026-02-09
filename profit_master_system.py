@@ -41,6 +41,32 @@ try:
     import psutil
 except ImportError as e:
     print(f"⚠️  WARNING: Missing dependency: {e}")
+    import pytz
+from datetime import datetime
+
+def get_active_prime_time_countries():
+    """በየሀገሩ ያለውን Standard Time አይቶ 'ወርቃማ' የዜና ሰዓቶችን ይለያል"""
+    world_zones = {
+        "US": "America/New_York", "GB": "Europe/London", "CA": "America/Toronto",
+        "AU": "Australia/Sydney", "DE": "Europe/Berlin", "FR": "Europe/Paris",
+        "JP": "Asia/Tokyo", "CH": "Europe/Zurich", "NO": "Europe/Oslo", 
+        "SE": "Europe/Stockholm", "ET": "Africa/Addis_Ababa"
+    }
+
+    # 🎯 ወርቃማ ሰዓታት (ጧት 7-11፣ ምሳ 12-14፣ ምሽት 19-22)
+    prime_slots = [(7, 11), (12, 14), (19, 22)]
+    
+    active_now = []
+    for code, zone in world_zones.items():
+        try:
+            tz = pytz.timezone(zone)
+            current_hour = datetime.now(tz).hour
+            for start, end in prime_slots:
+                if start <= current_hour <= end:
+                    active_now.append(code)
+                    break
+        except: continue
+    return active_now
 # --- ይህንን በፋይሉ አናት ላይ (Global) ያስቀምጡ ---
 COUNTRIES = {
     'US': {'name': 'USA', 'emoji': '🇺🇸', 'lang': 'English', 'comm': 50, 'delay': 45},
