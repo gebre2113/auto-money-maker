@@ -3141,10 +3141,13 @@ class EnterpriseProductionOrchestrator:
         }
         
         try:
-            # 🚀 ቋሚ መፍትሄ፦ ግቤቶችን (Arguments) በዝርዝር (List) መልክ መላክ
+            # 🛑 ወሳኝ ማስተካከያ፡ ፈንክሽኑን (self.run_enterprise_production) ያለ ቅንፍ ነው የምንልከው
+            # ግብዓቶቹን (topic, markets, content_type) ደግሞ ለብቻቸው እንሰጠዋለን
             result = await EnhancedErrorHandler.safe_execute(
-                self.run_enterprise_production,       # 1. የሚሰራው ተግባር
-                [topic, markets, content_type],       # 2. ግቤቶቹ (በዝርዝር [] ውስጥ)
+                self.run_enterprise_production, # ✅ ፈንክሽኑን ብቻ (ያለ ቅንፍ)
+                topic,                          # arg 1
+                markets,                        # arg 2
+                content_type,                   # arg 3
                 fallback_value={'status': 'failed', 'country_results': [], 'error': 'Production failed'},
                 max_retries=2,
                 retry_delay=5.0,
