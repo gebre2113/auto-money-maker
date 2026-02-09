@@ -3122,24 +3122,61 @@ class EnterpriseProductionOrchestrator:
                 self._create_fallback_module(module)
     
     def _create_fallback_module(self, module_name):
-        """ጎደለ ሞጁል ለመጠባበቅ መሠረታዊ ሞጁል ፍጠር (Fixed for Bridge)"""
-        # ... (ሌሎቹ እንዳሉ ሆነው) ...
+        """
+        ጎደለ ሞጁል ለመጠባበቅ መሠረታዊ ሞጁል ፍጠር (v6.0 Sovereign Edition)
+        ይህ ክፍል በ Syntax ስህተት ምክንያት የሚመጣን መቆራረጥ ይከላከላል
+        """
         
+        # 🛑 እዚህ ጋር ነው 'if' የሚጀምረው - ክፍተቱን (4 Spaces) በጥንቃቄ ጠብቅ
+        if module_name == 'human_engine':
+            self.human_engine = HumanLikenessEngine()
+            
+        elif module_name == 'image_engine':
+            self.image_engine = SmartImageEngine()
+            
+        elif module_name == 'cta_engine':
+            self.cta_engine = DynamicCTAEngine()
+            
+        elif module_name == 'cultural_guardian':
+            self.cultural_guardian = CulturalDepthGuardian()
+            
+        elif module_name == 'revenue_engine':
+            self.revenue_engine = RevenueForecastEngine()
+            
+        elif module_name == 'compliance_guardian':
+            self.compliance_guardian = EthicalComplianceGuardian()
+            
         elif module_name == 'content_system':
-            # 🛑 እዚህ ጋር ነው ማስተካከያው - 'mega_engine' መጨመር አለበት
+            # 🏢 ራነሩ ሜጋ ኢንጂኑን ማግኘት ካልቻለ ድልድዩ እንዳይሰበር ይህ 'Mock' ያስፈልገዋል
             class BasicContentSystem:
                 def __init__(self):
-                    # ድልድዩ እንዲሰራ ይህ የግድ ያስፈልጋል
-                    self.mega_engine = type('Mock', (), {'produce_single_country_sovereign_logic': self.mock_logic})()
-
-                async def mock_logic(self, topic, country):
-                    return f"<h1>{topic}</h1><p>Fallback content for {country}. Please check module loading.</p>"
-
-                async def generate_deep_content(self, topic, country, video_research, affiliate_product):
-                    return {'content': "Fallback content", 'word_count': 1000, 'quality_score': 70}
+                    # የድልድይ መለያ (Bridge attribute)
+                    self.mega_engine = type('Mock', (), {
+                        'produce_single_country_sovereign_logic': self.mock_sovereign_logic
+                    })()
+                
+                async def mock_sovereign_logic(self, topic, country, **kwargs):
+                    return f"<h1>{topic}</h1><p>Fallback sovereign content for {country}. Please ensure profit_master_system.py is present.</p>"
+                
+                async def generate_deep_content(self, *args, **kwargs):
+                    return {'content': "Fallback", 'word_count': 1000, 'quality_score': 70}
             
             self.content_system = BasicContentSystem()
-
+            
+        elif module_name == 'affiliate_manager':
+            # 💰 አፊሊዬት ማናጀሩ ካልተገኘ የሚሰራ ጊዜያዊ ሲስተም
+            class BasicAffiliateManager:
+                async def inject_affiliate_links(self, content, topic, **kwargs):
+                    # ሪፖርቱ ሲሰራ 'dict' object has no attribute 'split' ስህተት እንዳይመጣ ጥንቃቄ ተደርጓል
+                    return content, {'predicted_total_revenue': 500.0, 'ethical_score': 90}
+            
+            self.affiliate_manager = BasicAffiliateManager()
+            
+        elif module_name == 'youtube_hunter':
+            class BasicYouTubeHunter:
+                async def find_relevant_videos(self, *args, **kwargs):
+                    return []
+            self.youtube_hunter = BasicYouTubeHunter()
             
     def _initialize_all_components(self):
         """Enterprise componentsን በስርዓት ያስነሳል"""
