@@ -923,11 +923,11 @@ class HumanLikenessEngine:
 # =========================================================================
 # 🤖 UNSTOPPABLE AI PROVIDER (v29.0 - ENTERPRISE MULTI-KEY RELAY)
 # =========================================================================
-
 class UnstoppableAIProvider:
     """
     የዓለማችን እጅግ ጠንካራው AI አቅራቢ - 15 ቁልፎችን በየዙሩ ያፈራርቃል
     - ራነሩ ስራውን ሲጨርስ በንጽህና እንዲዘጋ ተደርጎ የተገነባ
+    - የ 7 ሰከንድ የ "Cool-down" ሲስተም ተካቷል
     """
     
     def __init__(self, config=None):
@@ -945,7 +945,7 @@ class UnstoppableAIProvider:
         }
         
         self.key_blacklist = {} 
-        self.is_running = True # ራነሩ እንዲቆም መቆጣጠሪያ
+        self.is_running = True
 
     def _load_key_pool(self, base_name, count):
         keys = []
@@ -968,10 +968,12 @@ class UnstoppableAIProvider:
             return "System shutting down..."
 
         now = time.time()
+        # 🔄 15ቱንም ቁልፎች ሁለት ዙር የመሞከር አቅም (Redundancy)
         for _ in range(len(self.groq_pool) * 2):
             idx = self.groq_index % len(self.groq_pool)
             api_key = self.groq_pool[idx]
             
+            # ብላክሊስት የተደረገ ቁልፍ ከሆነ እለፈው
             if idx in self.key_blacklist and now < self.key_blacklist[idx]:
                 self.groq_index += 1
                 continue
@@ -997,20 +999,37 @@ class UnstoppableAIProvider:
                     
                     if resp.status_code == 200:
                         if idx in self.key_blacklist: del self.key_blacklist[idx]
-                        await asyncio.sleep(5) # ፍጥነቱን ለመገደብ (Anti-Spam)
+                        # ስኬታማ ከሆነ ፍጥነቱን ለመቆጣጠር 2 ሰከንድ ይበቃል
+                        await asyncio.sleep(2) 
                         return str(resp.json()['choices'][0]['message']['content'])
                     
+                    # ⚠️ የ Rate Limit (429) ስህተት ካጋጠመ
                     if resp.status_code == 429:
                         self.logger.warning(f"⚠️ Key #{idx + 1} Limited. Cooling down 90s...")
                         self.key_blacklist[idx] = now + 90 
-                        await asyncio.sleep(10) # ወደ ቀጣዩ ቁልፍ ከመሄድ በፊት ትንሽ እረፍት
+                        await asyncio.sleep(7) # 🛡️ ስልታዊ የ 7 ሰከንድ እረፍት
                         continue
-            except: continue
+                    
+                    # ❌ ሌላ የ HTTP ስህተት ካጋጠመ
+                    else:
+                        self.logger.error(f"❌ Key #{idx + 1} Failed: HTTP {resp.status_code}. Waiting 7s...")
+                        await asyncio.sleep(7) # 🛡️ ስልታዊ የ 7 ሰከንድ እረፍት
+                        continue
 
-        # Fallbacks (DeepSeek/Gemini)
+            except Exception as e:
+                # 🌐 የኔትወርክ ወይም የግንኙነት ስህተት
+                self.logger.warning(f"⚠️ Connection Error Key #{idx + 1}: {str(e)[:50]}. Waiting 7s...")
+                await asyncio.sleep(7) # 🛡️ ስልታዊ የ 7 ሰከንድ እረፍት
+                continue
+
+        # --- 🛡️ FALLBACKS (ሁሉንም የ Groq ቁልፎች ሞክሮ ካልተሳካ) ---
+        self.logger.info("📡 Groq exhausted. Switching to Fallback Providers...")
+
         if self.keys['deepseek']:
-            try: return await self._call_api_direct("https://api.deepseek.com/chat/completions", self.keys['deepseek'], "deepseek-chat", prompt, max_tokens)
+            try: 
+                return await self._call_api_direct("https://api.deepseek.com/chat/completions", self.keys['deepseek'], "deepseek-chat", prompt, max_tokens)
             except: pass
+            
         if self.keys['gemini']:
             try:
                 url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={self.keys['gemini']}"
@@ -1019,7 +1038,7 @@ class UnstoppableAIProvider:
                     return str(resp.json()['candidates'][0]['content']['parts'][0]['text'])
             except: pass
 
-        return "Error: System Overloaded."
+        return "Error: System Overloaded. All 15 keys and fallbacks failed."
 
     def _get_system_prompt(self, task_type: str) -> str:
         prompts = {
@@ -1037,6 +1056,7 @@ class UnstoppableAIProvider:
         """ራነሩ ሲጨርስ AI ጥያቄዎችን እንዲያቆም"""
         self.is_running = False
         self.logger.info("🛑 AI Provider stopping...")
+
 # =================== ELITE SMART IMAGE ENGINE (PRODUCTION FIXED) ===================
 
 class SmartImageEngine:
