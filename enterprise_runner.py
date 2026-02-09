@@ -3181,7 +3181,7 @@ class EnterpriseProductionOrchestrator:
                         }
                     )
                     
-                    self.logger.info(try(f"💾 Safety backup created: {backup_file} ({safety_check['safety_score']}% safety score)")
+                self.logger.info(try(f"💾 Safety backup created: {backup_file} ({safety_check['safety_score']}% safety score)")
             
             return production_results
             
