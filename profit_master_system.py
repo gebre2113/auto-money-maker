@@ -4218,34 +4218,29 @@ class EnhancedWordCounter:
 
 # =========================================================================
 # 👑 TITAN v26.0 OMNIPOTENT: THE SOVEREIGN ORACLE (TOTAL UNIFICATION)
-# ======================================================================
+# ============================================================
 
 class MegaContentEngine:
     """
     የዓለማችን ቁንጮ የይዘት ማምረቻ ሞተር።
-    - 15,000+ Words በምዕራፍ (15,400 ቃላት የሚደርስ)
-    - 7-ቁልፍ ሮቴሽን ከ15 መጠባበቂያ ቁልፎች ጋር
-    - YouTube Authority Integration
-    - Ultra-Affiliate Monetization (v13.0)
-    - Hypnotic Fashion Design
-    - Market Timing Intelligence
+    v37.1 - Optimized Key Management System
     """
     
     def __init__(self, system):
-        # 1. መጀመሪያ ሎገሩን እንገልጻለን (ይህ ካልቀደመ 'AttributeError' ይፈጠራል)
+        # 1. መጀመሪያ ሎገሩን እንገልጻለን
         self.logger = logging.getLogger("MegaJournalist")
         self.system = system
         
         # 2. የ AI አቅራቢውን መለየት
         self.ai = getattr(system, 'failover_system', getattr(system, 'ai_provider', None))
         
-        # 3. የ15 መጠባበቂያ ቁልፎች ስርዓት (አሁን ሎገሩ ስለተፈጠረ በሰላም ይባላል)
+        # 3. የ15 መጠባበቂያ ቁልፎች ስርዓት (በተከታታይ እንዲሰሩ ተደርገው የተገነቡ)
         self.ai_providers = self._initialize_15_fallback_keys()
         
         # 4. የምርት ግቦች
         self.TARGET_WORDS = 15000
         
-        # 5. የሀገር የሰዓት ዞኖች (ለገበያ ሰዓት ብልህነት)
+        # 5. የሀገር የሰዓት ዞኖች
         self.country_timezones = {
             'US': 'America/New_York', 'GB': 'Europe/London', 'DE': 'Europe/Berlin',
             'JP': 'Asia/Tokyo', 'AU': 'Australia/Sydney', 'ET': 'Africa/Addis_Ababa',
@@ -4258,20 +4253,8 @@ class MegaContentEngine:
         
         # 7. የምርት ሁኔታ እና የገቢ ትንበያ መያዣዎች
         self.production_status = {}
-        self.revenue_predictions = {}
         
         # 8. የሀገራት ኢኮኖሚ መረጃ (ለFeb 2026 የተመቻቸ)
-        self.economic_indicators = {
-            'US': {'inflation': '3.2%', 'reg': 'AI Safety Act 2025'},
-            'GB': {'inflation': '4.1%', 'reg': 'Digital Markets Act'},
-            'ET': {'inflation': '28.5%', 'reg': 'Capital Market Proclamation'}
-        }
-        
-        # 9. የሜሞሪ ጽዳት
-        self.active_memory = ""
-        self.logger.info("✅ MegaContentEngine v37.0 Initialized Successfully")
-        
-        # 6. የሀገራት ኢኮኖሚ መረጃ
         self.economic_indicators = {
             'US': {'inflation': '3.2%', 'gdp_growth': '2.5%', 'reg': 'AI Safety Act 2025'},
             'GB': {'inflation': '4.1%', 'gdp_growth': '1.8%', 'reg': 'Digital Markets Act'},
@@ -4286,71 +4269,83 @@ class MegaContentEngine:
             'SE': {'inflation': '2.6%', 'gdp_growth': '2.0%', 'reg': 'Stockholm Tech Accord'}
         }
         
-        # 7. የገቢ ትንበያ መረጃ
         self.revenue_predictions = {}
+        self.active_memory = ""
+        self.logger.info("✅ MegaContentEngine v37.1 Patched & Initialized Successfully")
 
     def _initialize_15_fallback_keys(self):
-        """15 መጠባበቂያ ቁልፎችን ማስጀመር"""
-        providers = []
+        """15 መጠባበቂያ ቁልፎችን በተለየ ሁኔታ ማስጀመር"""
+        raw_providers = []
         
         if hasattr(self.ai, 'groq_pool'):
-            providers.extend(self.ai.groq_pool)
+            raw_providers.extend(self.ai.groq_pool)
         
         if hasattr(self.system, 'backup_providers'):
-            providers.extend(self.system.backup_providers)
+            raw_providers.extend(self.system.backup_providers)
         
-        while len(providers) < 15:
-            if providers:
-                providers.append(providers[0])
-            else:
-                providers.append(self.ai)
-                break
+        if not raw_providers:
+            raw_providers.append(self.ai)
+
+        # ልዩ የሆኑ 15 ቁልፎችን መለየት
+        self.ai_providers = raw_providers[:15]
         
-        self.logger.info(f"✅ 15 Fallback Keys Initialized: {len(providers)} providers available")
-        return providers
+        # የቁልፎቹን ጤንነት መከታተያ (የማይሰራ ቁልፍ 'False' ይሆናል)
+        self.provider_status = [True] * len(self.ai_providers)
+        
+        # በአሁኑ ሰዓት በስራ ላይ ያለውን ቁልፍ ጠቋሚ
+        self.current_provider_idx = 0
+
+        self.logger.info(f"🛡️ Unique Key Registry: {len(self.ai_providers)} verified keys online.")
+        return self.ai_providers
+
+    async def _call_ai_with_fallback(self, prompt, max_tokens=4000, phase_idx=0):
+        """
+        ብቸኛ ተከታታይ ጠሪ (Sequential Invoker)።
+        አንዱ ቁልፍ ምላሽ ሳይሰጥ ሌላኛው እንዳይጠራ በማድረግ ድግግሞሽን ያስቀራል።
+        """
+        num_providers = len(self.ai_providers)
+        
+        for attempt in range(num_providers):
+            # በቅደም ተከተል ለመሄድ ጠቋሚውን እንጠቀማለን
+            idx = (self.current_provider_idx + attempt) % num_providers
+            
+            if not self.provider_status[idx]:
+                continue
+                
+            provider = self.ai_providers[idx]
+            
+            try:
+                self.logger.info(f"🎯 Attempting Key #{idx + 1}/{num_providers} (Phase {phase_idx + 1})")
+                
+                if hasattr(provider, 'generate_content'):
+                    # የአንዱ ስራ ሳይጠናቀቅ ሌላው አይገባም (await)
+                    result = await provider.generate_content(prompt, max_tokens=max_tokens)
+                    
+                    # ስኬታማ ከሆነ ጠቋሚውን ለቀጣዩ ዙር እናዙረው
+                    self.current_provider_idx = (idx + 1) % num_providers
+                    self.logger.info(f"✅ Key #{idx + 1} succeeded.")
+                    return result
+                    
+            except Exception as e:
+                self.logger.warning(f"🚫 Key #{idx + 1} Failed. Blacklisting... Error: {str(e)[:50]}")
+                self.provider_status[idx] = False # ቁልፉን ማሰናከል
+                continue 
+        
+        raise Exception("🚨 CRITICAL: All 15 fallback keys have been exhausted!")
 
     def _is_hot_country_time(self, country):
         """ሀገሩ በገበያ ትኩረት ሰዓት ላይ መሆኑን ማረጋገጥ"""
         if country not in self.country_timezones:
             return False
-        
         try:
             country_tz = pytz.timezone(self.country_timezones[country])
             country_time = datetime.now(country_tz)
-            current_hour = country_time.hour
-            
-            is_hot_time = current_hour in self.hot_hours
-            
-            self.logger.info(f"⏰ {country} Time: {country_time.strftime('%I:%M %p')} | "
-                           f"Hot Time: {is_hot_time} | Current Hour: {current_hour}")
-            
+            is_hot_time = country_time.hour in self.hot_hours
+            self.logger.info(f"⏰ {country} Time: {country_time.strftime('%I:%M %p')} | Hot: {is_hot_time}")
             return is_hot_time
-            
         except Exception as e:
             self.logger.error(f"Error checking time for {country}: {e}")
             return False
-
-    async def _call_ai_with_fallback(self, prompt, max_tokens=4000, phase_idx=0):
-        """15 ቁልፎችን በመጠቀም ጥሪውን ማከናወን"""
-        providers_count = len(self.ai_providers)
-        
-        for i in range(providers_count):
-            provider_idx = (phase_idx + i) % providers_count
-            provider = self.ai_providers[provider_idx]
-            
-            try:
-                self.logger.info(f"🔄 Using Provider {provider_idx+1}/{providers_count} for Phase {phase_idx+1}")
-                
-                if hasattr(provider, 'generate_content'):
-                    result = await provider.generate_content(prompt, max_tokens=max_tokens)
-                    self.logger.info(f"✅ Provider {provider_idx+1} succeeded")
-                    return result
-                    
-            except Exception as e:
-                self.logger.warning(f"⚠️ Provider {provider_idx+1} failed: {str(e)[:100]}")
-                continue
-        
-        raise Exception("All 15 fallback keys failed")
 
     async def _inject_authority_videos(self, topic: str, country: str):
         """የዩቲዩብ ቪዲዮዎችን አድኖ በውብ ዲዛይን ያዘጋጃል"""
