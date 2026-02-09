@@ -1057,23 +1057,25 @@ class ComprehensiveErrorHandler:
 
 # =================== 🔄 TITAN v21.0: THE SEVEN-KEY FORTRESS ===================
 # =================== 🔄 TITAN v31.0: THE UNSTOPPABLE 15-KEY RELAY ===================
+# =================== 🔄 TITAN v33.0: THE 15-KEY RELAY FORTRESS ===================
 class EnhancedAIFailoverSystem:
     def __init__(self, config=None):
         self.config = config
         self.logger = logging.getLogger("Titan.Failover")
         
-        # 🛡️ 15ቱን ቁልፎች መጫን
+        # 🛡️ 15ቱንም የግሮቅ ቁልፎች ከ Secrets መጫን
         self.groq_pool = self._load_key_pool('GROQ_API_KEY', 15)
-        self.groq_index = 0 
+        self.groq_index = 0 # ግሎባል ጠቋሚ - በምርት ሂደቱ በሙሉ አይቆምም
         
-        self.key_blacklist = {} 
+        self.key_blacklist = {} # {index: timestamp_to_unblock}
         self.backups = {
             'gemini': os.getenv('GEMINI_API_KEY')
         }
         
-        self.logger.info(f"🛡️ TITAN v32.0 READY: 15 Keys with Auto-Rotation enabled.")
+        self.logger.info(f"🛡️ TITAN v33.0 READY: {len(self.groq_pool)} Keys with Strict Relay Logic.")
 
     def _load_key_pool(self, base_name, count):
+        """15ቱን ቁልፎች በሥርዓት ሰብስቦ ይጭናል"""
         keys = []
         main_key = os.getenv(base_name)
         if main_key: keys.append(main_key)
@@ -1081,31 +1083,35 @@ class EnhancedAIFailoverSystem:
             k = os.getenv(f"{base_name}_{i}")
             if k and k not in keys: keys.append(k)
         
-        if keys:
-            while len(keys) < count:
-                keys.append(random.choice(keys))
+        # 15 ቁልፍ ከሌለህ ያሉትን ደጋግሞ በመጠቀም ክፍተቱን ይሞላል
+        if not keys:
+            self.logger.error("❌ CRITICAL: No Groq keys found!")
+            return []
+        while len(keys) < count:
+            keys.append(random.choice(keys))
         return keys
 
     async def process_task(self, prompt: str, task_type: str = "production", max_tokens: int = 4000) -> str:
         """
-        🔄 ራስ-ሰር የሚሽከረከር እና እረፍት የሚሰጥ ዋና ተግባር
+        🔄 STRICT RELAY LOGIC:
+        አንዱ ቁልፍ ስራውን ሲጨርስ ለቀጣዩ ያስረክባል + 3 ሰከንድ የግዴታ እረፍት።
         """
         now = time.time()
         
-        # 🔄 15ቱንም ቁልፎች በቅደም ተከተል ለመሞከር
-        for _ in range(len(self.groq_pool)):
+        # 🔄 ሁሉንም 15 ቁልፎች ለመሞከር (ለ 2 ዙር ዑደት)
+        for _ in range(len(self.groq_pool) * 2):
             idx = self.groq_index % len(self.groq_pool)
             api_key = self.groq_pool[idx]
             
-            # 1. መረጃውን ለቀጣዩ ጥሪ አሁኑኑ እናሽከረክረው (Auto-Rotate)
+            # ለቀጣዩ ጥሪ አሁኑኑ ተራውን እናዞራለን (Strict Rotation)
             self.groq_index += 1 
 
-            # 2. ቁልፉ የታገደ መሆኑን ማረጋገጥ
+            # ቁልፉ በቅጣት (429) ላይ ከሆነ እለፈው
             if idx in self.key_blacklist and now < self.key_blacklist[idx]:
                 continue
 
             try:
-                self.logger.info(f"🚀 [KEY-{idx + 1}/15] Rotating to next key... (Task: {task_type})")
+                self.logger.info(f"🚀 [KEY-{idx + 1}/15] Handling Phase... (Mode: {task_type})")
                 
                 async with httpx.AsyncClient(timeout=160.0) as client:
                     resp = await client.post(
@@ -1119,53 +1125,54 @@ class EnhancedAIFailoverSystem:
                         }
                     )
                     
-                    # ስኬታማ ከሆነ
+                    # ✅ ስኬታማ ከሆነ
                     if resp.status_code == 200:
                         if idx in self.key_blacklist: del self.key_blacklist[idx]
+                        
+                        # 💤 ወሳኝ፦ አንዱ ቁልፍ ሲጨርስ ለቀጣዩ ከማስተላለፉ በፊት 3 ሰከንድ እረፍት
+                        self.logger.info(f"✅ Key-{idx + 1} Succeeded. Resting 3s for Relay...")
+                        await asyncio.sleep(3) 
+                        
                         return str(resp.json()['choices'][0]['message']['content'])
                     
-                    # Rate Limit (429) ከሆነ ለ 90 ሰከንድ ማገድ
+                    # ⚠️ Rate Limit (429) ካጋጠመ ለ 90 ሰከንድ አሳርፈው
                     elif resp.status_code == 429:
-                        self.logger.warning(f"⚠️ Key #{idx + 1} Limit. Blocking 90s & Waiting 7s...")
+                        self.logger.warning(f"⚠️ Key #{idx + 1} Limited. Penalty: 90s.")
                         self.key_blacklist[idx] = now + 90
-                        await asyncio.sleep(7) # 💤 ወደ ቀጣዩ ከመሄድ በፊት የግድ እረፍት
+                        await asyncio.sleep(5) # ወደ ቀጣዩ ከመሄድ በፊት ትንሽ መተንፈሻ
                         continue
                     
-                    # ሌላ HTTP ስህተት
                     else:
-                        self.logger.error(f"❌ Key #{idx + 1} HTTP {resp.status_code}. Rotating in 7s...")
-                        await asyncio.sleep(7) # 💤 የግድ እረፍት
+                        self.logger.error(f"❌ Key #{idx + 1} HTTP {resp.status_code}. Rotating...")
+                        await asyncio.sleep(5)
                         continue
 
             except Exception as e:
-                # የኔትወርክ ስህተት ካጋጠመ በራሱ እንዲሽከረከር
-                self.logger.warning(f"📡 Connection Error Key #{idx + 1}. Auto-rotating in 7s...")
-                await asyncio.sleep(7) # 💤 የግድ እረፍት
+                self.logger.warning(f"📡 Network Error Key #{idx + 1}. Rotating...")
+                await asyncio.sleep(5)
                 continue
 
-        # 🏰 ሁሉም የ Groq ቁልፎች ካልሰሩ ወደ Gemini መሸጋገር
+        # 🏰 ሁሉም የ Groq ቁልፎች ቢዝሉ ወደ Gemini
         if self.backups['gemini']:
             try:
                 self.logger.info("🌟 Groq Pool exhausted. Using Gemini Backup...")
-                # ... Gemini API Call ... (ከላይ የነበረው ኮድ)
                 return await self._call_gemini_backup(prompt)
             except: pass
 
-        return "Error: All keys exhausted after auto-rotation."
+        return "Error: All 15 keys and backups exhausted."
 
-    # --- 🔗 ሌሎች ክፍሎች የሚጠሩባቸው የተለያዩ ስሞች (Aliases) ---
-    async def generate_content(self, *args, **kwargs):
-        return await self.process_task(*args, **kwargs)
+    # --- 🔗 ሌሎች ክፍሎች የሚጠሩባቸው ስሞች (Aliases) ---
+    async def generate_content(self, prompt: str, max_tokens: int = 4000, **kwargs) -> str:
+        return await self.process_task(prompt, "production", max_tokens)
 
-    async def generate_with_specific_key(self, prompt, *args, **kwargs):
-        return await self.process_task(prompt)
+    async def generate_with_specific_key(self, prompt, key_type="worker", **kwargs):
+        return await self.process_task(prompt, key_type)
 
     async def _call_gemini_backup(self, prompt):
         url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={self.backups['gemini']}"
         async with httpx.AsyncClient(timeout=120.0) as client:
             resp = await client.post(url, json={"contents": [{"parts": [{"text": prompt}]}]})
             return str(resp.json()['candidates'][0]['content']['parts'][0]['text'])
-    
 # =================== 📝 የተሻሻለ የይዘት ጀነሬተር ===================
 
 class ProductionContentGenerator:
