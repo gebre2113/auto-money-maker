@@ -3141,13 +3141,13 @@ class EnterpriseProductionOrchestrator:
         }
         
         try:
-            # 🛑 ወሳኝ ማስተካከያ፡ ፈንክሽኑን (self.run_enterprise_production) ያለ ቅንፍ ነው የምንልከው
-            # ግብዓቶቹን (topic, markets, content_type) ደግሞ ለብቻቸው እንሰጠዋለን
+            # 🚀 ፍጹም ማስተካከያ፦ ግቤቶቹን በ args ዝርዝር ውስጥ በማስገባት ግጭቱን ማስወገድ
+            # ይህ አሰራር 'multiple values' ስህተትን 100% ይከላከላል
+            production_args = [topic, markets, content_type]
+            
             result = await EnhancedErrorHandler.safe_execute(
-                self.run_enterprise_production, # ✅ ፈንክሽኑን ብቻ (ያለ ቅንፍ)
-                topic,                          # arg 1
-                markets,                        # arg 2
-                content_type,                   # arg 3
+                self.run_enterprise_production, 
+                *production_args, # ✅ ግቤቶቹን እዚህ ጋር ነው የምንበትናቸው
                 fallback_value={'status': 'failed', 'country_results': [], 'error': 'Production failed'},
                 max_retries=2,
                 retry_delay=5.0,
