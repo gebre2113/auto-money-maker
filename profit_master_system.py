@@ -4301,49 +4301,59 @@ class MegaContentEngine:
     async def _call_ai_with_fallback(self, prompt, max_tokens=4000, phase_idx=0):
         """
         የተረጋጋ እና ተከታታይ ጠሪ (Throttled Sequential Invoker)
+        ከ Global Lock ጋር - የዜና ሰዓት ሳይነካ ቁልፎችን በአንድ ጊዜ ከመጨናነቅ ይከላከላል።
         """
-        num_providers = len(self.ai_providers)
-        
-        for attempt in range(num_providers):
-            idx = (self.current_provider_idx + attempt) % num_providers
+        # 🛡️ መቆለፊያውን ማረጋገጥ (ይህ ለሁሉም ሀገራት አንድ መቆለፊያ ነው)
+        if not hasattr(self, '_global_key_lock'):
+            self._global_key_lock = asyncio.Lock()
+
+        # 🔒 LOCK ACTIVE: አንዱ ሀገር (ለምሳሌ GB) ቁልፍ ይዞ ሳይጨርስ ሌላው (ለምሳሌ US) አይገባም
+        # ይህ የዜና ሰዓትን አይቀይርም፣ ይልቁንም በሰልፍ (Queue) ያስይዛቸዋል
+        async with self._global_key_lock:
+            num_providers = len(self.ai_providers)
             
-            # ቁልፉ ቀደም ብሎ ከከሸፈ ዝለለው
-            if not self.provider_status[idx]:
-                continue
+            for attempt in range(num_providers):
+                idx = (self.current_provider_idx + attempt) % num_providers
                 
-            provider = self.ai_providers[idx]
-            
-            try:
-                # 📢 በሎጉ ላይ ግልጽ እንዲሆን ሰዓቱን እና ሙከራውን እናሳያለን
-                self.logger.info(f"🚀 Attempting Key #{idx + 1} | Time: {datetime.now().strftime('%H:%M:%S')}")
-                
-                if hasattr(provider, 'generate_content'):
-                    # 🛡️ ወሳኝ፦ ጥሪው እስኪመለስ በ 'await' እንጠብቃለን
-                    result = await provider.generate_content(prompt, max_tokens=max_tokens)
+                if not self.provider_status[idx]:
+                    continue
                     
-                    if result:
-                        self.current_provider_idx = (idx + 1) % num_providers
-                        self.logger.info(f"✅ Key #{idx + 1} Succeeded!")
-                        return result
+                provider = self.ai_providers[idx]
+                
+                try:
+                    # 🕒 ትክክለኛው ሰዓት በሎግ ላይ
+                    current_time = datetime.now().strftime('%H:%M:%S')
+                    self.logger.info(f"🚀 [KEY LOCK] Attempting Key #{idx + 1} | Time: {current_time}")
+                    
+                    if hasattr(provider, 'generate_content'):
+                        # AIው መልስ እስኪሰጥ 'await' ተደርጎ ይቆያል
+                        result = await provider.generate_content(prompt, max_tokens=max_tokens)
                         
-            except Exception as e:
-                error_msg = str(e).lower()
-                self.logger.warning(f"⚠️ Key #{idx + 1} failed: {error_msg[:100]}")
-                
-                # 🛑 'Rate limit' ከሆነ ቁልፉን ለተወሰነ ጊዜ አሰናክለው
-                if "rate_limit" in error_msg or "429" in error_msg:
-                    self.provider_status[idx] = False
-                
-                # ⏳ ቀጣዩን ቁልፍ ከመጥራታችን በፊት ሲስተሙን ትንሽ እናሳርፈው (2 ሰከንድ)
-                # ይህ 'Race Condition'ን ይከላከላል
-                await asyncio.sleep(2)
-                continue 
+                        if result:
+                            self.current_provider_idx = (idx + 1) % num_providers
+                            self.logger.info(f"✅ Key #{idx + 1} Succeeded!")
+                            
+                            # ⏳ ከስኬት በኋላ ለ 3 ሰከንድ Cooldown (ቁልፎቹ እንዲያገግሙ)
+                            await asyncio.sleep(3) 
+                            return result
+                            
+                except Exception as e:
+                    error_msg = str(e).lower()
+                    self.logger.warning(f"⚠️ Key #{idx + 1} failed: {error_msg[:50]}")
+                    
+                    # 🛑 'Rate limit' ከሆነ ቁልፉን ለ 2 ሰከንድ አሰናክለው
+                    if "rate_limit" in error_msg or "429" in error_msg:
+                        self.provider_status[idx] = False
+                    
+                    # ⏳ ቀጣዩን ቁልፍ ከመጥራታችን በፊት 2 ሰከንድ እረፍት
+                    await asyncio.sleep(2)
+                    continue 
 
-        # ሁሉም ካልሰሩ ወደ ቀጣዩ ሀገር ከመሄዱ በፊት ረዘም ያለ እረፍት
-        self.logger.error("🚨 All keys failed. Entering emergency cooling...")
-        await asyncio.sleep(10)
-        raise Exception("🚨 CRITICAL: 15/15 Keys Exhausted.")
-
+            # ሁሉም ካልሰሩ ወደ ቀጣዩ ሀገር ከመሄዱ በፊት ረዘም ያለ እረፍት
+            self.logger.error("🚨 All 15 keys failed. Entering emergency cooling...")
+            await asyncio.sleep(10)
+            raise Exception("🚨 CRITICAL: 15/15 Keys Exhausted.")
+            
     def _is_hot_country_time(self, country):
         """ሀገሩ በገበያ ትኩረት ሰዓት ላይ መሆኑን ማረጋገጥ"""
         if country not in self.country_timezones:
