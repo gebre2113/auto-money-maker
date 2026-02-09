@@ -3141,13 +3141,14 @@ class EnterpriseProductionOrchestrator:
         }
         
         try:
-            # 🚀 ፍጹም ማስተካከያ፦ ግቤቶቹን በ args ዝርዝር ውስጥ በማስገባት ግጭቱን ማስወገድ
-            # ይህ አሰራር 'multiple values' ስህተትን 100% ይከላከላል
-            production_args = [topic, markets, content_type]
+            # 🚀 ቋሚ መፍትሄ፦ ግቤቶችን በ kwargs (Keyword Arguments) ብቻ መላክ
+            # ይህ አሰራር 'multiple values' ስህተትን ሙሉ በሙሉ ያስቀራል
             
             result = await EnhancedErrorHandler.safe_execute(
-                self.run_enterprise_production, 
-                *production_args, # ✅ ግቤቶቹን እዚህ ጋር ነው የምንበትናቸው
+                self.run_enterprise_production,
+                topic=topic,
+                markets=markets,
+                content_type=content_type,
                 fallback_value={'status': 'failed', 'country_results': [], 'error': 'Production failed'},
                 max_retries=2,
                 retry_delay=5.0,
