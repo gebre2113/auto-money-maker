@@ -42,29 +42,110 @@ import base64
 import pytz
 from datetime import datetime
 
-def get_active_prime_time_countries():
-    """አሁን ምርት የሚያስፈልጋቸውን ሀገራት ይለያል"""
-    world_zones = {
-        "US": "America/New_York", "GB": "Europe/London", "CA": "America/Toronto",
-        "AU": "Australia/Sydney", "DE": "Europe/Berlin", "FR": "Europe/Paris",
-        "JP": "Asia/Tokyo", "CH": "Europe/Zurich", "NO": "Europe/Oslo", 
-        "SE": "Europe/Stockholm", "ET": "Africa/Addis_Ababa"
-    }
+# =========================================================================
+# 🛡️ ክፍል 1፡ መዝገብ ቤት (DAILY TRACKER) - ስህተቱን የሚፈታው ቁልፍ እዚህ ነው
+# =========================================================================
+class DailyProductionTracker:
+    def __init__(self, log_file="production_history.json"):
+        self.log_file = log_file
+        if not os.path.exists(self.log_file):
+            with open(self.log_file, 'w') as f: json.dump({}, f)
 
-    # የወርቃማ ሰዓታት (ጧት፣ ምሳ፣ ምሽት)
-    prime_slots = [(7, 10), (12, 14), (19, 22)]
-    
-    active_now = []
-    for code, zone in world_zones.items():
+    def is_already_done(self, country, topic):
         try:
-            tz = pytz.timezone(zone)
-            current_hour = datetime.now(tz).hour
-            for start, end in prime_slots:
-                if start <= current_hour <= end:
-                    active_now.append(code)
-                    break
-        except: continue
-    return active_now
+            with open(self.log_file, 'r') as f: history = json.load(f)
+            return history.get(f"{country}_{topic}") == datetime.now().strftime('%Y-%m-%d')
+        except: return False
+
+    def mark_as_done(self, country, topic):
+        try:
+            with open(self.log_file, 'r') as f: history = json.load(f)
+            history[f"{country}_{topic}"] = datetime.now().strftime('%Y-%m-%d')
+            with open(self.log_file, 'w') as f: json.dump(history, f, indent=4)
+        except: pass
+
+# =========================================================================
+# 🌍 ክፍል 2፡ የሀገራት ሰዓት ቀጠና (PRIME TIME)
+# =========================================================================
+COUNTRIES = {
+    'US': {'name': 'USA', 'timezone': 'US/Eastern'},
+    'GB': {'name': 'UK', 'timezone': 'Europe/London'},
+    'DE': {'name': 'Germany', 'timezone': 'Europe/Berlin'},
+    'FR': {'name': 'France', 'timezone': 'Europe/Paris'},
+    'JP': {'name': 'Japan', 'timezone': 'Asia/Tokyo'},
+    'CA': {'name': 'Canada', 'timezone': 'Canada/Eastern'},
+    'AU': {'name': 'Australia', 'timezone': 'Australia/Sydney'},
+    'ET': {'name': 'Ethiopia', 'timezone': 'Africa/Addis_Ababa'}
+}
+
+def get_active_prime_time_countries():
+    active = []
+    for code, info in COUNTRIES.items():
+        tz = pytz.timezone(info.get('timezone', 'UTC'))
+        local_hour = datetime.now(tz).hour
+        if 8 <= local_hour <= 23: active.append(code)
+    return active
+
+# =========================================================================
+# 🚀 ክፍል 3፡ ዋናው አምራች (THE UNIFIED SOVEREIGN RUNNER)
+# =========================================================================
+class SovereignOrchestrator:
+    def __init__(self, system):
+        self.system = system
+        self.logger = logging.getLogger("TITAN-v38")
+        self.tracker = DailyProductionTracker()
+        # 🔒 የጋራ መቆለፊያ - 15ቱ ቁልፎች ተጋፍተው እንዳይወድቁ
+        self._global_relay_lock = asyncio.Lock()
+
+    async def run_enterprise_production(self, topic: str, markets: List[str] = None) -> dict:
+        """
+        ያንተን ኦሪጅናል እስክሪብቶ (Mega Pen) የሚቀሰቅስ ዋና አዛዥ
+        """
+        # 1. ሰዓታቸውን የጠበቁ ሀገራትን መለየት
+        prime_markets = get_active_prime_time_countries()
+        to_process = [c for c in (markets or prime_markets) if c in prime_markets]
+        
+        # 2. ዛሬ የተሰሩትን ማጣራት
+        to_process = [c for c in to_process if not self.tracker.is_already_done(c, topic)]
+
+        if not to_process:
+            self.logger.info("😴 No countries in Prime Time or already completed.")
+            return {'status': 'idle'}
+
+        self.logger.info(f"🏢 STARTING PRODUCTION FOR: {', '.join(to_process)}")
+
+        for idx, country in enumerate(to_process):
+            self.logger.info(f"\n🌍 PROCESSING {country} ({idx+1}/{len(to_process)})")
+            
+            # 🔒 መቆለፊያውን በመጠቀም አንዱ ሀገር ሳይጨርስ ሌላው እንዳይገባ እናደርጋለን
+            async with self._global_relay_lock:
+                try:
+                    # 🧠 Brain Wipe: የቀድሞውን ሀገር መረጃ ማጽዳት
+                    if hasattr(self.system, 'content_engine'):
+                        self.system.content_engine.active_memory = ""
+
+                    # 🛠️ እዚህ ጋር ነው ያንተን "Mega Pen" የምንጠራው
+                    # ይህ ጥሪ ያንተን ኦሪጅናል 15,000 ቃላት ሎጂክ ያንቀሳቅሳል
+                    result = await self.system._process_country_enterprise(
+                        topic=topic, 
+                        country=country, 
+                        idx=idx+1, 
+                        total=len(to_process)
+                    )
+
+                    if result.get('status') == 'success':
+                        self.tracker.mark_as_done(country, topic)
+                        self.logger.info(f"✅ {country} Successfully Produced.")
+
+                    # 💤 ለ 60 ሰከንድ ቁልፎቹ እንዲያገግሙ እረፍት መስጠት
+                    if idx < len(to_process) - 1:
+                        await asyncio.sleep(60)
+
+                except Exception as e:
+                    self.logger.error(f"❌ Error in {country}: {e}")
+                    continue
+
+        return {'status': 'success'}
 # Suppress warnings
 warnings.filterwarnings('ignore')
 
