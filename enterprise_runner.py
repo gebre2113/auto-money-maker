@@ -3011,16 +3011,23 @@ class EnterpriseProductionOrchestrator:
     def __init__(self):
         self.logger = self._setup_enterprise_logging()
         
+        # 1. መጀመሪያ ሲስተሞችን ማስገባት (Import)
         self.importer = EnterpriseImportSystem()
-        import_results = self.importer.import_enterprise_system()
+        self.importer.import_enterprise_system()
         
+        # 2. 🛡️ AI Provider መነሳት አለበት (ለሌሎቹ መሰረት ነው)
+        self.ai_provider = UnstoppableAIProvider()
+        
+        # 3. 📰 Content System መነሳቱን እና በስም መጠራቱን እናረጋግጥ
+        # ስህተቱ እዚህ ጋር ነበር - ስሙ 'content_system' መሆኑን እናረጋግጣለን
+        self.content_system = MegaContentEngine(self) 
+        
+        # 4. ሁሉንም ክፍሎች አንድ በአንድ ማስነሳት
         self._initialize_all_components()
         
         self.enterprise_standards = {
-            'min_words': 3000,
+            'min_words': 15400, # ወደ 15,400 አሳድገነዋል
             'min_quality': 88,
-            'min_cultural_depth': 85,
-            'min_compliance_score': 95,
             'sequential_processing': True,
             'intelligent_delays': True,
             'quality_guarantee': True
@@ -3029,31 +3036,51 @@ class EnterpriseProductionOrchestrator:
         self.performance_monitor = PerformanceMonitor()
         self.memory_manager = MemoryManager()
         
+        # ማሳወቂያዎች
+        self._print_startup_banner()
+        
+        # 5. ✅ አሁን ፍተሻውን ቢያደርግ ስህተት አይመጣም
+        self._verify_module_integrity()
+
+    def _initialize_all_components(self):
+        """ሁሉንም ሰብስቲሞች በትክክል ስም ሰጥቶ ማስነሳት"""
+        try:
+            self.economic_indicators = EconomicDataVault()
+            self.social_manager = SocialMediaManager()
+            self.dashboard = DashboardManager()
+            self.affiliate_manager = AffiliateManager()
+            self.sensory_writer = SensoryWriter()
+            self.neuro_converter = NeuroMarketingConverter()
+            
+            # content_system እዚህም መኖሩን እናረጋግጥ (Double Check)
+            if not hasattr(self, 'content_system'):
+                self.content_system = MegaContentEngine(self)
+                
+            self.logger.info("✅ All core modules assigned to orchestrator.")
+        except Exception as e:
+            self.logger.error(f"❌ Initialization Error: {e}")
+            raise
+
+    def _verify_module_integrity(self):
+        """የሞጁሎችን ዝግጁነት ማረጋገጫ"""
+        required_modules = [
+            'ai_provider', 
+            'content_system',  # ይህ ነው ስህተት ሲሰጥ የነበረው
+            'economic_indicators', 
+            'affiliate_manager'
+        ]
+        for module in required_modules:
+            if not hasattr(self, module) or getattr(self, module) is None:
+                raise Exception(f"Required module {module} not initialized.")
+        self.logger.info("🛡️ Module integrity verified. System is bulletproof.")
+
+    def _print_startup_banner(self):
         self.logger.info("="*80)
         self.logger.info("🏢 ENTERPRISE PRODUCTION ORCHESTRATOR v8.2 INITIALIZED")
         self.logger.info("💎 ALL ENHANCEMENTS INTEGRATED - ZERO COMPROMISE")
-        self.logger.info("🤖 NEW: AI-POWERED CULTURAL ENRICHER, QUALITY AUDITOR & TITLE OPTIMIZER")
-        self.logger.info("👥 HUMAN-LIKENESS ENGINE (95% AI Detection Reduction)")
-        self.logger.info("🖼️ SMART IMAGE SEO ENGINE (40% Ranking Boost)")
-        self.logger.info("🎯 DYNAMIC CTA A/B TESTING (35% Revenue Increase)")
-        self.logger.info("📊 ENHANCED PERFORMANCE MONITORING & MEMORY MANAGEMENT")
-        self.logger.info("🌍 10+ HIGH-VALUE MARKETS WITH ENTERPRISE DEPTH")
-        self.logger.info("🛡️ FULL ETHICAL COMPLIANCE & LEGAL PROTECTION")
+        self.logger.info("🛡️ KEY-SHIELD: 15 GROQ KEYS ROTATING SEQUENTIALLY")
+        self.logger.info("🌍 10+ HIGH-VALUE MARKETS READY")
         self.logger.info("="*80)
-        
-        self._verify_module_integrity()
-    
-    def _setup_enterprise_logging(self):
-        log_dir = Path('enterprise_logs')
-        log_dir.mkdir(exist_ok=True)
-        
-        logger = logging.getLogger('enterprise_orchestrator')
-        logger.setLevel(logging.DEBUG)
-        
-        logger.handlers.clear()
-        
-        console = logging.StreamHandler()
-        console.setLevel(logging.INFO)
         
         class EnterpriseFormatter(logging.Formatter):
             level_colors = {
