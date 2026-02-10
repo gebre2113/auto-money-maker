@@ -3639,14 +3639,14 @@ class EnterpriseProductionOrchestrator:
     async def run_enterprise_production(self, topic: str, 
                                       markets: List[str] = None,
                                       content_type: str = "enterprise_guide") -> Dict:
-        """ሙሉ የኢንተርፕራይዝ ምርት ፋይልን ማስኬድ"""
+        """ሙሉ የኢንተርፕራይዝ ምርት ፋይልን ማስኬድ - በየሀገሩ መሃል ወዲያውኑ የሚልክ (Real-time)"""
         
         if markets is None:
             markets = DEFAULT_TARGET_COUNTRIES
         
         production_id = f"enterprise_{hashlib.md5(f'{topic}{datetime.now()}'.encode()).hexdigest()[:12]}"
         
-        self.logger.info(f"🏢 Processing {len(markets)} countries sequentially with Omega Key System...")
+        self.logger.info(f"🏢 Processing {len(markets)} countries sequentially with Real-time Publishing...")
         
         production_results = {
             'production_id': production_id,
@@ -3670,19 +3670,19 @@ class EnterpriseProductionOrchestrator:
         for idx, country in enumerate(markets):
             self.logger.info(f"\n{'━'*60}")
             self.logger.info(f"🏢 Processing {country} ({idx+1}/{len(markets)})")
-            self.logger.info(f"🔑 Omega Key for this phase: {(idx % self.key_rotation_system['keys_loaded']) + 1}")
             self.logger.info(f"{'━'*60}")
             
+            # 🧠 ሜሞሪ ማጽዳት
             current_memory = self.performance_monitor.sample_memory()
             if current_memory > 500:
                 self.logger.info(f"🧠 High memory usage: {current_memory:.1f}MB - optimizing...")
                 self.memory_manager.optimize_memory()
             
             try:
-                # 🔄 የኦሜጋ ቁልፍ ስርዓት ለዚህ ፌዝ
+                # 🔄 የኦሜጋ ቁልፍ መምረጥ
                 phase_key, key_number = self._get_next_omega_key(phase_idx=idx)
-                self.logger.info(f"🔑 Phase {idx+1} using Omega Key {key_number}")
                 
+                # ✍️ ይዘቱን ማምረት
                 country_result = await EnhancedErrorHandler.safe_execute(
                     self._process_country_enterprise(
                         topic=topic,
@@ -3704,6 +3704,22 @@ class EnterpriseProductionOrchestrator:
                 )
                 
                 country_result['omega_key_used'] = key_number
+                
+                # 🚀 ወሳኝ ማስተካከያ፦ ሀገሩ እንዳለቀ ወዲያውኑ ወደ WordPress እና ቴሌግራም መላክ
+                if country_result.get('status') == 'completed':
+                    self.logger.info(f"📡 Sending {country} content to all platforms immediately...")
+                    
+                    # አስፈላጊ መረጃዎችን ለሶሻል ማናጀሩ ማሟላት
+                    country_result['topic'] = topic
+                    country_result['production_id'] = production_id
+                    
+                    # 📤 መላኪያውን መጥራት
+                    try:
+                        publish_res = await self.social_manager.publish_country_content(country_result)
+                        country_result['publishing_status'] = publish_res
+                    except Exception as pub_err:
+                        self.logger.warning(f"⚠️ Real-time publishing failed for {country}: {pub_err}")
+
                 country_results.append(country_result)
                 
                 # ✅ የቁልፍ ስታቲስቲክስ ማዘመን
@@ -3711,15 +3727,13 @@ class EnterpriseProductionOrchestrator:
                     self._update_key_statistics(key_number, success=True)
                 else:
                     self._update_key_statistics(key_number, success=False)
-                    # 🚫 በተደጋጋሚ ስህተት ካጋጠመ ቁልፉን ማግደል
-                    if country_result.get('error', '').lower().count('rate limit') > 0:
+                    if 'rate limit' in str(country_result.get('error', '')).lower():
                         self._blacklist_omega_key(key_number, 180)
                 
-                # ⏳ በሀገራት መካከል የኢንተርፕራይዝ እረፍት
+                # ⏳ በሀገራት መካከል እረፍት (Delay)
                 if idx < len(markets) - 1:
-                    delay_range = HIGH_VALUE_COUNTRIES.get(country, {}).get('delay_seconds', (150, 210))
+                    delay_range = HIGH_VALUE_COUNTRIES.get(country, {}).get('delay_seconds', (45, 65))
                     delay = random.randint(*delay_range)
-                    
                     self.logger.info(f"⏳ Enterprise delay for quality: {delay} seconds...")
                     await asyncio.sleep(delay)
                 
@@ -3733,20 +3747,18 @@ class EnterpriseProductionOrchestrator:
                     'quality_score': 0
                 })
         
+        # 📊 አጠቃላይ ውጤቶችን ማጠቃለል
         production_results['country_results'] = country_results
         production_results['overall_metrics'] = self._calculate_enterprise_metrics(country_results)
         production_results['status'] = 'completed'
         production_results['end_time'] = datetime.now().isoformat()
         production_results['total_duration'] = (datetime.fromisoformat(production_results['end_time']) - 
                                                datetime.fromisoformat(production_results['start_time'])).total_seconds()
-        production_results['omega_key_system']['end_rotations'] = self.key_rotation_system['total_rotations']
-        production_results['omega_key_system']['rotations_used'] = (self.key_rotation_system['total_rotations'] - 
-                                                                   production_results['omega_key_system']['start_rotations'])
         
         # 📋 የኢንተርፕራይዝ ሪፖርቶች ማመንጨት
         await self._generate_enterprise_reports(production_results)
         
-        # 📧 ማሳወቂያዎች መላክ
+        # 📧 የምርት ማጠቃለያውን ለሁሉም ቻናሎች ማሳወቅ
         await self._send_enterprise_notifications(production_results)
         
         # 📊 ማጠቃለያ ማተም
