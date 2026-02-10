@@ -3952,7 +3952,7 @@ Standards Achievement Rate: {metrics.get('enterprise_standards_rate', 0)}%
 ================================================================================
 
 PRODUCTION OVERVIEW
-────────────────────────────────────────────────────────────────────────────────
+#────────────────────────────────────────────────────────────────────────────────
 Production ID:      {production_results['production_id']}
 Topic:              {production_results['topic']}
 Date:               {datetime.now().strftime('%B %d, %Y')}
@@ -3960,7 +3960,7 @@ Time:               {datetime.now().strftime('%H:%M:%S')}
 Version:            Enterprise Production Runner v8.2 (AI-Enhanced Edition)
 
 PERFORMANCE METRICS
-────────────────────────────────────────────────────────────────────────────────
+#────────────────────────────────────────────────────────────────────────────────
 Countries Targeted:         {metrics.get('total_countries', 0)}
 Countries Completed:        {metrics.get('completed_countries', 0)} ({metrics.get('success_rate', 0)}%)
 Total Words Generated:      {metrics.get('total_words', 0):,}
