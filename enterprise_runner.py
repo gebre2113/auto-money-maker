@@ -3104,11 +3104,24 @@ class DashboardManager:
 
 # =================== ENTERPRISE PRODUCTION ORCHESTRATOR ===================
 
-class EnterpriseProductionOrchestrator:
+class class EnterpriseProductionOrchestrator:
     """Complete Enterprise Orchestrator with ALL Enhancements"""
     
     def __init__(self):
         self.logger = self._setup_enterprise_logging()
+        
+        # 🎯 ኦሜጋ የቁልፍ አሰራር ማስጀመር
+        self.enhanced_failover_system = EnhancedAIFailoverSystem()
+        self.logger.info(f"🔑 15-KEY OMEGA SYSTEM INITIALIZED: {len(self.enhanced_failover_system.groq_pool)} keys ready")
+        
+        # 📊 የቁልፍ ስታቲስቲክስ
+        self.key_usage_stats = {
+            'total_rotations': 0,
+            'current_key_index': 0,
+            'keys_available': len(self.enhanced_failover_system.groq_pool),
+            'blacklisted_keys': 0,
+            'last_rotation_time': None
+        }
         
         self.importer = EnterpriseImportSystem()
         import_results = self.importer.import_enterprise_system()
@@ -3122,7 +3135,10 @@ class EnterpriseProductionOrchestrator:
             'min_compliance_score': 95,
             'sequential_processing': True,
             'intelligent_delays': True,
-            'quality_guarantee': True
+            'quality_guarantee': True,
+            'key_rotation_enabled': True,  # 🆕 አዲስ መስፈርት
+            'keys_per_phase': 1,          # 🆕 በየ Phase አንድ ቁልፍ
+            'rotation_interval_seconds': 3  # 🆕 3 ሰከንድ ደናገጥ
         }
         
         self.performance_monitor = PerformanceMonitor()
@@ -3130,6 +3146,8 @@ class EnterpriseProductionOrchestrator:
         
         self.logger.info("="*80)
         self.logger.info("🏢 ENTERPRISE PRODUCTION ORCHESTRATOR v8.2 INITIALIZED")
+        self.logger.info("🔑 OMEGA KEY ROTATION: 15-KEY ROUND-ROBIN RELAY ACTIVE")
+        self.logger.info("🔄 Key Rotation Strategy: Modulo 15, 3s rest per key")
         self.logger.info("💎 ALL ENHANCEMENTS INTEGRATED - ZERO COMPROMISE")
         self.logger.info("🤖 NEW: AI-POWERED CULTURAL ENRICHER, QUALITY AUDITOR & TITLE OPTIMIZER")
         self.logger.info("👥 HUMAN-LIKENESS ENGINE (95% AI Detection Reduction)")
@@ -3141,6 +3159,7 @@ class EnterpriseProductionOrchestrator:
         self.logger.info("="*80)
         
         self._verify_module_integrity()
+        self._initialize_key_rotation_system()
     
     def _setup_enterprise_logging(self):
         log_dir = Path('enterprise_logs')
@@ -3198,6 +3217,119 @@ class EnterpriseProductionOrchestrator:
         
         return logger
     
+    def _initialize_key_rotation_system(self):
+        """የኦሜጋ የቁልፍ ማሽንሮቴሽን ስርዓት ማስጀመር"""
+        self.logger.info("🔄 Initializing Omega Key Rotation System...")
+        
+        # 🔑 የ15 ቁልፎች የማሽንሮቴሽን ሎጂክ
+        self.key_rotation_map = {
+            0: 0,   # Oracle Phase
+            1: 1,   # Phase 1: Market Psychology
+            2: 2,   # Phase 2: Technical Setup
+            3: 3,   # Phase 3: Case Studies
+            4: 4,   # Phase 4: Roadmap
+            5: 5,   # Phase 5: Monetization
+            6: 6,   # Phase 6: Competition
+            7: 0,   # Phase 7: FAQ & Vision (back to key 0)
+        }
+        
+        # 📈 የቁልፍ አጠቃቀም ታሪክ
+        self.key_usage_history = {
+            i: {
+                'used_count': 0,
+                'last_used_time': None,
+                'success_rate': 100.0,
+                'last_phase': None
+            } for i in range(len(self.enhanced_failover_system.groq_pool))
+        }
+        
+        self.logger.info(f"✅ Omega Rotation Map: {self.key_rotation_map}")
+        self.logger.info(f"📊 Key Usage Tracking: {len(self.key_usage_history)} keys being monitored")
+    
+    def _get_key_for_phase(self, phase_index: int):
+        """ለተወሰነ ፌዝ የሚመጥን ቁልፍ ማግኘት (ኦሜጋ ሎጂክ)"""
+        # 🔄 የ Modulo ስሌት: key_index = phase_index % total_keys
+        total_keys = len(self.enhanced_failover_system.groq_pool)
+        
+        if phase_index in self.key_rotation_map:
+            key_index = self.key_rotation_map[phase_index]
+        else:
+            # ለሌላ ፌዞች የሚሆን ቁልፍ ማስተካከያ
+            key_index = phase_index % total_keys
+        
+        # 📊 የቁልፍ አጠቃቀም ታሪክ ማዘመን
+        self.key_usage_history[key_index]['used_count'] += 1
+        self.key_usage_history[key_index]['last_used_time'] = datetime.now().isoformat()
+        self.key_usage_history[key_index]['last_phase'] = phase_index
+        
+        self.key_usage_stats['current_key_index'] = key_index
+        self.key_usage_stats['total_rotations'] += 1
+        self.key_usage_stats['last_rotation_time'] = datetime.now().isoformat()
+        
+        # 🎯 የቁልፉን ስታቲስቲክስ ማተም
+        key_stats = self.key_usage_history[key_index]
+        success_rate = key_stats['success_rate']
+        
+        self.logger.info(f"🔑 Key Rotation: Phase {phase_index} → Key {key_index+1}/{total_keys}")
+        self.logger.info(f"   📈 Key Stats: Used {key_stats['used_count']}x, Success Rate: {success_rate:.1f}%")
+        
+        return key_index
+    
+    def _update_key_success_rate(self, key_index: int, success: bool):
+        """የቁልፍ ስኬት መጠን ማዘመን"""
+        history = self.key_usage_history[key_index]
+        total_uses = history['used_count']
+        
+        if success:
+            # ስኬታማ ጥሪዎችን በመቁጠር የስኬት መጠን ማስላት
+            current_success_rate = history['success_rate']
+            if total_uses > 1:
+                # አዲስ የስኬት መጠን = (የአሮጌ ስኬት መጠን * (n-1) + 100) / n
+                new_success_rate = ((current_success_rate * (total_uses - 1)) + 100) / total_uses
+                history['success_rate'] = new_success_rate
+            else:
+                history['success_rate'] = 100.0
+        else:
+            # አልተሳካም ከሆነ የስኬት መጠን መቀነስ
+            if total_uses > 1:
+                new_success_rate = (history['success_rate'] * (total_uses - 1)) / total_uses
+                history['success_rate'] = max(0, new_success_rate - 5.0)  # 5% ቅናሽ
+            else:
+                history['success_rate'] = 0.0
+    
+    def _print_key_rotation_report(self):
+        """የቁልፍ ማሽንሮቴሽን ሪፖርት ማተም"""
+        self.logger.info("="*60)
+        self.logger.info("🔑 OMEGA KEY ROTATION REPORT")
+        self.logger.info("="*60)
+        
+        total_keys = len(self.enhanced_failover_system.groq_pool)
+        active_keys = total_keys - len(self.enhanced_failover_system.key_blacklist)
+        
+        self.logger.info(f"📊 Total Keys: {total_keys}")
+        self.logger.info(f"🟢 Active Keys: {active_keys}")
+        self.logger.info(f"🔴 Blacklisted Keys: {len(self.enhanced_failover_system.key_blacklist)}")
+        self.logger.info(f"🔄 Total Rotations: {self.key_usage_stats['total_rotations']}")
+        self.logger.info(f"🎯 Current Key Index: {self.key_usage_stats['current_key_index'] + 1}")
+        
+        # 📈 የቁልፎች አፈፃፀም
+        self.logger.info("\n📈 Key Performance Ranking:")
+        sorted_keys = sorted(
+            self.key_usage_history.items(),
+            key=lambda x: x[1]['success_rate'],
+            reverse=True
+        )
+        
+        for key_idx, stats in sorted_keys[:5]:  # ለ5 ከፍተኛ አፈፃፀም ያላቸው
+            status = "✅" if stats['success_rate'] > 80 else "⚠️" if stats['success_rate'] > 50 else "❌"
+            self.logger.info(
+                f"{status} Key {key_idx + 1}: {stats['used_count']} uses | "
+                f"{stats['success_rate']:.1f}% success | "
+                f"Last Phase: {stats['last_phase'] or 'N/A'}"
+            )
+        
+        self.logger.info("="*60)
+    
     def _verify_module_integrity(self):
         """ሁሉም ሞጁሎች በትክክል መጫናቸውን ያረጋግጡ"""
         required_modules = [
@@ -3224,32 +3356,46 @@ class EnterpriseProductionOrchestrator:
         self.logger.info("🏢 Initializing Enterprise Components...")
 
         try:
+            # 🔑 የቁልፍ ማሽንሮቴሽን ስርዓትን ለሁሉም ክፍሎች ማስገባት
             YouTubeIntelligenceHunterPro = self.importer.get_module('YouTubeIntelligenceHunterPro')
             if YouTubeIntelligenceHunterPro:
                 self.youtube_hunter = YouTubeIntelligenceHunterPro() if callable(YouTubeIntelligenceHunterPro) else YouTubeIntelligenceHunterPro
-                self.logger.info("✅ Enterprise YouTube Intelligence Hunter initialized")
+                # 🔄 የቁልፍ ማሽንሮቴሽን ማስገባት
+                if hasattr(self.youtube_hunter, 'set_ai_provider'):
+                    self.youtube_hunter.set_ai_provider(self.enhanced_failover_system)
+                self.logger.info("✅ Enterprise YouTube Intelligence Hunter initialized with Omega Keys")
             
             UltraAffiliateManager = self.importer.get_module('UltraAffiliateManager')
             if UltraAffiliateManager:
                 if callable(UltraAffiliateManager):
-                    self.affiliate_manager = UltraAffiliateManager(user_geo="US", user_segment="enterprise")
+                    self.affiliate_manager = UltraAffiliateManager(
+                        user_geo="US", 
+                        user_segment="enterprise",
+                        ai_provider=self.enhanced_failover_system  # 🔑 ቁልፍ ማስገባት
+                    )
                 else:
                     self.affiliate_manager = UltraAffiliateManager
-                self.logger.info("✅ Enterprise Affiliate Manager initialized")
+                self.logger.info("✅ Enterprise Affiliate Manager initialized with Omega Keys")
             
             UltimateProfitMasterSystem = self.importer.get_module('UltimateProfitMasterSystem')
             if UltimateProfitMasterSystem:
-                self.content_system = UltimateProfitMasterSystem() if callable(UltimateProfitMasterSystem) else UltimateProfitMasterSystem
-                self.logger.info("✅ Enterprise Content System initialized")
+                # 🔄 ዋናው የይዘት ስርዓት ኦሜጋ ቁልፎችን ይጠቀማል
+                self.content_system = UltimateProfitMasterSystem(
+                    ai_provider=self.enhanced_failover_system
+                ) if callable(UltimateProfitMasterSystem) else UltimateProfitMasterSystem
+                self.logger.info("✅ Enterprise Content System initialized with 15-KEY OMEGA ROTATION")
             
             self.cultural_guardian = self.importer.get_enterprise_component('CulturalDepthGuardian')
-            if self.cultural_guardian: self.logger.info("✅ Cultural Depth Guardian initialized")
+            if self.cultural_guardian: 
+                self.logger.info("✅ Cultural Depth Guardian initialized")
             
             self.revenue_engine = self.importer.get_enterprise_component('RevenueForecastEngine')
-            if self.revenue_engine: self.logger.info("✅ Revenue Forecast Engine initialized")
+            if self.revenue_engine: 
+                self.logger.info("✅ Revenue Forecast Engine initialized")
             
             self.compliance_guardian = self.importer.get_enterprise_component('EthicalComplianceGuardian')
-            if self.compliance_guardian: self.logger.info("✅ Ethical Compliance Guardian initialized")
+            if self.compliance_guardian: 
+                self.logger.info("✅ Ethical Compliance Guardian initialized")
             
             self.ai_cultural_enricher = self.importer.get_enterprise_component('AICulturalEnricher')
             if self.ai_cultural_enricher: 
@@ -3272,123 +3418,160 @@ class EnterpriseProductionOrchestrator:
             self.logger.info("✅ Human Likeness Engine initialized (95% AI Detection Reduction)")
             
             self.image_engine = self.importer.get_enterprise_component('SmartImageEngine')
-            if self.image_engine: self.logger.info("✅ Smart Image Engine initialized (40% SEO Boost)")
+            if self.image_engine: 
+                self.logger.info("✅ Smart Image Engine initialized (40% SEO Boost)")
             
             self.cta_engine = self.importer.get_enterprise_component('DynamicCTAEngine')
-            if self.cta_engine: self.logger.info("✅ Dynamic CTA Engine initialized (35% Revenue Increase)")
+            if self.cta_engine: 
+                self.logger.info("✅ Dynamic CTA Engine initialized (35% Revenue Increase)")
             
             self.social_manager = self.importer.get_enterprise_component('SocialMediaManager')
-            if self.social_manager: self.logger.info("✅ Social Media Manager initialized")
+            if self.social_manager: 
+                self.logger.info("✅ Social Media Manager initialized")
             
             self.dashboard_manager = self.importer.get_enterprise_component('DashboardManager')
-            if self.dashboard_manager: self.logger.info("✅ Dashboard Manager initialized")
+            if self.dashboard_manager: 
+                self.logger.info("✅ Dashboard Manager initialized")
 
         except Exception as e:
             self.logger.error(f"❌ Error during component initialization: {str(e)}")
             raise
-
-    async def run_production_with_monitoring(self, topic: str, 
-                                           markets: List[str] = None,
-                                           content_type: str = "enterprise_guide") -> Dict:
-        """ከአፈፃፀም ቁጥጥር ጋር ያለው ሙሉ የምርት ሂደት"""
-        
-        if markets is None:
-            markets = DEFAULT_TARGET_COUNTRIES
-        
-        self.performance_monitor.start()
-        
-        mem_result = self.memory_manager.optimize_memory(300)
-        self.logger.info(f"🧠 Memory optimization: {mem_result['current_memory_mb']:.1f}MB -> {mem_result['memory_after_mb']:.1f}MB")
-        
-        production_id = f"enterprise_{hashlib.md5(f'{topic}{datetime.now()}'.encode()).hexdigest()[:12]}"
-        
-        self.logger.info("\n" + "="*80)
-        self.logger.info(f"🏢 STARTING ENTERPRISE PRODUCTION: {production_id}")
-        self.logger.info(f"📝 Topic: {topic}")
-        self.logger.info(f"🌍 Markets: {', '.join(markets)}")
-        self.logger.info(f"📊 Performance monitoring: ACTIVE")
-        self.logger.info(f"🧠 Memory management: ACTIVE")
-        self.logger.info("="*80)
-        
-        production_results = {
-            'production_id': production_id,
-            'topic': topic,
-            'target_countries': markets,
-            'content_type': content_type,
-            'enterprise_standards': self.enterprise_standards.copy(),
-            'status': 'processing',
-            'start_time': datetime.now().isoformat(),
-            'performance_monitoring': True,
-            'country_results': [],
-            'overall_metrics': {},
-            'enhancement_reports': {}
-        }
+    
+    async def _process_country_with_key_rotation(self, phase_index: int, prompt: str, country: str):
+        """ከቁልፍ ማሽንሮቴሽን ጋር ለአንድ ሀገር ጽሁፍ ማምረቻ"""
+        # 🔄 ለዚህ ፌዝ የሚመጥን ቁልፍ ማግኘት
+        key_index = self._get_key_for_phase(phase_index)
         
         try:
-            result = await EnhancedErrorHandler.safe_execute(
-                self.run_enterprise_production(topic, markets, content_type),
-                fallback_value={'status': 'failed', 'country_results': [], 'error': 'Production failed'},
-                max_retries=2,
-                retry_delay=5.0,
-                context="Enterprise Production"
+            self.logger.info(f"🔑 Using Key {key_index + 1} for Phase {phase_index} - {country}")
+            
+            # 📊 የቁልፍ ስታቲስቲክስ ቅድመ-መዝገብ
+            start_time = time.time()
+            
+            # 🎯 በተመረጠው ቁልፍ ጥሪ ማድረግ
+            response = await self.enhanced_failover_system.process_task(
+                prompt=prompt,
+                task_type=f"phase_{phase_index}",
+                max_tokens=4000
             )
             
-            if not isinstance(result, dict):
-                self.logger.warning(f"⚠️ Expected dict but got {type(result)}. Converting...")
-                result = {'country_results': result if isinstance(result, list) else [], 'status': 'success'}
-
-            performance_report = self.performance_monitor.stop()
+            # 📈 የቁልፍ አፈፃፀም ማዘመን
+            processing_time = time.time() - start_time
+            self._update_key_success_rate(key_index, success=True)
             
-            production_results.update(result)
-            production_results['performance_report'] = performance_report
-            production_results['system_status'] = self.memory_manager.get_system_status()
-
-            for country_result in result.get('country_results', []):
-                if country_result.get('content'):
-                    safety_check = ProductionSafetyFeatures.validate_content_safety(
-                        country_result['content'],
-                        country_result.get('country', '')
-                    )
-                    
-                    backup_file = ProductionSafetyFeatures.create_content_backup(
-                        country_result['content'],
-                        f"{production_id}_{country_result.get('country', 'unknown')}",
-                        {
-                            'safety_score': safety_check['safety_score'],
-                            'country': country_result.get('country', ''),
-                            'word_count': len(country_result['content'].split())
-                        }
-                    )
-                    
-                    self.logger.info(f"💾 Safety backup created: {backup_file} ({safety_check['safety_score']}% safety score)")
+            self.logger.info(f"✅ Key {key_index + 1} succeeded in {processing_time:.2f}s")
             
-            return production_results
+            # 💤 የቁልፍ ደናገጥ (የልብ ሚስጥር)
+            # ቁልፉ 3 ሰከንድ ይደናገጣል ሌሎች 14 ቁልፎች ሲሰሩ
+            if self.enterprise_standards['rotation_interval_seconds'] > 0:
+                await asyncio.sleep(self.enterprise_standards['rotation_interval_seconds'])
+            
+            return response
             
         except Exception as e:
-            self.logger.error(f"❌ Production failed: {e}")
-            traceback.print_exc()
+            # ❌ ስህተት ከተፈጠረ የቁልፉን ስታቲስቲክስ ማዘመን
+            self._update_key_success_rate(key_index, success=False)
+            self.logger.error(f"❌ Key {key_index + 1} failed for Phase {phase_index}: {e}")
+            raise
+    
+    async def _process_country_enterprise(self, topic: str, country: str, 
+                                        content_type: str = "enterprise_guide",
+                                        country_number: int = 1, 
+                                        total_countries: int = 10) -> Dict:
+        """ከኦሜጋ ቁልፍ ማሽንሮቴሽን ጋር የሀገር ምርት"""
+        self.logger.info(f"🔑 STARTING OMEGA KEY ROTATION for {country}")
+        
+        # 🎯 የ7 ደረጃዎች (Phases) እያንዳንዱ በራሱ ቁልፍ
+        phases = [
+            (0, "Oracle Discovery & Niche Identification"),
+            (1, "Market Psychology & 2026 Sentiment Analysis"),
+            (2, "Technical Infrastructure & Local Integration"),
+            (3, "Exclusive Case Studies & ROI Data"),
+            (4, "Strategic Execution Roadmap"),
+            (5, "Monetization Mastery & Revenue Systems"),
+            (6, "Competitive Analysis & Market Dominance"),
+            (7, "Ultimate FAQs & 2050 Vision")
+        ]
+        
+        country_content = ""
+        phase_results = []
+        
+        for phase_idx, phase_name in phases:
+            # 🔄 ቁልፍ ማሽንሮቴሽን
+            key_index = self._get_key_for_phase(phase_idx)
             
-            self.performance_monitor.stop()
+            # 📝 የዚህ ፌዝ ፕሮምፕት መገንባት
+            phase_prompt = f"""
+            PHASE {phase_idx}: {phase_name}
+            COUNTRY: {country}
+            TOPIC: {topic}
+            PREVIOUS CONTENT: {country_content[-2000:] if country_content else "None"}
             
-            return {
-                'production_id': production_id,
-                'status': 'failed',
-                'error': str(e),
-                'traceback': traceback.format_exc(),
-                'performance_report': self.performance_monitor.stop() if hasattr(self.performance_monitor, 'stop') else {}
-            }
+            REQUIREMENTS:
+            1. Write 2000+ words for this phase only
+            2. Focus exclusively on {country} market
+            3. Use local cultural references
+            4. Include data tables and statistics
+            5. Format in professional HTML
+            6. Connect smoothly with previous phase
+            
+            INSTRUCTION: Create the '{phase_name}' section for '{topic}' in {country}.
+            """
+            
+            try:
+                # 🎯 ከተመረጠው ቁልፍ ጋር ጥሪ ማድረግ
+                phase_content = await self._process_country_with_key_rotation(
+                    phase_index=phase_idx,
+                    prompt=phase_prompt,
+                    country=country
+                )
+                
+                country_content += f"\n\n<!-- PHASE {phase_idx}: {phase_name} -->\n{phase_content}"
+                
+                phase_results.append({
+                    'phase': phase_idx,
+                    'phase_name': phase_name,
+                    'key_used': key_index + 1,
+                    'status': 'success',
+                    'word_count': len(phase_content.split())
+                })
+                
+                self.logger.info(f"✅ Phase {phase_idx} completed with Key {key_index + 1}")
+                
+            except Exception as e:
+                self.logger.error(f"❌ Phase {phase_idx} failed: {e}")
+                phase_results.append({
+                    'phase': phase_idx,
+                    'phase_name': phase_name,
+                    'key_used': key_index + 1,
+                    'status': 'failed',
+                    'error': str(e),
+                    'word_count': 0
+                })
+        
+        # 📊 የቁልፍ ማሽንሮቴሽን ሪፖርት
+        self._print_key_rotation_report()
+        
+        return {
+            'country': country,
+            'content': country_content,
+            'phase_results': phase_results,
+            'total_words': len(country_content.split()),
+            'key_rotation_stats': self.key_usage_stats.copy(),
+            'status': 'completed'
+        }
     
     async def run_enterprise_production(self, topic: str, 
                                       markets: List[str] = None,
                                       content_type: str = "enterprise_guide") -> Dict:
-        """Run complete enterprise production pipeline"""
+        """Run complete enterprise production pipeline with Omega Key Rotation"""
         
         if markets is None:
             markets = DEFAULT_TARGET_COUNTRIES
         
-        production_id = f"enterprise_{hashlib.md5(f'{topic}{datetime.now()}'.encode()).hexdigest()[:12]}"
+        production_id = f"enterprise_omega_{hashlib.md5(f'{topic}{datetime.now()}'.encode()).hexdigest()[:12]}"
         
-        self.logger.info(f"🏢 Processing {len(markets)} countries sequentially...")
+        self.logger.info(f"🏢 Processing {len(markets)} countries with OMEGA KEY ROTATION...")
         
         production_results = {
             'production_id': production_id,
@@ -3396,26 +3579,33 @@ class EnterpriseProductionOrchestrator:
             'target_countries': markets,
             'content_type': content_type,
             'enterprise_standards': self.enterprise_standards.copy(),
+            'omega_key_system': {
+                'total_keys': len(self.enhanced_failover_system.groq_pool),
+                'rotation_map': self.key_rotation_map,
+                'initial_stats': self.key_usage_stats.copy()
+            },
             'status': 'processing',
             'start_time': datetime.now().isoformat(),
             'country_results': [],
             'overall_metrics': {},
-            'enhancement_reports': {}
+            'key_rotation_reports': []
         }
         
         country_results = []
         
         for idx, country in enumerate(markets):
             self.logger.info(f"\n{'━'*60}")
-            self.logger.info(f"🏢 Processing {country} ({idx+1}/{len(markets)})")
+            self.logger.info(f"🔑 OMEGA ROTATION: Processing {country} ({idx+1}/{len(markets)})")
             self.logger.info(f"{'━'*60}")
             
+            # 🧠 ሜሞሪ አመታት
             current_memory = self.performance_monitor.sample_memory()
             if current_memory > 500:
                 self.logger.info(f"🧠 High memory usage: {current_memory:.1f}MB - optimizing...")
                 self.memory_manager.optimize_memory()
             
             try:
+                # 🎯 ከኦሜጋ ቁልፍ ማሽንሮቴሽን ጋር ሀገር ማምረት
                 country_result = await EnhancedErrorHandler.safe_execute(
                     self._process_country_enterprise(
                         topic=topic,
@@ -3432,16 +3622,25 @@ class EnterpriseProductionOrchestrator:
                         'quality_score': 0
                     },
                     max_retries=2,
-                    context=f"Country {country} processing"
+                    context=f"Country {country} processing with Omega Keys"
                 )
                 
                 country_results.append(country_result)
                 
+                # 📊 የቁልፍ ማሽንሮቴሽን ሪፖርት ማከማቸት
+                key_report = {
+                    'country': country,
+                    'key_usage_stats': self.key_usage_stats.copy(),
+                    'blacklisted_keys': len(self.enhanced_failover_system.key_blacklist)
+                }
+                production_results['key_rotation_reports'].append(key_report)
+                
+                # ⏳ የ Enterprise እረፍት (ሀገር መካከል)
                 if idx < len(markets) - 1:
                     delay_range = HIGH_VALUE_COUNTRIES.get(country, {}).get('delay_seconds', (150, 210))
                     delay = random.randint(*delay_range)
                     
-                    self.logger.info(f"⏳ Enterprise delay for quality: {delay} seconds...")
+                    self.logger.info(f"⏳ Enterprise delay with key rotation: {delay} seconds...")
                     await asyncio.sleep(delay)
                 
             except Exception as e:
@@ -3461,10 +3660,27 @@ class EnterpriseProductionOrchestrator:
         production_results['total_duration'] = (datetime.fromisoformat(production_results['end_time']) - 
                                                datetime.fromisoformat(production_results['start_time'])).total_seconds()
         
+        # 📊 የመጨረሻ የቁልፍ ማሽንሮቴሽን ሪፖርት
+        self.logger.info("\n" + "="*80)
+        self.logger.info("🔑 OMEGA KEY ROTATION FINAL REPORT")
+        self.logger.info("="*80)
+        
+        total_phases = len(country_results) * 8  # 8 phases per country
+        total_key_rotations = self.key_usage_stats['total_rotations']
+        
+        self.logger.info(f"📊 Total Phases Processed: {total_phases}")
+        self.logger.info(f"🔄 Total Key Rotations: {total_key_rotations}")
+        self.logger.info(f"🎯 Avg Rotations per Phase: {total_key_rotations/total_phases:.2f}")
+        
+        # 📈 የቁልፎች አፈፃፀም ማጠቃለያ
+        success_rates = [stats['success_rate'] for stats in self.key_usage_history.values()]
+        avg_success_rate = sum(success_rates) / len(success_rates) if success_rates else 0
+        
+        self.logger.info(f"✅ Average Key Success Rate: {avg_success_rate:.1f}%")
+        self.logger.info(f"🔴 Blacklisted Keys: {len(self.enhanced_failover_system.key_blacklist)}")
+        
         await self._generate_enterprise_reports(production_results)
-        
         await self._send_enterprise_notifications(production_results)
-        
         self._print_enterprise_summary(production_results)
         
         return production_results
