@@ -4645,18 +4645,6 @@ class EnhancedWordCounter:
 # ========================================================================
 
 class MegaContentEngine:
-    """
-    የዓለማችን ቁንጮ የይዘት ማምረቻ ሞተር።
-    - 15,000+ Words በምዕራፍ (15,400 ቃላት የሚደርስ)
-    - 15-ቁልፍ ሮቴሽን (Round-Robin Relay Race)
-    - YouTube Authority Integration
-    - Ultra-Affiliate Monetization (v13.0)
-    - Hypnotic Fashion Design
-    - Market Timing Intelligence
-    - 7-Phase Content Architecture
-    """
-    
-    class MegaContentEngine:
     def __init__(self, parent):
         self.parent = parent
         # ሎገሩን ከወላጁ (Parent) መውሰድ ወይም ራሱን እንዲችል ማድረግ
