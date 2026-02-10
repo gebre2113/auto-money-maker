@@ -3969,7 +3969,7 @@ Average Quality Score:      {metrics.get('avg_quality', 0)}%
 Average Human Score:        {metrics.get('avg_human_score', 0)}% (AI Detection Reduction)
 Average Cultural Depth:     {metrics.get('avg_cultural_depth', 0)}%
 Average Safety Score:       {metrics.get('avg_safety_score', 0)}%
-Total Revenue Forecast:     ${metrics.get('estimated_revenue', 0):,.2f}/month
+Total Revenue Forecast:     ${metrics.get(f"'estimated_revenue', 0):,.2f}/month
 
 AI ENHANCEMENTS PERFORMANCE
 ("────────────────────────────────────────────────────────────────────────────────")
