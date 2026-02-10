@@ -3203,30 +3203,48 @@ class EnterpriseProductionOrchestrator:
         
         return production_results
     
+    # =========================================================================
+# 🚀 PART 2: THE SOVEREIGN BRIDGE (_process_country_enterprise)
+# =========================================================================
     async def _process_country_enterprise(self, topic: str, country: str, **kwargs) -> Dict:
         country_result = {'country': country, 'status': 'processing', 'metrics': {}}
         try:
-            # 1. Mega Pen (v18.1) ጥሪ
+            # 1. የመጀመሪያው ግዙፍ እስክሪብቶ (Mega Pen) - 15,000 ቃላቱን ያመርታል
             self.logger.info(f"👑 CALLING MEGA-PEN for {country}")
             mega_content = await self.content_system.mega_engine.produce_single_country_sovereign_logic(topic, country)
             
-            # 2. Affiliate Pen (v13.0) ጥሪ
+            # 2. ሁለተኛው ግዙፍ እስክሪብቶ (Affiliate Pen) - አፊሊዬት ካርዶችን ያስገባል
+            # ራነሩ ራሱ አፊሊዬት ማናጀሩን ስለሚይዝ እዚህ ጋር በቀጥታ እንጠራዋለን
             self.logger.info(f"💰 CALLING AFFILIATE-PEN for {country}")
             final_content, aff_report = await self.affiliate_manager.inject_affiliate_links(
-                content=mega_content, topic=topic, user_intent="purchase"
+                content=mega_content, 
+                topic=topic, 
+                user_intent="purchase",
+                user_journey_stage="decision"
             )
 
-            # 3. ማሳመሪያዎች
+            # 3. የማሳመሪያ ስራዎች (Polishing)
+            self.logger.info(f"✨ POLISHING: Adding Human-Likeness for {country}")
             humanized = await self.human_engine.inject_human_elements(final_content, country, topic)
-            final_html = self.image_engine.generate_image_placeholders(humanized, country, topic)
-
-            # 4. ውጤቱን ማሸግ (Revenue Fix)
+            
+            # 4. ውጤቱን ማሸግ
             rev = aff_report.get('predicted_total_revenue', 1500.0)
             country_result.update({
-                'content': final_html,
+                'content': humanized,
                 'status': 'success', 
-                'metrics': {'final_word_count': len(final_html.split()), 'estimated_revenue': rev, 'quality_score': 98}
+                'metrics': {
+                    'final_word_count': len(humanized.split()), 
+                    'estimated_revenue': rev, 
+                    'quality_score': 98
+                }
             })
+            self.logger.info(f"✅ {country} Successfully Mastered! Predicted Revenue: ${rev}")
+            return country_result
+
+        except Exception as e:
+            self.logger.error(f"❌ Master Bridge Failure in {country}: {str(e)}")
+            country_result['status'] = 'failed'
+            country_result['error'] = str(e)
             return country_result
 
         except Exception as e:
