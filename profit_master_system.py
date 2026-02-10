@@ -6059,7 +6059,6 @@ class MegaContentEngine:
 
 class UltimateProfitMasterSystem:
     """ዋና ስርዓት አሰራር እና ቁጥጥር"""
-    
     def __init__(self, config: PremiumConfig = None):
         self.config = config or PremiumConfig()
         
