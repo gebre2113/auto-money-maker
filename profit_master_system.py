@@ -4656,10 +4656,13 @@ class MegaContentEngine:
     - 7-Phase Content Architecture
     """
     
-    def __init__(self, system):
-        self.system = system
-        self.ai = getattr(system, 'failover_system', getattr(system, 'ai_provider', None))
-        
+    class MegaContentEngine:
+    def __init__(self, parent):
+        self.parent = parent
+        # ሎገሩን ከወላጁ (Parent) መውሰድ ወይም ራሱን እንዲችል ማድረግ
+        self.logger = getattr(parent, 'logger', logging.getLogger(__name__))
+        self.ai_providers = self._initialize_15_fallback_keys()
+
         # 1. የቃል ግብ (ከ 7 ደረጃዎች × 2200 ቃላት)
         self.TARGET_WORDS = 15400
         
