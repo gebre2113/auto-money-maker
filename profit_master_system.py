@@ -6057,22 +6057,19 @@ class MegaContentEngine:
 # =========================================================================
 # 👑 TITAN v19.0: THE SOVEREIGN ORACLE - ULTIMATE EDITION (FINAL)
 # ========================================================================
-
-# =================== ዋና ስርዓት ክፍል =======================================================================
 class UltimateProfitMasterSystem:
     """ዋና ስርዓት አሰራር እና ቁጥጥር"""
     
-    def __init__(self, config=None):
-        # 🛡️ 1. ኮንፊግሬሽን (Indentation: 8 Spaces from start of line)
-        from enterprise_runner import PremiumConfig
+    def __init__(self, config: PremiumConfig = None):
         self.config = config or PremiumConfig()
         
-        # 🛡️ 2. AI Provider (ከራነሩ ጋር እንዲገጥም ተደርጓል)
-        from enterprise_runner import UnstoppableAIProvider
-        self.failover_system = UnstoppableAIProvider()
+        # 🛡️ 1. መጀመሪያ የ AI Failover Systemን እንፈጥራለን (ስህተቱን የሚፈታው ወሳኝ መስመር)
+        self.failover_system = EnhancedAIFailoverSystem(self.config)
         
-        # 3. የይዘት ማመንጫ ክፍሎች
+        # 2. የይዘት ማመንጫውን እንፈጥራለን
         self.content_generator = ProductionContentGenerator(self.config)
+        
+        # 3. ሌሎች ዋና ዋና ክፍሎች
         self.cultural_engine = CulturalAnthropologistEngine(self.config)
         self.hyper_localizer = HyperLocalizedContentProducer(self.cultural_engine)
         self.multimedia_enhancer = PremiumMultimediaEnhancer()
@@ -6083,11 +6080,26 @@ class UltimateProfitMasterSystem:
         self.visual_asset_generator = VisualAssetGenerator()
         self.production_manager = ProductionManager(self.config)
         self.error_handler = ComprehensiveErrorHandler()
-
-        # 👑 4. ሜጋ-ኢንጂን (15,000 ቃላቱን የሚጽፈው ክፍል)
+        
+        # 4. አማራጭ ክፍሎች (Dashboard, Optimizer)
+        try:
+            import pandas as pd
+            self.dashboard = RealTimeDashboard()
+        except ImportError:
+            self.dashboard = None
+            print("⚠️ Pandas not installed, dashboard disabled")
+        
+        try:
+            self.self_optimizer = SelfOptimizingEngine()
+        except:
+            self.self_optimizer = None
+            
+        # 🚀 5. በመጨረሻ ሜጋ-ሞተሩን እናስጀምራለን (አሁን failover_systemን ያገኘዋል)
+        # አሰላለፉ 4 Spaces መሆኑን አረጋግጫለሁ
         self.mega_engine = MegaContentEngine(self)
-
-    # 🔗 ወሳኝ ድልድይ፦ ራነሩ (File 1) የሚጠራው ዋና ዘዴ ይህ ነው
+        
+        logger.info("🚀 Ultimate Profit Master System v18.1 Initialized")
+        
     async def _process_country_enterprise(self, topic: str, country: str, **kwargs):
         """ራነሩን ከ ሜጋ-ፔን ጋር የሚያገናኝ ድልድይ"""
         try:
