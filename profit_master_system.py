@@ -6044,12 +6044,6 @@ class MegaContentEngine:
                 await asyncio.sleep(1)  # 1 ሰከንድ (GitHub Free Tier Frien
 # =================== ዋና ስርዓት ክፍል ===================
 
-import logging
-import asyncio
-
-# ሎገር ማዘጋጀት (ከክላሱ በፊት መሆኑን አረጋግጥ)
-logger = logging.getLogger("ProfitMaster")
-
 class UltimateProfitMasterSystem:
     """ዋና ስርዓት አሰራር እና ቁጥጥር - v19.0 STABLE"""
 
