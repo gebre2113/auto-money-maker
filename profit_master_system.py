@@ -4649,47 +4649,7 @@ class EnhancedWordCounter:
 # =========================================================================
 # 👑 PART 1: THE REFINED MASTER PEN (MegaContentEngine)
 # =========================================================================
-class MegaContentEngine:
-    def __init__(self, system):
-        self.logger = logging.getLogger("MegaPen")
-        self.system = system
-        self.ai = getattr(system, 'failover_system', getattr(system, 'ai_provider', None))
 
-    async def produce_single_country_sovereign_logic(self, topic: str, country: str) -> str:
-        full_html = ""
-        memory = ""
-        info = COUNTRIES.get(country, {'lang': 'English'})
-        lang = info['lang']
-        
-        tasks = [
-            ("Master Introduction", 2200), ("Technical Infrastructure", 2200),
-            ("25 Case Studies", 2200), ("36-Month Roadmap", 2200),
-            ("Monetization Mastery", 2200), ("Competition Domination", 2000), ("2050 Vision", 2000)
-        ]
-
-        for idx, (name, words) in enumerate(tasks):
-            self.logger.info(f"⚙️  {country} Phase {idx+1}/7...")
-            
-            # 🛑 400 Bad Request እንዳይመጣ Context ን እናጽዳለን
-            clean_context = memory[-3000:].replace('"', "'").replace('\\', '/') if memory else "Start."
-            prompt = f"CONTEXT: {clean_context}\n\nSTRICT TASK: Write '{name}' for '{topic}' in {country}. Use {lang}. Target {words} words. HTML. DO NOT REPEAT."
-            
-            part = await self.ai.generate_content(prompt, max_tokens=4000)
-            if len(str(part)) < 200: raise Exception(f"AI Failure at {name}")
-
-            # 🎙️ አውዲዮ ቁልፍ መሰንጠቅ
-            audio = f"<div class='audio-btn' style='background:#1e3c72; color:gold; padding:15px; border-radius:10px;'>🎙️ Listen to {name}</div>"
-            
-            full_html += f"\n\n{audio}\n{str(part)}"
-            memory += str(part)
-            # በየዙሩ 7 ሰከንድ እረፍት (በ Provider ውስጥ ተካቷል)
-
-        # 🛑 ወሳኝ፡ እዚህ ጋር አፊሊዬት ኢንጂኑን አንጠራም። ራነሩ ራሱ እንዲያደርገው ንጹህ ጽሁፍ እንመልሳለን።
-        return self._build_royal_design(full_html, topic, country)
-
-    def _build_royal_design(self, content, topic, country):
-        style = "<style>body{background:#0b0f19; color:#333; font-family:serif;} .doc{max-width:1050px; margin:50px auto; background:#fff; padding:70px; border:35px solid #1e3c72; line-height:2.2;} h1{text-align:center; font-size:60px;}</style>"
-        return f"{style}<div class='doc'><h1>{topic.upper()} - {country}</h1>{content}</div>"
 # =========================================================================
 # 👑 TITAN v26.0 OMNIPOTENT: THE SOVEREIGN ORACLE (TOTAL UNIFICATION)
 # ============================================================ 
