@@ -3574,24 +3574,34 @@ class EnterpriseProductionOrchestrator:
             self.logger.info("✅ All required modules verified")
     
     def _create_fallback_modules(self, missing_modules):
-        """ለጎደሉ ሞጁሎች መጠባበቂያ መፍጠር - የአዌይት (Await) ስህተት ተስተካክሏል"""
+        """ለጎደሉ ሞጁሎች መጠባበቂያ መፍጠር - የArgument ስህተት ተስተካክሏል"""
         for module in missing_modules:
             if module == 'content_system':
-                # መጠባበቂያውን አሲንክሮነስ እንዲሆን ማድረግ
+                # ማንኛውንም የArgument ብዛት እንዲቀበል ተደርጎ የተሰራ (Flexible args)
                 async def mock_generate(*args, **kwargs):
                     return {
-                        'content': f"# content\n\nFallback content generation.",
+                        'content': f"# Fallback\n\nContent generation fallback mode.",
                         'word_count': 1000,
                         'quality_score': 70
                     }
                 
-                async def mock_mega(topic, country):
-                    return f"# {topic} for {country}\n\nFallback content logic."
+                async def mock_mega(*args, **kwargs):
+                    # የላከውን መረጃ ፈልቅቆ ማውጣት
+                    topic = args[0] if len(args) > 0 else "Topic"
+                    # ለክላስ ጥሪ ከሆነ (self ን ለማለፍ)
+                    if hasattr(topic, 'mega_engine') or isinstance(topic, str) == False:
+                        topic = args[1] if len(args) > 1 else "Topic"
+                        country = args[2] if len(args) > 2 else "Country"
+                    else:
+                        country = args[1] if len(args) > 1 else "Country"
+                    
+                    return f"# {topic} for {country}\n\nEnterprise analysis content (Fallback)."
 
                 fallback_obj = type('FallbackContentSystem', (), {
                     'generate_deep_content': mock_generate
                 })()
                 
+                # mega_engineን በውስጡ መጨመር
                 fallback_obj.mega_engine = type('FallbackMegaEngine', (), {
                     'produce_single_country_sovereign_logic': mock_mega
                 })()
