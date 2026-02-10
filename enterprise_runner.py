@@ -3574,42 +3574,28 @@ class EnterpriseProductionOrchestrator:
             self.logger.info("✅ All required modules verified")
     
     def _create_fallback_modules(self, missing_modules):
-        """ለጎደሉ ሞጁሎች መጠባበቂያ መፍጠር"""
+        """ለጎደሉ ሞጁሎች መጠባበቂያ መፍጠር - የአዌይት (Await) ስህተት ተስተካክሏል"""
         for module in missing_modules:
-            if module == 'youtube_hunter':
-                self.youtube_hunter = type('FallbackYouTubeHunter', (), {
-                    'find_relevant_videos': lambda *args, **kwargs: []
-                })()
-            elif module == 'affiliate_manager':
-                self.affiliate_manager = type('FallbackAffiliateManager', (), {
-                    'inject_affiliate_links': lambda *args, **kwargs: (kwargs.get('content', ''), {'predicted_total_revenue': 1500.0})
-                })()
-            elif module == 'content_system':
-                self.content_system = type('FallbackContentSystem', (), {
-                    'generate_deep_content': lambda *args, **kwargs: {
-                        'content': f"# Fallback Content\n\nBasic content for {kwargs.get('country', 'Unknown')}",
-                        'word_count': 2000,
-                        'quality_score': 75
+            if module == 'content_system':
+                # መጠባበቂያውን አሲንክሮነስ እንዲሆን ማድረግ
+                async def mock_generate(*args, **kwargs):
+                    return {
+                        'content': f"# content\n\nFallback content generation.",
+                        'word_count': 1000,
+                        'quality_score': 70
                     }
+                
+                async def mock_mega(topic, country):
+                    return f"# {topic} for {country}\n\nFallback content logic."
+
+                fallback_obj = type('FallbackContentSystem', (), {
+                    'generate_deep_content': mock_generate
                 })()
-            elif module == 'human_engine':
-                self.human_engine = HumanLikenessEngine()
-            elif module == 'image_engine':
-                self.image_engine = SmartImageEngine()
-            elif module == 'cta_engine':
-                self.cta_engine = DynamicCTAEngine()
-            elif module == 'cultural_guardian':
-                self.cultural_guardian = CulturalDepthGuardian()
-            elif module == 'revenue_engine':
-                self.revenue_engine = RevenueForecastEngine()
-            elif module == 'compliance_guardian':
-                self.compliance_guardian = EthicalComplianceGuardian()
-            elif module == 'ai_cultural_enricher':
-                self.ai_cultural_enricher = AICulturalEnricher()
-            elif module == 'ai_quality_auditor':
-                self.ai_quality_auditor = AIQualityAuditor()
-            elif module == 'ai_title_optimizer':
-                self.ai_title_optimizer = AITitleOptimizer()
+                
+                fallback_obj.mega_engine = type('FallbackMegaEngine', (), {
+                    'produce_single_country_sovereign_logic': mock_mega
+                })()
+                self.content_system = fallback_obj
     
     def _initialize_all_components(self):
         """Enterprise componentsን በስርዓት ያስነሳል"""
