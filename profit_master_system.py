@@ -1163,123 +1163,437 @@ class ComprehensiveErrorHandler:
             return "🔴 ከፍተኛ ችግር አለ"
 
 # =================== 🔄 TITAN v21.0: THE SEVEN-KEY FORTRESS ===================
-# =================== 🔄 TITAN v34.0: THE SLOW-BURN 15-KEY RELAY ===================
+# =================== 🔄 TITAN v34.0: THE SLOW-BURN 15-KEY RELAY ==================
+
 class EnhancedAIFailoverSystem:
+    """
+    🛡️ TITAN v34.0 ENHANCED AI FAILOVER SYSTEM
+    - 15 የግሮቅ ቁልፎች ስርዓት (Round-Robin Relay Race)
+    - ኦሜጋ የቁልፍ አሰራር (የልብ ሚስጥር)
+    - Strict Relay with Cooling Periods
+    - Gemini Backup System
+    """
+    
     def __init__(self, config=None):
         self.config = config
         self.logger = logging.getLogger("Titan.Failover")
         
         # 🛡️ 15ቱንም የግሮቅ ቁልፎች በሥርዓት መጫን
         self.groq_pool = self._load_key_pool('GROQ_API_KEY', 15)
-        self.groq_index = 0 # ግሎባል ጠቋሚ
+        self.groq_index = 0  # ግሎባል ጠቋሚ (የልብ ሚስጥር)
         
-        self.key_blacklist = {} # {index: timestamp_to_unblock}
+        # 📊 የቁልፎች መረጃ
+        self.key_stats = {i: {"success": 0, "failures": 0, "last_used": None} for i in range(len(self.groq_pool))}
+        self.key_blacklist = {}  # {index: timestamp_to_unblock}
+        
+        # 🔄 የመጠባበቂያ ስርዓቶች
         self.backups = {
-            'gemini': os.getenv('GEMINI_API_KEY')
+            'gemini': os.getenv('GEMINI_API_KEY'),
+            'deepseek': os.getenv('DEEPSEEK_API_KEY'),
+            'openai': os.getenv('OPENAI_API_KEY')
         }
         
-        self.logger.info(f"🛡️ TITAN v34.0 READY: {len(self.groq_pool)} Keys. Strict Relay Active.")
+        # ⚡ ፈጣን መረጃ ማከማቻ
+        self.response_cache = {}
+        self.cache_ttl = 300  # 5 ደቂቃ
+        
+        # 📈 ስታቲስቲክስ
+        self.total_requests = 0
+        self.failed_requests = 0
+        self.rotation_count = 0
+        
+        self.logger.info(f"🛡️ TITAN v34.0 ENHANCED FAILOVER READY: {len(self.groq_pool)} Keys | Strict Relay Active")
+        self.logger.info(f"📊 Key Statistics: {len(self.groq_pool)} primary keys | {sum(1 for v in self.backups.values() if v)} backup keys")
 
     def _load_key_pool(self, base_name, count):
         """ከ Secrets ውስጥ 15ቱንም ቁልፎች ሰብስቦ ይጭናል"""
         keys = []
-        # መጀመሪያ ዋናውን (GROQ_API_KEY) ይፈትሻል
-        main_key = os.getenv(base_name)
-        if main_key: keys.append(main_key)
         
-        # በመቀጠል ቁጥር ያላቸውን (GROQ_API_KEY_1...15) ይጭናል
+        # 1. መጀመሪያ ዋናውን (GROQ_API_KEY) ይፈትሻል
+        main_key = os.getenv(base_name)
+        if main_key: 
+            keys.append(main_key)
+            self.logger.info(f"✅ Loaded primary key: {base_name}")
+        
+        # 2. በመቀጠል ቁጥር ያላቸውን (GROQ_API_KEY_1...15) ይጭናል
         for i in range(1, count + 1):
             k = os.getenv(f"{base_name}_{i}")
             if k and k not in keys:
                 keys.append(k)
+                self.logger.info(f"✅ Loaded numbered key: {base_name}_{i}")
         
         if not keys:
             self.logger.error("❌ CRITICAL: No Groq keys found in Secrets!")
             return []
-        return keys
+        
+        # 3. የተረጋጋ ቅደም ተከተል ማድረግ (የሚሳካ የሚመስል ዘዴ)
+        # ይህ በቅደም ተከተል የሚከፍቱትን ቁልፎች ለመረዳት ይረዳል
+        sorted_keys = []
+        if main_key:
+            sorted_keys.append(main_key)  # ዋናው በፊት
+        
+        # የቀሩትን በቁጥር ቅደም ተከተል
+        numbered_keys = [k for k in keys if k != main_key]
+        sorted_keys.extend(sorted(numbered_keys, key=lambda x: int(x[-2:]) if x[-2:].isdigit() else 0))
+        
+        self.logger.info(f"📋 Total keys loaded and sorted: {len(sorted_keys)}")
+        return sorted_keys
 
     async def process_task(self, prompt: str, task_type: str = "production", max_tokens: int = 4000) -> str:
         """
-        🔄 SLOW-BURN RELAY:
-        በየጥሪው ቁልፍ ይቀይራል፣ ስህተት ካጋጠመ ደግሞ ቆም ብሎ ቀጣዩን ይሞክራል።
+        🔄 O M E G A  R O U N D - R O B I N  R E L A Y  R A C E
+        የልብ ሚስጥር: በየጥሪው ቁልፍ ይቀይራል፣ ስህተት ካጋጠመ ደግሞ ቆም ብሎ ቀጣዩን ይሞክራል።
+        
+        ስልት:
+        1. ቁልፍ_ኢንዴክስ = (የአሁኑ_ኢንዴክስ % 15)
+        2. ቁልፉን ለጥሪ ይጠቀም
+        3. ተሳክቶ ከሆነ: ቁልፉን ለ3 ሰከንድ ያርፈው
+        4. ካልተሳከ: ቁልፉን ለ120 ሰከንድ አግድ
+        5. ወደ ቀጣዩ ቁልፍ ሂድ
         """
+        self.total_requests += 1
         now = time.time()
         
-        # ሁሉንም 15 ቁልፎች የመሞከር ዑደት (ለ 2 ዙር)
-        for _ in range(len(self.groq_pool) * 2):
-            idx = self.groq_index % len(self.groq_pool)
+        # 🔄 የካሽ ቼክ (ለተመሳሳይ ጥያቄዎች)
+        cache_key = hash(prompt[:500])
+        if cache_key in self.response_cache:
+            cache_entry = self.response_cache[cache_key]
+            if now - cache_entry["timestamp"] < self.cache_ttl:
+                self.logger.info("⚡ Returning cached response")
+                return cache_entry["response"]
+        
+        # 🏁 የ15 ቁልፎች ዑደት (ለ 2 ዙር ማለት 30 ሙከራ)
+        total_keys = len(self.groq_pool)
+        for attempt in range(total_keys * 2):
+            idx = self.groq_index % total_keys
             api_key = self.groq_pool[idx]
             
-            # ተረኛው ቁልፍ በቅጣት ላይ ከሆነ እለፈው
-            if idx in self.key_blacklist and now < self.key_blacklist[idx]:
-                self.groq_index += 1
-                continue
-
-            # 🛑 ወሳኝ፦ ለቀጣዩ ጥሪ አሁኑኑ ተራውን እናዞራለን
-            self.groq_index += 1 
-
+            # 📛 ተረኛው ቁልፍ በቅጣት ላይ ከሆነ እለፈው
+            if idx in self.key_blacklist:
+                if now < self.key_blacklist[idx]:
+                    self.logger.debug(f"⏸️ Key #{idx + 1} is blacklisted, skipping...")
+                    self.groq_index += 1
+                    continue
+                else:
+                    # የቅጣቱ ጊዜ ካለቀ አግዳሚነቱን አጥፋ
+                    del self.key_blacklist[idx]
+                    self.logger.info(f"✅ Key #{idx + 1} blacklist expired, reactivating")
+            
+            # 🛑 ወሳኝ ደረጃ: ለቀጣዩ ጥሪ አሁኑኑ ተራውን እናዞራለን
+            self.groq_index += 1
+            self.rotation_count += 1
+            
+            # 📊 የቁልፍ ስታቲስቲክስ ማዘመን
+            self.key_stats[idx]["last_used"] = datetime.now().isoformat()
+            
             try:
-                self.logger.info(f"🚀 [KEY-{idx + 1}/15] Attempting phase... (Mode: {task_type})")
+                self.logger.info(f"🚀 [KEY-{idx + 1}/{total_keys}] Attempting {task_type}... (Attempt {attempt + 1})")
                 
-                async with httpx.AsyncClient(timeout=160.0) as client:
+                # ⏱️ Request timeout with generous margin
+                timeout = httpx.Timeout(160.0, connect=30.0)
+                
+                async with httpx.AsyncClient(timeout=timeout) as client:
                     resp = await client.post(
                         "https://api.groq.com/openai/v1/chat/completions",
-                        headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"},
+                        headers={
+                            "Authorization": f"Bearer {api_key}",
+                            "Content-Type": "application/json"
+                        },
                         json={
                             "model": "llama-3.3-70b-versatile",
                             "messages": [{"role": "user", "content": prompt}],
                             "max_tokens": max_tokens,
-                            "temperature": 0.7
+                            "temperature": 0.7,
+                            "top_p": 0.9,
+                            "stream": False
                         }
                     )
                     
                     # ✅ ስኬታማ ከሆነ
                     if resp.status_code == 200:
-                        if idx in self.key_blacklist: del self.key_blacklist[idx]
+                        self.key_stats[idx]["success"] += 1
                         
-                        # 💤 ለ 3 ሰከንድ አርፎ ለቀጣዩ ቁልፍ ያስረክባል
-                        await asyncio.sleep(3) 
-                        return str(resp.json()['choices'][0]['message']['content'])
+                        # 🧹 ካለ አግዳሚነት አጥፋ
+                        if idx in self.key_blacklist:
+                            del self.key_blacklist[idx]
+                        
+                        response_data = resp.json()
+                        content = str(response_data['choices'][0]['message']['content'])
+                        
+                        # 💾 በካሽ ማስቀመጥ
+                        self.response_cache[cache_key] = {
+                            "response": content,
+                            "timestamp": now
+                        }
+                        
+                        # 💤 የማረፊያ ጊዜ (የልብ ሚስጥር)
+                        # ቁልፉ 3 ሰከንድ ይደናገጣል ሌሎች 14 ቁልፎች ሲሰሩ
+                        wait_time = 3.0
+                        self.logger.info(f"✅ Key #{idx + 1} succeeded. Cooling for {wait_time}s...")
+                        await asyncio.sleep(wait_time)
+                        
+                        return content
                     
                     # ⚠️ Rate Limit (429) - ቁልፉን ለ 120 ሰከንድ አግድ
                     elif resp.status_code == 429:
-                        self.logger.warning(f"⚠️ Key #{idx + 1} hit Rate Limit. Penalty: 120s.")
-                        self.key_blacklist[idx] = now + 120
-                        # 🛑 ወሳኝ፦ ወደ ቀጣዩ ቁልፍ ከመሄድ በፊት 10 ሰከንድ የግዴታ እረፍት
-                        await asyncio.sleep(10)
+                        self.key_stats[idx]["failures"] += 1
+                        self.failed_requests += 1
+                        
+                        penalty_duration = 120  # 2 ደቂቃ
+                        self.key_blacklist[idx] = now + penalty_duration
+                        
+                        self.logger.warning(f"⚠️ Key #{idx + 1} hit Rate Limit. Penalty: {penalty_duration}s.")
+                        
+                        # 🛑 ወሳኝ: ወደ ቀጣዩ ቁልፍ ከመሄድ በፊት 10 ሰከንድ የግዴታ እረፍት
+                        cooldown = 10.0
+                        self.logger.info(f"⏸️ Mandatory cooldown for {cooldown}s before next key...")
+                        await asyncio.sleep(cooldown)
                         continue
                     
+                    # 🚫 ሌሎች ስህተቶች
                     else:
-                        self.logger.error(f"❌ Key #{idx + 1} Error: HTTP {resp.status_code}. Pausing 5s...")
+                        self.key_stats[idx]["failures"] += 1
+                        self.failed_requests += 1
+                        
+                        error_msg = f"HTTP {resp.status_code}"
+                        if resp.status_code >= 500:
+                            error_msg += " (Server Error)"
+                        elif resp.status_code == 403:
+                            error_msg += " (Forbidden - Check Key)"
+                        elif resp.status_code == 401:
+                            error_msg += " (Unauthorized - Invalid Key)"
+                        
+                        self.logger.error(f"❌ Key #{idx + 1} Error: {error_msg}")
+                        
+                        # 🔄 ለተወሰነ ጊዜ ቁልፉን አግድ
+                        short_penalty = 30  # 30 ሰከንድ
+                        self.key_blacklist[idx] = now + short_penalty
+                        
+                        self.logger.info(f"⏸️ Pausing 5s before retry...")
                         await asyncio.sleep(5)
                         continue
 
+            except httpx.TimeoutException:
+                self.key_stats[idx]["failures"] += 1
+                self.failed_requests += 1
+                self.logger.warning(f"⏱️ Key #{idx + 1} timeout. Moving to next key...")
+                await asyncio.sleep(2)
+                continue
+                
+            except httpx.NetworkError:
+                self.key_stats[idx]["failures"] += 1
+                self.failed_requests += 1
+                self.logger.warning(f"📡 Network error with Key #{idx + 1}. Pausing 3s...")
+                await asyncio.sleep(3)
+                continue
+                
             except Exception as e:
-                self.logger.warning(f"📡 Connection Error with Key #{idx + 1}. Pausing 5s...")
+                self.key_stats[idx]["failures"] += 1
+                self.failed_requests += 1
+                self.logger.warning(f"🔧 Unexpected error with Key #{idx + 1}: {str(e)[:100]}")
                 await asyncio.sleep(5)
                 continue
 
-        # 🏰 ሁሉም ግሮቅ ካልሰሩ ወደ Gemini
+        # 🏰 ሁሉም ግሮቅ ካልሰሩ ወደ የመጠባበቂያ ስርዓቶች
+        self.logger.warning("🌋 All Groq keys exhausted. Activating backup systems...")
+        
+        # 1. ጀምረ (Gemini)
         if self.backups['gemini']:
             try:
-                self.logger.info("🌟 Groq Pool exhausted. Using Gemini Backup...")
-                return await self._call_gemini_backup(prompt)
-            except: pass
+                self.logger.info("🌟 Attempting Gemini Backup...")
+                gemini_result = await self._call_gemini_backup(prompt)
+                if gemini_result:
+                    return gemini_result
+            except Exception as e:
+                self.logger.error(f"❌ Gemini failed: {e}")
+        
+        # 2. ዲፕሲክ (DeepSeek)
+        if self.backups['deepseek']:
+            try:
+                self.logger.info("🌀 Attempting DeepSeek Backup...")
+                deepseek_result = await self._call_deepseek_backup(prompt, max_tokens)
+                if deepseek_result:
+                    return deepseek_result
+            except Exception as e:
+                self.logger.error(f"❌ DeepSeek failed: {e}")
+        
+        # 3. ኦፔንኤአይ (OpenAI)
+        if self.backups['openai']:
+            try:
+                self.logger.info("⚡ Attempting OpenAI Backup...")
+                openai_result = await self._call_openai_backup(prompt, max_tokens)
+                if openai_result:
+                    return openai_result
+            except Exception as e:
+                self.logger.error(f"❌ OpenAI failed: {e}")
+        
+        # 🚨 ሁሉም ስርዓቶች ካልሰሩ
+        self.logger.critical("💀 ALL SYSTEMS FAILED: 15 Groq keys + 3 backup providers exhausted")
+        
+        # 📊 የመጨረሻ ሪፖርት
+        self._print_failure_report()
+        
+        raise Exception("🚨 CRITICAL FAILURE: All 15 keys and 3 backup providers exhausted. Check API keys and network.")
 
-        raise Exception("🚨 CRITICAL: 15/15 Keys Exhausted even after cooling. Check Key Validity.")
+    async def _call_gemini_backup(self, prompt):
+        """የጄሚኒ የመጠባበቂያ ጥሪ"""
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={self.backups['gemini']}"
+        
+        async with httpx.AsyncClient(timeout=120.0) as client:
+            resp = await client.post(
+                url,
+                json={
+                    "contents": [{
+                        "parts": [{"text": prompt}]
+                    }]
+                }
+            )
+            
+            if resp.status_code == 200:
+                data = resp.json()
+                return str(data['candidates'][0]['content']['parts'][0]['text'])
+            
+            raise Exception(f"Gemini error: {resp.status_code}")
+
+    async def _call_deepseek_backup(self, prompt, max_tokens):
+        """የዲፕሲክ የመጠባበቂያ ጥሪ"""
+        url = "https://api.deepseek.com/v1/chat/completions"
+        
+        async with httpx.AsyncClient(timeout=120.0) as client:
+            resp = await client.post(
+                url,
+                headers={
+                    "Authorization": f"Bearer {self.backups['deepseek']}",
+                    "Content-Type": "application/json"
+                },
+                json={
+                    "model": "deepseek-chat",
+                    "messages": [{"role": "user", "content": prompt}],
+                    "max_tokens": max_tokens,
+                    "temperature": 0.7
+                }
+            )
+            
+            if resp.status_code == 200:
+                data = resp.json()
+                return str(data['choices'][0]['message']['content'])
+            
+            raise Exception(f"DeepSeek error: {resp.status_code}")
+
+    async def _call_openai_backup(self, prompt, max_tokens):
+        """የኦፔንኤአይ የመጠባበቂያ ጥሪ"""
+        url = "https://api.openai.com/v1/chat/completions"
+        
+        async with httpx.AsyncClient(timeout=120.0) as client:
+            resp = await client.post(
+                url,
+                headers={
+                    "Authorization": f"Bearer {self.backups['openai']}",
+                    "Content-Type": "application/json"
+                },
+                json={
+                    "model": "gpt-4",
+                    "messages": [{"role": "user", "content": prompt}],
+                    "max_tokens": max_tokens,
+                    "temperature": 0.7
+                }
+            )
+            
+            if resp.status_code == 200:
+                data = resp.json()
+                return str(data['choices'][0]['message']['content'])
+            
+            raise Exception(f"OpenAI error: {resp.status_code}")
+
+    def _print_failure_report(self):
+        """የስህተት ሪፖርት ማተም"""
+        self.logger.critical("=" * 60)
+        self.logger.critical("💀 SYSTEM FAILURE REPORT")
+        self.logger.critical("=" * 60)
+        
+        self.logger.critical(f"📊 Total Requests: {self.total_requests}")
+        self.logger.critical(f"📉 Failed Requests: {self.failed_requests}")
+        self.logger.critical(f"📈 Success Rate: {((self.total_requests - self.failed_requests) / self.total_requests * 100):.1f}%")
+        self.logger.critical(f"🔄 Rotations: {self.rotation_count}")
+        
+        self.logger.critical("\n📋 Key Performance:")
+        for idx, stats in self.key_stats.items():
+            total = stats["success"] + stats["failures"]
+            if total > 0:
+                success_rate = (stats["success"] / total) * 100
+                status = "✅" if success_rate > 80 else "⚠️" if success_rate > 50 else "❌"
+                self.logger.critical(f"{status} Key {idx + 1}: {stats['success']}/{total} ({success_rate:.1f}%)")
+        
+        self.logger.critical("\n🔒 Blacklisted Keys:")
+        if self.key_blacklist:
+            for idx, unblock_time in self.key_blacklist.items():
+                remaining = max(0, unblock_time - time.time())
+                self.logger.critical(f"⏳ Key {idx + 1}: Blacklisted for {remaining:.0f}s more")
+        else:
+            self.logger.critical("✅ No keys currently blacklisted")
+        
+        self.logger.critical("=" * 60)
 
     # --- 🔗 ለሌሎች ክፍሎች ድጋፍ ሰጪ ስሞች (Aliases) ---
     async def generate_content(self, prompt: str, max_tokens: int = 4000, **kwargs) -> str:
+        """ለ MegaContentEngine የሚመጥን ድጋፍ ሰጪ ስም"""
         return await self.process_task(prompt, "production", max_tokens)
 
     async def generate_with_specific_key(self, prompt, key_type="worker", **kwargs):
+        """ለተወሰነ ተግባር የሚመጥን ድጋፍ ሰጪ"""
         return await self.process_task(prompt, key_type)
 
-    async def _call_gemini_backup(self, prompt):
-        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={self.backups['gemini']}"
-        async with httpx.AsyncClient(timeout=120.0) as client:
-            resp = await client.post(url, json={"contents": [{"parts": [{"text": prompt}]}]})
-            return str(resp.json()['candidates'][0]['content']['parts'][0]['text'])
+    def get_key_statistics(self):
+        """የቁልፎች ስታቲስቲክስ ማግኘት"""
+        stats = []
+        for idx, key_stats in self.key_stats.items():
+            total = key_stats["success"] + key_stats["failures"]
+            if total > 0:
+                success_rate = (key_stats["success"] / total) * 100
+            else:
+                success_rate = 0
+            
+            stats.append({
+                "key_number": idx + 1,
+                "success": key_stats["success"],
+                "failures": key_stats["failures"],
+                "success_rate": success_rate,
+                "last_used": key_stats["last_used"],
+                "is_blacklisted": idx in self.key_blacklist
+            })
+        
+        return {
+            "total_keys": len(self.groq_pool),
+            "total_requests": self.total_requests,
+            "failed_requests": self.failed_requests,
+            "rotation_count": self.rotation_count,
+            "success_rate": ((self.total_requests - self.failed_requests) / self.total_requests * 100) if self.total_requests > 0 else 0,
+            "key_details": stats
+        }
+
+    def reset_blacklist(self):
+        """ሁሉንም አግዳሚ ቁልፎች ነጻ ማውጣት"""
+        blacklisted_count = len(self.key_blacklist)
+        self.key_blacklist.clear()
+        self.logger.info(f"✅ Cleared blacklist: {blacklisted_count} keys reactivated")
+        return blacklisted_count
+
+    def emergency_override(self):
+        """የአደጋ ጊዜ አማራጭ (ሁሉንም ቁልፎች እንደገና ማስጀመር)"""
+        self.groq_index = 0
+        self.key_blacklist.clear()
+        self.response_cache.clear()
+        
+        self.logger.critical("🚨 EMERGENCY OVERRIDE ACTIVATED")
+        self.logger.critical("🔄 Reset: Key rotation, blacklist, and cache cleared")
+        
+        return {
+            "status": "emergency_override_activated",
+            "groq_index_reset": True,
+            "blacklist_cleared": True,
+            "cache_cleared": True,
+            "timestamp": datetime.now().isoformat()
+        }
 # =================== 📝 የተሻሻለ የይዘት ጀነሬተር ===================
 
 class ProductionContentGenerator:
