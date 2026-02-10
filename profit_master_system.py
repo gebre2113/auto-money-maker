@@ -4643,24 +4643,56 @@ class EnhancedWordCounter:
 # =========================================================================
 # 👑 TITAN v19.0: THE SOVEREIGN ORACLE - ULTIMATE EDITION (FINAL)
 # ========================================================================
-
 class MegaContentEngine:
-    def __init__(self, parent):
-        self.parent = parent
-        # ሎገሩን ከወላጁ (Parent) መውሰድ ወይም ራሱን እንዲችል ማድረግ
-        self.logger = getattr(parent, 'logger', logging.getLogger(__name__))
-        self.ai_providers = self._initialize_15_fallback_keys()
-
-        # 1. የቃል ግብ (ከ 7 ደረጃዎች × 2200 ቃላት)
+    """
+    የዓለማችን ቁንጮ የይዘት ማምረቻ ሞተር።
+    - 15,000+ Words በምዕራፍ
+    """
+    
+    def __init__(self, system):
+        self.system = system
+        self.logger = logging.getLogger("MegaJournalist")
+        
+        # 🛡️ 1. መጀመሪያ 'ai' መገለጽ አለበት (ስህተቱን የሚፈታው ወሳኝ መስመር)
+        self.ai = getattr(system, 'failover_system', None)
+        
+        # 2. ሌሎች መሰረታዊ መረጃዎች
+        self.current_key_idx = 0
         self.TARGET_WORDS = 15400
         
-        # 2. የ15 መጠባበቂያ ቁልፎች ስርዓት (Round-Robin)
+        # 3. አሁን ቁልፎቹን ማዘጋጀት ይቻላል (ከ 'self.ai' በኋላ መሆን አለበት)
         self.ai_providers = self._initialize_15_fallback_keys()
         
-        # 3. የቁልፍ ማሽንሮቴሽን መቁጠሪያ (የልብ ሚስጥር)
-        self.current_key_idx = 0  # ለ Round-Robin ሎጂክ
-        self.phase_key_map = {}   # ለእያንዳንዱ ፌዝ የተመደበ ቁልፍ
+        self.logger.info("🚀 MegaContentEngine initialized and linked to AI Provider.")
+
+    def _initialize_15_fallback_keys(self):
+        """15 መጠባበቂያ ቁልፎችን በጥንቃቄ ማዘጋጀት"""
+        providers = []
         
+        # 🛡️ ቼክ፡ self.ai መኖሩን እና groq_pool መያዙን ማረጋገጥ
+        if self.ai and hasattr(self.ai, 'groq_pool'):
+            providers.extend(self.ai.groq_pool)
+            self.logger.info(f"Loaded {len(self.ai.groq_pool)} keys from AI pool")
+        
+        # 🔑 ተጨማሪ ቁልፎችን ከ environment መጫን
+        for i in range(1, 16):
+            key_name = f"GROQ_API_KEY_{i}"
+            key_val = os.getenv(key_name)
+            if key_val and key_val not in providers:
+                providers.append(key_val)
+        
+        # 🔄 ዝቅተኛው 15 ቁልፍ መሞላቱን ማረጋገጥ
+        if not providers:
+            self.logger.error("❌ No API keys found for MegaContentEngine")
+            return [self.ai] if self.ai else []
+            
+        while len(providers) < 15:
+            providers.append(providers[len(providers) % len(providers)])
+            
+        return providers
+
+    # ... የተቀሩት የክላሱ ዘዴዎች (produce_single_country_sovereign_logic ወዘተ) እንዳሉ ይቀጥሉ ...
+
         # 4. የሀገር የሰዓት ዞኖች
         self.country_timezones = {
             'US': 'America/New_York',
