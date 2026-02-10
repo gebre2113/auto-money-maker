@@ -4387,7 +4387,7 @@ class MegaContentEngine:
 # 👑 TITAN v26.0 OMNIPOTENT: THE SOVEREIGN ORACLE (TOTAL UNIFICATION)
 # ============================================================
 
-class MegaCምontentEngine:
+class MegaContentEngine:
     """
     የዓለማችን ቁንጮ የይዘት ማምረቻ ሞተር።
     - 15,000+ Words በምዕራፍ (15,400 ቃላት የሚደርስ)
