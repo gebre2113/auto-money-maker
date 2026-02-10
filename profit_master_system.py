@@ -4643,7 +4643,8 @@ class EnhancedWordCounter:
 # =========================================================================
 # 👑 TITAN v19.0: THE SOVEREIGN ORACLE - ULTIMATE EDITION (FINAL)
 # ========================================================================
- class MegaContentEngine:
+
+class MegaContentEngine:
     """
     የዓለማችን ቁንጮ የይዘት ማምረቻ ሞተር።
     - 15,000+ Words በምዕራፍ
@@ -4690,53 +4691,16 @@ class EnhancedWordCounter:
         # 6. ቁልፎቹን ማዘጋጀት
         self.ai_providers = self._initialize_15_fallback_keys()
         
-        self.logger.info("🚀 MegaContentEngine: Economic Intelligence Loaded.")
-
-    # ... ከዚህ በታች ያሉት ሌሎች የክላሱ ዘዴዎች (produce_single_country_sovereign_logic ወዘተ) እንዳሉ ይቀጥሉ ...
-        # 4. የሀገር የሰዓት ዞኖች
-        self.country_timezones = {
-            'US': 'America/New_York',
-            'GB': 'Europe/London',
-            'DE': 'Europe/Berlin',
-            'JP': 'Asia/Tokyo',
-            'AU': 'Australia/Sydney',
-            'ET': 'Africa/Addis_Ababa',
-            'CA': 'America/Toronto',
-            'FR': 'Europe/Paris',
-            'CH': 'Europe/Zurich',
-            'NO': 'Europe/Oslo',
-            'SE': 'Europe/Stockholm'
-        }
-        
-        # 5. የገበያ ትኩረት ሰዓቶች (2:00 AM - 12:00 PM)
-        self.hot_hours = range(2, 12)
-        
-        # 6. የምርት ሁኔታ
-        self.production_status = {}
-        self.logger = logging.getLogger("MegaJournalist")
-        
-        # 7. የሀገራት ኢኮኖሚ መረጃ
-        self.economic_indicators = {
-            'US': {'inflation': '3.2%', 'gdp_growth': '2.5%', 'reg': 'AI Safety Act 2025'},
-            'GB': {'inflation': '4.1%', 'gdp_growth': '1.8%', 'reg': 'Digital Markets Act'},
-            'DE': {'inflation': '3.8%', 'gdp_growth': '1.2%', 'reg': 'EU AI Act Enforcement'},
-            'JP': {'inflation': '2.9%', 'gdp_growth': '1.0%', 'reg': 'DX Transformation Law'},
-            'AU': {'inflation': '4.5%', 'gdp_growth': '2.1%', 'reg': 'Consumer Data Right v2'},
-            'ET': {'inflation': '28.5%', 'gdp_growth': '6.1%', 'reg': 'Capital Market Proclamation'},
-            'CA': {'inflation': '3.5%', 'gdp_growth': '2.3%', 'reg': 'Digital Charter Act'},
-            'FR': {'inflation': '3.9%', 'gdp_growth': '1.5%', 'reg': 'France 2030 Vision'},
-            'CH': {'inflation': '2.1%', 'gdp_growth': '1.8%', 'reg': 'Swiss Digital Initiative'},
-            'NO': {'inflation': '2.4%', 'gdp_growth': '1.9%', 'reg': 'Nordic Data Sovereignty'},
-            'SE': {'inflation': '2.6%', 'gdp_growth': '2.0%', 'reg': 'Stockholm Tech Accord'}
-        }
-        
-        # 8. የገቢ ትንበያ መረጃ
+        # 7. የገቢ ትንበያ መረጃ
         self.revenue_predictions = {}
         
-        # 9. የኮንቴክስት ሜሞሪ (ለ7 ደረጃዎች)
+        # 8. የኮንቴክስት ሜሞሪ (ለ7 ደረጃዎች)
         self.context_memory = {}
         
-        self.logger.info("🚀 MegaContentEngine Initialized with 15-Key Round-Robin System")
+        # 9. የቁልፍ ማሽንሮቴሽን መቁጠሪያ
+        self.phase_key_map = {}
+        
+        self.logger.info("🚀 MegaContentEngine: Economic Intelligence Loaded.")
 
     def _initialize_15_fallback_keys(self):
         """15 መጠባበቂያ ቁልፎችን ማስጀመር (የልብ ሚስጥር)"""
@@ -4789,30 +4753,6 @@ class EnhancedWordCounter:
         
         return providers
 
-    def _get_next_key(self, phase_idx=None):
-        """
-        የሚቀጥለውን ቁልፍ በ Round-Robin ዘዴ ማግኘት
-        መርሆ: ቁልፍ_ኢንዴክስ = (የአሁኑ_ኢንዴክስ % የቁልፎች_ብዛት)
-        """
-        if not self.ai_providers:
-            raise Exception("No API keys available")
-        
-        if phase_idx is not None and phase_idx in self.phase_key_map:
-            # ለተወሰነ ፌዝ የተመደበ ቁልፍ መጠቀም
-            return self.phase_key_map[phase_idx]
-        
-        # የ Round-Robin ሎጂክ (Modulo %)
-        selected_idx = self.current_key_idx % len(self.ai_providers)
-        selected_key = self.ai_providers[selected_idx]
-        
-        # ለሚቀጥለው ጥሪ ቁልፉን ቀይር
-        self.current_key_idx += 1
-        
-        self.logger.info(f"🔄 Key Rotation: Using key {selected_idx+1}/{len(self.ai_providers)} "
-                        f"(Phase {phase_idx if phase_idx else 'N/A'})")
-        
-        return selected_key
-
     def _is_hot_country_time(self, country):
         """ሀገሩ በገበያ ትኩረት ሰዓት ላይ መሆኑን ማረጋገጥ"""
         if country not in self.country_timezones:
@@ -4836,8 +4776,8 @@ class EnhancedWordCounter:
 
     async def _call_ai_with_round_robin(self, prompt, max_tokens=4000, phase_idx=0):
         """
-        15 ቁልፎችን በ Round-Robin ዘዴ በመጠቀም ጥሪውን ያከናውናል::
-        አንድ ቁልፍ ቢከሽፍ ወይም ሪሚት ቢመታ በራስ ሰር ወደ ቀጣዩ ይዘልላል::
+        15 ቁልፎችን በ Round-Robin ዘዴ በመጠቀም ጥሪውን ያከናውናል:
+        አንድ ቁልፍ ቢከሽፍ ወይም ሪሚት ቢመታ በራስ ሰር ወደ ቀጣዩ ይዘልላል:
         """
         total_providers = len(self.ai_providers)
         
@@ -4883,6 +4823,117 @@ class EnhancedWordCounter:
         
         # ሁሉም 15ቱንም ሞክሮ ካልሰራ ብቻ ስህተት ይጥላል
         raise Exception(f"All {total_providers} fallback keys failed for Phase {phase_idx}")
+
+    def _build_hypnotic_audio_button(self, section_name, lang, country, section_idx):
+        """ሂፕኖቲክ የአውዲዮ ቁልፍ ገንባት"""
+        play_texts = {
+            'English': f"🎧 Immerse Yourself: Listen to this section",
+            'Amharic': f"🎧 በዚህ ክፍል ውስጥ ይስጠሙ",
+            'German': f"🎧 Tauchen Sie ein: Hören Sie diesen Abschnitt",
+            'French': f"🎧 Immergez-vous: Écoutez cette section",
+            'Japanese': f"🎧 没入する: このセクションを聴く"
+        }
+        play_text = play_texts.get(lang, play_texts['English'])
+        
+        return f"""
+        <div class='hypnotic-audio-trigger'
+             onclick='playHypnoticAudio("{country}-section-{section_idx}")'
+             style='
+                background: linear-gradient(135deg, 
+                    rgba(26, 42, 68, 0.95) 0%, 
+                    rgba(197, 160, 89, 0.15) 100%);
+                color: #fbbf24;
+                padding: 25px 35px;
+                border-radius: 15px;
+                margin: 40px 0;
+                cursor: pointer;
+                border: 2px solid rgba(197, 160, 89, 0.3);
+                box-shadow: 
+                    0 10px 30px rgba(26, 42, 68, 0.4),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+                transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+                backdrop-filter: blur(10px);
+                position: relative;
+                overflow: hidden;
+             '
+             onmouseover='
+                this.style.transform = "translateY(-5px) scale(1.02)";
+                this.style.boxShadow = 
+                    "0 15px 40px rgba(197, 160, 89, 0.3), 
+                     inset 0 1px 0 rgba(255, 255, 255, 0.2)";
+                this.style.border = "2px solid rgba(197, 160, 89, 0.5)";
+             '
+             onmouseout='
+                this.style.transform = "translateY(0) scale(1)";
+                this.style.boxShadow = 
+                    "0 10px 30px rgba(26, 42, 68, 0.4), 
+                     inset 0 1px 0 rgba(255, 255, 255, 0.1)";
+                this.style.border = "2px solid rgba(197, 160, 89, 0.3)";
+             '>
+             
+             <div style='
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: linear-gradient(90deg, 
+                    transparent 0%, 
+                    rgba(197, 160, 89, 0.1) 50%, 
+                    transparent 100%);
+                animation: shimmer 3s infinite;
+             '></div>
+             
+             <div style='
+                display: flex;
+                align-items: center;
+                gap: 25px;
+                position: relative;
+                z-index: 2;
+             '>
+                <div style='
+                    font-size: 45px;
+                    filter: drop-shadow(0 5px 15px rgba(197, 160, 89, 0.4));
+                    animation: pulse 2s infinite;
+                '>🎙️</div>
+                
+                <div style='flex: 1;'>
+                    <div style='
+                        font-size: 20px;
+                        font-weight: bold;
+                        margin-bottom: 8px;
+                        text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+                    '>
+                        {play_text}
+                    </div>
+                    <div style='
+                        font-size: 14px;
+                        color: #cbd5e1;
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                    '>
+                        <span>Section: {section_name}</span>
+                        <span style='
+                            background: rgba(197, 160, 89, 0.2);
+                            color: #fbbf24;
+                            padding: 5px 15px;
+                            border-radius: 20px;
+                            font-size: 12px;
+                            font-weight: bold;
+                        '>
+                            🔥 PREMIUM AUDIO
+                        </span>
+                    </div>
+                </div>
+                
+                <div style='
+                    font-size: 30px;
+                    animation: bounce 2s infinite;
+                '>▶️</div>
+             </div>
+        </div>
+        """
 
     async def _inject_authority_videos(self, topic: str, country: str):
         """የዩቲዩብ ቪዲዮዎችን አድኖ በውብ ዲዛይን ያዘጋጃል"""
@@ -5010,117 +5061,6 @@ class EnhancedWordCounter:
         except Exception as e:
             self.logger.error(f"Error fetching YouTube videos: {e}")
             return ""
-
-    def _build_hypnotic_audio_button(self, section_name, lang, country, section_idx):
-        """ሂፕኖቲክ የአውዲዮ ቁልፍ ገንባት"""
-        play_texts = {
-            'English': f"🎧 Immerse Yourself: Listen to this section",
-            'Amharic': f"🎧 በዚህ ክፍል ውስጥ ይስጠሙ",
-            'German': f"🎧 Tauchen Sie ein: Hören Sie diesen Abschnitt",
-            'French': f"🎧 Immergez-vous: Écoutez cette section",
-            'Japanese': f"🎧 没入する: このセクションを聴く"
-        }
-        play_text = play_texts.get(lang, play_texts['English'])
-        
-        return f"""
-        <div class='hypnotic-audio-trigger'
-             onclick='playHypnoticAudio("{country}-section-{section_idx}")'
-             style='
-                background: linear-gradient(135deg, 
-                    rgba(26, 42, 68, 0.95) 0%, 
-                    rgba(197, 160, 89, 0.15) 100%);
-                color: #fbbf24;
-                padding: 25px 35px;
-                border-radius: 15px;
-                margin: 40px 0;
-                cursor: pointer;
-                border: 2px solid rgba(197, 160, 89, 0.3);
-                box-shadow: 
-                    0 10px 30px rgba(26, 42, 68, 0.4),
-                    inset 0 1px 0 rgba(255, 255, 255, 0.1);
-                transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-                backdrop-filter: blur(10px);
-                position: relative;
-                overflow: hidden;
-             '
-             onmouseover='
-                this.style.transform = "translateY(-5px) scale(1.02)";
-                this.style.boxShadow = 
-                    "0 15px 40px rgba(197, 160, 89, 0.3), 
-                     inset 0 1px 0 rgba(255, 255, 255, 0.2)";
-                this.style.border = "2px solid rgba(197, 160, 89, 0.5)";
-             '
-             onmouseout='
-                this.style.transform = "translateY(0) scale(1)";
-                this.style.boxShadow = 
-                    "0 10px 30px rgba(26, 42, 68, 0.4), 
-                     inset 0 1px 0 rgba(255, 255, 255, 0.1)";
-                this.style.border = "2px solid rgba(197, 160, 89, 0.3)";
-             '>
-             
-             <div style='
-                position: absolute;
-                top: 0;
-                left: 0;
-                right: 0;
-                bottom: 0;
-                background: linear-gradient(90deg, 
-                    transparent 0%, 
-                    rgba(197, 160, 89, 0.1) 50%, 
-                    transparent 100%);
-                animation: shimmer 3s infinite;
-             '></div>
-             
-             <div style='
-                display: flex;
-                align-items: center;
-                gap: 25px;
-                position: relative;
-                z-index: 2;
-             '>
-                <div style='
-                    font-size: 45px;
-                    filter: drop-shadow(0 5px 15px rgba(197, 160, 89, 0.4));
-                    animation: pulse 2s infinite;
-                '>🎙️</div>
-                
-                <div style='flex: 1;'>
-                    <div style='
-                        font-size: 20px;
-                        font-weight: bold;
-                        margin-bottom: 8px;
-                        text-shadow: 0 2px 4px rgba(0,0,0,0.3);
-                    '>
-                        {play_text}
-                    </div>
-                    <div style='
-                        font-size: 14px;
-                        color: #cbd5e1;
-                        display: flex;
-                        justify-content: space-between;
-                        align-items: center;
-                    '>
-                        <span>Section: {section_name}</span>
-                        <span style='
-                            background: rgba(197, 160, 89, 0.2);
-                            color: #fbbf24;
-                            padding: 5px 15px;
-                            border-radius: 20px;
-                            font-size: 12px;
-                            font-weight: bold;
-                        '>
-                            🔥 PREMIUM AUDIO
-                        </span>
-                    </div>
-                </div>
-                
-                <div style='
-                    font-size: 30px;
-                    animation: bounce 2s infinite;
-                '>▶️</div>
-             </div>
-        </div>
-        """
 
     async def _generate_section_tables(self, phase_num, country, lang, topic):
         """ለእያንዳንዱ ምዕራፍ የተለየ ሰንጠረዥ ማመንጨት"""
@@ -6084,7 +6024,7 @@ class EnhancedWordCounter:
                 await asyncio.sleep(1800)  # 30 ደቂቃ
             else:
                 self.logger.info("😴 No countries in hot time - Sleeping for 1 second (Energy Saving Mode)...")
-                await asyncio.sleep(1)  # 1 ሰከንድ (GitHub Free Tier Frien
+                await asyncio.sleep(1)  # 1 ሰከንድ (GitHub Free Tier Friendly)
 # =================== ዋና ስርዓት ክፍል ===================
 
 class UltimateProfitMasterSystem:
