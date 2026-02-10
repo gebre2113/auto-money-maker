@@ -868,64 +868,121 @@ class HumanLikenessEngine:
 
 # =================== የማይበገር MULTI-MODEL AI PROVIDER ===================
 
+# =========================================================================
+# 🤖 UNSTOPPABLE AI PROVIDER (v42.0 - THE INFINITE CIRCLE RELAY)
+# =========================================================================
+
 class UnstoppableAIProvider:
-    _global_idx = 0 # ቋሚ ጠቋሚ (ሀገር ሲቀየር ወደ 0 የማይመለስ)
+    # 🛑 ቋሚ ጠቋሚ (Global Index) - ፕሮግራሙ እስኪቆም ድረስ ወደ ዜሮ አይመለስም
+    _global_groq_idx = 0 
 
     def __init__(self, config=None):
-        self.logger = logging.getLogger("KeyFortress")
-        # 🛡️ 7ቱንም የግሮቅ ቁልፎች መጫን
-        self.groq_pool = self._load_keys('GROQ_API_KEY', 7)
-        self.key_blacklist = {} 
-        self.gemini_key = os.getenv('GEMINI_API_KEY')
+        self.config = config
+        self.logger = logging.getLogger("CircleRelay")
+        
+        # 🛡️ 15ቱንም የግሮቅ ቁልፎች መጫን
+        self.groq_pool = self._load_key_pool('GROQ_API_KEY', 15)
+        
+        # ቁልፎችን የማገጃ መዝገብ
+        self.key_blacklist = {} # {index: unblock_time}
+        self.backups = {'gemini': os.getenv('GEMINI_API_KEY')}
+        
+        self.logger.info(f"🛡️ v42.0 INFINITE CIRCLE: {len(self.groq_pool)} Keys Registered.")
 
-    def _load_keys(self, base, count):
+    def _load_key_pool(self, base_name, count):
+        """15ቱንም ቁልፎች ከ Secrets ሰብስቦ ይጭናል"""
         keys = []
-        # መጀመሪያ ዋናውን ቼክ ያደርጋል፣ ካለ ይጨምራል
-        main_key = os.getenv(base)
+        # መጀመሪያ ዋናውን (GROQ_API_KEY) ይፈትሻል
+        main_key = os.getenv(base_name)
         if main_key: keys.append(main_key)
-        # ከ1-7 ያሉትን ቁልፎች ይጭናል
+        
+        # በመቀጠል ቁጥር ያላቸውን (GROQ_API_KEY_1...15) ይጭናል
         for i in range(1, count + 1):
-            k = os.getenv(f"{base}_{i}")
-            if k and k not in keys: keys.append(k)
+            k = os.getenv(f"{base_name}_{i}")
+            if k and k not in keys:
+                keys.append(k)
+        
+        # 15 ቁልፍ ከሌለህ ያሉትን ደጋግሞ በመጠቀም 15ቱን ይሞላል (ክበቡ እንዳይቋረጥ)
+        if not keys: return []
+        while len(keys) < 15:
+            keys.append(random.choice(keys))
         return keys
 
     async def generate_content(self, prompt: str, max_tokens: int = 4000) -> str:
-        """STRICT 7-KEY ROTATION: በየጥሪው የግዴታ አዲስ ቁልፍ ይጠቀማል"""
+        """
+        🔄 THE CIRCLE LOGIC:
+        አንድ ጥያቄ ሲመጣ አንድ ቁልፍ ይጠቀማል። ጥያቄው ቢሳካም ባይሳካም 
+        ለቀጣዩ ጥያቄ ያ ቁልፍ 'ይዘጋል' (ይዘለላል)። ዑደቱ ከ1-15 ይዞራል።
+        """
         now = time.time()
-        for _ in range(len(self.groq_pool)):
-            idx = UnstoppableAIProvider._global_idx % len(self.groq_pool)
-            api_key = self.groq_pool[idx]
-            UnstoppableAIProvider._global_idx += 1 
+        
+        # 🔄 ለ 2 ሙሉ ዙር (30 ሙከራዎች) አዲስ ቁልፍ እየፈለገ ይዞራል
+        for attempt in range(len(self.groq_pool) * 2):
+            
+            # 🛑 ወሳኝ፦ ጠቋሚውን ወስደን ወዲያውኑ ለቀጣዩ ጥሪ እናሳድገዋለን (Circle)
+            current_slot = UnstoppableAIProvider._global_groq_idx % len(self.groq_pool)
+            api_key = self.groq_pool[current_slot]
+            UnstoppableAIProvider._global_groq_idx += 1 
 
-            if idx in self.key_blacklist and now < self.key_blacklist[idx]: continue
+            # ቁልፉ በ 429 ቅጣት ላይ ከሆነ ወደ ቀጣዩ 'ሲሊንደር' ዝለል
+            if current_slot in self.key_blacklist and now < self.key_blacklist[current_slot]:
+                continue
 
             try:
-                self.logger.info(f"🚀 [GROQ KEY-{idx + 1}/7] Processing Phase Request...")
+                self.logger.info(f"⚡ [CIRCLE SLOT-{current_slot + 1}/15] Attempting phase...")
+                
                 async with httpx.AsyncClient(timeout=160.0) as client:
-                    resp = await client.post("https://api.groq.com/openai/v1/chat/completions",
+                    resp = await client.post(
+                        "https://api.groq.com/openai/v1/chat/completions",
                         headers={"Authorization": f"Bearer {api_key}"},
-                        json={"model": "llama-3.3-70b-versatile", "messages": [{"role": "user", "content": prompt}], "max_tokens": max_tokens, "temperature": 0.7})
+                        json={
+                            "model": "llama-3.3-70b-versatile",
+                            "messages": [{"role": "user", "content": prompt}],
+                            "max_tokens": max_tokens, "temperature": 0.7
+                        }
+                    )
                     
+                    # ✅ ስኬታማ ከሆነ ውጤቱን ይመልሳል (ጠቋሚው አስቀድሞ ስለጨመረ ቀጣዩ ጥሪ አዲስ ቁልፍ ይጠቀማል)
                     if resp.status_code == 200:
-                        if idx in self.key_blacklist: del self.key_blacklist[idx]
-                        await asyncio.sleep(3) # በአንተ ፍላጎት መሰረት የ3 ሰከንድ እረፍት
+                        if current_slot in self.key_blacklist: del self.key_blacklist[current_slot]
+                        
+                        # ለ APIው መተንፈሻ 5 ሰከንድ እረፍት
+                        await asyncio.sleep(5) 
                         return str(resp.json()['choices'][0]['message']['content'])
                     
-                    if resp.status_code == 429:
-                        self.key_blacklist[idx] = now + 90 
-                        await asyncio.sleep(10) 
+                    # ⚠️ Rate Limit (429) ካጋጠመ ቁልፉን ለ 3 ደቂቃ አግድና ወደ ቀጣዩ ዝለል
+                    elif resp.status_code == 429:
+                        self.logger.warning(f"🚫 Slot-{current_slot + 1} Limited. Closing slot for 180s.")
+                        self.key_blacklist[current_slot] = now + 180
+                        await asyncio.sleep(2) # ወደ ቀጣዩ ከመሄድ በፊት ትንሽ እረፍት
+                        continue 
+                    
+                    else:
+                        self.logger.error(f"❌ Slot-{current_slot + 1} Error {resp.status_code}. Moving to next.")
+                        await asyncio.sleep(2)
                         continue
-            except: continue
 
-        # Fallback to Gemini
-        if self.gemini_key:
+            except Exception as e:
+                self.logger.warning(f"📡 Connection issues in Slot-{current_slot + 1}. Skipping...")
+                await asyncio.sleep(2)
+                continue
+
+        # 🏰 ሁሉም 15ቱ 'ሲሊንደሮች' ካልሰሩ ወደ Gemini
+        if self.keys['gemini']:
             try:
-                url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={self.gemini_key}"
+                self.logger.info("🌟 Sovereign Backup: Gemini Activated...")
+                url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={self.keys['gemini']}"
                 async with httpx.AsyncClient(timeout=120.0) as client:
                     resp = await client.post(url, json={"contents": [{"parts": [{"text": prompt}]}]})
-                    return str(resp.json()['candidates'][0]['content']['parts'][0]['text'])
+                    if resp.status_code == 200:
+                        return str(resp.json()['candidates'][0]['content']['parts'][0]['text'])
             except: pass
-        return "Error: All Systems Exhausted."
+
+        return "Error: The Infinite Circle is exhausted. Check API Keys."
+
+    # ለሌሎች ክፍሎች ድጋፍ ሰጪ ስሞች
+    async def process_task(self, prompt, **kwargs):
+        return await self.generate_content(prompt)
 # =================== ELITE SMART IMAGE ENGINE (PRODUCTION FIXED) ===================
 
 class SmartImageEngine:
