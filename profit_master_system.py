@@ -6053,9 +6053,51 @@ class MegaContentEngine:
                 await asyncio.sleep(1800)  # 30 ደቂቃ
             else:
                 self.logger.info("😴 No countries in hot time - Sleeping for 1 second (Energy Saving Mode)...")
-                await asyncio.sleep(1)  # 1 ሰከንድ (GitHub Free Tier Friendly)
-# =========================================================================
+                await asyncio.sleep(1)  # 1 ሰከንድ (GitHub Free Tier Frien
+# =================== ዋና ስርዓት ክፍል ===================
 
+class UltimateProfitMasterSystem:
+    """ዋና ስርዓት አሰራር እና ቁጥጥር"""
+    
+    def __init__(self, config: PremiumConfig = None):
+        self.config = config or PremiumConfig()
+        
+        # 🛡️ 1. መጀመሪያ የ AI Failover Systemን እንፈጥራለን (ስህተቱን የሚፈታው ወሳኝ መስመር)
+        self.failover_system = EnhancedAIFailoverSystem(self.config)
+        
+        # 2. የይዘት ማመንጫውን እንፈጥራለን
+        self.content_generator = ProductionContentGenerator(self.config)
+        
+        # 3. ሌሎች ዋና ዋና ክፍሎች
+        self.cultural_engine = CulturalAnthropologistEngine(self.config)
+        self.hyper_localizer = HyperLocalizedContentProducer(self.cultural_engine)
+        self.multimedia_enhancer = PremiumMultimediaEnhancer()
+        self.sensory_writer = SensoryWritingEngine()
+        self.neuro_converter = NeuroConversionEngine()
+        self.gamification = GamificationLayer()
+        self.visual_architect = HypnoticVisualArchitect()
+        self.visual_asset_generator = VisualAssetGenerator()
+        self.production_manager = ProductionManager(self.config)
+        self.error_handler = ComprehensiveErrorHandler()
+        
+        # 4. አማራጭ ክፍሎች (Dashboard, Optimizer)
+        try:
+            import pandas as pd
+            self.dashboard = RealTimeDashboard()
+        except ImportError:
+            self.dashboard = None
+            print("⚠️ Pandas not installed, dashboard disabled")
+        
+        try:
+            self.self_optimizer = SelfOptimizingEngine()
+        except:
+            self.self_optimizer = None
+            
+        # 🚀 5. በመጨረሻ ሜጋ-ሞተሩን እናስጀምራለን (አሁን failover_systemን ያገኘዋል)
+        # አሰላለፉ 4 Spaces መሆኑን አረጋግጫለሁ
+        self.mega_engine = MegaContentEngine(self)
+        
+        logger.info("🚀 Ultimate Profit Master System v18.1 Initialized")
         
     async def _process_country_enterprise(self, topic: str, country: str, **kwargs):
         """ራነሩን ከ ሜጋ-ፔን ጋር የሚያገናኝ ድልድይ"""
