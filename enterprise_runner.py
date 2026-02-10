@@ -869,275 +869,63 @@ class HumanLikenessEngine:
 # =================== የማይበገር MULTI-MODEL AI PROVIDER ===================
 
 class UnstoppableAIProvider:
-    """Unstoppable AI Multi-Model System with Automatic Failover"""
-    
-    def __init__(self):
-        self.keys = {
-            'gemini': os.getenv('AI_CULTURAL_API_KEY'),
-            'groq': os.getenv('GROQ_API_KEY'),
-            'hf': os.getenv('HUGGINGFACE_API_KEY'),
-            'openai': os.getenv('OPENAI_API_KEY')
-        }
-        self.session = None
-        self.performance_log = []
-        
-    async def process_task(self, prompt: str, task_type: str = "refinement") -> str:
-        """በተከታታይ ሞዴሎችን የመሞከር ሎጂክ"""
-        
-        self.performance_log = []
-        start_time = time.time()
-        
-        available_models = []
-        
-        if self.keys['gemini']:
-            available_models.append(('gemini', 'Gemini Pro (Google)'))
-        if self.keys['openai']:
-            available_models.append(('openai', 'GPT-4 (OpenAI)'))
-        if self.keys['groq']:
-            available_models.append(('groq', 'Llama 3 (Groq)'))
-        if self.keys['hf']:
-            available_models.append(('hf', 'Mistral (Hugging Face)'))
-        
-        if not available_models:
-            raise Exception("No AI models available. Please set at least one API key.")
-        
-        for model_key, model_name in available_models:
-            try:
-                result = await self._call_model(model_key, prompt, task_type)
-                elapsed = time.time() - start_time
-                
-                self.performance_log.append(
-                    f"✅ {model_name} succeeded in {elapsed:.1f}s"
-                )
-                
-                log_entry = {
-                    'timestamp': datetime.now().isoformat(),
-                    'model': model_key,
-                    'model_name': model_name,
-                    'task_type': task_type,
-                    'success': True,
-                    'response_time': elapsed,
-                    'fallback_order': available_models.index((model_key, model_name)) + 1
-                }
-                self._log_ai_usage(log_entry)
-                
-                return result
-                
-            except Exception as e:
-                elapsed = time.time() - start_time
-                error_msg = str(e)[:100]
-                
-                self.performance_log.append(
-                    f"⚠️ {model_name} failed after {elapsed:.1f}s: {error_msg}"
-                )
-                
-                log_entry = {
-                    'timestamp': datetime.now().isoformat(),
-                    'model': model_key,
-                    'model_name': model_name,
-                    'task_type': task_type,
-                    'success': False,
-                    'error': error_msg,
-                    'response_time': elapsed,
-                    'fallback_order': available_models.index((model_key, model_name)) + 1
-                }
-                self._log_ai_usage(log_entry)
-                
-                continue
-        
-        raise Exception("All AI models failed. Please check your API keys and network connection.")
-    
-    async def _call_model(self, model_key: str, prompt: str, task_type: str) -> str:
-        """የተለያዩ ሞዴሎችን ለመጠራት አገላለጽ"""
-        
-        if model_key == 'gemini':
-            return await self._call_gemini_advanced(prompt, task_type)
-        elif model_key == 'openai':
-            return await self._call_openai(prompt, task_type)
-        elif model_key == 'groq':
-            return await self._call_groq_llama3(prompt, task_type)
-        elif model_key == 'hf':
-            return await self._call_huggingface(prompt, task_type)
-        else:
-            raise ValueError(f"Unknown model: {model_key}")
-    
-    async def _call_gemini_advanced(self, prompt: str, task_type: str) -> str:
-        """ተሻሽሎ የGemini ጥሪ"""
-        try:
-            import google.generativeai as genai
-            
-            genai.configure(api_key=self.keys['gemini'])
-            
-            model = genai.GenerativeModel('gemini-pro')
-            
-            system_prompt = self._get_system_prompt(task_type)
-            full_prompt = f"{system_prompt}\n\nUser Content to Refine:\n{prompt}"
-            
-            response = await asyncio.to_thread(
-                model.generate_content,
-                full_prompt,
-                generation_config={
-                    "temperature": 0.7,
-                    "top_p": 0.9,
-                    "top_k": 40,
-                    "max_output_tokens": 4000,
-                }
-            )
-            
-            return response.text
-            
-        except Exception as e:
-            raise Exception(f"Gemini API Error: {str(e)[:50]}")
-    
-    async def _call_openai(self, prompt: str, task_type: str) -> str:
-        """OpenAI GPT-4 ጥሪ"""
-        try:
-            import openai
-            
-            openai.api_key = self.keys['openai']
-            
-            system_prompt = self._get_system_prompt(task_type)
-            
-            response = await openai.ChatCompletion.acreate(
-                model="gpt-4",
-                messages=[
-                    {"role": "system", "content": system_prompt},
-                    {"role": "user", "content": f"Refine this content:\n{prompt}"}
-                ],
-                temperature=0.7,
-                max_tokens=4000
-            )
-            
-            return response.choices[0].message.content
-            
-        except Exception as e:
-            raise Exception(f"OpenAI API Error: {str(e)[:50]}")
-    
-    async def _call_groq_llama3(self, prompt: str, task_type: str) -> str:
-        """Groq + Llama 3 ጥሪ"""
-        try:
-            from groq import Groq
-            
-            client = Groq(api_key=self.keys['groq'])
-            
-            system_prompt = self._get_system_prompt(task_type)
-            
-            response = client.chat.completions.create(
-                model="llama3-70b-8192",
-                messages=[
-                    {"role": "system", "content": system_prompt},
-                    {"role": "user", "content": f"Refine this content:\n{prompt}"}
-                ],
-                temperature=0.7,
-                max_tokens=4000
-            )
-            
-            return response.choices[0].message.content
-            
-        except Exception as e:
-            raise Exception(f"Groq API Error: {str(e)[:50]}")
-    
-    async def _call_huggingface(self, prompt: str, task_type: str) -> str:
-        """Hugging Face Inference API"""
-        try:
-            import requests
-            
-            API_URL = "https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.1"
-            headers = {"Authorization": f"Bearer {self.keys['hf']}"}
-            
-            system_prompt = self._get_system_prompt(task_type)
-            full_prompt = f"{system_prompt}\n\nContent to refine:\n{prompt}"
-            
-            response = requests.post(
-                API_URL,
-                headers=headers,
-                json={"inputs": full_prompt, "parameters": {"max_length": 4000}}
-            )
-            
-            if response.status_code == 200:
-                result = response.json()
-                return result[0]['generated_text']
-            else:
-                raise Exception(f"HF API Error: {response.status_code}")
-                
-        except Exception as e:
-            raise Exception(f"Hugging Face Error: {str(e)[:50]}")
-    
-    def _get_system_prompt(self, task_type: str) -> str:
-        """ለሥራው አይነት ተገቢውን አዋጭ አዘጋጅ"""
-        
-        prompts = {
-            'refinement': """
-            You are an enterprise content refinement expert. Your task is to enhance and polish the provided content while:
-            1. Maintaining the original meaning and key points
-            2. Improving flow, clarity, and engagement
-            3. Adding professional tone and enterprise-level language
-            4. Ensuring cultural appropriateness for international audiences
-            5. Adding subtle human-like elements (personal anecdotes, expert quotes)
-            
-            Do NOT rewrite from scratch. Only refine and enhance what's provided.
-            """,
-            
-            'title_optimization': """
-            You are an SEO and marketing expert specializing in title optimization.
-            Create 5 compelling, click-worthy titles for the given content that:
-            1. Include primary keywords naturally
-            2. Spark curiosity and interest
-            3. Are under 60 characters
-            4. Use power words and emotional triggers
-            5. Are appropriate for the target country's culture
-            """,
-            
-            'cultural_enrichment': """
-            You are a cultural localization expert. Add culturally relevant phrases and references to the content for the specified country.
-            Focus on:
-            1. Local business practices and etiquette
-            2. Cultural metaphors and expressions
-            3. Local success stories or examples
-            4. Appropriate tone and communication style
-            5. Regional market insights
-            """
-        }
-        
-        return prompts.get(task_type, prompts['refinement'])
-    
-    def _log_ai_usage(self, log_entry: Dict):
-        """የAI አጠቃቀምን ለመመዝገብ"""
-        log_dir = Path('ai_usage_logs')
-        log_dir.mkdir(exist_ok=True)
-        
-        log_file = log_dir / f"ai_usage_{datetime.now().strftime('%Y%m%d')}.json"
-        
-        try:
-            if log_file.exists():
-                with open(log_file, 'r', encoding='utf-8') as f:
-                    logs = json.load(f)
-            else:
-                logs = []
-            
-            logs.append(log_entry)
-            
-            with open(log_file, 'w', encoding='utf-8') as f:
-                json.dump(logs, f, indent=2)
-                
-        except Exception as e:
-            print(f"⚠️ Failed to log AI usage: {e}")
-    
-    def get_performance_report(self) -> Dict:
-        """የአፈፃፀም ሪፖርት"""
-        return {
-            'total_attempts': len(self.performance_log),
-            'successful_models': sum(1 for log in self.performance_log if '✅' in log),
-            'failed_models': sum(1 for log in self.performance_log if '⚠️' in log),
-            'log_entries': self.performance_log,
-            'available_keys': {k: bool(v) for k, v in self.keys.items()}
-        }
-    
-    async def close(self):
-        """መረብ ግንኙነትን ይዝጋ"""
-        if self.session:
-            await self.session.close()
+    _global_idx = 0 # ቋሚ ጠቋሚ (ሀገር ሲቀየር ወደ 0 የማይመለስ)
 
+    def __init__(self, config=None):
+        self.logger = logging.getLogger("KeyFortress")
+        # 🛡️ 7ቱንም የግሮቅ ቁልፎች መጫን
+        self.groq_pool = self._load_keys('GROQ_API_KEY', 7)
+        self.key_blacklist = {} 
+        self.gemini_key = os.getenv('GEMINI_API_KEY')
+
+    def _load_keys(self, base, count):
+        keys = []
+        # መጀመሪያ ዋናውን ቼክ ያደርጋል፣ ካለ ይጨምራል
+        main_key = os.getenv(base)
+        if main_key: keys.append(main_key)
+        # ከ1-7 ያሉትን ቁልፎች ይጭናል
+        for i in range(1, count + 1):
+            k = os.getenv(f"{base}_{i}")
+            if k and k not in keys: keys.append(k)
+        return keys
+
+    async def generate_content(self, prompt: str, max_tokens: int = 4000) -> str:
+        """STRICT 7-KEY ROTATION: በየጥሪው የግዴታ አዲስ ቁልፍ ይጠቀማል"""
+        now = time.time()
+        for _ in range(len(self.groq_pool)):
+            idx = UnstoppableAIProvider._global_idx % len(self.groq_pool)
+            api_key = self.groq_pool[idx]
+            UnstoppableAIProvider._global_idx += 1 
+
+            if idx in self.key_blacklist and now < self.key_blacklist[idx]: continue
+
+            try:
+                self.logger.info(f"🚀 [GROQ KEY-{idx + 1}/7] Processing Phase Request...")
+                async with httpx.AsyncClient(timeout=160.0) as client:
+                    resp = await client.post("https://api.groq.com/openai/v1/chat/completions",
+                        headers={"Authorization": f"Bearer {api_key}"},
+                        json={"model": "llama-3.3-70b-versatile", "messages": [{"role": "user", "content": prompt}], "max_tokens": max_tokens, "temperature": 0.7})
+                    
+                    if resp.status_code == 200:
+                        if idx in self.key_blacklist: del self.key_blacklist[idx]
+                        await asyncio.sleep(3) # በአንተ ፍላጎት መሰረት የ3 ሰከንድ እረፍት
+                        return str(resp.json()['choices'][0]['message']['content'])
+                    
+                    if resp.status_code == 429:
+                        self.key_blacklist[idx] = now + 90 
+                        await asyncio.sleep(10) 
+                        continue
+            except: continue
+
+        # Fallback to Gemini
+        if self.gemini_key:
+            try:
+                url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={self.gemini_key}"
+                async with httpx.AsyncClient(timeout=120.0) as client:
+                    resp = await client.post(url, json={"contents": [{"parts": [{"text": prompt}]}]})
+                    return str(resp.json()['candidates'][0]['content']['parts'][0]['text'])
+            except: pass
+        return "Error: All Systems Exhausted."
 # =================== ELITE SMART IMAGE ENGINE (PRODUCTION FIXED) ===================
 
 class SmartImageEngine:
