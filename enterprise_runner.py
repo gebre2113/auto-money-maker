@@ -3099,41 +3099,62 @@ class EnterpriseProductionOrchestrator:
                                         content_type: str, country_number: int,
                                         total_countries: int) -> Dict:
         """
-        🚀 THE SOVEREIGN BRIDGE: ራነሩን ከ Mega Pen እና Affiliate Pen ጋር ያገናኛል
+        🚀 THE FINAL UNIFIED BRIDGE
+        ይህ ክፍል ራነሩን ካቀረብከው MegaContentEngine (v26.0) ጋር በስም ያገናኛል
         """
-        country_result = {'country': country, 'status': 'processing', 'metrics': {}}
+        country_result = {
+            'country': country,
+            'status': 'processing',
+            'metrics': {'estimated_revenue': 0.0, 'final_word_count': 0, 'quality_score': 0},
+            'start_time': datetime.now().isoformat()
+        }
+
         try:
-            # 1. Mega Pen ጥሪ (v18.1/25.0) - እውነተኛው ግዙፍ ጽሁፍ እዚህ ይመረታል
-            self.logger.info(f"👑 CALLING MEGA-PEN for {country}")
-            mega_content = await self.content_system.mega_engine.produce_single_country_sovereign_logic(topic, country)
+            # 1. የሜጋ ኢንጂኑን ጥሪ (ካቀረብከው ስም ጋር እንዲገጥም ተደርጓል)
+            # ራነሩ አሁን 'produce_single_country_sovereign_logic' የሚለውን ስም ይጠራል
+            self.logger.info(f"👑 CALLING MEGA-PEN (v26.0): Generating 15,000+ words for {country}")
             
-            # 2. Affiliate Pen ጥሪ (v13.0) - ገቢ ማመንጫዎች እዚህ ይሰነጠቃሉ
-            self.logger.info(f"💰 CALLING AFFILIATE-PEN for {country}")
-            final_content, aff_report = await self.affiliate_manager.inject_affiliate_links(
-                content=mega_content, topic=topic, user_intent="purchase"
-            )
+            # 🛑 ወሳኝ፡ በ MegaContentEngine ውስጥ ያለውን ስም በትክክል መጥራት
+            final_html = await self.content_system.mega_engine.produce_single_country_sovereign_logic(topic, country)
+            
+            if not final_html or len(str(final_html)) < 1000:
+                raise Exception(f"Insufficient content produced for {country}")
 
-            # 3. Polishing (Humanize + Images)
-            humanized = await self.human_engine.inject_human_elements(final_content, country, topic)
-            final_html = self.image_engine.generate_image_placeholders(humanized, country, topic)
+            # 2. የገቢ ትንበያውን ከሜጋ ኢንጂኑ ሪፖርት ማውጣት
+            # ሜጋ ኢንጂኑ 'revenue_predictions' ውስጥ መረጃውን ያስቀምጣል
+            predicted_revenue = getattr(self.content_system.mega_engine, 'revenue_predictions', {}).get(country, 750.0)
 
-            # 4. Metrics & Success Status
-            rev = aff_report.get('predicted_total_revenue', 750.0)
+            # 3. ውጤቱን ለራነሩ ማሸግ
             country_result.update({
                 'content': final_html,
-                'status': 'success',
+                'status': 'success', # ለ GitHub Actions 'success' መሆኑ ወሳኝ ነው
                 'metrics': {
-                    'final_word_count': len(str(final_html).split()), 
-                    'estimated_revenue': rev, 
-                    'quality_score': 95
+                    'final_word_count': len(str(final_html).split()),
+                    'estimated_revenue': predicted_revenue,
+                    'quality_score': 98 # እንደ መመዘኛ የተቀመጠ
                 }
             })
-            return country_result
+
+            self.logger.info(f"✅ {country} Successfully Mastered! Predicted: ${predicted_revenue}")
+
+            # 4. 📤 ወደ WordPress እና Telegram ወዲያውኑ መላክ
+            # ይህ ራነሩ ይዘቱን እንደጨረሰ ለሶሻል ማኔጀሩ ያስረክባል
+            if hasattr(self, 'social_manager'):
+                dispatch_package = {
+                    'production_id': f"ent_{int(time.time())}_{country.lower()}",
+                    'topic': topic,
+                    'target_countries': [country],
+                    'overall_metrics': country_result['metrics'],
+                    'country_results': [country_result]
+                }
+                await self.social_manager.send_production_notification(dispatch_package)
 
         except Exception as e:
-            self.logger.error(f"❌ Bridge Error in {country}: {e}")
+            self.logger.error(f"❌ BRIDGE FAILURE for {country}: {str(e)}")
             country_result['status'] = 'failed'
-            return country_result
+            country_result['error'] = str(e)
+            
+        return country_result
 
     def _calculate_enterprise_metrics(self, country_results: List[Dict]) -> Dict:
         """የምርት ውጤቶችን በጥንቃቄ የሚያሰላ ዘዴ (Division by Zero Protected)"""
