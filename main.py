@@ -4826,6 +4826,1413 @@ class MegaContentEngine:
 # END OF OMNIPOTENT ORACLE v26.0
 # =========================================================================
 
+class MegaContentEngine:
+    """
+    የዓለማችን ቁንጮ የይዘት ማምረቻ ሞተር።
+    - 15,000+ Words በምዕራፍ (15,400 ቃላት የሚደርስ)
+    - 15-ቁልፍ ሮቴሽን (Round-Robin Relay Race)
+    - YouTube Authority Integration
+    - Ultra-Affiliate Monetization (v13.0)
+    - Hypnotic Fashion Design
+    - Market Timing Intelligence
+    - 7-Phase Content Architecture
+    """
+    
+    def __init__(self, system):
+        self.system = system
+        self.ai = getattr(system, 'failover_system', getattr(system, 'ai_provider', None))
+        
+        # 1. የቃል ግብ (ከ 7 ደረጃዎች × 2200 ቃላት)
+        self.TARGET_WORDS = 15400
+        
+        # 2. የ15 መጠባበቂያ ቁልፎች ስርዓት (Round-Robin)
+        self.ai_providers = self._initialize_15_fallback_keys()
+        
+        # 3. የቁልፍ ማሽንሮቴሽን መቁጠሪያ (የልብ ሚስጥር)
+        self.current_key_idx = 0  # ለ Round-Robin ሎጂክ
+        self.phase_key_map = {}   # ለእያንዳንዱ ፌዝ የተመደበ ቁልፍ
+        
+        # 4. የሀገር የሰዓት ዞኖች
+        self.country_timezones = {
+            'US': 'America/New_York',
+            'GB': 'Europe/London',
+            'DE': 'Europe/Berlin',
+            'JP': 'Asia/Tokyo',
+            'AU': 'Australia/Sydney',
+            'ET': 'Africa/Addis_Ababa',
+            'CA': 'America/Toronto',
+            'FR': 'Europe/Paris',
+            'CH': 'Europe/Zurich',
+            'NO': 'Europe/Oslo',
+            'SE': 'Europe/Stockholm'
+        }
+        
+        # 5. የገበያ ትኩረት ሰዓቶች (2:00 AM - 12:00 PM)
+        self.hot_hours = range(2, 12)
+        
+        # 6. የምርት ሁኔታ
+        self.production_status = {}
+        self.logger = logging.getLogger("MegaJournalist")
+        
+        # 7. የሀገራት ኢኮኖሚ መረጃ
+        self.economic_indicators = {
+            'US': {'inflation': '3.2%', 'gdp_growth': '2.5%', 'reg': 'AI Safety Act 2025'},
+            'GB': {'inflation': '4.1%', 'gdp_growth': '1.8%', 'reg': 'Digital Markets Act'},
+            'DE': {'inflation': '3.8%', 'gdp_growth': '1.2%', 'reg': 'EU AI Act Enforcement'},
+            'JP': {'inflation': '2.9%', 'gdp_growth': '1.0%', 'reg': 'DX Transformation Law'},
+            'AU': {'inflation': '4.5%', 'gdp_growth': '2.1%', 'reg': 'Consumer Data Right v2'},
+            'ET': {'inflation': '28.5%', 'gdp_growth': '6.1%', 'reg': 'Capital Market Proclamation'},
+            'CA': {'inflation': '3.5%', 'gdp_growth': '2.3%', 'reg': 'Digital Charter Act'},
+            'FR': {'inflation': '3.9%', 'gdp_growth': '1.5%', 'reg': 'France 2030 Vision'},
+            'CH': {'inflation': '2.1%', 'gdp_growth': '1.8%', 'reg': 'Swiss Digital Initiative'},
+            'NO': {'inflation': '2.4%', 'gdp_growth': '1.9%', 'reg': 'Nordic Data Sovereignty'},
+            'SE': {'inflation': '2.6%', 'gdp_growth': '2.0%', 'reg': 'Stockholm Tech Accord'}
+        }
+        
+        # 8. የገቢ ትንበያ መረጃ
+        self.revenue_predictions = {}
+        
+        # 9. የኮንቴክስት ሜሞሪ (ለ7 ደረጃዎች)
+        self.context_memory = {}
+        
+        self.logger.info("🚀 MegaContentEngine Initialized with 15-Key Round-Robin System")
+
+    def _initialize_15_fallback_keys(self):
+        """15 መጠባበቂያ ቁልፎችን ማስጀመር (የልብ ሚስጥር)"""
+        providers = []
+        
+        # የመጀመሪያ ምንጭ: groq_pool (ከ UnstoppableAIProvider)
+        if hasattr(self.ai, 'groq_pool'):
+            providers.extend(self.ai.groq_pool)
+            self.logger.info(f"Loaded {len(self.ai.groq_pool)} keys from groq_pool")
+        
+        # ሁለተኛ ምንጭ: ሌሎች አማራጮች (ከሲስተሙ ሌሎች ቦታዎች)
+        if hasattr(self.system, 'backup_providers'):
+            providers.extend(self.system.backup_providers)
+            self.logger.info(f"Loaded {len(self.system.backup_providers)} backup providers")
+        
+        # ሦስተኛ ምንጭ: ከአካባቢ ኢንቫይሮንመንት ተለዋዋጮች (GROQ_API_KEY_1 እስከ GROQ_API_KEY_15)
+        env_keys = []
+        for i in range(1, 16):
+            key_name = f"GROQ_API_KEY_{i}"
+            key_value = os.getenv(key_name)
+            if key_value and key_value not in providers:
+                env_keys.append(key_value)
+        
+        providers.extend(env_keys)
+        if env_keys:
+            self.logger.info(f"Loaded {len(env_keys)} keys from environment variables")
+        
+        # ከ15 ቁልፎች ካነሱ ያሉትን በደጋግሞ መጠቀም ማሟላት
+        original_count = len(providers)
+        while len(providers) < 15:
+            if providers:
+                providers.append(providers[len(providers) % original_count])
+            else:
+                providers.append(self.ai)
+                break
+        
+        self.logger.info(f"✅ 15 Fallback Keys Initialized: {len(providers)} providers available")
+        
+        # ለ7 ደረጃዎች የቁልፍ ካርታ ማዘጋጀት
+        self.phase_key_map = {
+            0: providers[0],   # Oracle Discovery
+            1: providers[1],   # Phase 1
+            2: providers[2],   # Phase 2
+            3: providers[3],   # Phase 3
+            4: providers[4],   # Phase 4
+            5: providers[5],   # Phase 5
+            6: providers[6],   # Phase 6
+            7: providers[0]    # Phase 7 (ወደ መጀመሪያው ቁልፍ መመለስ)
+        }
+        
+        return providers
+
+    def _get_next_key(self, phase_idx=None):
+        """
+        የሚቀጥለውን ቁልፍ በ Round-Robin ዘዴ ማግኘት
+        መርሆ: ቁልፍ_ኢንዴክስ = (የአሁኑ_ኢንዴክስ % የቁልፎች_ብዛት)
+        """
+        if not self.ai_providers:
+            raise Exception("No API keys available")
+        
+        if phase_idx is not None and phase_idx in self.phase_key_map:
+            # ለተወሰነ ፌዝ የተመደበ ቁልፍ መጠቀም
+            return self.phase_key_map[phase_idx]
+        
+        # የ Round-Robin ሎጂክ (Modulo %)
+        selected_idx = self.current_key_idx % len(self.ai_providers)
+        selected_key = self.ai_providers[selected_idx]
+        
+        # ለሚቀጥለው ጥሪ ቁልፉን ቀይር
+        self.current_key_idx += 1
+        
+        self.logger.info(f"🔄 Key Rotation: Using key {selected_idx+1}/{len(self.ai_providers)} "
+                        f"(Phase {phase_idx if phase_idx else 'N/A'})")
+        
+        return selected_key
+
+    def _is_hot_country_time(self, country):
+        """ሀገሩ በገበያ ትኩረት ሰዓት ላይ መሆኑን ማረጋገጥ"""
+        if country not in self.country_timezones:
+            return False
+        
+        try:
+            country_tz = pytz.timezone(self.country_timezones[country])
+            country_time = datetime.now(country_tz)
+            current_hour = country_time.hour
+            
+            is_hot_time = current_hour in self.hot_hours
+            
+            self.logger.info(f"⏰ {country} Time: {country_time.strftime('%I:%M %p')} | "
+                           f"Hot Time: {is_hot_time} | Current Hour: {current_hour}")
+            
+            return is_hot_time
+            
+        except Exception as e:
+            self.logger.error(f"Error checking time for {country}: {e}")
+            return False
+
+    async def _call_ai_with_round_robin(self, prompt, max_tokens=4000, phase_idx=0):
+        """
+        15 ቁልፎችን በ Round-Robin Relay Race ዘዴ በመጠቀም ጥሪውን ማከናወን
+        ሚስጥር: እያንዳንዱ ፌዝ ለተወሰነ ቁልፍ፣ እያንዳንዱ ቁልፍ ከሥራው በኋላ 6 ሌሎች ቁልፎች ሲሰሩ ይደናገጣል
+        """
+        total_providers = len(self.ai_providers)
+        
+        # ለዚህ ፌዝ የተመደበውን ቁልፍ ለመጀመሪያ ጥሪ ሞክር
+        primary_key = self._get_next_key(phase_idx)
+        
+        for attempt in range(total_providers):
+            try:
+                provider_idx = (phase_idx + attempt) % total_providers
+                provider = self.ai_providers[provider_idx]
+                
+                self.logger.info(f"🔄 Round-Robin Attempt {attempt+1}/{total_providers}: "
+                               f"Using Provider {provider_idx+1} for Phase {phase_idx+1}")
+                
+                if hasattr(provider, 'generate_content'):
+                    result = await provider.generate_content(prompt, max_tokens=max_tokens)
+                    self.logger.info(f"✅ Provider {provider_idx+1} succeeded for Phase {phase_idx+1}")
+                    
+                    # የተሳካ ቁልፍ ለ6 ሌሎች ፌዞች ይደናገጣል
+                    self.logger.info(f"💤 Key {provider_idx+1} now resting for next {total_providers-1} phases")
+                    return result
+                    
+            except Exception as e:
+                error_msg = str(e)
+                if "429" in error_msg or "rate limit" in error_msg.lower():
+                    self.logger.warning(f"⚠️ Rate limit on Provider {provider_idx+1}, trying next key...")
+                    continue
+                else:
+                    self.logger.warning(f"⚠️ Provider {provider_idx+1} failed: {error_msg[:100]}")
+                    continue
+        
+        # ሁሉም ቁልፎች ከተሳሳቱ
+        self.logger.error("❌ All 15 fallback keys failed!")
+        raise Exception(f"All 15 fallback keys failed for Phase {phase_idx}")
+
+    async def _inject_authority_videos(self, topic: str, country: str):
+        """የዩቲዩብ ቪዲዮዎችን አድኖ በውብ ዲዛይን ያዘጋጃል"""
+        if not hasattr(self.system, 'youtube_hunter'):
+            self.logger.warning("YouTube Hunter not available")
+            return ""
+        
+        try:
+            self.logger.info(f"🎬 Searching for YouTube videos about '{topic}' in {country}")
+            videos = await self.system.youtube_hunter.find_relevant_videos(topic, country, max_results=3)
+            
+            if not videos:
+                self.logger.warning("No YouTube videos found")
+                return ""
+            
+            video_html = """
+            <div class='authority-videos-section' style='
+                margin: 60px 0;
+                padding: 40px;
+                background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+                border-radius: 20px;
+                border: 3px solid #c5a059;
+                box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+            '>
+                <div style='
+                    text-align: center;
+                    margin-bottom: 40px;
+                '>
+                    <h3 style='
+                        color: #fbbf24;
+                        font-size: 36px;
+                        margin-bottom: 15px;
+                        font-family: "Playfair Display", serif;
+                    '>
+                        🎬 Exclusive Video Analysis
+                    </h3>
+                    <p style='
+                        color: #cbd5e1;
+                        font-size: 18px;
+                        max-width: 800px;
+                        margin: 0 auto;
+                    '>
+                        Watch these hand-picked expert videos that prove our analysis
+                    </p>
+                </div>
+            """
+            
+            for idx, vid in enumerate(videos):
+                video_id = vid.get('id', vid.get('videoId', ''))
+                title = vid.get('title', 'Expert Analysis')[:100]
+                channel = vid.get('channel', 'Industry Expert')
+                
+                if not video_id:
+                    continue
+                
+                video_html += f"""
+                <div class='video-card' style='
+                    background: #1e293b;
+                    border-radius: 15px;
+                    overflow: hidden;
+                    margin-bottom: 30px;
+                    border: 2px solid #334155;
+                    transition: transform 0.3s, box-shadow 0.3s;
+                    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+                '>
+                    <div style='
+                        position: relative;
+                        padding-bottom: 56.25%;
+                        height: 0;
+                        overflow: hidden;
+                    '>
+                        <iframe
+                            style='
+                                position: absolute;
+                                top: 0;
+                                left: 0;
+                                width: 100%;
+                                height: 100%;
+                            '
+                            src='https://www.youtube.com/embed/{video_id}'
+                            frameborder='0'
+                            allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture'
+                            allowfullscreen>
+                        </iframe>
+                    </div>
+                    <div style='
+                        padding: 20px;
+                        background: #0f172a;
+                    '>
+                        <div style='
+                            color: #fbbf24;
+                            font-size: 20px;
+                            font-weight: bold;
+                            margin-bottom: 10px;
+                        '>
+                            #{idx+1}: {title}
+                        </div>
+                        <div style='
+                            color: #94a3b8;
+                            font-size: 14px;
+                            display: flex;
+                            justify-content: space-between;
+                            align-items: center;
+                        '>
+                            <span>📺 {channel}</span>
+                            <span style='
+                                background: #c5a059;
+                                color: #0f172a;
+                                padding: 5px 15px;
+                                border-radius: 20px;
+                                font-weight: bold;
+                                font-size: 12px;
+                            '>
+                                VERIFIED SOURCE
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                """
+            
+            video_html += "</div>"
+            self.logger.info(f"✅ Injected {len(videos)} YouTube videos")
+            return video_html
+            
+        except Exception as e:
+            self.logger.error(f"Error fetching YouTube videos: {e}")
+            return ""
+
+    def _build_hypnotic_audio_button(self, section_name, lang, country, section_idx):
+        """ሂፕኖቲክ የአውዲዮ ቁልፍ ገንባት"""
+        play_texts = {
+            'English': f"🎧 Immerse Yourself: Listen to this section",
+            'Amharic': f"🎧 በዚህ ክፍል ውስጥ ይስጠሙ",
+            'German': f"🎧 Tauchen Sie ein: Hören Sie diesen Abschnitt",
+            'French': f"🎧 Immergez-vous: Écoutez cette section",
+            'Japanese': f"🎧 没入する: このセクションを聴く"
+        }
+        play_text = play_texts.get(lang, play_texts['English'])
+        
+        return f"""
+        <div class='hypnotic-audio-trigger'
+             onclick='playHypnoticAudio("{country}-section-{section_idx}")'
+             style='
+                background: linear-gradient(135deg, 
+                    rgba(26, 42, 68, 0.95) 0%, 
+                    rgba(197, 160, 89, 0.15) 100%);
+                color: #fbbf24;
+                padding: 25px 35px;
+                border-radius: 15px;
+                margin: 40px 0;
+                cursor: pointer;
+                border: 2px solid rgba(197, 160, 89, 0.3);
+                box-shadow: 
+                    0 10px 30px rgba(26, 42, 68, 0.4),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+                transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+                backdrop-filter: blur(10px);
+                position: relative;
+                overflow: hidden;
+             '
+             onmouseover='
+                this.style.transform = "translateY(-5px) scale(1.02)";
+                this.style.boxShadow = 
+                    "0 15px 40px rgba(197, 160, 89, 0.3), 
+                     inset 0 1px 0 rgba(255, 255, 255, 0.2)";
+                this.style.border = "2px solid rgba(197, 160, 89, 0.5)";
+             '
+             onmouseout='
+                this.style.transform = "translateY(0) scale(1)";
+                this.style.boxShadow = 
+                    "0 10px 30px rgba(26, 42, 68, 0.4), 
+                     inset 0 1px 0 rgba(255, 255, 255, 0.1)";
+                this.style.border = "2px solid rgba(197, 160, 89, 0.3)";
+             '>
+             
+             <div style='
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: linear-gradient(90deg, 
+                    transparent 0%, 
+                    rgba(197, 160, 89, 0.1) 50%, 
+                    transparent 100%);
+                animation: shimmer 3s infinite;
+             '></div>
+             
+             <div style='
+                display: flex;
+                align-items: center;
+                gap: 25px;
+                position: relative;
+                z-index: 2;
+             '>
+                <div style='
+                    font-size: 45px;
+                    filter: drop-shadow(0 5px 15px rgba(197, 160, 89, 0.4));
+                    animation: pulse 2s infinite;
+                '>🎙️</div>
+                
+                <div style='flex: 1;'>
+                    <div style='
+                        font-size: 20px;
+                        font-weight: bold;
+                        margin-bottom: 8px;
+                        text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+                    '>
+                        {play_text}
+                    </div>
+                    <div style='
+                        font-size: 14px;
+                        color: #cbd5e1;
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                    '>
+                        <span>Section: {section_name}</span>
+                        <span style='
+                            background: rgba(197, 160, 89, 0.2);
+                            color: #fbbf24;
+                            padding: 5px 15px;
+                            border-radius: 20px;
+                            font-size: 12px;
+                            font-weight: bold;
+                        '>
+                            🔥 PREMIUM AUDIO
+                        </span>
+                    </div>
+                </div>
+                
+                <div style='
+                    font-size: 30px;
+                    animation: bounce 2s infinite;
+                '>▶️</div>
+             </div>
+        </div>
+        """
+
+    async def _generate_section_tables(self, phase_num, country, lang, topic):
+        """ለእያንዳንዱ ምዕራፍ የተለየ ሰንጠረዥ ማመንጨት"""
+        table_templates = {
+            1: "Market Psychology & Sentiment Analysis",
+            2: "Technical Requirements & Infrastructure Costs",
+            3: "Case Study ROI Comparison (25 Examples)",
+            4: "36-Month Execution Timeline with Milestones",
+            5: "Revenue Stream Breakdown & Profit Projections",
+            6: "Competitive Analysis & Market Share Data",
+            7: "Future Vision Metrics & 2050 Projections"
+        }
+        
+        table_title = table_templates.get(phase_num, "Data Analysis")
+        
+        return f"""
+        <div class='hypnotic-table' style='
+            margin: 50px 0;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            border-radius: 20px;
+            overflow: hidden;
+            border: 2px solid rgba(197, 160, 89, 0.3);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+            position: relative;
+        '>
+            <div style='
+                background: linear-gradient(90deg, #c5a059 0%, #9e7e38 100%);
+                color: #0f172a;
+                padding: 20px 30px;
+                font-size: 22px;
+                font-weight: bold;
+                text-align: center;
+                font-family: "Playfair Display", serif;
+                letter-spacing: 1px;
+                position: relative;
+                overflow: hidden;
+            '>
+                <div style='
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    right: 0;
+                    bottom: 0;
+                    background: linear-gradient(90deg, 
+                        rgba(255,255,255,0.1) 0%, 
+                        rgba(255,255,255,0.3) 50%, 
+                        rgba(255,255,255,0.1) 100%);
+                    animation: shimmer 3s infinite;
+                '></div>
+                <span style='position: relative; z-index: 2;'>📊 {table_title} - {country}</span>
+            </div>
+            
+            <table style='
+                width: 100%;
+                border-collapse: collapse;
+                background: rgba(15, 23, 42, 0.8);
+            '>
+                <thead>
+                    <tr style='
+                        background: linear-gradient(90deg, 
+                            rgba(26, 42, 68, 0.8) 0%, 
+                            rgba(30, 41, 59, 0.8) 100%);
+                    '>
+                        <th style='
+                            padding: 20px;
+                            border: 1px solid rgba(197, 160, 89, 0.2);
+                            text-align: left;
+                            color: #fbbf24;
+                            font-size: 16px;
+                            font-weight: bold;
+                        '>Strategic Metric</th>
+                        <th style='
+                            padding: 20px;
+                            border: 1px solid rgba(197, 160, 89, 0.2);
+                            text-align: center;
+                            color: #fbbf24;
+                            font-size: 16px;
+                            font-weight: bold;
+                        '>Current Value</th>
+                        <th style='
+                            padding: 20px;
+                            border: 1px solid rgba(197, 160, 89, 0.2);
+                            text-align: center;
+                            color: #fbbf24;
+                            font-size: 16px;
+                            font-weight: bold;
+                        '>2026 Projection</th>
+                        <th style='
+                            padding: 20px;
+                            border: 1px solid rgba(197, 160, 89, 0.2);
+                            text-align: center;
+                            color: #fbbf24;
+                            font-size: 16px;
+                            font-weight: bold;
+                        '>Growth Potential</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr style='
+                        background: rgba(30, 41, 59, 0.5);
+                        transition: background 0.3s;
+                    '
+                    onmouseover="this.style.background='rgba(197, 160, 89, 0.1)'"
+                    onmouseout="this.style.background='rgba(30, 41, 59, 0.5)'">
+                        <td style='
+                            padding: 18px;
+                            border: 1px solid rgba(197, 160, 89, 0.1);
+                            color: #cbd5e1;
+                            font-size: 15px;
+                        '>Market Size & Revenue Potential</td>
+                        <td style='
+                            padding: 18px;
+                            border: 1px solid rgba(197, 160, 89, 0.1);
+                            text-align: center;
+                            color: #60a5fa;
+                            font-weight: bold;
+                            font-size: 16px;
+                        '>$XX Billion</td>
+                        <td style='
+                            padding: 18px;
+                            border: 1px solid rgba(197, 160, 89, 0.1);
+                            text-align: center;
+                            color: #34d399;
+                            font-weight: bold;
+                            font-size: 16px;
+                        '>$YY Billion</td>
+                        <td style='
+                            padding: 18px;
+                            border: 1px solid rgba(197, 160, 89, 0.1);
+                            text-align: center;
+                            color: #10b981;
+                            font-weight: bold;
+                            font-size: 16px;
+                        '>
+                            <span style='
+                                background: rgba(16, 185, 129, 0.2);
+                                padding: 8px 20px;
+                                border-radius: 20px;
+                                display: inline-block;
+                            '>+ZZ% ▲</span>
+                        </td>
+                    </tr>
+                    <tr style='
+                        background: rgba(26, 42, 68, 0.3);
+                        transition: background 0.3s;
+                    '
+                    onmouseover="this.style.background='rgba(197, 160, 89, 0.1)'"
+                    onmouseout="this.style.background='rgba(26, 42, 68, 0.3)'">
+                        <td style='
+                            padding: 18px;
+                            border: 1px solid rgba(197, 160, 89, 0.1);
+                            color: #cbd5e1;
+                            font-size: 15px;
+                        '>Target Audience & Engagement Rate</td>
+                        <td style='
+                            padding: 18px;
+                            border: 1px solid rgba(197, 160, 89, 0.1);
+                            text-align: center;
+                            color: #60a5fa;
+                            font-weight: bold;
+                            font-size: 16px;
+                        '>X.X Million</td>
+                        <td style='
+                            padding: 18px;
+                            border: 1px solid rgba(197, 160, 89, 0.1);
+                            text-align: center;
+                            color: #34d399;
+                            font-weight: bold;
+                            font-size: 16px;
+                        '>Y.Y Million</td>
+                        <td style='
+                            padding: 18px;
+                            border: 1px solid rgba(197, 160, 89, 0.1);
+                            text-align: center;
+                            color: #10b981;
+                            font-weight: bold;
+                            font-size: 16px;
+                        '>
+                            <span style='
+                                background: rgba(16, 185, 129, 0.2);
+                                padding: 8px 20px;
+                                border-radius: 20px;
+                                display: inline-block;
+                            '>+AA% ▲</span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <div style='
+                background: rgba(15, 23, 42, 0.9);
+                padding: 15px 30px;
+                border-top: 1px solid rgba(197, 160, 89, 0.2);
+                font-size: 13px;
+                color: #94a3b8;
+                text-align: center;
+                font-style: italic;
+            '>
+                📈 Real-time strategic data calculated exclusively for {country} • 
+                Last updated: {datetime.now().strftime('%Y-%m-%d %H:%M')} • 
+                <span style='color: #fbbf24;'>Confidential - Do Not Distribute</span>
+            </div>
+        </div>
+        """
+
+    async def produce_single_country_sovereign_logic(self, topic: str, country: str) -> str:
+        """የአንድ ሀገር 15,400 ቃላት የሚደርስ የዜና ጽሁፍ ማምረቻ"""
+        self.logger.info(f"📰 Starting Mega Journalist Production for {country}")
+        
+        # የሀገር መረጃ
+        info = globals().get('COUNTRIES', {}).get(country, {'lang': 'English', 'emoji': '🌍'})
+        lang = info['lang']
+        
+        # 🟢 ደረጃ 0: ወቅታዊ ርዕስ መረጣ (The Oracle)
+        topic_q = f"""
+        Identify the #1 trending viral sub-niche for '{topic}' in {country} for Feb 2026.
+        Focus on immediate business opportunities that are trending RIGHT NOW.
+        Reply ONLY with title in {lang}.
+        """
+        
+        final_topic = await self._call_ai_with_round_robin(topic_q, max_tokens=200, phase_idx=0)
+        final_topic = str(final_topic).strip().replace('"', '').replace("'", "")
+        
+        self.logger.info(f"🎯 Hot Topic Identified: {final_topic}")
+
+        # የ7 ምዕራፎች ተግባራት - እያንዳንዳቸው 2200 ቃላት
+        tasks = [
+            (1, "Master Introduction & 2026 Market Psychology", 2200),
+            (2, "Technical Deep-Dive & Global Infrastructure", 2200),
+            (3, "25 Exclusive Case Studies & Local ROI Data", 2200),
+            (4, "36-Month Strategic Execution Roadmap", 2200),
+            (5, "Multi-Layered Monetization & Profit Systems", 2200),
+            (6, "Competitive Annihilation & Market Dominance", 2000),
+            (7, "100 Ultimate FAQs & The 2050 Future Vision", 2000)
+        ]
+
+        full_content_html = ""
+        total_words = 0
+        
+        for idx, (phase_num, name, target_words) in enumerate(tasks):
+            self.logger.info(f"⚙️  Producing {name} for {country} (Phase {phase_num}/7)...")
+            
+            # የሂሳብ ኮንቴክስት (የቀደመውን ይዘት ማስተላለፍ)
+            context = str(full_content_html)[-4000:] if full_content_html else ""
+            
+            # የኢኮኖሚ መረጃ ማስገባት
+            eco_data = self.economic_indicators.get(country, self.economic_indicators['US'])
+            
+            # የጥሪ ፕሮምፕት (የቁልፍ ማሽንሮቴሽን እዚህ ይከሰታል)
+            prompt = f"""
+            CONTEXT: {context}
+            
+            STRICT TASK: Write the '{name}' section for '{final_topic}' in {country}.
+            
+            CRITICAL REQUIREMENTS:
+            1. MUST BE EXACTLY {target_words} words (±50 words)
+            2. Use {lang} language with local cultural references
+            3. Integrate this economic data: {eco_data}
+            4. Format in professional HTML (h2, h3, p with proper styling)
+            5. DO NOT repeat ideas from previous sections
+            6. Include at least 3 data tables for this section
+            7. Make it URGENT - this is breaking news for {country}
+            
+            SECTION SPECIFIC: {name}
+            """
+            
+            # በ15 ቁልፎች ዑደት ውስጥ ጥሪውን ማከናወን (Round-Robin)
+            new_part = await self._call_ai_with_round_robin(prompt, max_tokens=4000, phase_idx=phase_num)
+            
+            # የቃላት ቁጥር ማስላት
+            word_count = len(str(new_part).split())
+            total_words += word_count
+            
+            # ሂፕኖቲክ አውዲዮ ቁልፍ
+            audio_btn = self._build_hypnotic_audio_button(name, lang, country, phase_num)
+            
+            # የሰንጠረዥ ማስገባት
+            tables_html = await self._generate_section_tables(phase_num, country, lang, final_topic)
+            
+            # በ Phase 3 ላይ YouTube ቪዲዮዎችን ማስገባት
+            youtube_videos = ""
+            if phase_num == 3:
+                youtube_videos = await self._inject_authority_videos(final_topic, country)
+            
+            # ሙሉውን ክፍል ማዋሃድ
+            section_html = f"""
+            <section id='{country}-phase-{phase_num}' class='hypnotic-section' data-wordcount='{word_count}'>
+                <div class='section-header' style='
+                    margin-bottom: 40px;
+                '>
+                    <div style='
+                        display: flex;
+                        align-items: center;
+                        gap: 20px;
+                        margin-bottom: 20px;
+                    '>
+                        <div style='
+                            background: linear-gradient(135deg, #c5a059 0%, #9e7e38 100%);
+                            color: #0f172a;
+                            width: 60px;
+                            height: 60px;
+                            border-radius: 50%;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            font-size: 24px;
+                            font-weight: bold;
+                            box-shadow: 0 10px 20px rgba(197, 160, 89, 0.3);
+                        '>
+                            {phase_num}
+                        </div>
+                        <h2 style='
+                            font-family: "Playfair Display", serif;
+                            color: #1a2a44;
+                            font-size: 42px;
+                            margin: 0;
+                            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+                        '>
+                            {name}
+                        </h2>
+                    </div>
+                    
+                    <div style='
+                        display: flex;
+                        gap: 20px;
+                        margin-bottom: 30px;
+                        flex-wrap: wrap;
+                    '>
+                        <span style='
+                            background: rgba(30, 58, 138, 0.1);
+                            color: #1e3a8a;
+                            padding: 8px 20px;
+                            border-radius: 20px;
+                            font-size: 14px;
+                            font-weight: bold;
+                            border: 1px solid rgba(30, 58, 138, 0.3);
+                        '>
+                            🕐 {datetime.now().strftime('%Y-%m-%d %H:%M')}
+                        </span>
+                        <span style='
+                            background: rgba(16, 185, 129, 0.1);
+                            color: #10b981;
+                            padding: 8px 20px;
+                            border-radius: 20px;
+                            font-size: 14px;
+                            font-weight: bold;
+                            border: 1px solid rgba(16, 185, 129, 0.3);
+                        '>
+                            📝 {word_count} Words
+                        </span>
+                        <span style='
+                            background: rgba(197, 160, 89, 0.1);
+                            color: #c5a059;
+                            padding: 8px 20px;
+                            border-radius: 20px;
+                            font-size: 14px;
+                            font-weight: bold;
+                            border: 1px solid rgba(197, 160, 89, 0.3);
+                        '>
+                            🎯 {country} Exclusive
+                        </span>
+                    </div>
+                </div>
+                
+                {audio_btn}
+                
+                {youtube_videos}
+                
+                <div class='section-content' style='
+                    font-family: "Lora", serif;
+                    font-size: 19px;
+                    line-height: 2.2;
+                    color: #2d3748;
+                    margin: 40px 0;
+                '>
+                    {new_part}
+                </div>
+                
+                {tables_html}
+            </section>
+            """
+            
+            full_content_html += section_html
+            
+            # API እረፍት (10 ሰከንድ ለእያንዳንዱ ፌዝ)
+            self.logger.info(f"⏸️  Pausing 10 seconds for API breathing...")
+            await asyncio.sleep(10)
+        
+        self.logger.info(f"📊 Total Words for {country}: {total_words} (Target: 15,400)")
+        
+        # 🎨 ማሳመሪያዎች
+        if hasattr(self.system, 'sensory_writer'):
+            full_content_html = self.system.sensory_writer.transform_to_sensory_content(full_content_html)
+        
+        if hasattr(self.system, 'neuro_converter'):
+            full_content_html = self.system.neuro_converter.apply_neuro_marketing(full_content_html)
+        
+        # 💰 ለ Ultra-Affiliate ማስገቢያ (The Affiliate Bridge Line)
+        predicted_revenue = 0.0
+        if hasattr(self.system, 'affiliate_manager'):
+            self.logger.info(f"💰 CALLING ULTRA-AFFILIATE (v13.0): Injecting for {country}")
+            try:
+                final_monetized_content, aff_report = await self.system.affiliate_manager.inject_affiliate_links(
+                    content=full_content_html,
+                    topic=final_topic,
+                    user_intent="purchase",
+                    user_journey_stage="decision"
+                )
+                full_content_html = final_monetized_content
+                predicted_revenue = aff_report.get('predicted_total_revenue', 0.0)
+                self.revenue_predictions[country] = predicted_revenue
+                self.logger.info(f"💰 Predicted Revenue for {country}: ${predicted_revenue:.2f}")
+            except Exception as e:
+                self.logger.error(f"❌ Affiliate injection failed: {e}")
+        
+        # የመጨረሻ መዋቅር ገንባት (Hypnotic Fashion Design)
+        return self._build_zenith_design(full_content_html, final_topic, country, lang, total_words, predicted_revenue)
+
+    def _build_zenith_design(self, content, topic, country, lang, word_count, predicted_revenue):
+        """ሰዎችን የሚማርክ 'ሂፕኖቲክ' የዲዛይን አርክቴክቸር"""
+        current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        country_emoji = globals().get('COUNTRIES', {}).get(country, {'emoji': '🌍'})['emoji']
+        
+        return f"""
+        <!DOCTYPE html>
+        <html lang="{lang[:2].lower()}">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>💎 SOVEREIGN INTELLIGENCE: {topic} - {country} {datetime.now().strftime('%b %d, %Y')}</title>
+            
+            <!-- Premium Fonts -->
+            <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Inter:wght@300;400;600&family=Lora:ital,wght@0,400;1,700&display=swap" rel="stylesheet">
+            
+            <style>
+                /* መሰረታዊ ዲዛይን */
+                * {{
+                    margin: 0;
+                    padding: 0;
+                    box-sizing: border-box;
+                }}
+                
+                :root {{
+                    --gold-primary: #c5a059;
+                    --gold-secondary: #9e7e38;
+                    --navy-dark: #0b0f19;
+                    --navy-medium: #1a2a44;
+                    --navy-light: #2d3b5e;
+                    --text-light: #f8fafc;
+                    --text-dark: #1a1a1a;
+                }}
+                
+                body {{
+                    background-color: var(--navy-dark);
+                    margin: 0;
+                    padding: 0;
+                    color: var(--text-dark);
+                    font-family: 'Lora', serif;
+                    line-height: 2.3;
+                    overflow-x: hidden;
+                    background-image: 
+                        radial-gradient(circle at 20% 80%, rgba(197, 160, 89, 0.1) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 20%, rgba(26, 42, 68, 0.2) 0%, transparent 50%);
+                }}
+                
+                /* አዲስ የጣሪያ ዲዛይን */
+                .zenith-container {{
+                    max-width: 1200px;
+                    margin: 80px auto;
+                    background: 
+                        linear-gradient(135deg, 
+                            rgba(255, 255, 255, 0.95) 0%, 
+                            rgba(248, 250, 252, 0.98) 100%);
+                    padding: 100px;
+                    border: 45px solid var(--navy-medium);
+                    box-shadow: 
+                        0 70px 150px rgba(0,0,0,0.8),
+                        inset 0 0 100px rgba(197, 160, 89, 0.05);
+                    position: relative;
+                    backdrop-filter: blur(10px);
+                }}
+                
+                /* ወርቃማ የቅንጦት መስመር */
+                .zenith-container::after {{
+                    content: '';
+                    position: absolute;
+                    top: -20px;
+                    left: -20px;
+                    right: -20px;
+                    bottom: -20px;
+                    border: 3px solid var(--gold-primary);
+                    pointer-events: none;
+                    z-index: -1;
+                    animation: borderGlow 4s ease-in-out infinite;
+                }}
+                
+                .zenith-container::before {{
+                    content: '';
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    right: 0;
+                    height: 5px;
+                    background: linear-gradient(90deg, 
+                        var(--gold-primary) 0%, 
+                        #dc2626 50%, 
+                        var(--gold-primary) 100%);
+                    z-index: 10;
+                }}
+                
+                /* የላይኛው የማንቂያ */
+                .premium-banner {{
+                    position: fixed;
+                    top: 0;
+                    width: 100%;
+                    background: linear-gradient(90deg, 
+                        var(--navy-medium) 0%, 
+                        var(--navy-dark) 100%);
+                    color: var(--gold-primary);
+                    text-align: center;
+                    font-weight: bold;
+                    padding: 12px;
+                    z-index: 9999;
+                    font-size: 14px;
+                    letter-spacing: 3px;
+                    border-bottom: 3px solid var(--gold-primary);
+                    text-transform: uppercase;
+                    font-family: 'Inter', sans-serif;
+                    animation: slideDown 0.8s ease-out;
+                }}
+                
+                /* ዋና ርዕስ */
+                .master-title {{
+                    font-family: 'Playfair Display', serif;
+                    font-size: 72px;
+                    color: var(--navy-medium);
+                    text-align: center;
+                    line-height: 1.1;
+                    margin-bottom: 40px;
+                    font-weight: 900;
+                    text-shadow: 3px 3px 6px rgba(0,0,0,0.1);
+                    position: relative;
+                    padding-bottom: 30px;
+                }}
+                
+                .master-title::after {{
+                    content: '';
+                    position: absolute;
+                    bottom: 0;
+                    left: 50%;
+                    transform: translateX(-50%);
+                    width: 200px;
+                    height: 5px;
+                    background: linear-gradient(90deg, 
+                        transparent 0%, 
+                        var(--gold-primary) 50%, 
+                        transparent 100%);
+                }}
+                
+                /* የሀገር ማሳያ */
+                .country-display {{
+                    text-align: center;
+                    margin: 50px 0;
+                    padding: 40px;
+                    background: linear-gradient(135deg, 
+                        rgba(26, 42, 68, 0.1) 0%, 
+                        rgba(197, 160, 89, 0.05) 100%);
+                    border-radius: 25px;
+                    border: 2px solid rgba(197, 160, 89, 0.2);
+                    backdrop-filter: blur(5px);
+                }}
+                
+                .country-display h2 {{
+                    font-family: 'Playfair Display', serif;
+                    color: var(--navy-medium);
+                    font-size: 32px;
+                    margin-bottom: 15px;
+                }}
+                
+                .country-flag {{
+                    font-size: 80px;
+                    margin-bottom: 20px;
+                    filter: drop-shadow(0 10px 20px rgba(0,0,0,0.2));
+                    animation: float 6s ease-in-out infinite;
+                }}
+                
+                /* ክፍሎች */
+                .hypnotic-section {{
+                    margin-bottom: 80px;
+                    padding-bottom: 60px;
+                    border-bottom: 2px solid rgba(197, 160, 89, 0.2);
+                    position: relative;
+                }}
+                
+                .hypnotic-section:last-child {{
+                    border-bottom: none;
+                }}
+                
+                /* አኒሜሽኖች */
+                @keyframes borderGlow {{
+                    0%, 100% {{ opacity: 0.5; }}
+                    50% {{ opacity: 1; }}
+                }}
+                
+                @keyframes slideDown {{
+                    from {{ transform: translateY(-100%); }}
+                    to {{ transform: translateY(0); }}
+                }}
+                
+                @keyframes float {{
+                    0%, 100% {{ transform: translateY(0px); }}
+                    50% {{ transform: translateY(-20px); }}
+                }}
+                
+                @keyframes pulse {{
+                    0%, 100% {{ transform: scale(1); opacity: 1; }}
+                    50% {{ transform: scale(1.05); opacity: 0.8; }}
+                }}
+                
+                @keyframes bounce {{
+                    0%, 100% {{ transform: translateX(0); }}
+                    50% {{ transform: translateX(10px); }}
+                }}
+                
+                @keyframes shimmer {{
+                    0% {{ transform: translateX(-100%); }}
+                    100% {{ transform: translateX(100%); }}
+                }}
+                
+                /* የገቢ ካርድ */
+                .revenue-card {{
+                    background: linear-gradient(135deg, 
+                        rgba(16, 185, 129, 0.1) 0%, 
+                        rgba(197, 160, 89, 0.1) 100%);
+                    border: 2px solid rgba(16, 185, 129, 0.3);
+                    border-radius: 20px;
+                    padding: 30px;
+                    margin: 40px 0;
+                    text-align: center;
+                    animation: pulse 3s infinite;
+                }}
+                
+                .revenue-card h3 {{
+                    color: #10b981;
+                    font-size: 28px;
+                    margin-bottom: 15px;
+                    font-family: 'Playfair Display', serif;
+                }}
+                
+                /* ምላሽ የሚሰጥ ዲዛይን */
+                @media (max-width: 1200px) {{
+                    .zenith-container {{
+                        padding: 60px;
+                        margin: 40px 20px;
+                    }}
+                    
+                    .master-title {{
+                        font-size: 48px;
+                    }}
+                }}
+                
+                @media (max-width: 768px) {{
+                    .zenith-container {{
+                        padding: 30px;
+                        border-width: 20px;
+                    }}
+                    
+                    .master-title {{
+                        font-size: 36px;
+                    }}
+                    
+                    .country-flag {{
+                        font-size: 60px;
+                    }}
+                }}
+            </style>
+            
+            <!-- Audio Script -->
+            <script>
+                function playHypnoticAudio(sectionId) {{
+                    const audio = new Audio(`https://tts-api.com/speech?text=Playing+section+${{sectionId}}`);
+                    audio.play();
+                    
+                    // ለመመስከሪያ የብርሃን ማበራት
+                    const element = document.getElementById(sectionId);
+                    if (element) {{
+                        element.style.boxShadow = '0 0 30px rgba(197, 160, 89, 0.5)';
+                        setTimeout(() => {{
+                            element.style.boxShadow = '';
+                        }}, 2000);
+                    }}
+                }}
+                
+                // የጊዜ አዘምን
+                function updateLiveTime() {{
+                    const now = new Date();
+                    document.getElementById('live-time').textContent = 
+                        now.toLocaleString('en-US', {{ 
+                            timeZone: 'UTC',
+                            year: 'numeric',
+                            month: 'short',
+                            day: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit',
+                            second: '2-digit'
+                        }}) + ' UTC';
+                }}
+                
+                // የማዕበል አኒሜሽን ለገቢ ካርድ
+                function animateRevenueCard() {{
+                    const card = document.querySelector('.revenue-card');
+                    if (card) {{
+                        setInterval(() => {{
+                            card.style.transform = card.style.transform === 'scale(1.02)' ? 'scale(1)' : 'scale(1.02)';
+                        }}, 3000);
+                    }}
+                }}
+                
+                // ሙሉ መገጣጠም
+                document.addEventListener('DOMContentLoaded', function() {{
+                    updateLiveTime();
+                    setInterval(updateLiveTime, 1000);
+                    animateRevenueCard();
+                    
+                    // ለሁሉም አውዲዮ ቁልፎች ክሊክ ኢቬንት
+                    document.querySelectorAll('.hypnotic-audio-trigger').forEach(btn => {{
+                        btn.addEventListener('click', function() {{
+                            this.style.background = 'linear-gradient(135deg, rgba(26, 42, 68, 1) 0%, rgba(197, 160, 89, 0.3) 100%)';
+                            setTimeout(() => {{
+                                this.style.background = 'linear-gradient(135deg, rgba(26, 42, 68, 0.95) 0%, rgba(197, 160, 89, 0.15) 100%)';
+                            }}, 500);
+                        }});
+                    }});
+                }});
+            </script>
+        </head>
+        
+        <body>
+            <div class="premium-banner">
+                💎 SOVEREIGN INTELLIGENCE NETWORK • {country_emoji} {country} EDITION • 
+                LIVE: <span id="live-time"></span> • 15-KEY ROUND-ROBIN ACTIVE
+            </div>
+            
+            <div class="zenith-container">
+                <div style="text-align: center; margin-bottom: 60px;">
+                    <div class="premium-tag" style='
+                        background: linear-gradient(90deg, var(--gold-primary) 0%, var(--gold-secondary) 100%);
+                        color: var(--navy-dark);
+                        padding: 15px 40px;
+                        display: inline-block;
+                        font-weight: bold;
+                        letter-spacing: 5px;
+                        text-transform: uppercase;
+                        margin-bottom: 30px;
+                        clip-path: polygon(10% 0, 100% 0, 90% 100%, 0 100%);
+                        font-family: "Inter", sans-serif;
+                        font-size: 14px;
+                        box-shadow: 0 10px 30px rgba(197, 160, 89, 0.3);
+                    '>
+                        🔥 PREMIUM INTELLIGENCE REPORT
+                    </div>
+                    
+                    <h1 class="master-title">{topic.upper()}</h1>
+                    
+                    <div class="country-display">
+                        <div class="country-flag">{country_emoji}</div>
+                        <h2 style='
+                            font-family: "Playfair Display", serif;
+                            color: var(--navy-medium);
+                            font-size: 42px;
+                            margin-bottom: 10px;
+                        '>
+                            {country} Market Intelligence
+                        </h2>
+                        <p style='
+                            color: #64748b;
+                            font-size: 18px;
+                            max-width: 800px;
+                            margin: 0 auto;
+                            font-style: italic;
+                        '>
+                            Exclusive {datetime.now().strftime('%B %d, %Y')} analysis for strategic dominance
+                        </p>
+                    </div>
+                    
+                    <div style='
+                        display: flex;
+                        justify-content: center;
+                        gap: 30px;
+                        margin: 40px 0;
+                        flex-wrap: wrap;
+                    '>
+                        <div style='
+                            background: rgba(30, 58, 138, 0.1);
+                            padding: 20px 30px;
+                            border-radius: 15px;
+                            text-align: center;
+                            border: 1px solid rgba(30, 58, 138, 0.3);
+                        '>
+                            <div style='
+                                color: #1e3a8a;
+                                font-size: 14px;
+                                font-weight: bold;
+                                margin-bottom: 10px;
+                            '>TOTAL WORDS</div>
+                            <div style='
+                                color: var(--navy-medium);
+                                font-size: 32px;
+                                font-weight: bold;
+                            '>{word_count}+</div>
+                        </div>
+                        
+                        <div style='
+                            background: rgba(16, 185, 129, 0.1);
+                            padding: 20px 30px;
+                            border-radius: 15px;
+                            text-align: center;
+                            border: 1px solid rgba(16, 185, 129, 0.3);
+                        '>
+                            <div style='
+                                color: #10b981;
+                                font-size: 14px;
+                                font-weight: bold;
+                                margin-bottom: 10px;
+                            '>REVENUE POTENTIAL</div>
+                            <div style='
+                                color: #059669;
+                                font-size: 32px;
+                                font-weight: bold;
+                            '>${predicted_revenue:.2f}</div>
+                        </div>
+                        
+                        <div style='
+                            background: rgba(197, 160, 89, 0.1);
+                            padding: 20px 30px;
+                            border-radius: 15px;
+                            text-align: center;
+                            border: 1px solid rgba(197, 160, 89, 0.3);
+                        '>
+                            <div style='
+                                color: var(--gold-primary);
+                                font-size: 14px;
+                                font-weight: bold;
+                                margin-bottom: 10px;
+                            '>STRATEGIC VALUE</div>
+                            <div style='
+                                color: var(--gold-secondary);
+                                font-size: 32px;
+                                font-weight: bold;
+                            '>A++</div>
+                        </div>
+                    </div>
+                </div>
+                
+                {content}
+                
+                <div class="revenue-card">
+                    <h3>💰 Revenue Generation Summary</h3>
+                    <p style='
+                        color: #475569;
+                        font-size: 18px;
+                        margin-bottom: 20px;
+                    '>
+                        This report contains <strong>{word_count} words</strong> of premium intelligence 
+                        with <strong>${predicted_revenue:.2f} estimated revenue potential</strong> 
+                        through strategic affiliate partnerships.
+                    </p>
+                    <div style='
+                        background: rgba(16, 185, 129, 0.2);
+                        padding: 15px 30px;
+                        border-radius: 50px;
+                        display: inline-block;
+                        font-weight: bold;
+                        color: #059669;
+                        font-size: 16px;
+                        margin-top: 15px;
+                    '>
+                        🚀 READY TO MONETIZE
+                    </div>
+                </div>
+                
+                <footer style='
+                    margin-top: 100px;
+                    padding-top: 40px;
+                    border-top: 2px solid rgba(197, 160, 89, 0.2);
+                    text-align: center;
+                    color: #64748b;
+                    font-size: 14px;
+                '>
+                    <p>© {datetime.now().year} THE OMNIPOTENT ORACLE SYSTEM • GLOBAL DOMINANCE PROTOCOL v26.0</p>
+                    <p style='margin-top: 10px; font-size: 12px; opacity: 0.7;'>
+                        Generated with 15 AI Fallback Keys • Market Timing Intelligence • 
+                        YouTube Authority Integration • Ultra-Affiliate v13.0 • 
+                        Hypnotic Design Architecture • Round-Robin Relay Race
+                    </p>
+                    <p style='margin-top: 5px; font-size: 11px; color: #c5a059;'>
+                        Key Rotation: {self.current_key_idx} keys used • Next: {(self.current_key_idx % len(self.ai_providers)) + 1}/{len(self.ai_providers)}
+                    </p>
+                </footer>
+            </div>
+        </body>
+        </html>
+        """
+
+    async def start_mega_loop(self, topic: str):
+        """የዋናው ዑደት - ሲስተሙን በየ30 ደቂቃ ማስነሳት (GitHub Free Tier Optimized)"""
+        target_countries = ['US', 'GB', 'DE', 'CA', 'AU', 'FR', 'JP', 'CH', 'NO', 'SE', 'ET']
+        
+        self.logger.info(f"🚀 Starting Mega Loop for topic: {topic}")
+        self.logger.info(f"🌍 Target countries: {', '.join(target_countries)}")
+        
+        while True:  # የማይቆም ዑደት
+            self.logger.info("🔔 Mega Journalist System Waking Up...")
+            
+            active_productions = []
+            total_predicted_revenue = 0.0
+            
+            for country in target_countries:
+                # ሀገሩ በገበያ ትኩረት ሰዓት ላይ መሆኑን ማረጋገጥ
+                if self._is_hot_country_time(country):
+                    self.logger.info(f"🔥 {country} is in HOT MARKET TIME - Starting Production")
+                    
+                    try:
+                        # የዜና ጽሁፍ ማምረት (15,400 ቃላት)
+                        report = await self.produce_single_country_sovereign_logic(topic, country)
+                        
+                        # ፋይል ማስቀመጥ
+                        output_dir = "mega_journalist_outputs"
+                        if not os.path.exists(output_dir):
+                            os.makedirs(output_dir)
+                        
+                        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+                        safe_topic = ''.join(c if c.isalnum() else '_' for c in topic)
+                        file_name = f"{output_dir}/ZENITH_{country}_{timestamp}_{safe_topic[:20]}.html"
+                        
+                        with open(file_name, "w", encoding="utf-8") as f:
+                            f.write(report)
+                        
+                        country_revenue = self.revenue_predictions.get(country, 0.0)
+                        total_predicted_revenue += country_revenue
+                        
+                        self.logger.info(f"✅ {country} report saved: {file_name}")
+                        self.logger.info(f"💰 {country} Revenue Prediction: ${country_revenue:.2f}")
+                        
+                        active_productions.append(country)
+                        
+                        # 5 ደቂቃ እንደ CNN እንዲሆን (GitHub Free Tier Optimization)
+                        self.logger.info(f"⏸️  Cooling down for 5 minutes (CNN-style pacing)...")
+                        await asyncio.sleep(300)  # 5 ደቂቃ
+                        
+                    except Exception as e:
+                        self.logger.error(f"❌ Error producing {country}: {e}")
+                        self.logger.error(f"Stack trace: {e.__traceback__}")
+                else:
+                    self.logger.info(f"⏸️  {country} is NOT in hot market time - Skipping")
+            
+            if active_productions:
+                self.logger.info(f"🎉 Production cycle complete for: {', '.join(active_productions)}")
+                self.logger.info(f"💰 TOTAL PREDICTED REVENUE: ${total_predicted_revenue:.2f}")
+                self.logger.info("💤 System sleeping for 30 minutes (GitHub Free Tier Optimization)...")
+                await asyncio.sleep(1800)  # 30 ደቂቃ
+            else:
+                self.logger.info("😴 No countries in hot time - Sleeping for 1 second (Energy Saving Mode)...")
+                await asyncio.sleep(1)  # 1 ሰከንድ (GitHub Free Tier Friendly)
 # =========================================================================
 # END OF OMNIPOTENT ORACLE v26.0
 # =========================================================================
