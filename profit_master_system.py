@@ -4844,42 +4844,53 @@ class MegaContentEngine:
 
     async def _call_ai_with_round_robin(self, prompt, max_tokens=4000, phase_idx=0):
         """
-        15 ቁልፎችን በ Round-Robin Relay Race ዘዴ በመጠቀም ጥሪውን ማከናወን
-        ሚስጥር: እያንዳንዱ ፌዝ ለተወሰነ ቁልፍ፣ እያንዳንዱ ቁልፍ ከሥራው በኋላ 6 ሌሎች ቁልፎች ሲሰሩ ይደናገጣል
+        15 ቁልፎችን በ Round-Robin ዘዴ በመጠቀም ጥሪውን ያከናውናል::
+        አንድ ቁልፍ ቢከሽፍ ወይም ሪሚት ቢመታ በራስ ሰር ወደ ቀጣዩ ይዘልላል::
         """
         total_providers = len(self.ai_providers)
         
-        # ለዚህ ፌዝ የተመደበውን ቁልፍ ለመጀመሪያ ጥሪ ሞክር
-        primary_key = self._get_next_key(phase_idx)
-        
         for attempt in range(total_providers):
+            # የትኛው ቁልፍ ላይ እንዳለን ለማወቅ (ዙር)
+            provider_idx = (phase_idx + attempt) % total_providers
+            provider = self.ai_providers[provider_idx]
+            
             try:
-                provider_idx = (phase_idx + attempt) % total_providers
-                provider = self.ai_providers[provider_idx]
+                self.logger.info(f"🔄 Round-Robin Attempt {attempt+1}/{total_providers}: Using Key {provider_idx+1}")
                 
-                self.logger.info(f"🔄 Round-Robin Attempt {attempt+1}/{total_providers}: "
-                               f"Using Provider {provider_idx+1} for Phase {phase_idx+1}")
-                
+                # አቅራቢው (provider) ቀጥታ ኦብጀክት ከሆነ (ለምሳሌ UnstoppableAIProvider)
                 if hasattr(provider, 'generate_content'):
                     result = await provider.generate_content(prompt, max_tokens=max_tokens)
-                    self.logger.info(f"✅ Provider {provider_idx+1} succeeded for Phase {phase_idx+1}")
-                    
-                    # የተሳካ ቁልፍ ለ6 ሌሎች ፌዞች ይደናገጣል
-                    self.logger.info(f"💤 Key {provider_idx+1} now resting for next {total_providers-1} phases")
-                    return result
-                    
+                    if result and not result.startswith("Error"):
+                        return str(result)
+                
+                # አቅራቢው (provider) የቁልፍ ጽሁፍ (String) ብቻ ከሆነ በቀጥታ በ httpx ይጠራዋል
+                elif isinstance(provider, str):
+                    async with httpx.AsyncClient(timeout=160.0) as client:
+                        resp = await client.post(
+                            "https://api.groq.com/openai/v1/chat/completions",
+                            headers={"Authorization": f"Bearer {provider}"},
+                            json={
+                                "model": "llama-3.3-70b-versatile", 
+                                "messages": [{"role": "user", "content": prompt}], 
+                                "max_tokens": max_tokens,
+                                "temperature": 0.7
+                            }
+                        )
+                        if resp.status_code == 200:
+                            return str(resp.json()['choices'][0]['message']['content'])
+                        elif resp.status_code == 429:
+                            self.logger.warning(f"⚠️ Key {provider_idx+1} hit rate limit (429), trying next...")
+                            continue
+                        else:
+                            self.logger.warning(f"⚠️ Key {provider_idx+1} failed with status {resp.status_code}")
+                            continue
+
             except Exception as e:
-                error_msg = str(e)
-                if "429" in error_msg or "rate limit" in error_msg.lower():
-                    self.logger.warning(f"⚠️ Rate limit on Provider {provider_idx+1}, trying next key...")
-                    continue
-                else:
-                    self.logger.warning(f"⚠️ Provider {provider_idx+1} failed: {error_msg[:100]}")
-                    continue
+                self.logger.warning(f"⚠️ Provider {provider_idx+1} failed: {str(e)[:100]}")
+                continue
         
-        # ሁሉም ቁልፎች ከተሳሳቱ
-        self.logger.error("❌ All 15 fallback keys failed!")
-        raise Exception(f"All 15 fallback keys failed for Phase {phase_idx}")
+        # ሁሉም 15ቱንም ሞክሮ ካልሰራ ብቻ ስህተት ይጥላል
+        raise Exception(f"All {total_providers} fallback keys failed for Phase {phase_idx}")
 
     async def _inject_authority_videos(self, topic: str, country: str):
         """የዩቲዩብ ቪዲዮዎችን አድኖ በውብ ዲዛይን ያዘጋጃል"""
