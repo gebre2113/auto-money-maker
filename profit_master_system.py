@@ -4643,7 +4643,7 @@ class EnhancedWordCounter:
 # =========================================================================
 # 👑 TITAN v19.0: THE SOVEREIGN ORACLE - ULTIMATE EDITION (FINAL)
 # ========================================================================
-class MegaContentEngine:
+ class MegaContentEngine:
     """
     የዓለማችን ቁንጮ የይዘት ማምረቻ ሞተር።
     - 15,000+ Words በምዕራፍ
@@ -4653,54 +4653,46 @@ class MegaContentEngine:
         self.system = system
         self.logger = logging.getLogger("MegaJournalist")
         
-        # 🛡️ 1. መጀመሪያ 'ai' መገለጽ አለበት (ከስም ስህተት መከላከያ)
-        # ራነሩ 'failover_system' ወይም 'ai_provider' ቢለውም እዚህ ጋር በ 'ai' ስር ይያዛል
-        self.ai = getattr(system, 'failover_system', getattr(system, 'ai_provider', None))
+        # 🛡️ 1. AI Provider መግለጽ
+        self.ai = getattr(system, 'failover_system', None)
         
-        # 2. ሌሎች መሰረታዊ መረጃዎች
+        # 2. መሰረታዊ መረጃዎች
         self.current_key_idx = 0
         self.TARGET_WORDS = 15400
+        self.revenue_predictions = {}
         
-        # 3. 15 መጠባበቂያ ቁልፎችን ማዘጋጀት (ከ 'self.ai' በኋላ መሆን አለበት)
+        # 🌍 3. የሀገራት ኢኮኖሚ መረጃ (ስህተቱን የሚፈታው ወሳኝ ክፍል)
+        self.economic_indicators = {
+            'US': {'inflation': '3.2%', 'gdp_growth': '2.5%', 'reg': 'AI Safety Act 2025'},
+            'GB': {'inflation': '4.1%', 'gdp_growth': '1.8%', 'reg': 'Digital Markets Act'},
+            'DE': {'inflation': '3.8%', 'gdp_growth': '1.2%', 'reg': 'EU AI Act Enforcement'},
+            'JP': {'inflation': '2.9%', 'gdp_growth': '1.0%', 'reg': 'DX Transformation Law'},
+            'AU': {'inflation': '4.5%', 'gdp_growth': '2.1%', 'reg': 'Consumer Data Right v2'},
+            'ET': {'inflation': '28.5%', 'gdp_growth': '6.1%', 'reg': 'Capital Market Proclamation'},
+            'CA': {'inflation': '3.5%', 'gdp_growth': '2.3%', 'reg': 'Digital Charter Act'},
+            'FR': {'inflation': '3.9%', 'gdp_growth': '1.5%', 'reg': 'France 2030 Vision'},
+            'CH': {'inflation': '2.1%', 'gdp_growth': '1.8%', 'reg': 'Swiss Digital Initiative'},
+            'NO': {'inflation': '2.4%', 'gdp_growth': '1.9%', 'reg': 'Nordic Data Sovereignty'},
+            'SE': {'inflation': '2.6%', 'gdp_growth': '2.0%', 'reg': 'Stockholm Tech Accord'}
+        }
+        
+        # 4. የሀገር የሰዓት ዞኖች
+        self.country_timezones = {
+            'US': 'America/New_York', 'GB': 'Europe/London', 'DE': 'Europe/Berlin',
+            'JP': 'Asia/Tokyo', 'AU': 'Australia/Sydney', 'ET': 'Africa/Addis_Ababa',
+            'CA': 'America/Toronto', 'FR': 'Europe/Paris', 'CH': 'Europe/Zurich',
+            'NO': 'Europe/Oslo', 'SE': 'Europe/Stockholm'
+        }
+        
+        # 5. የገበያ ትኩረት ሰዓቶች
+        self.hot_hours = range(2, 23)
+        
+        # 6. ቁልፎቹን ማዘጋጀት
         self.ai_providers = self._initialize_15_fallback_keys()
         
-        self.logger.info(f"🚀 MegaContentEngine initialized with {len(self.ai_providers)} keys.")
+        self.logger.info("🚀 MegaContentEngine: Economic Intelligence Loaded.")
 
-    def _initialize_15_fallback_keys(self):
-        """15 መጠባበቂያ ቁልፎችን ከገንዳውና ከኢንቫይሮመንት መሰብሰብ"""
-        providers = []
-        
-        # 🛡️ ቼክ፡ ከዋናው AI ፌይልኦቨር ሲስተም የቁልፍ ገንዳ (groq_pool) መውሰድ
-        if self.ai and hasattr(self.ai, 'groq_pool'):
-            # groq_pool ውስጥ ያሉትን ሁሉንም ቁልፎች ይጨምራል
-            providers.extend(self.ai.groq_pool)
-            self.logger.info(f"Loaded {len(self.ai.groq_pool)} keys from AI pool")
-        
-        # 🔑 ተጨማሪ ቁልፎችን ከ Environment Variables (1-15) መጫን
-        for i in range(1, 16):
-            key_name = f"GROQ_API_KEY_{i}"
-            key_val = os.getenv(key_name)
-            if key_val and key_val not in providers:
-                providers.append(key_val)
-        
-        # 🔄 አንድም ቁልፍ ካልተገኘ መደበኛውን 'ai' መጠቀም
-        if not providers:
-            if self.ai:
-                providers.append(self.ai)
-            else:
-                self.logger.error("❌ No API keys found for MegaContentEngine")
-                return []
-
-        # 🔄 በትክክል 15 ቁልፎች እስኪሞሉ ድረስ ያሉትን በዙር (Cyclic) መድገም
-        # ይህ ለ 7-Phase Relay ሩጫ በቂ ቁልፍ መኖሩን ያረጋግጣል
-        source_list = list(providers)
-        while len(providers) < 15:
-            providers.append(source_list[len(providers) % len(source_list)])
-            
-        return providers
-
-    # ... የተቀሩት የክላሱ ዘዴዎች (produce_single_country_sovereign_logic ወዘተ) እንዳሉ ይቀጥሉ ...
-
+    # ... ከዚህ በታች ያሉት ሌሎች የክላሱ ዘዴዎች (produce_single_country_sovereign_logic ወዘተ) እንዳሉ ይቀጥሉ ...
         # 4. የሀገር የሰዓት ዞኖች
         self.country_timezones = {
             'US': 'America/New_York',
