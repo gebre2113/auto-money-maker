@@ -873,6 +873,13 @@ class HumanLikenessEngine:
 # =========================================================================
 
 class UnstoppableAIProvider:
+    """
+    🔄 THE INFINITE CIRCLE: 15-Key Round Robin Relay System
+    - Global Index that never resets (until program stops)
+    - Each query uses one key, then closes that slot
+    - 15 Cylinders rotate like an engine
+    """
+    
     # 🛑 ቋሚ ጠቋሚ (Global Index) - ፕሮግራሙ እስኪቆም ድረስ ወደ ዜሮ አይመለስም
     _global_groq_idx = 0 
 
@@ -885,28 +892,60 @@ class UnstoppableAIProvider:
         
         # ቁልፎችን የማገጃ መዝገብ
         self.key_blacklist = {} # {index: unblock_time}
-        self.backups = {'gemini': os.getenv('GEMINI_API_KEY')}
+        self.backup_keys = {'gemini': os.getenv('GEMINI_API_KEY')}
+        
+        # 📊 የመጠቀም ስታቲስቲክስ
+        self.key_usage_stats = {i: 0 for i in range(15)}
+        self.total_requests = 0
         
         self.logger.info(f"🛡️ v42.0 INFINITE CIRCLE: {len(self.groq_pool)} Keys Registered.")
+        self.logger.info(f"📊 Key Distribution: {self._get_key_status()}")
 
     def _load_key_pool(self, base_name, count):
         """15ቱንም ቁልፎች ከ Secrets ሰብስቦ ይጭናል"""
         keys = []
+        
         # መጀመሪያ ዋናውን (GROQ_API_KEY) ይፈትሻል
         main_key = os.getenv(base_name)
-        if main_key: keys.append(main_key)
+        if main_key:
+            keys.append(main_key)
+            self.logger.info("✅ Loaded main GROQ_API_KEY")
         
         # በመቀጠል ቁጥር ያላቸውን (GROQ_API_KEY_1...15) ይጭናል
         for i in range(1, count + 1):
-            k = os.getenv(f"{base_name}_{i}")
+            key_name = f"{base_name}_{i}"
+            k = os.getenv(key_name)
             if k and k not in keys:
                 keys.append(k)
+                self.logger.info(f"✅ Loaded {key_name}")
         
         # 15 ቁልፍ ከሌለህ ያሉትን ደጋግሞ በመጠቀም 15ቱን ይሞላል (ክበቡ እንዳይቋረጥ)
-        if not keys: return []
-        while len(keys) < 15:
-            keys.append(random.choice(keys))
+        if not keys:
+            self.logger.error("❌ No GROQ API keys found!")
+            return []
+            
+        if len(keys) < 15:
+            self.logger.warning(f"⚠️ Only {len(keys)} keys found. Repeating to fill 15 slots...")
+            original_keys = keys.copy()
+            while len(keys) < 15:
+                keys.append(original_keys[len(keys) % len(original_keys)])
+        
+        self.logger.info(f"✅ Total keys in pool: {len(keys)}")
         return keys
+
+    def _get_key_status(self):
+        """የቁልፎች ሁኔታን ለሪፖርት ማዘጋጀት"""
+        if not self.groq_pool:
+            return "No keys available"
+        
+        active = len(self.groq_pool) - len(self.key_blacklist)
+        blocked = len(self.key_blacklist)
+        
+        # ተግባራዊ የሆኑ ቁልፎችን መቁጠር
+        now = time.time()
+        blocked_keys = [k for k, t in self.key_blacklist.items() if now < t]
+        
+        return f"Active: {active}, Blocked: {blocked}, Total: {len(self.groq_pool)}"
 
     async def generate_content(self, prompt: str, max_tokens: int = 4000) -> str:
         """
@@ -914,6 +953,7 @@ class UnstoppableAIProvider:
         አንድ ጥያቄ ሲመጣ አንድ ቁልፍ ይጠቀማል። ጥያቄው ቢሳካም ባይሳካም 
         ለቀጣዩ ጥያቄ ያ ቁልፍ 'ይዘጋል' (ይዘለላል)። ዑደቱ ከ1-15 ይዞራል።
         """
+        self.total_requests += 1
         now = time.time()
         
         # 🔄 ለ 2 ሙሉ ዙር (30 ሙከራዎች) አዲስ ቁልፍ እየፈለገ ይዞራል
@@ -922,67 +962,236 @@ class UnstoppableAIProvider:
             # 🛑 ወሳኝ፦ ጠቋሚውን ወስደን ወዲያውኑ ለቀጣዩ ጥሪ እናሳድገዋለን (Circle)
             current_slot = UnstoppableAIProvider._global_groq_idx % len(self.groq_pool)
             api_key = self.groq_pool[current_slot]
-            UnstoppableAIProvider._global_groq_idx += 1 
+            UnstoppableAIProvider._global_groq_idx += 1
 
             # ቁልፉ በ 429 ቅጣት ላይ ከሆነ ወደ ቀጣዩ 'ሲሊንደር' ዝለል
             if current_slot in self.key_blacklist and now < self.key_blacklist[current_slot]:
+                self.logger.debug(f"⏭️ Slot-{current_slot + 1} is blacklisted, skipping...")
                 continue
 
             try:
-                self.logger.info(f"⚡ [CIRCLE SLOT-{current_slot + 1}/15] Attempting phase...")
+                self.logger.info(f"⚡ [CIRCLE SLOT-{current_slot + 1}/15] Attempt #{attempt + 1}...")
+                
+                # 📊 የቁልፍ አጠቃቀም መረጃ ማዘጋጀት
+                self.key_usage_stats[current_slot] += 1
                 
                 async with httpx.AsyncClient(timeout=160.0) as client:
                     resp = await client.post(
                         "https://api.groq.com/openai/v1/chat/completions",
-                        headers={"Authorization": f"Bearer {api_key}"},
+                        headers={
+                            "Authorization": f"Bearer {api_key}",
+                            "Content-Type": "application/json"
+                        },
                         json={
                             "model": "llama-3.3-70b-versatile",
                             "messages": [{"role": "user", "content": prompt}],
-                            "max_tokens": max_tokens, "temperature": 0.7
+                            "max_tokens": max_tokens,
+                            "temperature": 0.7,
+                            "top_p": 0.9
                         }
                     )
                     
                     # ✅ ስኬታማ ከሆነ ውጤቱን ይመልሳል (ጠቋሚው አስቀድሞ ስለጨመረ ቀጣዩ ጥሪ አዲስ ቁልፍ ይጠቀማል)
                     if resp.status_code == 200:
-                        if current_slot in self.key_blacklist: del self.key_blacklist[current_slot]
+                        if current_slot in self.key_blacklist:
+                            del self.key_blacklist[current_slot]
+                        
+                        result = resp.json()['choices'][0]['message']['content']
+                        word_count = len(result.split())
+                        
+                        self.logger.info(f"✅ Slot-{current_slot + 1} succeeded! Words: {word_count}")
                         
                         # ለ APIው መተንፈሻ 5 ሰከንድ እረፍት
-                        await asyncio.sleep(5) 
-                        return str(resp.json()['choices'][0]['message']['content'])
+                        await asyncio.sleep(5)
+                        return str(result)
                     
                     # ⚠️ Rate Limit (429) ካጋጠመ ቁልፉን ለ 3 ደቂቃ አግድና ወደ ቀጣዩ ዝለል
                     elif resp.status_code == 429:
-                        self.logger.warning(f"🚫 Slot-{current_slot + 1} Limited. Closing slot for 180s.")
+                        self.logger.warning(f"🚫 Slot-{current_slot + 1} Rate Limited. Closing slot for 180s.")
                         self.key_blacklist[current_slot] = now + 180
-                        await asyncio.sleep(2) # ወደ ቀጣዩ ከመሄድ በፊት ትንሽ እረፍት
-                        continue 
+                        
+                        # Rate limit details ማውጣት
+                        try:
+                            limit_info = resp.headers
+                            self.logger.warning(f"Rate Limit Headers: {dict(limit_info)}")
+                        except:
+                            pass
+                            
+                        await asyncio.sleep(2)
+                        continue
                     
+                    # 🔴 ሌላ ስህተት
                     else:
-                        self.logger.error(f"❌ Slot-{current_slot + 1} Error {resp.status_code}. Moving to next.")
+                        error_msg = f"Slot-{current_slot + 1} Error {resp.status_code}"
+                        try:
+                            error_detail = resp.json()
+                            error_msg += f": {error_detail}"
+                        except:
+                            error_msg += f": {resp.text[:100]}"
+                        
+                        self.logger.error(error_msg)
+                        
+                        # ለተወሰኑ ስህተቶች ቁልፉን ማገድ
+                        if resp.status_code in [401, 403, 500, 502, 503]:
+                            self.logger.warning(f"🔒 Slot-{current_slot + 1} blocked for 300s due to error {resp.status_code}")
+                            self.key_blacklist[current_slot] = now + 300
+                        
                         await asyncio.sleep(2)
                         continue
 
+            except httpx.TimeoutException:
+                self.logger.warning(f"⏱️ Slot-{current_slot + 1} timeout. Moving to next...")
+                await asyncio.sleep(2)
+                continue
+                
+            except httpx.RequestError as e:
+                self.logger.warning(f"📡 Slot-{current_slot + 1} connection error: {str(e)[:100]}")
+                await asyncio.sleep(2)
+                continue
+                
             except Exception as e:
-                self.logger.warning(f"📡 Connection issues in Slot-{current_slot + 1}. Skipping...")
+                self.logger.warning(f"⚠️ Slot-{current_slot + 1} general error: {str(e)[:100]}")
                 await asyncio.sleep(2)
                 continue
 
         # 🏰 ሁሉም 15ቱ 'ሲሊንደሮች' ካልሰሩ ወደ Gemini
-        if self.keys['gemini']:
+        self.logger.warning("🔄 All 15 Groq keys failed. Trying Gemini backup...")
+        
+        if self.backup_keys.get('gemini'):
             try:
-                self.logger.info("🌟 Sovereign Backup: Gemini Activated...")
-                url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={self.keys['gemini']}"
+                self.logger.info("🌟 Sovereign Backup: Gemini 1.5 Flash Activated...")
+                
                 async with httpx.AsyncClient(timeout=120.0) as client:
-                    resp = await client.post(url, json={"contents": [{"parts": [{"text": prompt}]}]})
+                    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={self.backup_keys['gemini']}"
+                    
+                    gemini_prompt = f"""
+                    You are a senior business intelligence analyst with 20+ years experience.
+                    TASK: {prompt}
+                    
+                    INSTRUCTIONS:
+                    1. Write comprehensive, detailed content
+                    2. Use professional tone with actionable insights
+                    3. Format with clear headings and bullet points
+                    4. Target 2000+ words
+                    """
+                    
+                    resp = await client.post(
+                        url,
+                        json={
+                            "contents": [{
+                                "parts": [{"text": gemini_prompt}]
+                            }],
+                            "generationConfig": {
+                                "temperature": 0.7,
+                                "topK": 40,
+                                "topP": 0.95,
+                                "maxOutputTokens": max_tokens
+                            }
+                        }
+                    )
+                    
                     if resp.status_code == 200:
-                        return str(resp.json()['candidates'][0]['content']['parts'][0]['text'])
-            except: pass
+                        result = resp.json()['candidates'][0]['content']['parts'][0]['text']
+                        self.logger.info("✅ Gemini backup succeeded!")
+                        return str(result)
+                    else:
+                        self.logger.error(f"❌ Gemini failed: {resp.status_code}")
+            except Exception as e:
+                self.logger.error(f"❌ Gemini error: {e}")
 
-        return "Error: The Infinite Circle is exhausted. Check API Keys."
+        # 🚨 ሁሉም አማራጮች ከተሳሳቱ
+        self.logger.error("🚨 CRITICAL: All API providers exhausted!")
+        
+        # የመጨረሻ አማራጭ: መሰረታዊ መልስ
+        emergency_response = f"""
+        [EMERGENCY MODE - API KEYS EXHAUSTED]
+        
+        Based on your query about: {prompt[:100]}...
+        
+        RECOMMENDATION:
+        1. Check your API keys configuration
+        2. Ensure GROQ_API_KEY_1 through GROQ_API_KEY_15 are set
+        3. Verify Gemini API key if using backup
+        4. Consider rotating keys or checking rate limits
+        
+        System Status:
+        - Total Requests: {self.total_requests}
+        - Active Keys: {len(self.groq_pool) - len(self.key_blacklist)}/{len(self.groq_pool)}
+        - Key Usage: {self.key_usage_stats}
+        
+        This is an automated placeholder response. Please fix your API configuration.
+        """
+        
+        return emergency_response
 
-    # ለሌሎች ክፍሎች ድጋፍ ሰጪ ስሞች
+    def get_status_report(self):
+        """የሲስተሙን ሁኔታ ሪፖርት ማዘጋጀት"""
+        now = time.time()
+        
+        # የተገደቡ ቁልፎችን መቁጠር
+        blocked_keys = []
+        for idx, unblock_time in self.key_blacklist.items():
+            if now < unblock_time:
+                blocked_keys.append(f"Key-{idx+1} (unblocks in {int(unblock_time - now)}s)")
+        
+        # የቁልፍ አጠቃቀም ስታቲስቲክስ
+        usage_stats = []
+        for idx, count in self.key_usage_stats.items():
+            if count > 0:
+                usage_stats.append(f"Key-{idx+1}: {count} requests")
+        
+        return {
+            "total_requests": self.total_requests,
+            "total_keys": len(self.groq_pool),
+            "active_keys": len(self.groq_pool) - len(self.key_blacklist),
+            "blocked_keys": blocked_keys,
+            "usage_stats": usage_stats,
+            "global_index": UnstoppableAIProvider._global_groq_idx,
+            "current_slot": UnstoppableAIProvider._global_groq_idx % len(self.groq_pool) if self.groq_pool else None,
+            "key_status": self._get_key_status()
+        }
+
     async def process_task(self, prompt, **kwargs):
-        return await self.generate_content(prompt)
+        """ለሌሎች ክፍሎች ድጋፍ ሰጪ ስም"""
+        return await self.generate_content(prompt, **kwargs)
+
+    def reset_blacklist(self):
+        """ሁሉንም የተገደቡ ቁልፎች ነፃ ማውጣት"""
+        blocked_count = len(self.key_blacklist)
+        self.key_blacklist.clear()
+        self.logger.info(f"♻️ Blacklist cleared. {blocked_count} keys unblocked.")
+        return blocked_count
+
+    def add_key(self, key_value):
+        """አዲስ ቁልፍ ማከል"""
+        if key_value and key_value not in self.groq_pool:
+            self.groq_pool.append(key_value)
+            self.key_usage_stats[len(self.groq_pool) - 1] = 0
+            self.logger.info(f"✅ New key added. Total keys: {len(self.groq_pool)}")
+            return True
+        return False
+
+    def remove_key(self, key_value):
+        """ቁልፍ ማስወገድ"""
+        if key_value in self.groq_pool:
+            idx = self.groq_pool.index(key_value)
+            self.groq_pool.pop(idx)
+            # የኢንዴክስ ማስተካከያ
+            if idx in self.key_usage_stats:
+                del self.key_usage_stats[idx]
+            if idx in self.key_blacklist:
+                del self.key_blacklist[idx]
+            
+            # የቀሩትን ስታትስ አደላድል
+            new_stats = {}
+            for i, key in enumerate(self.groq_pool):
+                new_stats[i] = self.key_usage_stats.get(i+1, 0)
+            self.key_usage_stats = new_stats
+            
+            self.logger.info(f"🗑️ Key removed. Total keys: {len(self.groq_pool)}")
+            return True
+        return False
+
 # =================== ELITE SMART IMAGE ENGINE (PRODUCTION FIXED) ===================
 
 class SmartImageEngine:
