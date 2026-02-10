@@ -3952,7 +3952,7 @@ Standards Achievement Rate: {metrics.get('enterprise_standards_rate', 0)}%
 ================================================================================
 
 PRODUCTION OVERVIEW
-(────────────────────────────────────────────────────────────────────────────────)
+("────────────────────────────────────────────────────────────────────────────────")
 Production ID:      {production_results['production_id']}
 Topic:              {production_results['topic']}
 Date:               {datetime.now().strftime('%B %d, %Y')}
