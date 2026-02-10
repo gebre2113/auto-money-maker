@@ -4332,57 +4332,50 @@ class EnhancedWordCounter:
 # =========================================================================
 # 👑 PART 2: THE SOVEREIGN WRITER (MegaContentEngine)
 # =========================================================================
+# =========================================================================
+# 👑 PART 1: THE REFINED MASTER PEN (MegaContentEngine)
+# =========================================================================
 class MegaContentEngine:
     def __init__(self, system):
-        self.logger = logging.getLogger("MegaOracle")
+        self.logger = logging.getLogger("MegaPen")
         self.system = system
         self.ai = getattr(system, 'failover_system', getattr(system, 'ai_provider', None))
 
     async def produce_single_country_sovereign_logic(self, topic: str, country: str) -> str:
-        """7-PHASE RELAY: 10,000+ ቃላት በ 15 ቁልፎች ርክክብ"""
-        self.active_memory = "" # Brain Wipe
         full_html = ""
+        memory = ""
         info = COUNTRIES.get(country, {'lang': 'English'})
         lang = info['lang']
         
-        # 7ቱ ስልታዊ ምዕራፎች (እያንዳንዳቸው ~1,500 ቃላት)
         tasks = [
-            ("Master Intro & Market Psychology", 2000), 
-            ("Technical Deep-Dive & Setup", 2000),
-            ("25 Exclusive Case Studies", 1800), 
-            ("36-Month Strategic Roadmap", 1800),
-            ("Revenue & ROI Secret Systems", 1800), 
-            ("Competition Domination SWOT", 1500),
-            ("100 Ultimate FAQs & 2050 Vision", 1500)
+            ("Master Introduction", 2200), ("Technical Infrastructure", 2200),
+            ("25 Case Studies", 2200), ("36-Month Roadmap", 2200),
+            ("Monetization Mastery", 2200), ("Competition Domination", 2000), ("2050 Vision", 2000)
         ]
 
         for idx, (name, words) in enumerate(tasks):
-            self.logger.info(f"⚙️  {country} Phase {idx+1}/7 [Sequential Key Mode]...")
+            self.logger.info(f"⚙️  {country} Phase {idx+1}/7...")
             
-            # Smart Context (መደጋገም መከላከያ)
-            context = str(self.active_memory)[-3500:] if self.active_memory else "Start."
-            prompt = f"CONTEXT: {context}\n\nTASK: Write '{name}' for topic '{topic}' in {country}. Use {lang}. Target {words} words. HTML. DO NOT REPEAT."
+            # 🛑 400 Bad Request እንዳይመጣ Context ን እናጽዳለን
+            clean_context = memory[-3000:].replace('"', "'").replace('\\', '/') if memory else "Start."
+            prompt = f"CONTEXT: {clean_context}\n\nSTRICT TASK: Write '{name}' for '{topic}' in {country}. Use {lang}. Target {words} words. HTML. DO NOT REPEAT."
             
-            # AI ጥሪ (በየጥሪው አዲስ ቁልፍ ከ 15ቱ ውስጥ በራሱ ያዞራል)
-            new_part = await self.ai.generate_content(prompt, max_tokens=4000)
+            part = await self.ai.generate_content(prompt, max_tokens=4000)
+            if len(str(part)) < 200: raise Exception(f"AI Failure at {name}")
+
+            # 🎙️ አውዲዮ ቁልፍ መሰንጠቅ
+            audio = f"<div class='audio-btn' style='background:#1e3c72; color:gold; padding:15px; border-radius:10px;'>🎙️ Listen to {name}</div>"
             
-            if len(str(new_part)) < 200: raise Exception(f"AI Failure at {name}")
+            full_html += f"\n\n{audio}\n{str(part)}"
+            memory += str(part)
+            # በየዙሩ 7 ሰከንድ እረፍት (በ Provider ውስጥ ተካቷል)
 
-            # አውዲዮ እና ምስል መሰንጠቅ
-            audio_btn = f"<div class='audio-btn' style='background:gold; color:black; padding:15px; border-radius:10px; cursor:pointer;'>🎙️ Listen to {name}</div>"
-            full_html += f"\n\n{audio_btn}\n{str(new_part)}"
-            self.active_memory += str(new_part)
+        # 🛑 ወሳኝ፡ እዚህ ጋር አፊሊዬት ኢንጂኑን አንጠራም። ራነሩ ራሱ እንዲያደርገው ንጹህ ጽሁፍ እንመልሳለን።
+        return self._build_royal_design(full_html, topic, country)
 
-        # አፊሊዬት ውህደት እና ማስዋብ (v13.0 + Neuro/Sensory)
-        final_content, _ = await self.system.affiliate_manager.inject_affiliate_links(
-            content=full_html, topic=topic, user_intent="purchase"
-        )
-        
-        return self._build_royal_design(final_content, topic, country, lang)
-
-    def _build_royal_design(self, content, topic, country, lang):
-        style = "<style>body{background:#0b0f19; color:#333; font-family:'Lora',serif;} .master-container{max-width:1100px; margin:60px auto; background:#fff; padding:80px; border:45px solid #1a2a44; box-shadow:0 50px 100px rgba(0,0,0,0.8); line-height:2.3;}</style>"
-        return f"{style}<div class='master-container'><h1>{topic.upper()} - {country}</h1>{content}</div>"
+    def _build_royal_design(self, content, topic, country):
+        style = "<style>body{background:#0b0f19; color:#333; font-family:serif;} .doc{max-width:1050px; margin:50px auto; background:#fff; padding:70px; border:35px solid #1e3c72; line-height:2.2;} h1{text-align:center; font-size:60px;}</style>"
+        return f"{style}<div class='doc'><h1>{topic.upper()} - {country}</h1>{content}</div>"
 # =========================================================================
 # 👑 TITAN v26.0 OMNIPOTENT: THE SOVEREIGN ORACLE (TOTAL UNIFICATION)
 # ============================================================ 
