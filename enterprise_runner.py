@@ -3919,7 +3919,7 @@ class EnterpriseProductionOrchestrator:
         return production_results
     
     async def _process_country_enterprise(self, topic: str, country: str, **kwargs) -> Dict:
-        """አንድ ሀገርን በኢንተርፕራይዝ ደረጃ ማቀናበር"""
+        """አንድ ሀገርን በኢንተርፕራይዝ ደረጃ ማቀናበር - ድልድዩ ተስተካክሏል"""
         country_result = {
             'country': country, 
             'status': 'processing', 
@@ -3928,14 +3928,19 @@ class EnterpriseProductionOrchestrator:
         }
         
         try:
-            # 1. 🎯 የመጀመሪያ ግዙፍ እስክሪብት (Mega-Pen) - 15,000 ቃላት
-            self.logger.info(f"👑 CALLING MEGA-PEN for {country} (Omega Key: {kwargs.get('omega_key_number', 'N/A')})")
+            self.logger.info(f"👑 CALLING MEGA-PEN for {country}")
             
-            # 🔑 የኦሜጋ ቁልፍ ስርዓትን ለ Mega-Pen መጠቀም
-            mega_content = await self.content_system.mega_engine.produce_single_country_sovereign_logic(topic, country)
-            
+            # 🔄 ድልድዩን የማጠናከር ስራ (Check for attributes safely)
+            if hasattr(self.content_system, 'mega_engine'):
+                # እውነተኛው ሲስተም ካለ
+                mega_content = await self.content_system.mega_engine.produce_single_country_sovereign_logic(topic, country)
+            else:
+                # መጠባበቂያው (Fallback) ጥቅም ላይ ከዋለ
+                self.logger.warning(f"⚠️ Using Fallback content generation for {country}")
+                res = await self.content_system.generate_deep_content(topic=topic, country=country)
+                mega_content = res.get('content', '')
+
             # 2. 💰 ሁለተኛው ግዙፍ እስክሪብት (Affiliate-Pen)
-            self.logger.info(f"💰 CALLING AFFILIATE-PEN for {country}")
             final_content, aff_report = await self.affiliate_manager.inject_affiliate_links(
                 content=mega_content, 
                 topic=topic, 
@@ -3943,46 +3948,36 @@ class EnterpriseProductionOrchestrator:
                 user_journey_stage="decision"
             )
 
-            # 3. ✨ የማሳመሪያ ስራዎች
-            self.logger.info(f"✨ POLISHING: Adding Human-Likeness for {country}")
+            # 3. ✨ የማሳመሪያ ስራዎች (Human-Likeness)
             humanized = await self.human_engine.inject_human_elements(final_content, country, topic)
             
             # 4. 🖼️ የምስል ማስገቢያ
-            if hasattr(self, 'image_engine'):
-                self.logger.info(f"🖼️ Adding SEO Images for {country}")
+            if hasattr(self.image_engine, 'enhance_with_images'):
                 humanized = self.image_engine.enhance_with_images(humanized, country)
             
             # 5. 🎯 የ CTA ማሻሻያ
-            if hasattr(self, 'cta_engine'):
-                self.logger.info(f"🎯 Optimizing CTAs for {country}")
+            if hasattr(self.cta_engine, 'optimize_ctas'):
                 humanized = self.cta_engine.optimize_ctas(humanized, country)
             
-            # 6. 📊 ውጤቱን ማሸግ
             rev = aff_report.get('predicted_total_revenue', 1500.0)
-            word_count = len(humanized.split())
             
             country_result.update({
                 'content': humanized,
                 'status': 'completed', 
                 'metrics': {
-                    'final_word_count': word_count, 
+                    'final_word_count': len(humanized.split()), 
                     'estimated_revenue': rev, 
                     'quality_score': 98,
                     'enterprise_grade': True
-                },
-                'enhancements': {
-                    'human_score': {
-                        'human_score': 95,
-                        'ai_detection_risk': 'LOW'
-                    },
-                    'seo_impact': {
-                        'seo_score_boost': 40,
-                        'images_added': 3
-                    }
                 }
             })
             
-            self.logger.info(f"✅ {country} Successfully Mastered! Words: {word_count:,} | Revenue: ${rev:,.2f}")
+            # 📡 እያንዳንዱ ሀገር እንዳለቀ ወዲያውኑ መላክ (Real-time Publishing)
+            if hasattr(self, 'social_manager'):
+                country_result['topic'] = topic
+                country_result['production_id'] = getattr(self, 'current_production_id', 'unknown')
+                await self.social_manager.publish_country_content(country_result)
+
             return country_result
 
         except Exception as e:
