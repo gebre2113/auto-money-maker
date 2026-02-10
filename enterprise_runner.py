@@ -3103,8 +3103,7 @@ class DashboardManager:
         return self.stats.copy()
 
 # =================== ENTERPRISE PRODUCTION ORCHESTRATOR ===================
-
-class class EnterpriseProductionOrchestrator:
+class EnterpriseProductionOrchestrator:
     """Complete Enterprise Orchestrator with ALL Enhancements"""
     
     def __init__(self):
