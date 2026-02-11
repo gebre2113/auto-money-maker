@@ -5275,96 +5275,77 @@ class MegaContentEngine:
 
     async def produce_single_country_sovereign_logic(self, topic: str, country: str) -> str:
         """
-        7-PHASE SOVEREIGN RELAY: 
-        የድሮውን የማምረት ብቃት ከአዲሱ የዲዛይን ጥበብ ጋር ያዋህዳል።
+        HYBRID LOGIC: v19.0 Stability + v22.0 Intelligence.
+        የአውድ መጠንን በመቀነስ (Prompt Thinning) ስህተቶችን ይከላከላል።
         """
-        self.logger.info(f"📰 Starting Sovereign Production for {country}")
+        self.logger.info(f"📰 Starting Hybrid Production for {country}")
         
-        # 1. የሀገር እና የቋንቋ ዝግጅት (Isolation Logic)
         info = globals().get('COUNTRIES', {}).get(country, {'lang': 'English', 'emoji': '🌍'})
         lang = info['lang']
         full_content_html = ""
-        clean_text_context = "" # ለ AI አውድ የሚሆን ንጹህ ጽሁፍ (ሚስጥራዊው ቁልፍ)
         total_words = 0
         
-        import re
-        from datetime import datetime
-
-        # 2. ደረጃ 0: ወቅታዊ ርዕስ መረጣ
-        topic_q = f"Identify the #1 trending viral sub-niche for '{topic}' in {country} for Feb 2026. Reply ONLY with title in {lang}."
-        final_topic = await self._call_ai_with_round_robin(topic_q, max_tokens=200, phase_idx=0)
+        # 🟢 ደረጃ 0: ርዕስ መረጣ (Oracle)
+        topic_q = f"Viral trending business topic for {topic} in {country} Feb 2026. Title only, {lang}."
+        final_topic = await self._call_ai_with_round_robin(topic_q, max_tokens=150, phase_idx=0)
         final_topic = str(final_topic).strip().replace('"', '').replace("'", "")
-        self.logger.info(f"🎯 Sovereign Topic: {final_topic}")
 
-        # 3. የ7ቱ ደረጃዎች ተግባራት (Tasks)
+        # የ7ቱ ክፍሎች ተግባራት (እንደ v19.0 አጠር ያሉ ትዕዛዞች)
         tasks = [
-            (1, "Master Introduction & 2026 Market Psychology", 1800),
-            (2, "Technical Deep-Dive & Global Infrastructure", 1800),
-            (3, "25 Exclusive Case Studies & Local ROI Data", 1800),
-            (4, "36-Month Strategic Execution Roadmap", 1800),
-            (5, "Multi-Layered Monetization & Profit Systems", 1800),
-            (6, "Competitive Annihilation & Market Dominance", 1500),
-            (7, "100 Ultimate FAQs & The 2050 Future Vision", 1500)
+            (1, "Master Introduction & Market Psychology", 1800),
+            (2, "Technical Architecture & System Design", 1800),
+            (3, "Exclusive Case Studies & Local ROI", 1800),
+            (4, "Strategic Execution Roadmap", 1800),
+            (5, "Multi-Layered Monetization Systems", 1800),
+            (6, "Competitive Annihilation", 1500),
+            (7, "100 FAQs & Future Vision", 1500)
         ]
 
         for idx, (phase_num, name, target_words) in enumerate(tasks):
             self.logger.info(f"⚙️  Phase {phase_num}/7: {name}...")
-            
-            # 4. Context Trimming ሎጂክ (ከ 6000 ቁምፊ በላይ እንዳይላክ)
-            # ይህ "400 Bad Request" ስህተትን ሙሉ በሙሉ ይከላከላል
-            context = clean_text_context[-6000:] if clean_text_context else "Initial Phase."
-            
-            eco_data = self.economic_indicators.get(country, self.economic_indicators.get('US', {}))
-            
-            # 5. የተቀናጀ ፕሮምፕት (የድሮው ስሪት ቅልጥፍና ያለው)
+
+            # 🚨 v19.0 ሚስጥር፡ የቀደመውን ሙሉ ጽሁፍ አለመላክ (Prompt Thinning)
+            # ይልቁንም አጭር ማጠቃለያ ብቻ እንሰጠዋለን
             prompt = f"""
-            PREVIOUS SUMMARY: {context}
+            STRICT TASK: Write '{name}' (Phase {phase_num} of 7) for the guide: '{final_topic}'.
+            MARKET: {country}
+            LANGUAGE: {lang}
+            TARGET: {target_words} words.
+            FORMAT: Professional HTML (h2, h3, p).
             
-            TASK: Write the '{name}' section for '{final_topic}' in {country}.
-            CRITICAL SPECS:
-            - Language: {lang}
-            - Words: {target_words}
-            - Context: Integrate {eco_data}
-            - Format: Professional HTML (h2, h3, p). No <html> or <body> tags.
-            - Focus: High-level authority and unique insights for 2026.
+            INSTRUCTION: This is a continuation. Do not repeat the introduction. Focus ONLY on {name}.
             """
-            
-            # 6. የ AI ጥሪ (Round-Robin with 7s rest)
-            new_part = await self._call_ai_with_round_robin(prompt, max_tokens=3200, phase_idx=phase_num)
-            
-            # 7. አውድን ማጽዳት (ሚስጥራዊ ማስተካከያ)
-            clean_part = re.sub('<[^<]+?>', '', str(new_part))
-            clean_text_context += f"\n\n--- Phase {phase_num} ---\n{clean_part}"
+
+            # 🚨 ሎጂክ ጥበቃ፡ በ v22.0 የቁልፍ መቀያየሪያ (Round-Robin) መጠቀም
+            new_part = await self._call_ai_with_round_robin(prompt, max_tokens=3000, phase_idx=phase_num)
             
             word_count = len(str(new_part).split())
             total_words += word_count
             
-            # 8. ተጨማሪ ሎጂኮች (Audio, Tables, YouTube)
+            # v22.0 ሎጂኮች፡ Audio, Tables, YouTube (ሳይቀነሱ ተጠብቀዋል)
             audio_btn = self._build_hypnotic_audio_button(name, lang, country, phase_num)
             tables_html = await self._generate_section_tables(phase_num, country, lang, final_topic)
             
             youtube_videos = ""
             if phase_num == 3:
                 youtube_videos = await self._inject_authority_videos(final_topic, country)
-            
-            # 9. HTML መገንባት
+
+            # HTML መገንባት
             section_html = f"""
-            <section id='{country}-phase-{phase_num}' class='sovereign-block'>
+            <section id='{country}-p{phase_num}' class='sovereign-block'>
                 {audio_btn}
-                <div class='phase-content'>
-                    {new_part}
-                </div>
+                <div class='content'>{new_part}</div>
                 {youtube_videos}
                 {tables_html}
             </section>
             """
             full_content_html += section_html
             
-            # 10. API Breathing Space
-            self.logger.info(f"⏸️  Resting 12s...")
-            await asyncio.sleep(12)
-        
-        # 11. Affiliate & Final Design ሎጂክ
+            # 🚨 v19.0 እረፍት፡ APIው እንዲረጋጋ (15 ሰከንድ)
+            self.logger.info(f"⏸️  Cooldown: 15s...")
+            await asyncio.sleep(15)
+
+        # 💰 Affiliate & Sensory Processing (v22.0 ሎጂክ)
         predicted_revenue = 0.0
         if hasattr(self.system, 'affiliate_manager'):
             try:
@@ -5372,12 +5353,10 @@ class MegaContentEngine:
                     content=full_content_html, topic=final_topic, user_intent="purchase", user_journey_stage="decision"
                 )
                 predicted_revenue = aff_report.get('predicted_total_revenue', 0.0)
-            except Exception as e:
-                self.logger.error(f"❌ Affiliate Logic Error: {e}")
+            except: pass
 
-        self.logger.info(f"✅ {country} Completed. Total Words: {total_words}")
         return self._build_zenith_design(full_content_html, final_topic, country, lang, total_words, predicted_revenue)
-
+                
     def _build_zenith_design(self, content, topic, country, lang, word_count, predicted_revenue):
         """ሰዎችን የሚማርክ 'ሂፕኖቲክ' የዲዛይን አርክቴክቸር"""
         current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
