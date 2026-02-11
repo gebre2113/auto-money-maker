@@ -1,64 +1,60 @@
 import os
-import json
 import requests
-from base64 import b64encode
+from datetime import datetime
 
-# ⚙️ WordPress Settings
-WP_URL = os.getenv('WP_URL')
-WP_USER = os.getenv('WP_USERNAME')
-WP_PASS = os.getenv('WP_PASSWORD')
+# የተላኩ ፖስቶችን መመዝገቢያ (GitHub ላይ አብሮ ይቀመጣል)
+LOG_FILE = "published_history.log"
 
-# 🔍 ምስሉ ላይ ያየናቸው ትክክለኛ መገኛዎች
-SEARCH_DIRS = ["enterprise_outputs", "enterprise_exports"]
+def is_already_published(market, topic):
+    """ይህ ፖስት ቀደም ብሎ መላኩን ያረጋግጣል"""
+    post_id = f"{market}-{topic}".strip().lower()
+    if os.path.exists(LOG_FILE):
+        with open(LOG_FILE, "r") as f:
+            if post_id in f.read().splitlines():
+                return True
+    return False
 
-def push_to_wordpress(title, content):
-    if not WP_URL or not WP_USER or not WP_PASS: return False
-    clean_url = WP_URL.strip('/')
-    wp_auth = b64encode(f"{WP_USER}:{WP_PASS}".encode()).decode()
-    headers = {'Authorization': f'Basic {wp_auth}', 'Content-Type': 'application/json'}
-    post_data = {'title': title, 'content': content, 'status': 'publish'}
-    try:
-        response = requests.post(f"{clean_url}/wp-json/wp/v2/posts", headers=headers, json=post_data, timeout=60)
-        return response.status_code == 201
-    except: return False
+def mark_as_published(market, topic):
+    """የተላከውን ፖስት በመዝገብ ላይ ያሰፍራል"""
+    post_id = f"{market}-{topic}".strip().lower()
+    with open(LOG_FILE, "a") as f:
+        f.write(post_id + "\n")
 
-def aggregate_and_upload():
-    print("🚜 የፋይል ክፍሎችን የመሰብሰብ ስራ ተጀምሯል...")
+def push_to_wordpress(market, topic, content, wp_url, wp_user, wp_app_pass):
+    """ጥራት ያለው ይዘት ብቻ ወደ ወርድፕረስ ይልካል"""
     
-    for base_dir in SEARCH_DIRS:
-        if not os.path.exists(base_dir): continue
-        
-        for root, dirs, files in os.walk(base_dir):
-            # ፎልደሩ '_content' የሚል ስም ካለው በውስጡ ያሉትን ፋይሎች በሙሉ እናያይዛለን
-            if "_content" in root and files:
-                print(f"📦 በፎልደር {os.path.basename(root)} ውስጥ ያሉትን ክፍሎች እያያያዝኩ ነው...")
-                full_article_parts = []
-                
-                # ፋይሎቹን በቅደም ተከተል እንዲቀመጡ በስማቸው Sort እናደርጋቸዋለን
-                for file_name in sorted(files):
-                    file_path = os.path.join(root, file_name)
-                    with open(file_path, 'r', encoding='utf-8') as f:
-                        try:
-                            # ፋይሉ JSON ከሆነ ይዘቱን ይወስዳል፣ ካልሆነ ግን ጥሬ ጽሁፉን ያነባል
-                            file_data = f.read()
-                            try:
-                                json_data = json.loads(file_data)
-                                part = json_data.get('content') or json_data.get('full_content') or str(json_data)
-                                full_article_parts.append(str(part))
-                            except:
-                                full_article_parts.append(file_data)
-                        except: continue
-                
-                if full_article_parts:
-                    final_content = "\n\n".join(full_article_parts)
-                    folder_id = os.path.basename(root).split('_')[1]
-                    title = f"Enterprise Strategy Report: {folder_id}"
-                    
-                    print(f"📤 {len(full_article_parts)} ክፍሎች ተገኝተዋል። በመጫን ላይ...")
-                    if push_to_wordpress(title, final_content):
-                        print(f"✅ በስኬት ተጭኗል: {title}")
-                    else:
-                        print(f"❌ መጫን አልተቻለም: {title}")
+    # 1. መጀመሪያ ድግግሞሽ መኖሩን አረጋግጥ
+    if is_already_published(market, topic):
+        print(f"⚠️ ዝለል፡ {market} - {topic} ቀደም ብሎ ተልኳል!")
+        return False
 
-if __name__ == "__main__":
-    aggregate_and_upload()
+    print(f"📡 አዲስ ይዘት ወደ ወርድፕረስ እየተላከ ነው: {market}...")
+
+    # 2. የቪዲዮ እና የዲዛይን ማስተካከያ (ጥራት)
+    # ማሳሰቢያ፡ content ውስጥ [VIDEO_HERE] የሚል ቦታ ካለ በቪዲዮ ይተካዋል
+    video_code = f'<div class="wp-block-embed is-type-video"><iframe src="https://www.youtube.com/embed?listType=search&list=AI+Wealth+{market}" width="560" height="315" frameborder="0" allowfullscreen></iframe></div>'
+    final_content = content.replace("[VIDEO_HERE]", video_code)
+
+    # 3. WordPress API Payload
+    payload = {
+        "title": f"Enterprise AI Implementation Strategies 2026 for {market}",
+        "content": final_content,
+        "status": "publish",
+        "categories": [1], # እንደፈለግክ ቀይረው
+        "format": "standard"
+    }
+
+    # 4. መላክ
+    response = requests.post(
+        f"{wp_url}/wp-json/wp/v2/posts",
+        auth=(wp_user, wp_app_pass),
+        json=payload
+    )
+
+    if response.status_code == 201:
+        print(f"✅ በተሳካ ሁኔታ ተለጠፈ፡ {market}")
+        mark_as_published(market, topic) # ድጋሚ እንዳይላክ መዝግብ
+        return True
+    else:
+        print(f"❌ ስህተት፡ {response.status_code} - {response.text}")
+        return False
