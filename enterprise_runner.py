@@ -41,7 +41,12 @@ from typing import Dict, List, Optional, Any, Tuple, Union
 import textwrap
 import requests
 import base64
-
+import html
+import logging
+import re
+import traceback
+from typing import List, Tuple, Dict, Optional
+from urllib.parse import quote
 # Suppress warnings
 warnings.filterwarnings('ignore')
 
