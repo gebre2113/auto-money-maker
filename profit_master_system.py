@@ -4774,55 +4774,57 @@ class MegaContentEngine:
             self.logger.error(f"Error checking time for {country}: {e}")
             return False
 
-    async def _call_ai_with_round_robin(self, prompt, max_tokens=4000, phase_idx=0):
-        """
-        15 ቁልፎችን በ Round-Robin ዘዴ በመጠቀም ጥሪውን ያከናውናል:
-        አንድ ቁልፍ ቢከሽፍ ወይም ሪሚት ቢመታ በራስ ሰር ወደ ቀጣዩ ይዘልላል:
-        """
-        total_providers = len(self.ai_providers)
-        
-        for attempt in range(total_providers):
-            # የትኛው ቁልፍ ላይ እንዳለን ለማወቅ (ዙር)
-            provider_idx = (phase_idx + attempt) % total_providers
-            provider = self.ai_providers[provider_idx]
-            
-            try:
-                self.logger.info(f"🔄 Round-Robin Attempt {attempt+1}/{total_providers}: Using Key {provider_idx+1}")
-                
-                # አቅራቢው (provider) ቀጥታ ኦብጀክት ከሆነ (ለምሳሌ UnstoppableAIProvider)
-                if hasattr(provider, 'generate_content'):
-                    result = await provider.generate_content(prompt, max_tokens=max_tokens)
-                    if result and not result.startswith("Error"):
-                        return str(result)
-                
-                # አቅራቢው (provider) የቁልፍ ጽሁፍ (String) ብቻ ከሆነ በቀጥታ በ httpx ይጠራዋል
-                elif isinstance(provider, str):
-                    async with httpx.AsyncClient(timeout=160.0) as client:
-                        resp = await client.post(
-                            "https://api.groq.com/openai/v1/chat/completions",
-                            headers={"Authorization": f"Bearer {provider}"},
-                            json={
-                                "model": "llama-3.3-70b-versatile", 
-                                "messages": [{"role": "user", "content": prompt}], 
-                                "max_tokens": max_tokens,
-                                "temperature": 0.7
-                            }
-                        )
-                        if resp.status_code == 200:
-                            return str(resp.json()['choices'][0]['message']['content'])
-                        elif resp.status_code == 429:
-                            self.logger.warning(f"⚠️ Key {provider_idx+1} hit rate limit (429), trying next...")
-                            continue
-                        else:
-                            self.logger.warning(f"⚠️ Key {provider_idx+1} failed with status {resp.status_code}")
-                            continue
+async def _call_ai_with_round_robin(self, prompt, max_tokens=4000, phase_idx=0):
+    """
+    15 ቁልፎችን በ Round-Robin ዘዴ በመጠቀም ጥሪውን ያከናውናል:
+    አንድ ቁልፍ ቢከሽፍ ለ 7 ሰከንድ ከቆየ በኋላ ብቻ ወደ ቀጣዩ ይሸጋገራል።
+    """
+    total_providers = len(self.ai_providers)
+    start_provider_idx = phase_idx % total_providers
 
-            except Exception as e:
-                self.logger.warning(f"⚠️ Provider {provider_idx+1} failed: {str(e)[:100]}")
-                continue
+    for attempt in range(total_providers):
+        provider_idx = (start_provider_idx + attempt) % total_providers
+        provider = self.ai_providers[provider_idx]
         
-        # ሁሉም 15ቱንም ሞክሮ ካልሰራ ብቻ ስህተት ይጥላል
-        raise Exception(f"All {total_providers} fallback keys failed for Phase {phase_idx}")
+        try:
+            self.logger.info(f"🔄 Phase {phase_idx}, Attempt {attempt+1}: Using Key {provider_idx+1}")
+            
+            if hasattr(provider, 'generate_content'):
+                result = await provider.generate_content(prompt, max_tokens=max_tokens)
+                if result and not str(result).startswith("Error"):
+                    return str(result)
+
+            elif isinstance(provider, str):
+                async with httpx.AsyncClient(timeout=180.0) as client:
+                    resp = await client.post(
+                        "https://api.groq.com/openai/v1/chat/completions",
+                        headers={"Authorization": f"Bearer {provider}"},
+                        json={
+                            "model": "llama-3.3-70b-versatile",
+                            "messages": [{"role": "user", "content": prompt}],
+                            "max_tokens": max_tokens,
+                            "temperature": 0.7
+                        }
+                    )
+                    
+                    if resp.status_code == 200:
+                        data = resp.json()
+                        return str(data['choices'][0]['message']['content'])
+                    
+                    elif resp.status_code == 429:
+                        self.logger.warning(f"⚠️ Key {provider_idx+1} rate limited (429).")
+                    else:
+                        self.logger.warning(f"⚠️ Key {provider_idx+1} failed with status {resp.status_code}.")
+
+        except Exception as e:
+            self.logger.warning(f"⚠️ Key {provider_idx+1} error: {str(e)[:50]}")
+
+        # አንተ እንዳልከው: ቁልፉ ካልሰራ እና ገና ሙከራ የሚቀረን ከሆነ 7 ሰከንድ እንጠብቃለን
+        if attempt < total_providers - 1:
+            self.logger.info(f"⏱️ Waiting 7 seconds before switching to Key {((provider_idx + 1) % total_providers) + 1}...")
+            await asyncio.sleep(7)
+
+    raise Exception(f"❌ Master Bridge Failure: All {total_providers} keys failed for Phase {phase_idx}")
 
     def _build_hypnotic_audio_button(self, section_name, lang, country, section_idx):
         """ሂፕኖቲክ የአውዲዮ ቁልፍ ገንባት"""
