@@ -4774,7 +4774,7 @@ class MegaContentEngine:
             self.logger.error(f"Error checking time for {country}: {e}")
             return False
 
-Async def _call_ai_with_round_robin(self, prompt, max_tokens=4000, phase_idx=0):
+    Async def _call_ai_with_round_robin(self, prompt, max_tokens=4000, phase_idx=0):
         """
         15 ቁልፎችን በ Round-Robin ዘዴ በመጠቀም ጥሪውን ያከናውናል:
         አንድ ቁልፍ ቢከሽፍ ወይም ሪሚት ቢመታ በራስ ሰር ወደ ቀጣዩ ይዘልላል:
