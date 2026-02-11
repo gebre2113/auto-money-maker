@@ -5273,219 +5273,238 @@ class MegaContentEngine:
         </div>
         """
 
-    async def produce_single_country_sovereign_logic(self, topic: str, country: str) -> str:
-        """የአንድ ሀገር 15,400 ቃላት የሚደርስ የዜና ጽሁፍ ማምረቻ"""
-        self.logger.info(f"📰 Starting Mega Journalist Production for {country}")
+async def produce_single_country_sovereign_logic(self, topic: str, country: str) -> str:
+    """የአንድ ሀገር 10,500 ቃላት የሚደርስ የዜና ጽሁፍ ማምረቻ"""
+    self.logger.info(f"📰 Starting Mega Journalist Production for {country}")
+    
+    # 🛑 BRAIN WIPE: ለዚህ ሀገር ሙሉ ኮንቴክስት ማጽዳት
+    if country in self.context_memory:
+        del self.context_memory[country]
+    self.context_memory[country] = ""
+    
+    # የሀገር መረጃ
+    info = globals().get('COUNTRIES', {}).get(country, {'lang': 'English', 'emoji': '🌍'})
+    lang = info['lang']
+    
+    # 🟢 ደረጃ 0: ወቅታዊ ርዕስ መረጣ (The Oracle) - ከዜሮ መጀመር
+    topic_q = f"""
+    Identify the #1 trending viral sub-niche for '{topic}' in {country} for Feb 2026.
+    Focus on immediate business opportunities that are trending RIGHT NOW.
+    Reply ONLY with title in {lang}.
+    IMPORTANT: Do not use any information from other countries.
+    """
+    
+    final_topic = await self._call_ai_with_round_robin(topic_q, max_tokens=150, phase_idx=0)
+    final_topic = str(final_topic).strip().replace('"', '').replace("'", "")
+    
+    self.logger.info(f"🎯 Hot Topic Identified for {country}: {final_topic}")
+
+    # የ7 ምዕራፎች ተግባራት - እያንዳንዳቸው 1500 ቃላት (ጠቅላላ 10,500 ቃላት)
+    tasks = [
+        (1, "Master Introduction & 2026 Market Psychology", 1500),
+        (2, "Technical Deep-Dive & Global Infrastructure", 1500),
+        (3, "25 Exclusive Case Studies & Local ROI Data", 1500),
+        (4, "36-Month Strategic Execution Roadmap", 1500),
+        (5, "Multi-Layered Monetization & Profit Systems", 1500),
+        (6, "Competitive Annihilation & Market Dominance", 1500),
+        (7, "100 Ultimate FAQs & The 2050 Future Vision", 1500)
+    ]
+
+    full_content_html = ""
+    total_words = 0
+    
+    for idx, (phase_num, name, target_words) in enumerate(tasks):
+        self.logger.info(f"⚙️  Producing {name} for {country} (Phase {phase_num}/7)...")
         
-        # የሀገር መረጃ
-        info = globals().get('COUNTRIES', {}).get(country, {'lang': 'English', 'emoji': '🌍'})
-        lang = info['lang']
+        # የኮንቴስት አጠቃቀም: የዚህ ሀገር ብቻ ባለፈውን ቃላት መጠቀም
+        country_context = self.context_memory.get(country, "")
+        context = str(country_context)[-1500:] if country_context else ""
         
-        # 🟢 ደረጃ 0: ወቅታዊ ርዕስ መረጣ (The Oracle)
-        topic_q = f"""
-        Identify the #1 trending viral sub-niche for '{topic}' in {country} for Feb 2026.
-        Focus on immediate business opportunities that are trending RIGHT NOW.
-        Reply ONLY with title in {lang}.
+        # የኢኮኖሚ መረጃ ማስገባት (የዚህ ሀገር ብቻ)
+        eco_data = self.economic_indicators.get(country, self.economic_indicators['US'])
+        
+        # የጥሪ ፕሮምፕት (የቁልፍ ማሽንሮቴሽን እዚህ ይከሰታል)
+        prompt = f"""
+        COUNTRY-SPECIFIC RULES:
+        1. Focus EXCLUSIVELY on {country} market
+        2. DO NOT mention or reference any other country
+        3. Use ONLY {lang} language with local {country} cultural references
+        4. Integrate this {country} economic data: {eco_data}
+        5. Target: {target_words} words (±100 words)
+        
+        CONTEXT FROM PREVIOUS SECTIONS (ONLY FOR THIS COUNTRY):
+        {context}
+        
+        STRICT TASK: Write the '{name}' section for '{final_topic}' in {country}.
+        
+        ADDITIONAL REQUIREMENTS:
+        - Format in professional HTML (h2, h3, p with proper styling)
+        - Include at least 2 data tables for this section
+        - Make it URGENT - this is breaking news for {country} in 2026
+        - Include local examples and case studies from {country} only
+        
+        SECTION: {name}
         """
         
-        final_topic = await self._call_ai_with_round_robin(topic_q, max_tokens=200, phase_idx=0)
-        final_topic = str(final_topic).strip().replace('"', '').replace("'", "")
+        # በ15 ቁልፎች ዑደት ውስጥ ጥሪውን ማከናወን (አሁን 1500 ከፍተኛ ቶከን)
+        new_part = await self._call_ai_with_round_robin(prompt, max_tokens=1500, phase_idx=phase_num)
         
-        self.logger.info(f"🎯 Hot Topic Identified: {final_topic}")
-
-        # የ7 ምዕራፎች ተግባራት - እያንዳንዳቸው 2200 ቃላት
-        tasks = [
-            (1, "Master Introduction & 2026 Market Psychology", 2200),
-            (2, "Technical Deep-Dive & Global Infrastructure", 2000),
-            (3, "25 Exclusive Case Studies & Local ROI Data", 1800),
-            (4, "36-Month Strategic Execution Roadmap", 1600),
-            (5, "Multi-Layered Monetization & Profit Systems", 1400),
-            (6, "Competitive Annihilation & Market Dominance", 12000),
-            (7, "100 Ultimate FAQs & The 2050 Future Vision", 1000)
-        ]
-
-        full_content_html = ""
-        total_words = 0
+        # የቃላት ቁጥር ማስላት
+        word_count = len(str(new_part).split())
+        total_words += word_count
         
-        for idx, (phase_num, name, target_words) in enumerate(tasks):
-            self.logger.info(f"⚙️  Producing {name} for {country} (Phase {phase_num}/7)...")
-            
-            # የሂሳብ ኮንቴክስት (የቀደመውን ይዘት ማስተላለፍ)
-            context = str(full_content_html)[-2500:] if full_content_html else ""
-            
-            # የኢኮኖሚ መረጃ ማስገባት
-            eco_data = self.economic_indicators.get(country, self.economic_indicators['US'])
-            
-            # የጥሪ ፕሮምፕት (የቁልፍ ማሽንሮቴሽን እዚህ ይከሰታል)
-            prompt = f"""
-            CONTEXT: {context}
-            
-            STRICT TASK: Write the '{name}' section for '{final_topic}' in {country}.
-            
-            CRITICAL REQUIREMENTS:
-            1. MUST BE EXACTLY {target_words} words (±50 words)
-            2. Use {lang} language with local cultural references
-            3. Integrate this economic data: {eco_data}
-            4. Format in professional HTML (h2, h3, p with proper styling)
-            5. DO NOT repeat ideas from previous sections
-            6. Include at least 3 data tables for this section
-            7. Make it URGENT - this is breaking news for {country}
-            
-            SECTION SPECIFIC: {name}
-            """
-            
-            # በ15 ቁልፎች ዑደት ውስጥ ጥሪውን ማከናወን (Round-Robin)
-            new_part = await self._call_ai_with_round_robin(prompt, max_tokens=4000, phase_idx=phase_num)
-            
-            # የቃላት ቁጥር ማስላት
-            word_count = len(str(new_part).split())
-            total_words += word_count
-            
-            # ሂፕኖቲክ አውዲዮ ቁልፍ
-            audio_btn = self._build_hypnotic_audio_button(name, lang, country, phase_num)
-            
-            # የሰንጠረዥ ማስገባት
-            tables_html = await self._generate_section_tables(phase_num, country, lang, final_topic)
-            
-            # በ Phase 3 ላይ YouTube ቪዲዮዎችን ማስገባት
-            youtube_videos = ""
-            if phase_num == 3:
-                youtube_videos = await self._inject_authority_videos(final_topic, country)
-            
-            # ሙሉውን ክፍል ማዋሃድ
-            section_html = f"""
-            <section id='{country}-phase-{phase_num}' class='hypnotic-section' data-wordcount='{word_count}'>
-                <div class='section-header' style='
-                    margin-bottom: 40px;
+        # የዚህን ሀገር ኮንቴክስት ማዘመን
+        self.context_memory[country] = self.context_memory.get(country, "") + f"\n\n{new_part}"
+        
+        # ሂፕኖቲክ አውዲዮ ቁልፍ
+        audio_btn = self._build_hypnotic_audio_button(name, lang, country, phase_num)
+        
+        # የሰንጠረዥ ማስገባት
+        tables_html = await self._generate_section_tables(phase_num, country, lang, final_topic)
+        
+        # በ Phase 3 ላይ YouTube ቪዲዮዎችን ማስገባት
+        youtube_videos = ""
+        if phase_num == 3:
+            youtube_videos = await self._inject_authority_videos(final_topic, country)
+        
+        # ሙሉውን ክፍል ማዋሃድ
+        section_html = f"""
+        <section id='{country}-phase-{phase_num}' class='hypnotic-section' data-wordcount='{word_count}'>
+            <div class='section-header' style='
+                margin-bottom: 40px;
+            '>
+                <div style='
+                    display: flex;
+                    align-items: center;
+                    gap: 20px;
+                    margin-bottom: 20px;
                 '>
                     <div style='
+                        background: linear-gradient(135deg, #c5a059 0%, #9e7e38 100%);
+                        color: #0f172a;
+                        width: 60px;
+                        height: 60px;
+                        border-radius: 50%;
                         display: flex;
                         align-items: center;
-                        gap: 20px;
-                        margin-bottom: 20px;
+                        justify-content: center;
+                        font-size: 24px;
+                        font-weight: bold;
+                        box-shadow: 0 10px 20px rgba(197, 160, 89, 0.3);
                     '>
-                        <div style='
-                            background: linear-gradient(135deg, #c5a059 0%, #9e7e38 100%);
-                            color: #0f172a;
-                            width: 60px;
-                            height: 60px;
-                            border-radius: 50%;
-                            display: flex;
-                            align-items: center;
-                            justify-content: center;
-                            font-size: 24px;
-                            font-weight: bold;
-                            box-shadow: 0 10px 20px rgba(197, 160, 89, 0.3);
-                        '>
-                            {phase_num}
-                        </div>
-                        <h2 style='
-                            font-family: "Playfair Display", serif;
-                            color: #1a2a44;
-                            font-size: 42px;
-                            margin: 0;
-                            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
-                        '>
-                            {name}
-                        </h2>
+                        {phase_num}
                     </div>
-                    
-                    <div style='
-                        display: flex;
-                        gap: 20px;
-                        margin-bottom: 30px;
-                        flex-wrap: wrap;
+                    <h2 style='
+                        font-family: "Playfair Display", serif;
+                        color: #1a2a44;
+                        font-size: 36px;
+                        margin: 0;
+                        text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
                     '>
-                        <span style='
-                            background: rgba(30, 58, 138, 0.1);
-                            color: #1e3a8a;
-                            padding: 8px 20px;
-                            border-radius: 20px;
-                            font-size: 14px;
-                            font-weight: bold;
-                            border: 1px solid rgba(30, 58, 138, 0.3);
-                        '>
-                            🕐 {datetime.now().strftime('%Y-%m-%d %H:%M')}
-                        </span>
-                        <span style='
-                            background: rgba(16, 185, 129, 0.1);
-                            color: #10b981;
-                            padding: 8px 20px;
-                            border-radius: 20px;
-                            font-size: 14px;
-                            font-weight: bold;
-                            border: 1px solid rgba(16, 185, 129, 0.3);
-                        '>
-                            📝 {word_count} Words
-                        </span>
-                        <span style='
-                            background: rgba(197, 160, 89, 0.1);
-                            color: #c5a059;
-                            padding: 8px 20px;
-                            border-radius: 20px;
-                            font-size: 14px;
-                            font-weight: bold;
-                            border: 1px solid rgba(197, 160, 89, 0.3);
-                        '>
-                            🎯 {country} Exclusive
-                        </span>
-                    </div>
+                        {name}
+                    </h2>
                 </div>
                 
-                {audio_btn}
-                
-                {youtube_videos}
-                
-                <div class='section-content' style='
-                    font-family: "Lora", serif;
-                    font-size: 19px;
-                    line-height: 2.2;
-                    color: #2d3748;
-                    margin: 40px 0;
+                <div style='
+                    display: flex;
+                    gap: 20px;
+                    margin-bottom: 30px;
+                    flex-wrap: wrap;
                 '>
-                    {new_part}
+                    <span style='
+                        background: rgba(30, 58, 138, 0.1);
+                        color: #1e3a8a;
+                        padding: 8px 20px;
+                        border-radius: 20px;
+                        font-size: 14px;
+                        font-weight: bold;
+                        border: 1px solid rgba(30, 58, 138, 0.3);
+                    '>
+                        🕐 {datetime.now().strftime('%Y-%m-%d %H:%M')}
+                    </span>
+                    <span style='
+                        background: rgba(16, 185, 129, 0.1);
+                        color: #10b981;
+                        padding: 8px 20px;
+                        border-radius: 20px;
+                        font-size: 14px;
+                        font-weight: bold;
+                        border: 1px solid rgba(16, 185, 129, 0.3);
+                    '>
+                        📝 {word_count} Words
+                    </span>
+                    <span style='
+                        background: rgba(197, 160, 89, 0.1);
+                        color: #c5a059;
+                        padding: 8px 20px;
+                        border-radius: 20px;
+                        font-size: 14px;
+                        font-weight: bold;
+                        border: 1px solid rgba(197, 160, 89, 0.3);
+                    '>
+                        🎯 {country} Exclusive
+                    </span>
                 </div>
-                
-                {tables_html}
-            </section>
-            """
+            </div>
             
-            full_content_html += section_html
+            {audio_btn}
             
-            # API እረፍት (10 ሰከንድ ለእያንዳንዱ ፌዝ)
-            self.logger.info(f"⏸️  Pausing 10 seconds for API breathing...")
-            await asyncio.sleep(10)
+            {youtube_videos}
+            
+            <div class='section-content' style='
+                font-family: "Lora", serif;
+                font-size: 18px;
+                line-height: 2.0;
+                color: #2d3748;
+                margin: 40px 0;
+            '>
+                {new_part}
+            </div>
+            
+            {tables_html}
+        </section>
+        """
         
-        self.logger.info(f"📊 Total Words for {country}: {total_words} (Target: 15,400)")
+        full_content_html += section_html
         
-        # 🎨 ማሳመሪያዎች
-        if hasattr(self.system, 'sensory_writer'):
-            full_content_html = self.system.sensory_writer.transform_to_sensory_content(full_content_html)
-        
-        if hasattr(self.system, 'neuro_converter'):
-            full_content_html = self.system.neuro_converter.apply_neuro_marketing(full_content_html)
-        
-        # 💰 ለ Ultra-Affiliate ማስገቢያ (The Affiliate Bridge Line)
-        predicted_revenue = 0.0
-        if hasattr(self.system, 'affiliate_manager'):
-            self.logger.info(f"💰 CALLING ULTRA-AFFILIATE (v13.0): Injecting for {country}")
-            try:
-                final_monetized_content, aff_report = await self.system.affiliate_manager.inject_affiliate_links(
-                    content=full_content_html,
-                    topic=final_topic,
-                    user_intent="purchase",
-                    user_journey_stage="decision"
-                )
-                full_content_html = final_monetized_content
-                predicted_revenue = aff_report.get('predicted_total_revenue', 0.0)
-                self.revenue_predictions[country] = predicted_revenue
-                self.logger.info(f"💰 Predicted Revenue for {country}: ${predicted_revenue:.2f}")
-            except Exception as e:
-                self.logger.error(f"❌ Affiliate injection failed: {e}")
-        
-        # የመጨረሻ መዋቅር ገንባት (Hypnotic Fashion Design)
-        return self._build_zenith_design(full_content_html, final_topic, country, lang, total_words, predicted_revenue)
-
+        # API እረፍት (8 ሰከንድ ለእያንዳንዱ ፌዝ - ቀደም ካለው ያነሰ)
+        self.logger.info(f"⏸️  Pausing 8 seconds for API breathing...")
+        await asyncio.sleep(8)
+    
+    self.logger.info(f"📊 Total Words for {country}: {total_words} (Target: 10,500)")
+    
+    # 🎨 ማሳመሪያዎች
+    if hasattr(self.system, 'sensory_writer'):
+        full_content_html = self.system.sensory_writer.transform_to_sensory_content(full_content_html)
+    
+    if hasattr(self.system, 'neuro_converter'):
+        full_content_html = self.system.neuro_converter.apply_neuro_marketing(full_content_html)
+    
+    # 💰 ለ Ultra-Affiliate ማስገቢያ (The Affiliate Bridge Line)
+    predicted_revenue = 0.0
+    if hasattr(self.system, 'affiliate_manager'):
+        self.logger.info(f"💰 CALLING ULTRA-AFFILIATE (v13.0): Injecting for {country}")
+        try:
+            final_monetized_content, aff_report = await self.system.affiliate_manager.inject_affiliate_links(
+                content=full_content_html,
+                topic=final_topic,
+                user_intent="purchase",
+                user_journey_stage="decision"
+            )
+            full_content_html = final_monetized_content
+            predicted_revenue = aff_report.get('predicted_total_revenue', 0.0)
+            self.revenue_predictions[country] = predicted_revenue
+            self.logger.info(f"💰 Predicted Revenue for {country}: ${predicted_revenue:.2f}")
+        except Exception as e:
+            self.logger.error(f"❌ Affiliate injection failed: {e}")
+    
+    # ከዚህ ሀገር መረጃ ሙሉ በሙሉ ማጽዳት (ቀጣይ ሀገር እንዳይገባ)
+    if country in self.context_memory:
+        del self.context_memory[country]
+    
+    # የመጨረሻ መዋቅር ገንባት (Hypnotic Fashion Design)
+    return self._build_zenith_design(full_content_html, final_topic, country, lang, total_words, predicted_revenue)
+    
     def _build_zenith_design(self, content, topic, country, lang, word_count, predicted_revenue):
         """ሰዎችን የሚማርክ 'ሂፕኖቲክ' የዲዛይን አርክቴክቸር"""
         current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
