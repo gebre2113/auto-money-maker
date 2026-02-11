@@ -4158,73 +4158,101 @@ class EnterpriseProductionOrchestrator:
         
         return production_results
     
-    async def _process_country_enterprise(self, topic: str, country: str, **kwargs) -> Dict:
-        """አንድ ሀገርን በኢንተርፕራይዝ ደረጃ ማቀናበር - ድልድዩ ተስተካክሏል"""
-        country_result = {
-            'country': country, 
-            'status': 'processing', 
-            'metrics': {},
-            'omega_key_used': kwargs.get('omega_key_number', 0)
-        }
+# =========================================================================
+# 📝 ወደ MegaContentEngine ክፍል ውስጥ ጨምር
+# =========================================================================
+
+def produce_single_country_sovereign_logic(self, country: str, topic: str, 
+                                           additional_context: dict = None) -> dict:
+    """
+    👑 ሉዓላዊ የሀገር ይዘት ማመንጫ ዘዴ
+    ይህ ዘዴ በቲታን ራነር በቀጥታ ይጠራል፣ ስለሆነም ስሙ መቀየር የለበትም።
+    
+    Args:
+        country: የሀገር ኮድ (ለምሳሌ 'US', 'ET')
+        topic:  ዋና ርዕስ
+        additional_context: ተጨማሪ መረጃ (ለወደፊት ጥቅም)
+    
+    Returns:
+        dict: የይዘት፣ መለኪያዎች እና ሁኔታ የያዘ መዝገብ
+    """
+    start_time = datetime.now()
+    self.logger.info(f"👑 Sovereign content generation started for {country} – {topic}")
+    
+    # ነባሪ ውጤት (ስህተት ቢከሰትም ኦርከስትሬተሩ እንዲቀጥል)
+    result = {
+        'status': 'failed',
+        'country': country,
+        'topic': topic,
+        'content': '',
+        'metrics': {},
+        'error': None,
+        'production_id': f"{country}_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+    }
+    
+    try:
+        # 1. መሠረታዊ ይዘት ማመንጨት (ለምሳሌ በMega-Pen ዋና ዘዴ)
+        #    እዚህ ላይ የአንተ ነባሪ የይዘት ማመንጫ ዘዴ መጠራት አለበት።
+        if hasattr(self, 'generate_country_content'):
+            content = self.generate_country_content(country, topic)
+        elif hasattr(self, '_generate_core_content'):
+            content = self._generate_core_content(country, topic)
+        else:
+            # ማስመሰያ – በእውነተኛ ኮድህ መሠረት ቀይር
+            content = f"# {topic} – {country}\n\nComprehensive guide for {country} market."
         
-        try:
-            self.logger.info(f"👑 CALLING MEGA-PEN for {country}")
-            
-            # 🔄 ድልድዩን የማጠናከር ስራ (Check for attributes safely)
-            if hasattr(self.content_system, 'mega_engine'):
-                # እውነተኛው ሲስተም ካለ
-                mega_content = await self.content_system.mega_engine.produce_single_country_sovereign_logic(topic, country)
-            else:
-                # መጠባበቂያው (Fallback) ጥቅም ላይ ከዋለ
-                self.logger.warning(f"⚠️ Using Fallback content generation for {country}")
-                res = await self.content_system.generate_deep_content(topic=topic, country=country)
-                mega_content = res.get('content', '')
-
-            # 2. 💰 ሁለተኛው ግዙፍ እስክሪብት (Affiliate-Pen)
-            final_content, aff_report = await self.affiliate_manager.inject_affiliate_links(
-                content=mega_content, 
-                topic=topic, 
-                user_intent="purchase",
-                user_journey_stage="decision"
-            )
-
-            # 3. ✨ የማሳመሪያ ስራዎች (Human-Likeness)
-            humanized = await self.human_engine.inject_human_elements(final_content, country, topic)
-            
-            # 4. 🖼️ የምስል ማስገቢያ
-            if hasattr(self.image_engine, 'enhance_with_images'):
-                humanized = self.image_engine.enhance_with_images(humanized, country)
-            
-            # 5. 🎯 የ CTA ማሻሻያ
-            if hasattr(self.cta_engine, 'optimize_ctas'):
-                humanized = self.cta_engine.optimize_ctas(humanized, country)
-            
-            rev = aff_report.get('predicted_total_revenue', 1500.0)
-            
-            country_result.update({
-                'content': humanized,
-                'status': 'completed', 
-                'metrics': {
-                    'final_word_count': len(humanized.split()), 
-                    'estimated_revenue': rev, 
-                    'quality_score': 98,
-                    'enterprise_grade': True
-                }
-            })
-            
-            # 📡 እያንዳንዱ ሀገር እንዳለቀ ወዲያውኑ መላክ (Real-time Publishing)
-            if hasattr(self, 'social_manager'):
-                country_result['topic'] = topic
-                country_result['production_id'] = getattr(self, 'current_production_id', 'unknown')
-                await self.social_manager.publish_country_content(country_result)
-
-            return country_result
-
-        except Exception as e:
-            self.logger.error(f"❌ Master Bridge Failure in {country}: {str(e)}")
-            country_result['status'] = 'failed'
-            country_result['error'] = str(e)
-            return country_result
+        # 2. 🖼️ SmartImageEngine በመጠቀም ምስሎችን አስገባ
+        if hasattr(self, 'image_engine'):
+            try:
+                content = self.image_engine.generate_image_placeholders(content, country, topic)
+                image_count = self.image_engine.count_injected_images(content)
+                self.logger.info(f"🖼️ {image_count} images injected for {country}")
+            except Exception as e:
+                self.logger.warning(f"⚠️ Image injection failed for {country}: {e}")
+        
+        # 3. 💎 EliteQualityOptimizer በመጠቀም የመጨረሻ ማሻሻያ
+        if hasattr(self, 'quality_optimizer'):
+            try:
+                # ተመሳሳዩን ዘዴ በመጠቀም (async ከሆነ ማስተካከል ያስፈልጋል)
+                if asyncio.iscoroutinefunction(self.quality_optimizer.apply_100_percent_standard):
+                    # ከasync ተልዕኮ ውስጥ ከሆንን በቀጥታ መጥራት እንችላለን
+                    import asyncio
+                    loop = asyncio.get_event_loop()
+                    if loop.is_running():
+                        # በሩጫ ላይ ከሆነ ተግባር ፍጠር
+                        content = await self.quality_optimizer.apply_100_percent_standard(content, country, topic)
+                    else:
+                        # አለበለዚያ በአዲስ ሉፕ
+                        content = asyncio.run(self.quality_optimizer.apply_100_percent_standard(content, country, topic))
+                else:
+                    content = self.quality_optimizer.apply_100_percent_standard(content, country, topic)
+            except Exception as e:
+                self.logger.warning(f"⚠️ Quality optimization failed for {country}: {e}")
+        
+        # 4. መለኪያዎችን አስላ
+        word_count = len(content.split())
+        estimated_revenue = self._estimate_revenue(country, word_count) if hasattr(self, '_estimate_revenue') else word_count * 0.05
+        
+        # 5. ውጤቱን ዘምን
+        result.update({
+            'status': 'success',
+            'content': content,
+            'metrics': {
+                'final_word_count': word_count,
+                'estimated_revenue': round(estimated_revenue, 2),
+                'processing_time_seconds': (datetime.now() - start_time).total_seconds(),
+                'image_count': self.image_engine.count_injected_images(content) if hasattr(self, 'image_engine') else 0
+            },
+            'error': None
+        })
+        
+        self.logger.info(f"✅ Sovereign content generation completed for {country} in {result['metrics']['processing_time_seconds']:.1f}s")
+        
+    except Exception as e:
+        self.logger.error(f"❌ Sovereign content generation failed for {country}: {traceback.format_exc()}")
+        result['error'] = str(e)[:500]
+    
+    return def
     
     def _calculate_enterprise_metrics(self, country_results: List[Dict]) -> Dict:
         """የኢንተርፕራይዝ ሜትሪክስ ማስላት"""
