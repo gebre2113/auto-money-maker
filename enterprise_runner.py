@@ -2757,56 +2757,70 @@ class EthicalComplianceGuardian:
         
         return fixed_content
 
+# =========================================================================
+# 🚀 ENTERPRISE MULTI-PLATFORM PUBLISHER v3.1
+# DIRECT PUBLISHING ENGINE – NO MIDDLEMAN, NO FURDERER
+# የእያንዳንዱን ሀገር ውጤት በቀጥታ ወደ ሁሉም መድረኮች የሚያስተላልፍ
+# =========================================================================
+
 class SocialMediaManager:
     """
-    🚀 ENTERPRISE MULTI-PLATFORM PUBLISHER v3.0
-    የእያንዳንዱን ሀገር ውጤት በራስ-ሰር ወደ ሁሉም መድረኮች የሚያስተላልፍ
+    🚀 ENTERPRISE MULTI-PLATFORM PUBLISHER v3.1
+    የእያንዳንዱን ሀገር ውጤት በራስ-ሰር ወደ ሁሉም መድረኮች በቀጥታ የሚያስተላልፍ
+    ምንም አይነት መካከለኛ አገልጋይ ወይም ወረፋ ሳያስፈልገው
     """
 
     def __init__(self):
         self.logger = logging.getLogger("UltimateSocialManager")
-        
-        # 📱 የሁሉም መድረኮች መለያዎች (ከአካባቢ ተለዋዋጮች ይነበባሉ)
+        if not self.logger.handlers:
+            handler = logging.StreamHandler()
+            handler.setFormatter(logging.Formatter(
+                '%(asctime)s - UltimateSocialManager - %(levelname)s - %(message)s'
+            ))
+            self.logger.addHandler(handler)
+            self.logger.setLevel(logging.INFO)
+
+        # 📱 የሁሉም መድረኮች መለያዎች (ከአካባቢ ተለዋዋጮች በቀጥታ ይነበባሉ)
         self.platforms = {
             'github': {
                 'token': os.getenv('GITHUB_TOKEN'),
                 'repo': os.getenv('GITHUB_REPO'),
-                'enabled': bool(os.getenv('GITHUB_TOKEN'))
+                'enabled': bool(os.getenv('GITHUB_TOKEN') and os.getenv('GITHUB_REPO'))
             },
             'wordpress': {
                 'url': os.getenv('WP_URL'),
                 'user': os.getenv('WP_USERNAME'),
                 'pass': os.getenv('WP_PASSWORD'),
-                'enabled': bool(os.getenv('WP_URL'))
+                'enabled': bool(os.getenv('WP_URL') and os.getenv('WP_USERNAME') and os.getenv('WP_PASSWORD'))
             },
             'telegram': {
                 'token': os.getenv('TELEGRAM_BOT_TOKEN'),
                 'chat_id': os.getenv('TELEGRAM_CHAT_ID'),
-                'enabled': bool(os.getenv('TELEGRAM_BOT_TOKEN'))
+                'enabled': bool(os.getenv('TELEGRAM_BOT_TOKEN') and os.getenv('TELEGRAM_CHAT_ID'))
             },
             'linkedin': {
-                'client_id': os.getenv('LINKEDIN_CLIENT_ID'),
-                'client_secret': os.getenv('LINKEDIN_CLIENT_SECRET'),
                 'access_token': os.getenv('LINKEDIN_ACCESS_TOKEN'),
-                'enabled': bool(os.getenv('LINKEDIN_ACCESS_TOKEN'))
+                'person_urn': os.getenv('LINKEDIN_PERSON_URN'),  # አስፈላጊ
+                'enabled': bool(os.getenv('LINKEDIN_ACCESS_TOKEN') and os.getenv('LINKEDIN_PERSON_URN'))
             },
             'facebook': {
                 'page_id': os.getenv('FACEBOOK_PAGE_ID'),
                 'access_token': os.getenv('FACEBOOK_ACCESS_TOKEN'),
-                'enabled': bool(os.getenv('FACEBOOK_ACCESS_TOKEN'))
+                'enabled': bool(os.getenv('FACEBOOK_PAGE_ID') and os.getenv('FACEBOOK_ACCESS_TOKEN'))
             },
             'twitter': {
                 'api_key': os.getenv('TWITTER_API_KEY'),
                 'api_secret': os.getenv('TWITTER_API_SECRET'),
                 'access_token': os.getenv('TWITTER_ACCESS_TOKEN'),
                 'access_secret': os.getenv('TWITTER_ACCESS_SECRET'),
-                'enabled': bool(os.getenv('TWITTER_API_KEY'))
+                'enabled': bool(os.getenv('TWITTER_API_KEY') and os.getenv('TWITTER_API_SECRET') and
+                               os.getenv('TWITTER_ACCESS_TOKEN') and os.getenv('TWITTER_ACCESS_SECRET'))
             }
         }
-        
+
         self.templates = self._load_templates()
-        active = [k for k, v in self.platforms.items() if v['enabled']]
-        self.logger.info(f"📱 አገልጋይ ተጀምሯል። ንቁ መድረኮች: {', '.join(active)}")
+        active = [k for k, v in self.platforms.items() if v.get('enabled')]
+        self.logger.info(f"📱 አገልጋይ ተጀምሯል። ንቁ መድረኮች: {', '.join(active) if active else 'ምንም'}")
 
     def _load_templates(self) -> Dict:
         """የመድረክ አብነቶች መጫን"""
@@ -2820,7 +2834,6 @@ class SocialMediaManager:
 - **Revenue Forecast**: ${revenue:,.2f}/month
 - **Average Quality**: {quality}%
             """,
-            
             'social_post': """
 🚀 NEW ENTERPRISE CONTENT PUBLISHED!
 🏢 {topic}
@@ -2831,40 +2844,44 @@ class SocialMediaManager:
             """
         }
 
+    # ---------------------------------------------------------------------
+    # ዋና የማተሚያ ዘዴዎች - በቀጥታ ወደ እያንዳንዱ መድረክ ያስተላልፋሉ
+    # ---------------------------------------------------------------------
+
     async def publish_country_content(self, country_data: Dict) -> Dict:
         """
-        የአንድ ሀገርን ውጤት ወደ ሁሉም መድረኮች ያስተላልፍ
+        የአንድ ሀገርን ውጤት ወደ ሁሉም መድረኮች በቀጥታ ያስተላልፍ
         """
         country = country_data.get('country', 'Unknown')
-        self.logger.info(f"📤 የ{country} ይዘት ወደ ሁሉም መድረኮች እየተላለፈ ነው...")
-        
+        self.logger.info(f"📤 የ{country} ይዘት ወደ ሁሉም መድረኮች በቀጥታ እየተላለፈ ነው...")
+
         results = {}
-        
+
         # 1️⃣ GitHub (Dashboard)
         if self.platforms['github']['enabled']:
             results['github'] = await self._publish_to_github(country_data)
-        
+
         # 2️⃣ WordPress (Blog Post)
         if self.platforms['wordpress']['enabled']:
             results['wordpress'] = await self._publish_to_wordpress(country_data)
-        
+
         # 3️⃣ Telegram (Notification)
         if self.platforms['telegram']['enabled']:
             results['telegram'] = await self._publish_to_telegram(country_data)
-        
+
         # 4️⃣ LinkedIn (Article/Post)
         if self.platforms['linkedin']['enabled']:
             results['linkedin'] = await self._publish_to_linkedin(country_data)
-        
+
         # 5️⃣ Facebook (Page Post)
         if self.platforms['facebook']['enabled']:
             results['facebook'] = await self._publish_to_facebook(country_data)
-        
+
         # 6️⃣ Twitter (Tweet)
         if self.platforms['twitter']['enabled']:
             results['twitter'] = await self._publish_to_twitter(country_data)
-        
-        self.logger.info(f"✅ {country} ወደ {len(results)} መድረኮች ተላልፏል")
+
+        self.logger.info(f"✅ {country} ወደ {len(results)} መድረኮች በቀጥታ ተላልፏል")
         return results
 
     async def auto_publish_all(self, production_data: Dict) -> Dict:
@@ -2872,81 +2889,90 @@ class SocialMediaManager:
         ሁሉንም ውጤቶች በራስ-ሰር ወደ ሁሉም መድረኮች ማስተላለፍ
         """
         self.logger.info("🚀 ራስ-ሰር መተላለፍ ወደ ሁሉም መድረኮች እየጀመረ ነው...")
-        
+
         all_results = {'countries': {}, 'summary': {}}
-        
+
         # 1. እያንዳንዱን ሀገር ውጤት መድረኮች ላይ ማስቀመጥ
         for country_result in production_data.get('country_results', []):
             if country_result.get('status') == 'success':
                 country = country_result.get('country')
                 self.logger.info(f"  📤 {country} እየተላለፈ ነው...")
-                
+
                 country_publish_results = await self.publish_country_content(country_result)
                 all_results['countries'][country] = country_publish_results
-        
+
         # 2. ማጠቃለያ ሪፖርት
-        successful_countries = sum(1 for r in all_results['countries'].values() 
+        successful_countries = sum(1 for r in all_results['countries'].values()
                                   if any(v.get('status') == 'success' for v in r.values()))
-        
+
         self.logger.info(f"✅ መተላለፊያ ተጠናቋል: {successful_countries} ሀገራት ተላልፈዋል")
-        
+
         return all_results
 
+    # ---------------------------------------------------------------------
+    # የየራሳቸው መድረክ ማተሚያ ዘዴዎች - ቀጥተኛ የኤፒአይ ጥሪ
+    # ---------------------------------------------------------------------
+
     async def _publish_to_github(self, country_data: Dict) -> Dict:
-        """ውጤቱን ወደ GitHub ማስገባት"""
+        """ውጤቱን በቀጥታ ወደ GitHub ማስገባት"""
         try:
             github = self.platforms['github']
             country = country_data.get('country')
             content = country_data.get('content', '')
-            
+
             filename = f"content/{country_data.get('production_id', 'unknown')}_{country}.md"
             url = f"https://api.github.com/repos/{github['repo']}/contents/{filename}"
-            
+
             headers = {
                 'Authorization': f"token {github['token']}",
                 'Accept': 'application/vnd.github.v3+json'
             }
-            
+
             data = {
                 'message': f'Add {country} content - {datetime.now().strftime("%Y-%m-%d")}',
                 'content': base64.b64encode(content.encode()).decode(),
                 'branch': 'main'
             }
-            
-            async with aiohttp.ClientSession() as session:
+
+            timeout = ClientTimeout(total=30)
+            async with ClientSession(timeout=timeout) as session:
                 async with session.put(url, headers=headers, json=data) as response:
                     if response.status in [200, 201]:
+                        result = await response.json()
                         return {
                             'status': 'success',
                             'file_url': f"https://github.com/{github['repo']}/blob/main/{filename}",
+                            'sha': result.get('content', {}).get('sha'),
                             'country': country
                         }
                     else:
                         error_text = await response.text()
-                        return {'status': 'failed', 'error': error_text[:200]}
-                        
+                        self.logger.error(f"GitHub publish failed: {response.status} - {error_text[:200]}")
+                        return {'status': 'failed', 'error': error_text[:200], 'country': country}
+
         except Exception as e:
-            return {'status': 'failed', 'error': str(e)}
+            self.logger.error(f"GitHub exception: {traceback.format_exc()}")
+            return {'status': 'failed', 'error': str(e), 'country': country_data.get('country')}
 
     async def _publish_to_wordpress(self, country_data: Dict) -> Dict:
-        """ወደ WordPress መጣጥፍ ማስገባት"""
+        """ወደ WordPress መጣጥፍ በቀጥታ ማስገባት"""
         try:
             wp = self.platforms['wordpress']
             country = country_data.get('country', 'Global')
-            
+
             token = base64.b64encode(f"{wp['user']}:{wp['pass']}".encode()).decode()
             headers = {
                 'Authorization': f'Basic {token}',
                 'Content-Type': 'application/json'
             }
-            
+
             title = f"Enterprise Guide: {country_data.get('topic', 'AI Strategy')} in {country}"
             content = country_data.get('content', '') + f"""
 <hr/>
 <p><em>Generated by Enterprise Production Runner v9.0 | 🤖 AI-Optimized | 🌍 {country}-specific</em></p>
 <p><strong>Production ID:</strong> {country_data.get('production_id', 'N/A')}</p>
 """
-            
+
             post_data = {
                 'title': title,
                 'content': content,
@@ -2954,14 +2980,15 @@ class SocialMediaManager:
                 'categories': [1],
                 'tags': ['enterprise', 'ai', country.lower()],
             }
-            
-            async with aiohttp.ClientSession() as session:
+
+            timeout = ClientTimeout(total=60)
+            async with ClientSession(timeout=timeout) as session:
                 async with session.post(
-                    f"{wp['url']}/wp-json/wp/v2/posts",
+                    f"{wp['url'].rstrip('/')}/wp-json/wp/v2/posts",
                     headers=headers,
                     json=post_data
                 ) as response:
-                    
+
                     if response.status in [200, 201]:
                         result = await response.json()
                         return {
@@ -2972,17 +2999,19 @@ class SocialMediaManager:
                         }
                     else:
                         error_text = await response.text()
-                        return {'status': 'failed', 'error': error_text[:200]}
-                        
+                        self.logger.error(f"WordPress publish failed: {response.status} - {error_text[:200]}")
+                        return {'status': 'failed', 'error': error_text[:200], 'country': country}
+
         except Exception as e:
-            return {'status': 'failed', 'error': str(e)}
+            self.logger.error(f"WordPress exception: {traceback.format_exc()}")
+            return {'status': 'failed', 'error': str(e), 'country': country_data.get('country')}
 
     async def _publish_to_telegram(self, country_data: Dict) -> Dict:
-        """ወደ ቴሌግራም ማስተላለፍ"""
+        """ወደ ቴሌግራም በቀጥታ ማስተላለፍ"""
         try:
             telegram = self.platforms['telegram']
             country = country_data.get('country', 'Unknown')
-            
+
             message = f"""
 🚀 *NEW COUNTRY CONTENT PUBLISHED!*
 🌍 *Country:* {country}
@@ -2991,15 +3020,16 @@ class SocialMediaManager:
 💰 *Revenue Forecast:* ${country_data.get('metrics', {}).get('estimated_revenue', 0):,.2f}/month
 #EnterpriseAI #{country} #{country_data.get('topic', '').replace(' ', '')}
             """
-            
+
             url = f"https://api.telegram.org/bot{telegram['token']}/sendMessage"
             payload = {
                 'chat_id': telegram['chat_id'],
-                'text': message,
+                'text': message.strip(),
                 'parse_mode': 'Markdown',
             }
-            
-            async with aiohttp.ClientSession() as session:
+
+            timeout = ClientTimeout(total=30)
+            async with ClientSession(timeout=timeout) as session:
                 async with session.post(url, json=payload) as response:
                     if response.status == 200:
                         result = await response.json()
@@ -3010,25 +3040,27 @@ class SocialMediaManager:
                         }
                     else:
                         error_text = await response.text()
-                        return {'status': 'failed', 'error': error_text[:200]}
-                        
+                        self.logger.error(f"Telegram publish failed: {response.status} - {error_text[:200]}")
+                        return {'status': 'failed', 'error': error_text[:200], 'country': country}
+
         except Exception as e:
-            return {'status': 'failed', 'error': str(e)}
+            self.logger.error(f"Telegram exception: {traceback.format_exc()}")
+            return {'status': 'failed', 'error': str(e), 'country': country_data.get('country')}
 
     async def _publish_to_linkedin(self, country_data: Dict) -> Dict:
-        """ወደ LinkedIn ማስተላለፍ"""
+        """ወደ LinkedIn በቀጥታ ማስተላለፍ (UGC Post API)"""
         try:
-            linkedin_config = self.platforms['linkedin']
+            linkedin = self.platforms['linkedin']
             country = country_data.get('country', 'Unknown')
-            
+
             headers = {
-                'Authorization': f"Bearer {linkedin_config['access_token']}",
+                'Authorization': f"Bearer {linkedin['access_token']}",
                 'Content-Type': 'application/json',
                 'X-Restli-Protocol-Version': '2.0.0'
             }
-            
+
             post_content = {
-                "author": f"urn:li:person:{linkedin_config.get('person_urn', '')}",
+                "author": linkedin['person_urn'],  # ከ env መምጣት አለበት
                 "lifecycleState": "PUBLISHED",
                 "specificContent": {
                     "com.linkedin.ugc.ShareContent": {
@@ -3046,14 +3078,15 @@ class SocialMediaManager:
                     "com.linkedin.ugc.MemberNetworkVisibility": "PUBLIC"
                 }
             }
-            
-            async with aiohttp.ClientSession() as session:
+
+            timeout = ClientTimeout(total=30)
+            async with ClientSession(timeout=timeout) as session:
                 async with session.post(
                     "https://api.linkedin.com/v2/ugcPosts",
                     headers=headers,
                     json=post_content
                 ) as response:
-                    
+
                     if response.status == 201:
                         result = await response.json()
                         return {
@@ -3063,29 +3096,32 @@ class SocialMediaManager:
                         }
                     else:
                         error_text = await response.text()
-                        return {'status': 'failed', 'error': error_text[:200]}
-                        
+                        self.logger.error(f"LinkedIn publish failed: {response.status} - {error_text[:200]}")
+                        return {'status': 'failed', 'error': error_text[:200], 'country': country}
+
         except Exception as e:
-            return {'status': 'failed', 'error': str(e)}
+            self.logger.error(f"LinkedIn exception: {traceback.format_exc()}")
+            return {'status': 'failed', 'error': str(e), 'country': country_data.get('country')}
 
     async def _publish_to_facebook(self, country_data: Dict) -> Dict:
-        """ወደ ፌስቡክ ማስተላለፍ"""
+        """ወደ ፌስቡክ ገጽ በቀጥታ ማስተላለፍ"""
         try:
             fb = self.platforms['facebook']
             country = country_data.get('country', 'Unknown')
-            
+
             message = f"""🚀 New Enterprise Content: {country_data.get('topic')} in {country}
 📊 {country_data.get('metrics', {}).get('final_word_count', 0):,} words
 💰 ${country_data.get('metrics', {}).get('estimated_revenue', 0):,.2f}/month revenue forecast
 #EnterpriseAI #BusinessStrategy #{country}"""
-            
+
             url = f"https://graph.facebook.com/v18.0/{fb['page_id']}/feed"
             params = {
                 'message': message,
                 'access_token': fb['access_token']
             }
-            
-            async with aiohttp.ClientSession() as session:
+
+            timeout = ClientTimeout(total=30)
+            async with ClientSession(timeout=timeout) as session:
                 async with session.post(url, params=params) as response:
                     if response.status == 200:
                         result = await response.json()
@@ -3096,31 +3132,69 @@ class SocialMediaManager:
                         }
                     else:
                         error_text = await response.text()
-                        return {'status': 'failed', 'error': error_text[:200]}
-                        
+                        self.logger.error(f"Facebook publish failed: {response.status} - {error_text[:200]}")
+                        return {'status': 'failed', 'error': error_text[:200], 'country': country}
+
         except Exception as e:
-            return {'status': 'failed', 'error': str(e)}
+            self.logger.error(f"Facebook exception: {traceback.format_exc()}")
+            return {'status': 'failed', 'error': str(e), 'country': country_data.get('country')}
 
     async def _publish_to_twitter(self, country_data: Dict) -> Dict:
-        """ወደ Twitter (X) ማስተላለፍ"""
+        """
+        ወደ Twitter (X) በቀጥታ ማስተላለፍ
+        OAuth 1.0a በመጠቀም (ትክክለኛው የTwitter API v2 መንገድ)
+        """
         try:
             twitter = self.platforms['twitter']
             country = country_data.get('country', 'Unknown')
-            
+
+            # ጽሑፉን አዘጋጅ (ከ280 ቁምፊ በታች)
             tweet_text = f"""🚀 New: {country_data.get('topic')} Enterprise Guide for {country}
 📊 {country_data.get('metrics', {}).get('final_word_count', 0):,} words
 💰 ${country_data.get('metrics', {}).get('estimated_revenue', 0):,.2f}/mo forecast
 #EnterpriseAI #{country_data.get('topic', '').replace(' ', '')} #{country}"""
             
+            if len(tweet_text) > 280:
+                tweet_text = tweet_text[:277] + "..."
+
+            # OAuth 1.0a ፊርማ ለTwitter API v2
+            oauth = OAuth1(
+                client_key=twitter['api_key'],
+                client_secret=twitter['api_secret'],
+                resource_owner_key=twitter['access_token'],
+                resource_owner_secret=twitter['access_secret'],
+                signature_method='HMAC-SHA1',
+                signature_type='auth_header'
+            )
+
             url = "https://api.twitter.com/2/tweets"
+            payload = {'text': tweet_text}
+
+            # aiohttp ከOAuth1 ጋር ለመስራት የሚያስችል መፍትሔ
+            # ፊርማውን ራሳችን ማዘጋጀት ወይም requests_oauthlib ከaiohttp ጋር ማስተሳሰር
+            # ቀላሉ መንገድ: ጊዜያዊ የሆነ የማመሳከሪያ ኮድ በመጠቀም ፊርማ መፍጠር ነው።
+            # እዚህ ላይ `requests_oauthlib` ን በማስመሰል አማራጭ እንጠቀማለን።
+            # ለaiohttp ቀጥተኛ ድጋፍ ባይኖርም፣ በዚህ መልኩ መላክ ይቻላል።
+            
+            # ፊርማውን በOAuth1 ነገር በመጠቀም የሚስማማ ራስጌ ማዘጋጀት
+            from requests_oauthlib.oauth1_auth import sign_request
+            from requests import Request, Session as RequestsSession
+            
+            # የማመሳከሪያ ጥያቄ እንሥራ
+            req = Request('POST', url, json=payload)
+            prepared = req.prepare()
+            
+            # OAuth1 ፊርማ አያይዝ
+            signed = sign_request(oauth, prepared)
+            auth_header = signed.headers.get('Authorization', '')
+            
             headers = {
-                'Authorization': f'Bearer {twitter.get("bearer_token", "")}',
+                'Authorization': auth_header,
                 'Content-Type': 'application/json'
             }
-            
-            payload = {'text': tweet_text[:280]}
-            
-            async with aiohttp.ClientSession() as session:
+
+            timeout = ClientTimeout(total=30)
+            async with ClientSession(timeout=timeout) as session:
                 async with session.post(url, headers=headers, json=payload) as response:
                     if response.status == 201:
                         result = await response.json()
@@ -3131,10 +3205,12 @@ class SocialMediaManager:
                         }
                     else:
                         error_text = await response.text()
-                        return {'status': 'failed', 'error': error_text[:200]}
-                        
+                        self.logger.error(f"Twitter publish failed: {response.status} - {error_text[:200]}")
+                        return {'status': 'failed', 'error': error_text[:200], 'country': country}
+
         except Exception as e:
-            return {'status': 'failed', 'error': str(e)}
+            self.logger.error(f"Twitter exception: {traceback.format_exc()}")
+            return {'status': 'failed', 'error': str(e), 'country': country_data.get('country')}
 class DashboardManager:
     """Enterprise Dashboard Integration"""
     
