@@ -5296,12 +5296,12 @@ class MegaContentEngine:
         # የ7 ምዕራፎች ተግባራት - እያንዳንዳቸው 2200 ቃላት
         tasks = [
             (1, "Master Introduction & 2026 Market Psychology", 2200),
-            (2, "Technical Deep-Dive & Global Infrastructure", 2200),
-            (3, "25 Exclusive Case Studies & Local ROI Data", 2200),
-            (4, "36-Month Strategic Execution Roadmap", 2200),
-            (5, "Multi-Layered Monetization & Profit Systems", 2200),
-            (6, "Competitive Annihilation & Market Dominance", 2000),
-            (7, "100 Ultimate FAQs & The 2050 Future Vision", 2000)
+            (2, "Technical Deep-Dive & Global Infrastructure", 2000),
+            (3, "25 Exclusive Case Studies & Local ROI Data", 1800),
+            (4, "36-Month Strategic Execution Roadmap", 1600),
+            (5, "Multi-Layered Monetization & Profit Systems", 1400),
+            (6, "Competitive Annihilation & Market Dominance", 12000),
+            (7, "100 Ultimate FAQs & The 2050 Future Vision", 1000)
         ]
 
         full_content_html = ""
@@ -5311,7 +5311,7 @@ class MegaContentEngine:
             self.logger.info(f"⚙️  Producing {name} for {country} (Phase {phase_num}/7)...")
             
             # የሂሳብ ኮንቴክስት (የቀደመውን ይዘት ማስተላለፍ)
-            context = str(full_content_html)[-2000:] if full_content_html else ""
+            context = str(full_content_html)[-2500:] if full_content_html else ""
             
             # የኢኮኖሚ መረጃ ማስገባት
             eco_data = self.economic_indicators.get(country, self.economic_indicators['US'])
