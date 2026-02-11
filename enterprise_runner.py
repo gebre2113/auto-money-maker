@@ -4238,6 +4238,86 @@ def produce_single_country_sovereign_logic(self, country: str, topic: str,
             'status': 'success',
             'content': content,
             'metrics': {
+# =========================================================================
+# 📝 ወደ MegaContentEngine ክፍል ውስጥ ጨምር
+# =========================================================================
+
+def produce_single_country_sovereign_logic(self, country: str, topic: str, 
+                                           additional_context: dict = None) -> dict:
+    """
+    👑 ሉዓላዊ የሀገር ይዘት ማመንጫ ዘዴ
+    ይህ ዘዴ በቲታን ራነር በቀጥታ ይጠራል፣ ስለሆነም ስሙ መቀየር የለበትም።
+    
+    Args:
+        country: የሀገር ኮድ (ለምሳሌ 'US', 'ET')
+        topic:  ዋና ርዕስ
+        additional_context: ተጨማሪ መረጃ (ለወደፊት ጥቅም)
+    
+    Returns:
+        dict: የይዘት፣ መለኪያዎች እና ሁኔታ የያዘ መዝገብ
+    """
+    start_time = datetime.now()
+    self.logger.info(f"👑 Sovereign content generation started for {country} – {topic}")
+    
+    # ነባሪ ውጤት (ስህተት ቢከሰትም ኦርከስትሬተሩ እንዲቀጥል)
+    result = {
+        'status': 'failed',
+        'country': country,
+        'topic': topic,
+        'content': '',
+        'metrics': {},
+        'error': None,
+        'production_id': f"{country}_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+    }
+    
+    try:
+        # 1. መሠረታዊ ይዘት ማመንጨት (ለምሳሌ በMega-Pen ዋና ዘዴ)
+        #    እዚህ ላይ የአንተ ነባሪ የይዘት ማመንጫ ዘዴ መጠራት አለበት።
+        if hasattr(self, 'generate_country_content'):
+            content = self.generate_country_content(country, topic)
+        elif hasattr(self, '_generate_core_content'):
+            content = self._generate_core_content(country, topic)
+        else:
+            # ማስመሰያ – በእውነተኛ ኮድህ መሠረት ቀይር
+            content = f"# {topic} – {country}\n\nComprehensive guide for {country} market."
+        
+        # 2. 🖼️ SmartImageEngine በመጠቀም ምስሎችን አስገባ
+        if hasattr(self, 'image_engine'):
+            try:
+                content = self.image_engine.generate_image_placeholders(content, country, topic)
+                image_count = self.image_engine.count_injected_images(content)
+                self.logger.info(f"🖼️ {image_count} images injected for {country}")
+            except Exception as e:
+                self.logger.warning(f"⚠️ Image injection failed for {country}: {e}")
+        
+        # 3. 💎 EliteQualityOptimizer በመጠቀም የመጨረሻ ማሻሻያ
+        if hasattr(self, 'quality_optimizer'):
+            try:
+                # ተመሳሳዩን ዘዴ በመጠቀም (async ከሆነ ማስተካከል ያስፈልጋል)
+                if asyncio.iscoroutinefunction(self.quality_optimizer.apply_100_percent_standard):
+                    # ከasync ተልዕኮ ውስጥ ከሆንን በቀጥታ መጥራት እንችላለን
+                    import asyncio
+                    loop = asyncio.get_event_loop()
+                    if loop.is_running():
+                        # በሩጫ ላይ ከሆነ ተግባር ፍጠር
+                        content = await self.quality_optimizer.apply_100_percent_standard(content, country, topic)
+                    else:
+                        # አለበለዚያ በአዲስ ሉፕ
+                        content = asyncio.run(self.quality_optimizer.apply_100_percent_standard(content, country, topic))
+                else:
+                    content = self.quality_optimizer.apply_100_percent_standard(content, country, topic)
+            except Exception as e:
+                self.logger.warning(f"⚠️ Quality optimization failed for {country}: {e}")
+        
+        # 4. መለኪያዎችን አስላ
+        word_count = len(content.split())
+        estimated_revenue = self._estimate_revenue(country, word_count) if hasattr(self, '_estimate_revenue') else word_count * 0.05
+        
+        # 5. ውጤቱን ዘምን
+        result.update({
+            'status': 'success',
+            'content': content,
+            'metrics': {
                 'final_word_count': word_count,
                 'estimated_revenue': round(estimated_revenue, 2),
                 'processing_time_seconds': (datetime.now() - start_time).total_seconds(),
