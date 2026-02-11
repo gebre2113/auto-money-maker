@@ -4777,55 +4777,59 @@ class MegaContentEngine:
 async def _call_ai_with_round_robin(self, prompt, max_tokens=4000, phase_idx=0):
     """
     15 ቁልፎችን በ Round-Robin ዘዴ በመጠቀም ጥሪውን ያከናውናል:
-    አንድ ቁልፍ ቢከሽፍ ለ 7 ሰከንድ ከቆየ በኋላ ብቻ ወደ ቀጣዩ ይሸጋገራል።
+    አንድ ቁልፍ ቢከሽፍ ለ 7 ሰከንድ ከቆየ በኋላ ብቻ ወደ ቀጣዩ ይዘልላል።
     """
     total_providers = len(self.ai_providers)
-    start_provider_idx = phase_idx % total_providers
-
+    
     for attempt in range(total_providers):
-        provider_idx = (start_provider_idx + attempt) % total_providers
+        # የትኛው ቁልፍ ላይ እንዳለን ለማወቅ
+        provider_idx = (phase_idx + attempt) % total_providers
         provider = self.ai_providers[provider_idx]
         
         try:
-            self.logger.info(f"🔄 Phase {phase_idx}, Attempt {attempt+1}: Using Key {provider_idx+1}")
+            self.logger.info(f"🔄 Round-Robin Attempt {attempt+1}/{total_providers}: Using Key {provider_idx+1}")
             
+            # 1. አቅራቢው (provider) ኦብጀክት ከሆነ
             if hasattr(provider, 'generate_content'):
                 result = await provider.generate_content(prompt, max_tokens=max_tokens)
                 if result and not str(result).startswith("Error"):
                     return str(result)
-
+            
+            # 2. አቅራቢው የቁልፍ ጽሁፍ (API Key) ከሆነ
             elif isinstance(provider, str):
+                # Timeout ወደ 180 ሰከንድ አድጓል (ለረጅም ጽሁፎች ፋታ ለመስጠት)
                 async with httpx.AsyncClient(timeout=180.0) as client:
                     resp = await client.post(
                         "https://api.groq.com/openai/v1/chat/completions",
                         headers={"Authorization": f"Bearer {provider}"},
                         json={
-                            "model": "llama-3.3-70b-versatile",
-                            "messages": [{"role": "user", "content": prompt}],
+                            "model": "llama-3.3-70b-versatile", 
+                            "messages": [{"role": "user", "content": prompt}], 
                             "max_tokens": max_tokens,
                             "temperature": 0.7
                         }
                     )
                     
                     if resp.status_code == 200:
-                        data = resp.json()
-                        return str(data['choices'][0]['message']['content'])
+                        return str(resp.json()['choices'][0]['message']['content'])
                     
                     elif resp.status_code == 429:
-                        self.logger.warning(f"⚠️ Key {provider_idx+1} rate limited (429).")
+                        self.logger.warning(f"⚠️ Key {provider_idx+1} hit rate limit (429).")
                     else:
-                        self.logger.warning(f"⚠️ Key {provider_idx+1} failed with status {resp.status_code}.")
+                        self.logger.warning(f"⚠️ Key {provider_idx+1} failed with status {resp.status_code}")
 
         except Exception as e:
-            self.logger.warning(f"⚠️ Key {provider_idx+1} error: {str(e)[:50]}")
+            self.logger.warning(f"⚠️ Provider {provider_idx+1} error: {str(e)[:50]}")
 
-        # አንተ እንዳልከው: ቁልፉ ካልሰራ እና ገና ሙከራ የሚቀረን ከሆነ 7 ሰከንድ እንጠብቃለን
+        # --- የ 7 ሰከንድ እረፍት ሎጂክ ---
+        # ሙከራው ካልተሳካ እና ገና የሚቀሩ ቁልፎች ካሉ 7 ሰከንድ ይጠብቃል
         if attempt < total_providers - 1:
-            self.logger.info(f"⏱️ Waiting 7 seconds before switching to Key {((provider_idx + 1) % total_providers) + 1}...")
+            self.logger.info(f"⏱️ Waiting 7 seconds for cooling down before trying next key...")
             await asyncio.sleep(7)
-
-    raise Exception(f"❌ Master Bridge Failure: All {total_providers} keys failed for Phase {phase_idx}")
-
+    
+    # ሁሉም 15ቱንም ሞክሮ ካልሰራ ብቻ ስህተት ይጥላል
+    raise Exception(f"❌ Master Bridge Failure: All {total_providers} keys exhausted for Phase {phase_idx}")
+    
     def _build_hypnotic_audio_button(self, section_name, lang, country, section_idx):
         """ሂፕኖቲክ የአውዲዮ ቁልፍ ገንባት"""
         play_texts = {
