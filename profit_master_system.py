@@ -4773,11 +4773,11 @@ class MegaContentEngine:
         except Exception as e:
             self.logger.error(f"Error checking time for {country}: {e}")
             return False
-
-    Async def _call_ai_with_round_robin(self, prompt, max_tokens=4000, phase_idx=0):
+            
+    async def _call_ai_with_round_robin(self, prompt, max_tokens=4000, phase_idx=0):
         """
         15 ቁልፎችን በ Round-Robin ዘዴ በመጠቀም ጥሪውን ያከናውናል:
-        አንድ ቁልፍ ቢከሽፍ ወይም ሪሚት ቢመታ በራስ ሰር ወደ ቀጣዩ ይዘልላል:
+        አንድ ቁልፍ ቢከሽፍ ለ 7 ሰከንድ አርፎ ወደ ቀጣዩ ይዘልላል።
         """
         total_providers = len(self.ai_providers)
         
@@ -4789,15 +4789,16 @@ class MegaContentEngine:
             try:
                 self.logger.info(f"🔄 Round-Robin Attempt {attempt+1}/{total_providers}: Using Key {provider_idx+1}")
                 
-                # አቅራቢው (provider) ቀጥታ ኦብጀክት ከሆነ (ለምሳሌ UnstoppableAIProvider)
+                # 1. አቅራቢው (provider) ቀጥታ ኦብጀክት ከሆነ
                 if hasattr(provider, 'generate_content'):
                     result = await provider.generate_content(prompt, max_tokens=max_tokens)
-                    if result and not result.startswith("Error"):
+                    if result and not str(result).startswith("Error"):
                         return str(result)
                 
-                # አቅራቢው (provider) የቁልፍ ጽሁፍ (String) ብቻ ከሆነ በቀጥታ በ httpx ይጠራዋል
+                # 2. አቅራቢው የቁልፍ ጽሁፍ (String) ከሆነ
                 elif isinstance(provider, str):
-                    async with httpx.AsyncClient(timeout=160.0) as client:
+                    # Timeout ወደ 180.0 አድጓል ለተሻለ ጥንካሬ
+                    async with httpx.AsyncClient(timeout=180.0) as client:
                         resp = await client.post(
                             "https://api.groq.com/openai/v1/chat/completions",
                             headers={"Authorization": f"Bearer {provider}"},
@@ -4808,18 +4809,24 @@ class MegaContentEngine:
                                 "temperature": 0.7
                             }
                         )
+                        
                         if resp.status_code == 200:
-                            return str(resp.json()['choices'][0]['message']['content'])
+                            data = resp.json()
+                            return str(data['choices'][0]['message']['content'])
+                        
                         elif resp.status_code == 429:
-                            self.logger.warning(f"⚠️ Key {provider_idx+1} hit rate limit (429), trying next...")
-                            continue
+                            self.logger.warning(f"⚠️ Key {provider_idx+1} hit rate limit (429).")
                         else:
                             self.logger.warning(f"⚠️ Key {provider_idx+1} failed with status {resp.status_code}")
-                            continue
 
             except Exception as e:
                 self.logger.warning(f"⚠️ Provider {provider_idx+1} failed: {str(e)[:100]}")
-                continue
+
+            # --- የግዴታ የ 7 ሰከንድ እረፍት ---
+            # የመጨረሻው ሙከራ ካልሆነ በስተቀር እረፍት ያደርጋል
+            if attempt < total_providers - 1:
+                self.logger.info(f"⏱️ Waiting 7 seconds before switching keys to maintain stability...")
+                await asyncio.sleep(7)
         
         # ሁሉም 15ቱንም ሞክሮ ካልሰራ ብቻ ስህተት ይጥላል
         raise Exception(f"All {total_providers} fallback keys failed for Phase {phase_idx}")
