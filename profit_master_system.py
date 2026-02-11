@@ -4798,7 +4798,7 @@ class MegaContentEngine:
                 # 2. አቅራቢው የቁልፍ ጽሁፍ (String) ከሆነ
                 elif isinstance(provider, str):
                     # Timeout ወደ 180.0 አድጓል ለተሻለ ጥንካሬ
-                    async with httpx.AsyncClient(timeout=180.0) as client:
+                    async with httpx.AsyncClient(timeout=60.0) as client:
                         resp = await client.post(
                             "https://api.groq.com/openai/v1/chat/completions",
                             headers={"Authorization": f"Bearer {provider}"},
