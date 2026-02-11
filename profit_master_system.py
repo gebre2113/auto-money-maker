@@ -5273,91 +5273,102 @@ class MegaContentEngine:
         </div>
         """
 
-async def produce_single_country_sovereign_logic(self, topic: str, country: str) -> str:
-    """የአንድ ሀገር 15,400 ቃላት የሚደርስ የዜና ጽሁፍ ማምረቻ - Optimized version"""
-    self.logger.info(f"📰 Starting Mega Journalist Production for {country}")
-    
-    # 🚨 የደህንነት ማስተካከያ 1: አዲስ ሀገር ሲጀመር የቀደመው ታሪክ እንዲጠፋ ማድረግ (Isolation)
-    full_content_html = ""
-    total_words = 0
-    
-    # የሀገር መረጃ
-    info = globals().get('COUNTRIES', {}).get(country, {'lang': 'English', 'emoji': '🌍'})
-    lang = info['lang']
-    
-    # 🟢 ደረጃ 0: ወቅታዊ ርዕስ መረጣ
-    topic_q = f"Identify the #1 trending viral sub-niche for '{topic}' in {country} for Feb 2026. Reply ONLY with title in {lang}."
-    final_topic = await self._call_ai_with_round_robin(topic_q, max_tokens=200, phase_idx=0)
-    final_topic = str(final_topic).strip().replace('"', '').replace("'", "")
-    
-    self.logger.info(f"🎯 Hot Topic Identified: {final_topic}")
-
-    tasks = [
-        (1, "Master Introduction & 2026 Market Psychology", 2200),
-        (2, "Technical Deep-Dive & Global Infrastructure", 2200),
-        (3, "25 Exclusive Case Studies & Local ROI Data", 2200),
-        (4, "36-Month Strategic Execution Roadmap", 2200),
-        (5, "Multi-Layered Monetization & Profit Systems", 2200),
-        (6, "Competitive Annihilation & Market Dominance", 2000),
-        (7, "100 Ultimate FAQs & The 2050 Future Vision", 2000)
-    ]
-
-    for idx, (phase_num, name, target_words) in enumerate(tasks):
-        self.logger.info(f"⚙️  Producing Phase {phase_num}/7: {name}...")
+    async def produce_single_country_sovereign_logic(self, topic: str, country: str) -> str:
+        """የአንድ ሀገር 15,400 ቃላት የሚደርስ የዜና ጽሁፍ ማምረቻ"""
+        self.logger.info(f"📰 Starting Mega Journalist Production for {country}")
         
-        # 🚨 የደህንነት ማስተካከያ 2: Context Trimming (ከ1500 ቃላት/6000 ቁምፊዎች እንዳይበልጥ)
-        # የቀደመውን HTML ዳታ ሳይሆን ጽሁፉን ብቻ (Text Only) መላክ ለ AI ይቀላል
-        clean_context = re.sub('<[^<]+?>', '', full_content_html) # HTML ታጎችን ማጽዳት
-        context_brief = clean_context[-1500:] if clean_context else "Start of the report."
+        # የሀገር መረጃ
+        info = globals().get('COUNTRIES', {}).get(country, {'lang': 'English', 'emoji': '🌍'})
+        lang = info['lang']
         
-        eco_data = self.economic_indicators.get(country, self.economic_indicators['US'])
-        
-        prompt = f"""
-        PAST SUMMARY: {context_brief}
-        
-        STRICT TASK: Write the '{name}' section for '{final_topic}' in {country}.
-        
-        REQUIREMENTS:
-        1. Words: EXACTLY {target_words}
-        2. Language: {lang}
-        3. Local Economy: {eco_data}
-        4. Format: HTML (h2, h3, p)
-        5. DO NOT REPEAT previous points. Focus ONLY on {name}.
+        # 🟢 ደረጃ 0: ወቅታዊ ርዕስ መረጣ (The Oracle)
+        topic_q = f"""
+        Identify the #1 trending viral sub-niche for '{topic}' in {country} for Feb 2026.
+        Focus on immediate business opportunities that are trending RIGHT NOW.
+        Reply ONLY with title in {lang}.
         """
         
-        # AI ጥሪ (በውስጡ የ7 ሰከንድ እረፍት ያለው)
-        new_part = await self._call_ai_with_round_robin(prompt, max_tokens=3500, phase_idx=phase_num)
+        final_topic = await self._call_ai_with_round_robin(topic_q, max_tokens=200, phase_idx=0)
+        final_topic = str(final_topic).strip().replace('"', '').replace("'", "")
         
-        word_count = len(str(new_part).split())
-        total_words += word_count
-        
-        # Audio, Tables እና YouTube ሎጂክ (እንደነበረው ይቀጥላል)
-        audio_btn = self._build_hypnotic_audio_button(name, lang, country, phase_num)
-        tables_html = await self._generate_section_tables(phase_num, country, lang, final_topic)
-        
-        youtube_videos = ""
-        if phase_num == 3:
-            youtube_videos = await self._inject_authority_videos(final_topic, country)
-        
-        section_html = f"""
-        <section id='{country}-phase-{phase_num}' class='hypnotic-section'>
-            <h2>{name}</h2>
-            {audio_btn}
-            {youtube_videos}
-            <div class='content'>{new_part}</div>
-            {tables_html}
-        </section>
-        """
-        
-        full_content_html += section_html
-        
-        # 🚨 የደህንነት ማስተካከያ 3: API Breathing (ከ 10 ሰከንድ ወደ 15 ከፍ ብሏል)
-        self.logger.info(f"⏸️  Pausing 15 seconds for API breathing...")
-        await asyncio.sleep(15)
-    
-    # Final processing... (Affiliate & Design)
-    return self._build_zenith_design(full_content_html, final_topic, country, lang, total_words, 0)
+        self.logger.info(f"🎯 Hot Topic Identified: {final_topic}")
 
+        # የ7 ምዕራፎች ተግባራት
+        tasks = [
+            (1, "Master Introduction & 2026 Market Psychology", 2200),
+            (2, "Technical Deep-Dive & Global Infrastructure", 2200),
+            (3, "25 Exclusive Case Studies & Local ROI Data", 2200),
+            (4, "36-Month Strategic Execution Roadmap", 2200),
+            (5, "Multi-Layered Monetization & Profit Systems", 2200),
+            (6, "Competitive Annihilation & Market Dominance", 2000),
+            (7, "100 Ultimate FAQs & The 2050 Future Vision", 2000)
+        ]
+
+        full_content_html = ""
+        total_words = 0
+        
+        for idx, (phase_num, name, target_words) in enumerate(tasks):
+            self.logger.info(f"⚙️  Producing {name} for {country} (Phase {phase_num}/7)...")
+            
+            # 🚨 ማስተካከያ፡ Context Trimming - HTML ታጎችን አጽድቶ የመጨረሻ 1500 ቃላትን ብቻ መላክ
+            import re
+            clean_text = re.sub('<[^<]+?>', '', full_content_html)
+            context = clean_text[-1500:] if clean_text else ""
+            
+            # የኢኮኖሚ መረጃ ማስገባት
+            eco_data = self.economic_indicators.get(country, self.economic_indicators['US'])
+            
+            # የጥሪ ፕሮምፕት
+            prompt = f"""
+            CONTEXT: {context}
+            STRICT TASK: Write the '{name}' section for '{final_topic}' in {country}.
+            CRITICAL REQUIREMENTS:
+            1. MUST BE EXACTLY {target_words} words
+            2. Use {lang} language
+            3. Integrate: {eco_data}
+            4. Format: HTML (h2, h3, p)
+            5. DO NOT repeat ideas from previous sections.
+            """
+            
+            # በ15 ቁልፎች ዑደት ውስጥ ጥሪውን ማከናወን
+            new_part = await self._call_ai_with_round_robin(prompt, max_tokens=3500, phase_idx=phase_num)
+            
+            word_count = len(str(new_part).split())
+            total_words += word_count
+            
+            # ሂፕኖቲክ አውዲዮ ቁልፍ
+            audio_btn = self._build_hypnotic_audio_button(name, lang, country, phase_num)
+            
+            # የሰንጠረዥ ማስገባት
+            tables_html = await self._generate_section_tables(phase_num, country, lang, final_topic)
+            
+            # Phase 3 ላይ YouTube ቪዲዮዎችን ማስገባት
+            youtube_videos = ""
+            if phase_num == 3:
+                youtube_videos = await self._inject_authority_videos(final_topic, country)
+            
+            # ሙሉውን ክፍል ማዋሃድ
+            section_html = f"""
+            <section id='{country}-phase-{phase_num}' class='hypnotic-section' data-wordcount='{word_count}'>
+                <div class='section-header'>
+                    <h2>{phase_num}. {name}</h2>
+                </div>
+                {audio_btn}
+                {youtube_videos}
+                <div class='section-content'>{new_part}</div>
+                {tables_html}
+            </section>
+            """
+            
+            full_content_html += section_html
+            
+            # ⏸️ እረፍት
+            self.logger.info(f"⏸️ Pausing 10 seconds for API breathing...")
+            await asyncio.sleep(10)
+        
+        # ... (ቀሪው የ Affiliate እና Design ሎጂክ ያንተ እንደነበረው ይቀጥላል)
+        return self._build_zenith_design(full_content_html, final_topic, country, lang, total_words, 0)
+        
     def _build_zenith_design(self, content, topic, country, lang, word_count, predicted_revenue):
         """ሰዎችን የሚማርክ 'ሂፕኖቲክ' የዲዛይን አርክቴክቸር"""
         current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
