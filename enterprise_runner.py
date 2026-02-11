@@ -4253,6 +4253,10 @@ def produce_single_country_sovereign_logic(self, country: str, topic: str,
     Returns:
         dict: የይዘት፣ መለኪያዎች እና ሁኔታ የያዘ መዝገብ
     """
+    import asyncio
+    from datetime import datetime
+    import traceback
+    
     start_time = datetime.now()
     self.logger.info(f"👑 Sovereign content generation started for {country} – {topic}")
     
@@ -4262,74 +4266,144 @@ def produce_single_country_sovereign_logic(self, country: str, topic: str,
         'country': country,
         'topic': topic,
         'content': '',
-        'metrics': {},
+        'metrics': {
+            'final_word_count': 0,
+            'estimated_revenue': 0.0,
+            'processing_time_seconds': 0.0,
+            'image_count': 0,
+            'video_count': 0
+        },
         'error': None,
         'production_id': f"{country}_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
     }
     
     try:
-        # 1. መሠረታዊ ይዘት ማመንጨት (ለምሳሌ በMega-Pen ዋና ዘዴ)
-        #    እዚህ ላይ የአንተ ነባሪ የይዘት ማመንጫ ዘዴ መጠራት አለበት።
+        # ----------------------------------------------------------
+        # 1. መሠረታዊ ይዘት ማመንጨት (በMega-Pen ዋና ዘዴ)
+        # ----------------------------------------------------------
         if hasattr(self, 'generate_country_content'):
+            # ዋናው የይዘት ማመንጫ ዘዴ (ነባር)
             content = self.generate_country_content(country, topic)
         elif hasattr(self, '_generate_core_content'):
             content = self._generate_core_content(country, topic)
+        elif hasattr(self, 'mega_pen'):
+            # MegaPen ተጠቀም
+            content = self.mega_pen.write_comprehensive_guide(topic, country, 
+                                                              self._get_country_requirements(country))
         else:
-            # ማስመሰያ – በእውነተኛ ኮድህ መሠረት ቀይር
-            content = f"# {topic} – {country}\n\nComprehensive guide for {country} market."
+            # ማስመሰያ – ምንም ባይኖር ቢያንስ አንድ ነገር እንዲኖር
+            content = f"# {topic} – {country}\n\n"
+            content += f"This comprehensive guide provides enterprise-level insights for the {country} market.\n\n"
+            content += "## Executive Summary\n\n"
+            content += f"Businesses in {country} are rapidly adopting AI solutions to stay competitive.\n\n"
         
+        self.logger.info(f"✅ Base content generated for {country} – {len(content.split())} words")
+        
+        # ----------------------------------------------------------
         # 2. 🖼️ SmartImageEngine በመጠቀም ምስሎችን አስገባ
-        if hasattr(self, 'image_engine'):
+        # ----------------------------------------------------------
+        image_count = 0
+        if hasattr(self, 'image_engine') and self.image_engine:
             try:
+                # አስገዳጅ ምስል ማስገቢያ (2 ሙከራ)
                 content = self.image_engine.generate_image_placeholders(content, country, topic)
                 image_count = self.image_engine.count_injected_images(content)
+                
+                # 0 ምስል ከሆነ እንደገና ሞክር (የግድ እንዲገባ)
+                if image_count == 0:
+                    self.logger.warning(f"⚠️ Image engine returned 0 images for {country}, forcing...")
+                    content = self.image_engine.generate_image_placeholders(content, country, topic + " [FORCE]")
+                    image_count = self.image_engine.count_injected_images(content)
+                
                 self.logger.info(f"🖼️ {image_count} images injected for {country}")
             except Exception as e:
-                self.logger.warning(f"⚠️ Image injection failed for {country}: {e}")
+                self.logger.error(f"❌ Image injection failed for {country}: {traceback.format_exc()}")
         
-        # 3. 💎 EliteQualityOptimizer በመጠቀም የመጨረሻ ማሻሻያ
-        if hasattr(self, 'quality_optimizer'):
+        # ----------------------------------------------------------
+        # 3. 🎬 ቪዲዮዎችን አስገባ (Authority Videos)
+        # ----------------------------------------------------------
+        video_html = ""
+        video_count = 0
+        if hasattr(self, '_inject_authority_videos'):
             try:
-                # ተመሳሳዩን ዘዴ በመጠቀም (async ከሆነ ማስተካከል ያስፈልጋል)
-                if asyncio.iscoroutinefunction(self.quality_optimizer.apply_100_percent_standard):
-                    # ከasync ተልዕኮ ውስጥ ከሆንን በቀጥታ መጥራት እንችላለን
-                    import asyncio
+                # async ዘዴ መጥራት
+                if asyncio.iscoroutinefunction(self._inject_authority_videos):
                     loop = asyncio.get_event_loop()
                     if loop.is_running():
-                        # በሩጫ ላይ ከሆነ ተግባር ፍጠር
-                        content = await self.quality_optimizer.apply_100_percent_standard(content, country, topic)
+                        # በሩጫ ላይ ከሆነ ቀጥታ መጠበቅ አይቻልም → create_task ወይም አማራጭ
+                        # እዚህ ላይ ግን ለማስተካከል ቀላሉ መንገድ run_coroutine_threadsafe
+                        future = asyncio.run_coroutine_threadsafe(
+                            self._inject_authority_videos(topic, country), 
+                            loop
+                        )
+                        video_html = future.result(timeout=15)
                     else:
-                        # አለበለዚያ በአዲስ ሉፕ
+                        video_html = asyncio.run(self._inject_authority_videos(topic, country))
+                else:
+                    video_html = self._inject_authority_videos(topic, country)
+                
+                if video_html:
+                    # ቪዲዮዎቹን ከይዘቱ መጨረሻ ላይ ጨምር
+                    content += f"\n\n{video_html}"
+                    video_count = video_html.count('<iframe')  # ግምታዊ ቁጥር
+                    self.logger.info(f"🎬 {video_count} videos injected for {country}")
+            except Exception as e:
+                self.logger.warning(f"⚠️ Video injection failed for {country}: {e}")
+        
+        # ----------------------------------------------------------
+        # 4. 💎 EliteQualityOptimizer – የመጨረሻ ማሻሻያ
+        # ----------------------------------------------------------
+        if hasattr(self, 'quality_optimizer') and self.quality_optimizer:
+            try:
+                if asyncio.iscoroutinefunction(self.quality_optimizer.apply_100_percent_standard):
+                    loop = asyncio.get_event_loop()
+                    if loop.is_running():
+                        future = asyncio.run_coroutine_threadsafe(
+                            self.quality_optimizer.apply_100_percent_standard(content, country, topic),
+                            loop
+                        )
+                        content = future.result(timeout=30)
+                    else:
                         content = asyncio.run(self.quality_optimizer.apply_100_percent_standard(content, country, topic))
                 else:
                     content = self.quality_optimizer.apply_100_percent_standard(content, country, topic)
+                
+                self.logger.info(f"💎 Quality optimization completed for {country}")
             except Exception as e:
                 self.logger.warning(f"⚠️ Quality optimization failed for {country}: {e}")
         
-        # 4. መለኪያዎችን አስላ
+        # ----------------------------------------------------------
+        # 5. መለኪያዎች ስሌት
+        # ----------------------------------------------------------
         word_count = len(content.split())
         estimated_revenue = self._estimate_revenue(country, word_count) if hasattr(self, '_estimate_revenue') else word_count * 0.05
+        processing_time = (datetime.now() - start_time).total_seconds()
         
-        # 5. ውጤቱን ዘምን
+        # ----------------------------------------------------------
+        # 6. ውጤት ዘምን
+        # ----------------------------------------------------------
         result.update({
             'status': 'success',
             'content': content,
             'metrics': {
                 'final_word_count': word_count,
                 'estimated_revenue': round(estimated_revenue, 2),
-                'processing_time_seconds': (datetime.now() - start_time).total_seconds(),
-                'image_count': self.image_engine.count_injected_images(content) if hasattr(self, 'image_engine') else 0
+                'processing_time_seconds': round(processing_time, 1),
+                'image_count': image_count,
+                'video_count': video_count
             },
             'error': None
         })
         
-        self.logger.info(f"✅ Sovereign content generation completed for {country} in {result['metrics']['processing_time_seconds']:.1f}s")
+        self.logger.info(f"✅ Sovereign generation SUCCESS for {country} – {word_count} words, "
+                        f"${result['metrics']['estimated_revenue']:.2f} revenue, "
+                        f"{processing_time:.1f}s")
         
     except Exception as e:
-        self.logger.error(f"❌ Sovereign content generation failed for {country}: {traceback.format_exc()}")
+        self.logger.error(f"❌ Sovereign generation FAILED for {country}: {traceback.format_exc()}")
         result['error'] = str(e)[:500]
     
-    return def
+    return tracebackult
     
     def _calculate_enterprise_metrics(self, country_results: List[Dict]) -> Dict:
         """የኢንተርፕራይዝ ሜትሪክስ ማስላት"""
