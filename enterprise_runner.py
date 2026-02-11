@@ -4471,21 +4471,17 @@ async def main_execution():
         
         return {'status': 'failed', 'error': str(e), 'error_file': str(error_file)}
 
+# =================== 🏁 የስተካከለ የማጠቃለያ ሎጂክ ===================
 if __name__ == "__main__":
     try:
         results = asyncio.run(main_execution())
         
-        if results.get('status') == 'success':
+        # 'completed' ወይም 'success' መሆኑን ማረጋገጥ
+        if results.get('status') in ['success', 'completed']:
+            print("🚀 Exit Status: 0 (Success)")
             sys.exit(0)
         elif results.get('status') == 'interrupted':
             sys.exit(130)
         else:
+            print(f"❌ Exit Status: 1 (Failed - Status was {results.get('status')})")
             sys.exit(1)
-            
-    except KeyboardInterrupt:
-        print("\n⚠️ Script interrupted by user")
-        sys.exit(130)
-    except Exception as e:
-        print(f"\n❌ Fatal error in main execution: {e}")
-        traceback.print_exc()
-        sys.exit(1)
