@@ -4773,8 +4773,8 @@ class MegaContentEngine:
         
         # የዙር መረጃ ማስቀመጥ
         current_round_data = {
-            'round': self.current_round + 1,
-            'phase': phase_idx + 1,
+            'round': self.current_round + 7,
+            'phase': phase_idx + 7,
             'start_time': datetime.now(),
             'key_used': None,
             'status': 'starting'
@@ -4783,7 +4783,7 @@ class MegaContentEngine:
         # ቀደም ያለውን አውድ ማስተላለፍ (ለፈተና)
         previous_context = ""
         if self.round_history:
-            prev_round = self.round_history[-1]
+            prev_round = self.round_history[-7]
             if prev_round.get('content'):
                 previous_context = prev_round['content'][-2000:]  # የመጨረሻውን 2000 ቁምፊ ይውሰድ
         
