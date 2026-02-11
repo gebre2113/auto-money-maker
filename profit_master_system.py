@@ -4662,7 +4662,7 @@ class MegaContentEngine:
         self.TARGET_WORDS = 15400
         self.revenue_predictions = {}
         
-        # 🌍 3. የሀገራት ኢኮኖሚ መረጃ
+        # 🌍 3. የሀገራት ኢኮኖሚ መረጃ (ስህተቱን የሚፈታው ወሳኝ ክፍል)
         self.economic_indicators = {
             'US': {'inflation': '3.2%', 'gdp_growth': '2.5%', 'reg': 'AI Safety Act 2025'},
             'GB': {'inflation': '4.1%', 'gdp_growth': '1.8%', 'reg': 'Digital Markets Act'},
@@ -4697,15 +4697,13 @@ class MegaContentEngine:
         # 8. የኮንቴክስት ሜሞሪ (ለ7 ደረጃዎች)
         self.context_memory = {}
         
-        # 9. የዙር ታሪክ (ለፈተና)
-        self.round_history = []
-        self.current_phase = 0
-        self.current_round = 0
+        # 9. የቁልፍ ማሽንሮቴሽን መቁጠሪያ
+        self.phase_key_map = {}
         
-        self.logger.info("🚀 MegaContentEngine: Advanced Key Rotation System Loaded.")
+        self.logger.info("🚀 MegaContentEngine: Economic Intelligence Loaded.")
 
     def _initialize_15_fallback_keys(self):
-        """15 መጠባበቂያ ቁልፎችን ማስጀመር"""
+        """15 መጠባበቂያ ቁልፎችን ማስጀመር (የልብ ሚስጥር)"""
         providers = []
         
         # የመጀመሪያ ምንጭ: groq_pool (ከ UnstoppableAIProvider)
@@ -4718,7 +4716,7 @@ class MegaContentEngine:
             providers.extend(self.system.backup_providers)
             self.logger.info(f"Loaded {len(self.system.backup_providers)} backup providers")
         
-        # ሦስተኛ ምንጭ: ከአካባቢ ኢንቫይሮንመንት ተለዋዋጮች
+        # ሦስተኛ ምንጭ: ከአካባቢ ኢንቫይሮንመንት ተለዋዋጮች (GROQ_API_KEY_1 እስከ GROQ_API_KEY_15)
         env_keys = []
         for i in range(1, 16):
             key_name = f"GROQ_API_KEY_{i}"
@@ -4740,6 +4738,19 @@ class MegaContentEngine:
                 break
         
         self.logger.info(f"✅ 15 Fallback Keys Initialized: {len(providers)} providers available")
+        
+        # ለ7 ደረጃዎች የቁልፍ ካርታ ማዘጋጀት
+        self.phase_key_map = {
+            0: providers[0],   # Oracle Discovery
+            1: providers[1],   # Phase 1
+            2: providers[2],   # Phase 2
+            3: providers[3],   # Phase 3
+            4: providers[4],   # Phase 4
+            5: providers[5],   # Phase 5
+            6: providers[6],   # Phase 6
+            7: providers[0]    # Phase 7 (ወደ መጀመሪያው ቁልፍ መመለስ)
+        }
+        
         return providers
 
     def _is_hot_country_time(self, country):
@@ -4763,128 +4774,166 @@ class MegaContentEngine:
             self.logger.error(f"Error checking time for {country}: {e}")
             return False
 
-    async def _call_ai_with_intelligent_rotation(self, prompt, max_tokens=4000, phase_idx=0):
+    async def _call_ai_with_round_robin(self, prompt, max_tokens=4000, phase_idx=0):
         """
-        የተሻሻለ የቁልፍ ማሽንሮቴሽን ሲስተም፡
-        እያንዳንዱ ቁልፍ ሥራውን ካጠናቀቀ በኋላ 3 ሰከንድ ይደናገጣል
-        የቀደመውን አውድ ወደ ቀጣዩ ይሰጣል
+        15 ቁልፎችን በ Round-Robin ዘዴ በመጠቀም ጥሪውን ያከናውናል:
+        አንድ ቁልፍ ቢከሽፍ ወይም ሪሚት ቢመታ በራስ ሰር ወደ ቀጣዩ ይዘልላል:
         """
         total_providers = len(self.ai_providers)
         
-        # የዙር መረጃ ማስቀመጥ
-        current_round_data = {
-            'round': self.current_round + 7,
-            'phase': phase_idx + 7,
-            'start_time': datetime.now(),
-            'key_used': None,
-            'status': 'starting'
-        }
-        
-        # ቀደም ያለውን አውድ ማስተላለፍ (ለፈተና)
-        previous_context = ""
-        if self.round_history:
-            prev_round = self.round_history[-7]
-            if prev_round.get('content'):
-                previous_context = prev_round['content'][-2000:]  # የመጨረሻውን 2000 ቁምፊ ይውሰድ
-        
-        # የፈተና ፕሮምፕት ጨምር
-        enhanced_prompt = f"""
-        PREVIOUS CONTEXT (for continuation): {previous_context}
-        
-        CURRENT TASK: {prompt}
-        
-        IMPORTANT: This is Phase {phase_idx + 1} of 7. Continue naturally from previous work.
-        """
-        
-        attempts = 0
-        while attempts < total_providers:
-            # የቁልፍ ምርጫ (Round-Robin)
-            key_idx = (self.current_key_idx + attempts) % total_providers
-            selected_key = self.ai_providers[key_idx]
-            
-            self.logger.info(f"🔄 ROUND {self.current_round + 1}, PHASE {phase_idx + 1}: "
-                           f"Attempting with Key {key_idx + 1}/{total_providers}")
+        for attempt in range(total_providers):
+            # የትኛው ቁልፍ ላይ እንዳለን ለማወቅ (ዙር)
+            provider_idx = (phase_idx + attempt) % total_providers
+            provider = self.ai_providers[provider_idx]
             
             try:
-                # ቁልፉን መሞከር
-                result = await self._try_single_key(selected_key, enhanced_prompt, max_tokens)
+                self.logger.info(f"🔄 Round-Robin Attempt {attempt+1}/{total_providers}: Using Key {provider_idx+1}")
                 
-                if result:
-                    # ስኬት: የቁልፍ ኢንዴክስ አዘምን
-                    self.current_key_idx = (key_idx + 1) % total_providers
-                    
-                    # የዙር መረጃ ማስቀመጥ
-                    current_round_data.update({
-                        'key_used': f"Key {key_idx + 1}",
-                        'status': 'success',
-                        'end_time': datetime.now(),
-                        'content': result[:500] + "..." if len(result) > 500 else result
-                    })
-                    
-                    self.round_history.append(current_round_data)
-                    self.current_phase = phase_idx
-                    self.current_round += 1
-                    
-                    # ከዚህ ቁልፍ በኋላ 3 ሰከንድ እረፍት
-                    self.logger.info(f"✅ Key {key_idx + 1} succeeded. Resting for 3 seconds...")
-                    await asyncio.sleep(3)
-                    
-                    return result
-                    
-            except Exception as e:
-                error_msg = str(e)
-                if "429" in error_msg or "rate limit" in error_msg.lower():
-                    self.logger.warning(f"⚠️ Key {key_idx + 1} rate limited, trying next...")
-                else:
-                    self.logger.warning(f"⚠️ Key {key_idx + 1} failed: {error_msg[:100]}")
+                # አቅራቢው (provider) ቀጥታ ኦብጀክት ከሆነ (ለምሳሌ UnstoppableAIProvider)
+                if hasattr(provider, 'generate_content'):
+                    result = await provider.generate_content(prompt, max_tokens=max_tokens)
+                    if result and not result.startswith("Error"):
+                        return str(result)
                 
-                attempts += 1
-                
-                # በመካከል 1 ሰከንድ እረፍት (ለሌላ ቁልፍ ለመሞከር)
-                if attempts < total_providers:
-                    await asyncio.sleep(1)
-        
-        # ሁሉም ቁልፎች ከተሳሳቱ
-        current_round_data.update({
-            'status': 'failed',
-            'end_time': datetime.now()
-        })
-        self.round_history.append(current_round_data)
-        
-        raise Exception(f"All {total_providers} keys failed for Phase {phase_idx + 1}")
+                # አቅራቢው (provider) የቁልፍ ጽሁፍ (String) ብቻ ከሆነ በቀጥታ በ httpx ይጠራዋል
+                elif isinstance(provider, str):
+                    async with httpx.AsyncClient(timeout=160.0) as client:
+                        resp = await client.post(
+                            "https://api.groq.com/openai/v1/chat/completions",
+                            headers={"Authorization": f"Bearer {provider}"},
+                            json={
+                                "model": "llama-3.3-70b-versatile", 
+                                "messages": [{"role": "user", "content": prompt}], 
+                                "max_tokens": max_tokens,
+                                "temperature": 0.7
+                            }
+                        )
+                        if resp.status_code == 200:
+                            return str(resp.json()['choices'][0]['message']['content'])
+                        elif resp.status_code == 429:
+                            self.logger.warning(f"⚠️ Key {provider_idx+1} hit rate limit (429), trying next...")
+                            continue
+                        else:
+                            self.logger.warning(f"⚠️ Key {provider_idx+1} failed with status {resp.status_code}")
+                            continue
 
-    async def _try_single_key(self, key, prompt, max_tokens):
-        """አንድ ቁልፍን መሞከር"""
-        try:
-            # አቅራቢው (provider) ቀጥታ ኦብጀክት ከሆነ
-            if hasattr(key, 'generate_content'):
-                result = await key.generate_content(prompt, max_tokens=max_tokens)
-                if result and not result.startswith("Error"):
-                    return str(result)
-            
-            # አቅራቢው (provider) የቁልፍ ጽሁፍ (String) ብቻ ከሆነ
-            elif isinstance(key, str):
-                async with httpx.AsyncClient(timeout=160.0) as client:
-                    resp = await client.post(
-                        "https://api.groq.com/openai/v1/chat/completions",
-                        headers={"Authorization": f"Bearer {key}"},
-                        json={
-                            "model": "llama-3.3-70b-versatile", 
-                            "messages": [{"role": "user", "content": prompt}], 
-                            "max_tokens": max_tokens,
-                            "temperature": 0.7
-                        }
-                    )
-                    if resp.status_code == 200:
-                        return str(resp.json()['choices'][0]['message']['content'])
-                    else:
-                        raise Exception(f"API Error: {resp.status_code}")
-                        
-            else:
-                raise Exception("Invalid key format")
+            except Exception as e:
+                self.logger.warning(f"⚠️ Provider {provider_idx+1} failed: {str(e)[:100]}")
+                continue
+        
+        # ሁሉም 15ቱንም ሞክሮ ካልሰራ ብቻ ስህተት ይጥላል
+        raise Exception(f"All {total_providers} fallback keys failed for Phase {phase_idx}")
+
+    def _build_hypnotic_audio_button(self, section_name, lang, country, section_idx):
+        """ሂፕኖቲክ የአውዲዮ ቁልፍ ገንባት"""
+        play_texts = {
+            'English': f"🎧 Immerse Yourself: Listen to this section",
+            'Amharic': f"🎧 በዚህ ክፍል ውስጥ ይስጠሙ",
+            'German': f"🎧 Tauchen Sie ein: Hören Sie diesen Abschnitt",
+            'French': f"🎧 Immergez-vous: Écoutez cette section",
+            'Japanese': f"🎧 没入する: このセクションを聴く"
+        }
+        play_text = play_texts.get(lang, play_texts['English'])
+        
+        return f"""
+        <div class='hypnotic-audio-trigger'
+             onclick='playHypnoticAudio("{country}-section-{section_idx}")'
+             style='
+                background: linear-gradient(135deg, 
+                    rgba(26, 42, 68, 0.95) 0%, 
+                    rgba(197, 160, 89, 0.15) 100%);
+                color: #fbbf24;
+                padding: 25px 35px;
+                border-radius: 15px;
+                margin: 40px 0;
+                cursor: pointer;
+                border: 2px solid rgba(197, 160, 89, 0.3);
+                box-shadow: 
+                    0 10px 30px rgba(26, 42, 68, 0.4),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+                transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+                backdrop-filter: blur(10px);
+                position: relative;
+                overflow: hidden;
+             '
+             onmouseover='
+                this.style.transform = "translateY(-5px) scale(1.02)";
+                this.style.boxShadow = 
+                    "0 15px 40px rgba(197, 160, 89, 0.3), 
+                     inset 0 1px 0 rgba(255, 255, 255, 0.2)";
+                this.style.border = "2px solid rgba(197, 160, 89, 0.5)";
+             '
+             onmouseout='
+                this.style.transform = "translateY(0) scale(1)";
+                this.style.boxShadow = 
+                    "0 10px 30px rgba(26, 42, 68, 0.4), 
+                     inset 0 1px 0 rgba(255, 255, 255, 0.1)";
+                this.style.border = "2px solid rgba(197, 160, 89, 0.3)";
+             '>
+             
+             <div style='
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: linear-gradient(90deg, 
+                    transparent 0%, 
+                    rgba(197, 160, 89, 0.1) 50%, 
+                    transparent 100%);
+                animation: shimmer 3s infinite;
+             '></div>
+             
+             <div style='
+                display: flex;
+                align-items: center;
+                gap: 25px;
+                position: relative;
+                z-index: 2;
+             '>
+                <div style='
+                    font-size: 45px;
+                    filter: drop-shadow(0 5px 15px rgba(197, 160, 89, 0.4));
+                    animation: pulse 2s infinite;
+                '>🎙️</div>
                 
-        except Exception as e:
-            raise e
+                <div style='flex: 1;'>
+                    <div style='
+                        font-size: 20px;
+                        font-weight: bold;
+                        margin-bottom: 8px;
+                        text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+                    '>
+                        {play_text}
+                    </div>
+                    <div style='
+                        font-size: 14px;
+                        color: #cbd5e1;
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                    '>
+                        <span>Section: {section_name}</span>
+                        <span style='
+                            background: rgba(197, 160, 89, 0.2);
+                            color: #fbbf24;
+                            padding: 5px 15px;
+                            border-radius: 20px;
+                            font-size: 12px;
+                            font-weight: bold;
+                        '>
+                            🔥 PREMIUM AUDIO
+                        </span>
+                    </div>
+                </div>
+                
+                <div style='
+                    font-size: 30px;
+                    animation: bounce 2s infinite;
+                '>▶️</div>
+             </div>
+        </div>
+        """
 
     async def _inject_authority_videos(self, topic: str, country: str):
         """የዩቲዩብ ቪዲዮዎችን አድኖ በውብ ዲዛይን ያዘጋጃል"""
@@ -5012,117 +5061,6 @@ class MegaContentEngine:
         except Exception as e:
             self.logger.error(f"Error fetching YouTube videos: {e}")
             return ""
-
-    def _build_hypnotic_audio_button(self, section_name, lang, country, section_idx):
-        """ሂፕኖቲክ የአውዲዮ ቁልፍ ገንባት"""
-        play_texts = {
-            'English': f"🎧 Immerse Yourself: Listen to this section",
-            'Amharic': f"🎧 በዚህ ክፍል ውስጥ ይስጠሙ",
-            'German': f"🎧 Tauchen Sie ein: Hören Sie diesen Abschnitt",
-            'French': f"🎧 Immergez-vous: Écoutez cette section",
-            'Japanese': f"🎧 没入する: このセクションを聴く"
-        }
-        play_text = play_texts.get(lang, play_texts['English'])
-        
-        return f"""
-        <div class='hypnotic-audio-trigger'
-             onclick='playHypnoticAudio("{country}-section-{section_idx}")'
-             style='
-                background: linear-gradient(135deg, 
-                    rgba(26, 42, 68, 0.95) 0%, 
-                    rgba(197, 160, 89, 0.15) 100%);
-                color: #fbbf24;
-                padding: 25px 35px;
-                border-radius: 15px;
-                margin: 40px 0;
-                cursor: pointer;
-                border: 2px solid rgba(197, 160, 89, 0.3);
-                box-shadow: 
-                    0 10px 30px rgba(26, 42, 68, 0.4),
-                    inset 0 1px 0 rgba(255, 255, 255, 0.1);
-                transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-                backdrop-filter: blur(10px);
-                position: relative;
-                overflow: hidden;
-             '
-             onmouseover='
-                this.style.transform = "translateY(-5px) scale(1.02)";
-                this.style.boxShadow = 
-                    "0 15px 40px rgba(197, 160, 89, 0.3), 
-                     inset 0 1px 0 rgba(255, 255, 255, 0.2)";
-                this.style.border = "2px solid rgba(197, 160, 89, 0.5)";
-             '
-             onmouseout='
-                this.style.transform = "translateY(0) scale(1)";
-                this.style.boxShadow = 
-                    "0 10px 30px rgba(26, 42, 68, 0.4), 
-                     inset 0 1px 0 rgba(255, 255, 255, 0.1)";
-                this.style.border = "2px solid rgba(197, 160, 89, 0.3)";
-             '>
-             
-             <div style='
-                position: absolute;
-                top: 0;
-                left: 0;
-                right: 0;
-                bottom: 0;
-                background: linear-gradient(90deg, 
-                    transparent 0%, 
-                    rgba(197, 160, 89, 0.1) 50%, 
-                    transparent 100%);
-                animation: shimmer 3s infinite;
-             '></div>
-             
-             <div style='
-                display: flex;
-                align-items: center;
-                gap: 25px;
-                position: relative;
-                z-index: 2;
-             '>
-                <div style='
-                    font-size: 45px;
-                    filter: drop-shadow(0 5px 15px rgba(197, 160, 89, 0.4));
-                    animation: pulse 2s infinite;
-                '>🎙️</div>
-                
-                <div style='flex: 1;'>
-                    <div style='
-                        font-size: 20px;
-                        font-weight: bold;
-                        margin-bottom: 8px;
-                        text-shadow: 0 2px 4px rgba(0,0,0,0.3);
-                    '>
-                        {play_text}
-                    </div>
-                    <div style='
-                        font-size: 14px;
-                        color: #cbd5e1;
-                        display: flex;
-                        justify-content: space-between;
-                        align-items: center;
-                    '>
-                        <span>Section: {section_name}</span>
-                        <span style='
-                            background: rgba(197, 160, 89, 0.2);
-                            color: #fbbf24;
-                            padding: 5px 15px;
-                            border-radius: 20px;
-                            font-size: 12px;
-                            font-weight: bold;
-                        '>
-                            🔥 PREMIUM AUDIO
-                        </span>
-                    </div>
-                </div>
-                
-                <div style='
-                    font-size: 30px;
-                    animation: bounce 2s infinite;
-                '>▶️</div>
-             </div>
-        </div>
-        """
 
     async def _generate_section_tables(self, phase_num, country, lang, topic):
         """ለእያንዳንዱ ምዕራፍ የተለየ ሰንጠረዥ ማመንጨት"""
@@ -5343,7 +5281,7 @@ class MegaContentEngine:
         Reply ONLY with title in {lang}.
         """
         
-        final_topic = await self._call_ai_with_intelligent_rotation(topic_q, max_tokens=200, phase_idx=0)
+        final_topic = await self._call_ai_with_round_robin(topic_q, max_tokens=200, phase_idx=0)
         final_topic = str(final_topic).strip().replace('"', '').replace("'", "")
         
         self.logger.info(f"🎯 Hot Topic Identified: {final_topic}")
@@ -5373,7 +5311,7 @@ class MegaContentEngine:
             
             # የጥሪ ፕሮምፕት (የቁልፍ ማሽንሮቴሽን እዚህ ይከሰታል)
             prompt = f"""
-            PREVIOUS CONTEXT (Continue from here): {context}
+            CONTEXT: {context}
             
             STRICT TASK: Write the '{name}' section for '{final_topic}' in {country}.
             
@@ -5389,8 +5327,8 @@ class MegaContentEngine:
             SECTION SPECIFIC: {name}
             """
             
-            # በ15 ቁልፎች ዑደት ውስጥ ጥሪውን ማከናወን
-            new_part = await self._call_ai_with_intelligent_rotation(prompt, max_tokens=4000, phase_idx=phase_num)
+            # በ15 ቁልፎች ዑደት ውስጥ ጥሪውን ማከናወን (Round-Robin)
+            new_part = await self._call_ai_with_round_robin(prompt, max_tokens=4000, phase_idx=phase_num)
             
             # የቃላት ቁጥር ማስላት
             word_count = len(str(new_part).split())
@@ -5507,10 +5445,9 @@ class MegaContentEngine:
             
             full_content_html += section_html
             
-            # በመካከል 10 ሰከንድ እረፍት (ለፈተና መገጣጠም)
-            if idx < len(tasks) - 1:
-                self.logger.info(f"⏸️  Inter-phase cooldown: 10 seconds...")
-                await asyncio.sleep(10)
+            # API እረፍት (10 ሰከንድ ለእያንዳንዱ ፌዝ)
+            self.logger.info(f"⏸️  Pausing 10 seconds for API breathing...")
+            await asyncio.sleep(10)
         
         self.logger.info(f"📊 Total Words for {country}: {total_words} (Target: 15,400)")
         
@@ -5521,7 +5458,7 @@ class MegaContentEngine:
         if hasattr(self.system, 'neuro_converter'):
             full_content_html = self.system.neuro_converter.apply_neuro_marketing(full_content_html)
         
-        # 💰 ለ Ultra-Affiliate ማስገቢያ
+        # 💰 ለ Ultra-Affiliate ማስገቢያ (The Affiliate Bridge Line)
         predicted_revenue = 0.0
         if hasattr(self.system, 'affiliate_manager'):
             self.logger.info(f"💰 CALLING ULTRA-AFFILIATE (v13.0): Injecting for {country}")
@@ -5539,72 +5476,13 @@ class MegaContentEngine:
             except Exception as e:
                 self.logger.error(f"❌ Affiliate injection failed: {e}")
         
-        # የመጨረሻ መዋቅር ገንባት
+        # የመጨረሻ መዋቅር ገንባት (Hypnotic Fashion Design)
         return self._build_zenith_design(full_content_html, final_topic, country, lang, total_words, predicted_revenue)
 
     def _build_zenith_design(self, content, topic, country, lang, word_count, predicted_revenue):
         """ሰዎችን የሚማርክ 'ሂፕኖቲክ' የዲዛይን አርክቴክቸር"""
         current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         country_emoji = globals().get('COUNTRIES', {}).get(country, {'emoji': '🌍'})['emoji']
-        
-        # የፈተና ማጠቃለያ
-        rotation_summary = f"""
-        <div style='
-            background: linear-gradient(135deg, rgba(26, 42, 68, 0.1) 0%, rgba(197, 160, 89, 0.05) 100%);
-            padding: 25px;
-            border-radius: 15px;
-            margin: 30px 0;
-            border: 2px solid rgba(197, 160, 89, 0.2);
-        '>
-            <h3 style='
-                color: #1a2a44;
-                font-family: "Playfair Display", serif;
-                font-size: 24px;
-                margin-bottom: 15px;
-                text-align: center;
-            '>
-                🔄 Key Rotation Analysis
-            </h3>
-            <div style='
-                display: grid;
-                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-                gap: 15px;
-                margin-top: 20px;
-            '>
-                <div style='
-                    background: rgba(30, 58, 138, 0.1);
-                    padding: 15px;
-                    border-radius: 10px;
-                    text-align: center;
-                '>
-                    <div style='color: #1e3a8a; font-size: 12px; font-weight: bold;'>TOTAL ROUNDS</div>
-                    <div style='color: #1a2a44; font-size: 28px; font-weight: bold;'>{len(self.round_history)}</div>
-                </div>
-                <div style='
-                    background: rgba(16, 185, 129, 0.1);
-                    padding: 15px;
-                    border-radius: 10px;
-                    text-align: center;
-                '>
-                    <div style='color: #10b981; font-size: 12px; font-weight: bold;'>SUCCESS RATE</div>
-                    <div style='color: #059669; font-size: 28px; font-weight: bold;'>
-                        {len([r for r in self.round_history if r['status'] == 'success'])}/{len(self.round_history)}
-                    </div>
-                </div>
-                <div style='
-                    background: rgba(197, 160, 89, 0.1);
-                    padding: 15px;
-                    border-radius: 10px;
-                    text-align: center;
-                '>
-                    <div style='color: #c5a059; font-size: 12px; font-weight: bold;'>NEXT KEY</div>
-                    <div style='color: #9e7e38; font-size: 28px; font-weight: bold;'>
-                        {(self.current_key_idx % len(self.ai_providers)) + 1}/{len(self.ai_providers)}
-                    </div>
-                </div>
-            </div>
-        </div>
-        """
         
         return f"""
         <!DOCTYPE html>
@@ -5923,7 +5801,7 @@ class MegaContentEngine:
         <body>
             <div class="premium-banner">
                 💎 SOVEREIGN INTELLIGENCE NETWORK • {country_emoji} {country} EDITION • 
-                LIVE: <span id="live-time"></span> • INTELLIGENT KEY ROTATION ACTIVE
+                LIVE: <span id="live-time"></span> • 15-KEY ROUND-ROBIN ACTIVE
             </div>
             
             <div class="zenith-container">
@@ -6037,8 +5915,6 @@ class MegaContentEngine:
                     </div>
                 </div>
                 
-                {rotation_summary}
-                
                 {content}
                 
                 <div class="revenue-card">
@@ -6076,13 +5952,12 @@ class MegaContentEngine:
                 '>
                     <p>© {datetime.now().year} THE OMNIPOTENT ORACLE SYSTEM • GLOBAL DOMINANCE PROTOCOL v26.0</p>
                     <p style='margin-top: 10px; font-size: 12px; opacity: 0.7;'>
-                        Generated with 15 AI Fallback Keys • Intelligent Key Rotation • 
+                        Generated with 15 AI Fallback Keys • Market Timing Intelligence • 
                         YouTube Authority Integration • Ultra-Affiliate v13.0 • 
-                        Hypnotic Design Architecture • Context-Aware Processing
+                        Hypnotic Design Architecture • Round-Robin Relay Race
                     </p>
                     <p style='margin-top: 5px; font-size: 11px; color: #c5a059;'>
-                        Round {len(self.round_history)} Completed • Next Phase: {self.current_phase + 1}/7 • 
-                        Key Rest Period: 3 seconds per key • Inter-country: 79 seconds
+                        Key Rotation: {self.current_key_idx} keys used • Next: {(self.current_key_idx % len(self.ai_providers)) + 1}/{len(self.ai_providers)}
                     </p>
                 </footer>
             </div>
@@ -6091,7 +5966,7 @@ class MegaContentEngine:
         """
 
     async def start_mega_loop(self, topic: str):
-        """የዋናው ዑደት - ሲስተሙን በየ30 ደቂቃ ማስነሳት"""
+        """የዋናው ዑደት - ሲስተሙን በየ30 ደቂቃ ማስነሳት (GitHub Free Tier Optimized)"""
         target_countries = ['US', 'GB', 'DE', 'CA', 'AU', 'FR', 'JP', 'CH', 'NO', 'SE', 'ET']
         
         self.logger.info(f"🚀 Starting Mega Loop for topic: {topic}")
@@ -6103,7 +5978,7 @@ class MegaContentEngine:
             active_productions = []
             total_predicted_revenue = 0.0
             
-            for idx, country in enumerate(target_countries):
+            for country in target_countries:
                 # ሀገሩ በገበያ ትኩረት ሰዓት ላይ መሆኑን ማረጋገጥ
                 if self._is_hot_country_time(country):
                     self.logger.info(f"🔥 {country} is in HOT MARKET TIME - Starting Production")
@@ -6132,24 +6007,24 @@ class MegaContentEngine:
                         
                         active_productions.append(country)
                         
-                        # በሀገራት መካከል 79 ሰከንድ እረፍት
-                        if idx < len(target_countries) - 1:
-                            self.logger.info(f"⏸️  Inter-country cooldown: 79 seconds...")
-                            await asyncio.sleep(79)
+                        # 5 ደቂቃ እንደ CNN እንዲሆን (GitHub Free Tier Optimization)
+                        self.logger.info(f"⏸️  Cooling down for 5 minutes (CNN-style pacing)...")
+                        await asyncio.sleep(300)  # 5 ደቂቃ
                         
                     except Exception as e:
                         self.logger.error(f"❌ Error producing {country}: {e}")
+                        self.logger.error(f"Stack trace: {e.__traceback__}")
                 else:
                     self.logger.info(f"⏸️  {country} is NOT in hot market time - Skipping")
             
             if active_productions:
                 self.logger.info(f"🎉 Production cycle complete for: {', '.join(active_productions)}")
                 self.logger.info(f"💰 TOTAL PREDICTED REVENUE: ${total_predicted_revenue:.2f}")
-                self.logger.info("💤 System sleeping for 30 minutes...")
+                self.logger.info("💤 System sleeping for 30 minutes (GitHub Free Tier Optimization)...")
                 await asyncio.sleep(1800)  # 30 ደቂቃ
             else:
-                self.logger.info("😴 No countries in hot time - Sleeping for 1 second...")
-                await asyncio.sleep(1)  # 1 ሰከንድ
+                self.logger.info("😴 No countries in hot time - Sleeping for 1 second (Energy Saving Mode)...")
+                await asyncio.sleep(1)  # 1 ሰከንድ (GitHub Free Tier Friendly)
 # =================== ዋና ስርዓት ክፍል ===================
 
 class UltimateProfitMasterSystem:
