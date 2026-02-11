@@ -2,30 +2,48 @@ import os
 import requests
 import json
 
-def push_and_cleanup():
+# 1. መዝገብ (ድጋሚ እንዳይላክ)
+LOG_FILE = "published_history.log"
+
+def is_already_published(content_id):
+    if os.path.exists(LOG_FILE):
+        with open(LOG_FILE, "r") as f:
+            return content_id in f.read().splitlines()
+    return False
+
+def mark_as_published(content_id):
+    with open(LOG_FILE, "a") as f:
+        f.write(content_id + "\n")
+
+def push_to_wordpress():
     wp_url = os.getenv('WP_URL')
     wp_user = os.getenv('WP_USERNAME')
     wp_pass = os.getenv('WP_PASSWORD')
 
-    # በዋናው ፎልደር ውስጥ ያሉትን JSON ፋይሎች በሙሉ መፈለግ
-    files_to_send = [f for f in os.listdir('.') if f.endswith('.json')]
+    # ፋይሎችን በዋናው ፎልደር (Root) ውስጥ መፈለግ
+    files_found = [f for f in os.listdir('.') if f.endswith('.json')]
     
-    if not files_to_send:
-        print("📭 የሚላክ አዲስ ፋይል የለም። ሁሉም ተልከው ተወግደዋል!")
+    if not files_found:
+        print("❌ ዜሮ (0) የ JSON ፋይል ነው ያገኘሁት። ማምረቻው ማሽን (main.py) ፋይል አልፈጠረም ማለት ነው።")
         return
 
-    for filename in files_to_send:
+    for filename in files_found:
         try:
-            # 1. ፋይሉን ማንበብ
             with open(filename, 'r', encoding='utf-8') as f:
                 data = json.load(f)
             
-            market = data.get('market', 'Unknown')
-            print(f"📡 {market}ን ወደ ወርድፕረስ እየላኩ ነው...")
+            market = data.get('market', 'Global')
+            topic = data.get('topic', 'Enterprise AI')
+            content_id = f"{market}-{topic}".strip().lower()
 
-            # 2. ወደ WordPress መላክ
+            # ድግግሞሽ መቆጣጠሪያ
+            if is_already_published(content_id):
+                print(f"⏭️ {market} ቀደም ብሎ ተልኳል፣ ዘለልኩት።")
+                continue
+
+            # ይዘቱን ወደ WordPress መላክ
             payload = {
-                "title": data.get('title', f"Enterprise AI Strategy 2026 - {market}"),
+                "title": f"Enterprise AI Implementation Strategies 2026 for {market}",
                 "content": data.get('content', ''),
                 "status": "publish"
             }
@@ -36,16 +54,14 @@ def push_and_cleanup():
                 json=payload
             )
 
-            # 3. ከተላከ በኋላ ፋይሉን ማጥፋት
             if response.status_code == 201:
-                print(f"✅ {market} በተሳካ ሁኔታ ተልኳል። አሁን ፋይሉን እያጠፋሁ ነው...")
-                os.remove(filename) # ፋይሉን ከ GitHub workspace ላይ ያጠፋዋል
-                print(f"🗑️ ፋይሉ {filename} ተወግዷል።")
+                print(f"✅ ተሳክቷል፡ {market} ተልኳል።")
+                mark_as_published(content_id)
             else:
-                print(f"❌ ስህተት {market}: {response.status_code} - አልተላከም፣ ፋይሉ አልጠፋም።")
+                print(f"❌ ስህተት ለ {market}: {response.status_code}")
                 
         except Exception as e:
-            print(f"⚠️ ስህተት ተከስቷል {filename}: {str(e)}")
+            print(f"❌ ፋይሉን ማንበብ አልተቻለም {filename}: {str(e)}")
 
 if __name__ == "__main__":
-    push_and_cleanup()
+    push_to_wordpress()
