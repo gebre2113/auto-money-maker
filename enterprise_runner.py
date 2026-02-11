@@ -4477,16 +4477,42 @@ async def main_execution():
         return {'status': 'failed', 'error': str(e), 'error_file': str(error_file)}
 
 # =================== 🏁 የስተካከለ የማጠቃለያ ሎጂክ ===================
+# =================== 🏁 የመጨረሻው የምርት ማስጀመሪያ (የተስተካከለ) ===================
+
 if __name__ == "__main__":
     try:
+        # ዋናውን ስራ ማስጀመር
         results = asyncio.run(main_execution())
         
-        # 'completed' ወይም 'success' መሆኑን ማረጋገጥ
-        if results.get('status') in ['success', 'completed']:
-            print("🚀 Exit Status: 0 (Success)")
+        # ውጤቱን በጥንቃቄ መመርመር
+        # ማሳሰቢያ፡ ራነሩ 'completed' ወይም 'success' ብሎ ሊመልስ ይችላል
+        if results and results.get('status') in ['success', 'completed']:
+            print("\n" + "="*50)
+            print("🚀 MISSION ACCOMPLISHED: Status 0 (Success)")
+            print("="*50)
             sys.exit(0)
-        elif results.get('status') == 'interrupted':
+        elif results and results.get('status') == 'interrupted':
+            print("\n⚠️ Process interrupted by user.")
             sys.exit(130)
         else:
-            print(f"❌ Exit Status: 1 (Failed - Status was {results.get('status')})")
+            status = results.get('status') if results else "None"
+            print(f"\n❌ MISSION FAILED: Status 1 (Status was: {status})")
             sys.exit(1)
+
+    except KeyboardInterrupt:
+        print("\n\n👋 ፕሮግራሙ በተጠቃሚ ተቋርጧል!")
+        sys.exit(130)
+        
+    except Exception as e:
+        print(f"\n💥 ከፍተኛ ስህተት ተከስቷል: {e}")
+        import traceback
+        traceback.print_exc()
+        
+        # የስህተት ሪፖርት መጻፍ
+        try:
+            with open('crash_report.log', 'a', encoding='utf-8') as f:
+                f.write(f"\n--- {datetime.now()} ---\n{traceback.format_exc()}\n")
+        except:
+            pass
+            
+        sys.exit(1)
