@@ -1,6 +1,0 @@
-{
-  "error": "name 'PremiumConfig' is not defined",
-  "traceback": "Traceback (most recent call last):\n  File \"/home/runner/work/auto-money-maker/auto-money-maker/enterprise_runner.py\", line 4489, in main_execution\n    orchestrator = EnterpriseProductionOrchestrator()\n                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/runner/work/auto-money-maker/auto-money-maker/enterprise_runner.py\", line 3011, in __init__\n    self.config = PremiumConfig()\n                  ^^^^^^^^^^^^^\nNameError: name 'PremiumConfig' is not defined\n",
-  "timestamp": "2026-02-09T12:57:58.902472",
-  "topic": "Unknown"
-}

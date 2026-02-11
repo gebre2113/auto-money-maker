@@ -1,6 +1,0 @@
-{
-  "error": "name 'EnhancedAIFailoverSystem' is not defined",
-  "traceback": "Traceback (most recent call last):\n  File \"/home/runner/work/auto-money-maker/auto-money-maker/enterprise_runner.py\", line 4732, in main_execution\n    orchestrator = EnterpriseProductionOrchestrator()\n                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/runner/work/auto-money-maker/auto-money-maker/enterprise_runner.py\", line 3113, in __init__\n    self.enhanced_failover_system = EnhancedAIFailoverSystem()\n                                    ^^^^^^^^^^^^^^^^^^^^^^^^\nNameError: name 'EnhancedAIFailoverSystem' is not defined\n",
-  "timestamp": "2026-02-10T06:03:31.701841",
-  "topic": "Unknown"
-}

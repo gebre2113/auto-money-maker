@@ -1,6 +1,0 @@
-{
-  "error": "name 'EnterpriseProductionOrchestrator' is not defined",
-  "traceback": "Traceback (most recent call last):\n  File \"/home/runner/work/auto-money-maker/auto-money-maker/enterprise_runner.py\", line 4379, in main_execution\n    orchestrator = EnterpriseProductionOrchestrator()\n                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nNameError: name 'EnterpriseProductionOrchestrator' is not defined\n",
-  "timestamp": "2026-02-09T14:06:37.626624",
-  "topic": "Unknown"
-}
