@@ -2,53 +2,31 @@ import os
 import requests
 import json
 
-# 1. አድራሻዎች እና መዝገቦች
-LOG_FILE = "published_history.log"
-JSON_DIR = "generated_content" # AI ያመረታቸው ፋይሎች የሚቀመጡበት
-
-def is_already_published(content_id):
-    if os.path.exists(LOG_FILE):
-        with open(LOG_FILE, "r") as f:
-            return content_id in f.read().splitlines()
-    return False
-
-def mark_as_published(content_id):
-    with open(LOG_FILE, "a") as f:
-        f.write(content_id + "\n")
-
-def push_to_wordpress():
+def push_and_cleanup():
     wp_url = os.getenv('WP_URL')
     wp_user = os.getenv('WP_USERNAME')
     wp_pass = os.getenv('WP_PASSWORD')
 
-    # በፎልደሩ ውስጥ ያሉትን ሁሉንም JSON ፋይሎች መፈተሽ
-    if not os.path.exists(JSON_DIR):
-        print("❌ ምንም የሚላክ ፋይል (JSON) አልተገኘም!")
+    # በዋናው ፎልደር ውስጥ ያሉትን JSON ፋይሎች በሙሉ መፈለግ
+    files_to_send = [f for f in os.listdir('.') if f.endswith('.json')]
+    
+    if not files_to_send:
+        print("📭 የሚላክ አዲስ ፋይል የለም። ሁሉም ተልከው ተወግደዋል!")
         return
 
-    for filename in os.listdir(JSON_DIR):
-        if filename.endswith(".json"):
-            file_path = os.path.join(JSON_DIR, filename)
-            
-            with open(file_path, 'r') as f:
+    for filename in files_to_send:
+        try:
+            # 1. ፋይሉን ማንበብ
+            with open(filename, 'r', encoding='utf-8') as f:
                 data = json.load(f)
             
-            market = data.get('market', 'Global')
-            topic = data.get('topic', 'Enterprise AI')
-            content_id = f"{market}-{topic}".strip().lower()
+            market = data.get('market', 'Unknown')
+            print(f"📡 {market}ን ወደ ወርድፕረስ እየላኩ ነው...")
 
-            # ድግግሞሽ መቆጣጠሪያ
-            if is_already_published(content_id):
-                print(f"⏭️ ተዘልሏል፡ {market} ቀደም ብሎ ተልኳል።")
-                continue
-
-            # ቪዲዮ መጨመሪያ (ጥራት)
-            video_embed = f'<div class="wp-video"><iframe src="https://www.youtube.com/embed?listType=search&list=AI+Wealth+{market}" width="100%" height="400"></iframe></div>'
-            full_content = video_embed + data.get('content', '')
-
+            # 2. ወደ WordPress መላክ
             payload = {
-                "title": f"Enterprise AI Strategy 2026: {market} Edition",
-                "content": full_content,
+                "title": data.get('title', f"Enterprise AI Strategy 2026 - {market}"),
+                "content": data.get('content', ''),
                 "status": "publish"
             }
 
@@ -58,11 +36,16 @@ def push_to_wordpress():
                 json=payload
             )
 
+            # 3. ከተላከ በኋላ ፋይሉን ማጥፋት
             if response.status_code == 201:
-                print(f"✅ ተሳክቷል፡ {market} ወደ WordPress ተልኳል።")
-                mark_as_published(content_id)
+                print(f"✅ {market} በተሳካ ሁኔታ ተልኳል። አሁን ፋይሉን እያጠፋሁ ነው...")
+                os.remove(filename) # ፋይሉን ከ GitHub workspace ላይ ያጠፋዋል
+                print(f"🗑️ ፋይሉ {filename} ተወግዷል።")
             else:
-                print(f"❌ ስህተት ለ {market}: {response.status_code}")
+                print(f"❌ ስህተት {market}: {response.status_code} - አልተላከም፣ ፋይሉ አልጠፋም።")
+                
+        except Exception as e:
+            print(f"⚠️ ስህተት ተከስቷል {filename}: {str(e)}")
 
 if __name__ == "__main__":
-    push_to_wordpress()
+    push_and_cleanup()
