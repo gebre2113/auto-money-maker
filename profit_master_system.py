@@ -5311,7 +5311,7 @@ class MegaContentEngine:
             self.logger.info(f"⚙️  Producing {name} for {country} (Phase {phase_num}/7)...")
             
             # የሂሳብ ኮንቴክስት (የቀደመውን ይዘት ማስተላለፍ)
-            context = str(full_content_html)[-4000:] if full_content_html else ""
+            context = str(full_content_html)[-2000:] if full_content_html else ""
             
             # የኢኮኖሚ መረጃ ማስገባት
             eco_data = self.economic_indicators.get(country, self.economic_indicators['US'])
