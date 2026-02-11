@@ -4238,10 +4238,7 @@ def produce_single_country_sovereign_logic(self, country: str, topic: str,
             'status': 'success',
             'content': content,
             'metrics': {
-# =========================================================================
-# 📝 ወደ MegaContentEngine ክፍል ውስጥ ጨምር
-# =========================================================================
-
+                
 def produce_single_country_sovereign_logic(self, country: str, topic: str, 
                                            additional_context: dict = None) -> dict:
     """
