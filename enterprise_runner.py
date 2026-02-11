@@ -1200,235 +1200,227 @@ class UnstoppableAIProvider:
 # =================== ELITE SMART IMAGE ENGINE (PRODUCTION FIXED) ===================
 
 class SmartImageEngine:
-    """
-    🏆 ELITE SMART IMAGE ENGINE v3.1 - PRODUCTION FIXED
-    የ10 ከፍተኛ አገራት ለምርት ዝግጁ ሲስተም
-    """
-    
-    def __init__(self, seed: str = None):
+    def __init__(self, seed: Optional[str] = None):
         """መጀመሪያ ማድረግ - ስህተት እንዳይፈጠር"""
         self.seed = seed or "elite-image-engine-v3"
-        self.logger = logging.getLogger(__name__ + ".EliteSmartImageEngine")
+        self._setup_logger()
         self._initialize_country_intelligence()
-        
-        self.logger.info(f"✅ EliteSmartImageEngine initialized with seed: {self.seed}")
-        
+        self.logger.info(f"✅ EliteSmartImageEngine v3.2 initialized with seed: {self.seed}")
+
+    def _setup_logger(self):
+        """አስተማማኝ ሎጊንግ - ሁልጊዜ ይሰራል"""
+        self.logger = logging.getLogger(__name__ + ".EliteSmartImageEngine")
+        if not self.logger.handlers:
+            handler = logging.StreamHandler()
+            formatter = logging.Formatter(
+                '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+            )
+            handler.setFormatter(formatter)
+            self.logger.addHandler(handler)
+            self.logger.setLevel(logging.INFO)
+
     def _initialize_country_intelligence(self):
-        """የአገሮችን የምስል መረጃ መጫን"""
+        """የአገሮችን የምስል መረጃ መጫን (ሙሉ ትክክለኛ)"""
         self.country_data = {
-            'US': {
-                'name': 'United States',
-                'visual_preference': 'data_driven',
+            'US': { 'name': 'United States', 'visual_preference': 'data_driven',
                 'image_style': 'professional dashboards, charts, infographics',
-                'primary_color': '#1e40af',
-                'seo_focus': 'Google Images, rich snippets',
-                'content_density': 'high'
-            },
-            'GB': {
-                'name': 'United Kingdom',
-                'visual_preference': 'editorial_excellence',
+                'primary_color': '#1e40af', 'seo_focus': 'Google Images, rich snippets',
+                'content_density': 'high' },
+            'GB': { 'name': 'United Kingdom', 'visual_preference': 'editorial_excellence',
                 'image_style': 'clean infographics, editorial visuals',
-                'primary_color': '#7c3aed',
-                'seo_focus': 'Google Images, professional platforms',
-                'content_density': 'medium-high'
-            },
-            'CA': {
-                'name': 'Canada',
-                'visual_preference': 'balanced_clarity',
+                'primary_color': '#7c3aed', 'seo_focus': 'Google Images, professional platforms',
+                'content_density': 'medium-high' },
+            'CA': { 'name': 'Canada', 'visual_preference': 'balanced_clarity',
                 'image_style': 'clear infographics, bilingual elements',
-                'primary_color': '#dc2626',
-                'seo_focus': 'Google Images, local directories',
-                'content_density': 'medium'
-            },
-            'AU': {
-                'name': 'Australia',
-                'visual_preference': 'direct_practical',
+                'primary_color': '#dc2626', 'seo_focus': 'Google Images, local directories',
+                'content_density': 'medium' },
+            'AU': { 'name': 'Australia', 'visual_preference': 'direct_practical',
                 'image_style': 'straightforward charts, practical illustrations',
-                'primary_color': '#059669',
-                'seo_focus': 'Google Images, business platforms',
-                'content_density': 'medium'
-            },
-            'DE': {
-                'name': 'Germany',
-                'visual_preference': 'precision_engineering',
+                'primary_color': '#059669', 'seo_focus': 'Google Images, business platforms',
+                'content_density': 'medium' },
+            'DE': { 'name': 'Germany', 'visual_preference': 'precision_engineering',
                 'image_style': 'technical diagrams, precision charts',
-                'primary_color': '#065f46',
-                'seo_focus': 'Google Images, technical platforms',
-                'content_density': 'high'
-            },
-            'FR': {
-                'name': 'France',
-                'visual_preference': 'aesthetic_design',
+                'primary_color': '#065f46', 'seo_focus': 'Google Images, technical platforms',
+                'content_density': 'high' },
+            'FR': { 'name': 'France', 'visual_preference': 'aesthetic_design',
                 'image_style': 'elegant infographics, artistic visuals',
-                'primary_color': '#be123c',
-                'seo_focus': 'Google Images, design platforms',
-                'content_density': 'medium'
-            },
-            'JP': {
-                'name': 'Japan',
-                'visual_preference': 'minimalist_perfection',
+                'primary_color': '#be123c', 'seo_focus': 'Google Images, design platforms',
+                'content_density': 'medium' },
+            'JP': { 'name': 'Japan', 'visual_preference': 'minimalist_perfection',
                 'image_style': 'clean diagrams, minimalist UI',
-                'primary_color': '#111827',
-                'seo_focus': 'Google Images, technical platforms',
-                'content_density': 'medium-high'
-            },
-            'CH': {
-                'name': 'Switzerland',
-                'visual_preference': 'precision_quality',
+                'primary_color': '#111827', 'seo_focus': 'Google Images, technical platforms',
+                'content_density': 'medium-high' },
+            'CH': { 'name': 'Switzerland', 'visual_preference': 'precision_quality',
                 'image_style': 'high-quality infographics, precision charts',
-                'primary_color': '#7c2d12',
-                'seo_focus': 'Google Images, premium platforms',
-                'content_density': 'high'
-            },
-            'NO': {
-                'name': 'Norway',
-                'visual_preference': 'sustainable_clarity',
+                'primary_color': '#7c2d12', 'seo_focus': 'Google Images, premium platforms',
+                'content_density': 'high' },
+            'NO': { 'name': 'Norway', 'visual_preference': 'sustainable_clarity',
                 'image_style': 'clean environmental graphics, sustainability charts',
-                'primary_color': '#0369a1',
-                'seo_focus': 'Google Images, environmental platforms',
-                'content_density': 'medium'
-            },
-            'SE': {
-                'name': 'Sweden',
-                'visual_preference': 'innovative_simple',
+                'primary_color': '#0369a1', 'seo_focus': 'Google Images, environmental platforms',
+                'content_density': 'medium' },
+            'SE': { 'name': 'Sweden', 'visual_preference': 'innovative_simple',
                 'image_style': 'innovative diagrams, simple infographics',
-                'primary_color': '#0f766e',
-                'seo_focus': 'Google Images, innovation platforms',
-                'content_density': 'medium-high'
-            },
-            'ET': {
-                'name': 'Ethiopia',
-                'visual_preference': 'community_focused',
+                'primary_color': '#0f766e', 'seo_focus': 'Google Images, innovation platforms',
+                'content_density': 'medium-high' },
+            'ET': { 'name': 'Ethiopia', 'visual_preference': 'community_focused',
                 'image_style': 'community diagrams, local business visuals',
-                'primary_color': '#dc2626',
-                'seo_focus': 'Google Images, local platforms',
-                'content_density': 'medium'
-            },
-            'default': {
-                'name': 'Default',
-                'visual_preference': 'professional',
+                'primary_color': '#dc2626', 'seo_focus': 'Google Images, local platforms',
+                'content_density': 'medium' },
+            'default': { 'name': 'Default', 'visual_preference': 'professional',
                 'image_style': 'infographics, charts, diagrams',
-                'primary_color': '#3b82f6',
-                'seo_focus': 'Google Images',
-                'content_density': 'medium'
-            }
+                'primary_color': '#3b82f6', 'seo_focus': 'Google Images',
+                'content_density': 'medium' }
         }
-    
-    def get_country_info(self, country_code: str) -> Dict:
-        """የአገር መረጃ ማግኘት ከሌለ default"""
-        return self.country_data.get(country_code, self.country_data['default'])
-    
+
+    # ---------- ዋና ዘዴዎች ----------
     def generate_image_placeholders(self, content: str, country: str, topic: str) -> str:
         """
         ዋናው ዘዴ - ይዘቱን ተቀብሎ ምስሎችን ያከል
+        አሁን ሁልጊዜ ምስሎችን ያስገባል (በማዕረግ ካልተገኘ በቀጥታ በአንቀጾች)
         """
         try:
             if not content:
                 self.logger.warning("⚠️ Empty content provided, returning as-is")
                 return content or ""
-            
+
             if not isinstance(content, str):
                 self.logger.warning(f"⚠️ Non-string content type: {type(content)}")
                 return str(content) if content else ""
-            
+
             country_info = self.get_country_info(country)
             self.logger.debug(f"Processing images for {country} ({country_info['name']})")
-            
+
             word_count = len(content.split())
             max_images = self._calculate_max_images(word_count, country_info['content_density'])
-            
+            self.logger.info(f"📊 {word_count} words → max {max_images} images for {country}")
+
             sections = self._extract_sections(content)
-            if len(sections) <= 1:
-                self.logger.debug("No sections found for images")
-                return content
-            
+
+            # --- አዲስ: ክፍሎች ከሌሉ በቀጥታ በአንቀጾች ምስሎችን አስገባ ---
+            if len(sections) <= 1 and word_count >= 300:
+                self.logger.info("📌 No markdown headings found – using paragraph‑based injection")
+                return self._fallback_inject_images(content, country, topic, country_info, max_images)
+
             enhanced_sections = self._inject_images_into_sections(
                 sections, country, topic, country_info, max_images
             )
-            
             result = "\n\n".join(enhanced_sections)
-            
+
             images_added = self.count_injected_images(result)
             self.logger.info(f"✅ Added {images_added} images for {country} ({word_count} words)")
-            
+
+            # --- ምንም ምስል ካልተጨመረ ተመሳሳይ መፍትሄ ---
+            if images_added == 0 and word_count >= 300:
+                self.logger.warning("⚠️ No images were injected – forcing fallback injection")
+                return self._fallback_inject_images(content, country, topic, country_info, max_images)
+
             return result
-            
+
         except Exception as e:
-            self.logger.error(f"❌ Image generation failed: {str(e)[:100]}")
+            self.logger.error(f"❌ Image generation failed: {str(e)[:200]}")
             self.logger.debug(f"Full error: {traceback.format_exc()}")
             return content
-    
-    def _calculate_max_images(self, word_count: int, density: str) -> int:
-        """የምስል ከፍተኛ ብዛት ስሌት"""
-        density_factors = {
-            'high': 500,
-            'medium-high': 550,
-            'medium': 600,
-            'low': 700
-        }
-        
-        factor = density_factors.get(density, 600)
-        base_images = max(1, word_count // factor)
-        
-        max_allowed = min(6, base_images)
-        min_required = 2 if word_count >= 1000 else 1
-        
-        return max(min_required, max_allowed)
-    
-    def _extract_sections(self, content: str) -> List[Tuple[str, str]]:
-        """የይዘቱን ወደ ክፍሎች መከፋፈል"""
-        if not content:
-            return [("", "")]
-        
-        sections = []
-        current_title = ""
-        current_body = ""
-        
-        lines = content.split('\n')
-        for line in lines:
-            if line.startswith('## '):
-                if current_title or current_body:
-                    sections.append((current_title, current_body.strip()))
-                current_title = line[3:].strip()
-                current_body = ""
-            else:
-                current_body += line + "\n"
-        
-        if current_title or current_body:
-            sections.append((current_title, current_body.strip()))
-        
-        return sections
-    
-    def _inject_images_into_sections(self, sections: List[Tuple[str, str]], 
-                                   country: str, topic: str,
-                                   country_info: Dict, max_images: int) -> List[str]:
-        """ምስሎችን ወደ ክፍሎች መጨመር"""
-        
+
+    def _fallback_inject_images(self, content: str, country: str, topic: str,
+                                country_info: Dict, max_images: int) -> str:
+        """ክፍሎች በሌሉበት ጊዜ በአንቀጾች መሀል ምስሎችን አስገባ"""
+        paragraphs = [p.strip() for p in content.split('\n\n') if p.strip()]
+        if len(paragraphs) < 2:
+            return content
+
         enhanced = []
         image_count = 0
-        
-        if sections and sections[0][0] == "":
+        inserted = 0
+
+        for para in paragraphs:
+            enhanced.append(para)
+            # ምስል አስገባ ከእያንዳንዱ 2-3 አንቀጾች በኋላ
+            if (inserted % 2 == 1 and image_count < max_images and
+                len(para.split()) > 50):
+                try:
+                    img = self._create_image_block(
+                        title=f"{topic} – {country_info['name']}",
+                        body=para[:200],
+                        country=country,
+                        country_info=country_info,
+                        topic=topic,
+                        image_number=image_count + 1
+                    )
+                    enhanced.append(img)
+                    image_count += 1
+                except Exception as e:
+                    self.logger.warning(f"Fallback image {image_count+1} failed: {e}")
+            inserted += 1
+
+        return '\n\n'.join(enhanced)
+
+    def _calculate_max_images(self, word_count: int, density: str) -> int:
+        """የምስል ከፍተኛ ብዛት ስሌት (ከ6 አይበልጥም)"""
+        density_factors = {'high': 500, 'medium-high': 550, 'medium': 600, 'low': 700}
+        factor = density_factors.get(density, 600)
+        base = max(1, word_count // factor)
+        min_required = 2 if word_count >= 1000 else 1
+        images = max(min_required, base)
+        return min(images, 6)   # ጠንካራ ካፕ
+
+    def _extract_sections(self, content: str) -> List[Tuple[str, str]]:
+        """የይዘቱን ወደ ክፍሎች መከፋፈል (## ብቻ ሳይሆን # እና ### ደግሞ ይደግፋል)"""
+        if not content:
+            return [("", "")]
+
+        sections = []
+        current_title = ""
+        current_body = []
+        lines = content.split('\n')
+
+        # ሁሉንም የማርክዳውን ማዕረጎች ይደግፋል (#, ##, ###)
+        heading_pattern = re.compile(r'^(#{1,3})\s+(.*)')
+
+        for line in lines:
+            match = heading_pattern.match(line)
+            if match:
+                if current_title or current_body:
+                    sections.append((current_title, '\n'.join(current_body).strip()))
+                current_title = match.group(2).strip()
+                current_body = []
+            else:
+                current_body.append(line)
+
+        if current_title or current_body:
+            sections.append((current_title, '\n'.join(current_body).strip()))
+
+        return sections
+
+    def _inject_images_into_sections(self, sections: List[Tuple[str, str]],
+                                   country: str, topic: str,
+                                   country_info: Dict, max_images: int) -> List[str]:
+        """ምስሎችን ወደ ክፍሎች መጨመር (የተሻሻለ ሎጂክ)"""
+        enhanced = []
+        image_count = 0
+
+        # መጀመሪያ ክፍል ማዕረግ ከሌለው እንደተለመደው አስቀምጥ
+        if sections and not sections[0][0]:
             enhanced.append(sections[0][1])
             start_idx = 1
         else:
             start_idx = 0
-        
+
         for i in range(start_idx, len(sections)):
             title, body = sections[i]
-            
             if not title:
                 enhanced.append(body)
                 continue
-            
+
+            # ምስል መጨመር ያለበት ከሆነ
             should_add = (
                 image_count < max_images and
-                len(body.split()) >= 100 and
+                len(body.split()) >= 80 and      # ከ80 ቃላት በላይ ከሆነ ሁልጊዜ ማለት ይቻላል
                 self._is_important_section(title, country)
             )
-            
+
             if should_add:
                 try:
-                    image_block = self._create_image_block(
+                    img = self._create_image_block(
                         title=title,
                         body=body,
                         country=country,
@@ -1436,103 +1428,102 @@ class SmartImageEngine:
                         topic=topic,
                         image_number=image_count + 1
                     )
-                    
-                    enhanced_section = f"## {title}\n\n{image_block}\n\n{body}"
+                    enhanced_section = f"## {title}\n\n{img}\n\n{body}"
                     enhanced.append(enhanced_section)
                     image_count += 1
-                    
                 except Exception as e:
-                    self.logger.warning(f"⚠️ Failed to create image for '{title}': {e}")
+                    self.logger.warning(f"⚠️ Image injection failed for '{title}': {e}")
                     enhanced.append(f"## {title}\n{body}")
             else:
                 enhanced.append(f"## {title}\n{body}")
-        
+
         return enhanced
-    
+
     def _is_important_section(self, title: str, country: str) -> bool:
-        """ይህ ክፍል ምስል መጨመር የሚገባ ነው ወይስ?"""
-        
+        """ይህ ክፍል ምስል መጨመር የሚገባ ነው ወይስ? (ትክክለኛ ቃላት ብቻ)"""
         title_lower = title.lower()
-        
+
         important_keywords = [
-            'how to', 'guide', 'tutorial', 'steps',
+            'how to', 'guide', 'tutorial', 'steps?',
             'case study', 'example', 'implementation',
-            'comparison', 'vs ', 'versus',
+            'comparison', r'\bvs\b', r'\bversus\b',
             'benefits', 'advantages', 'why',
             'architecture', 'system', 'framework',
             'data', 'statistics', 'results'
         ]
-        
+
         country_specific = {
             'DE': ['technical', 'engineering', 'precision', 'specification'],
             'JP': ['method', 'process', 'quality', 'standard'],
             'US': ['data', 'analysis', 'results', 'roi'],
             'ET': ['practical', 'local', 'community', 'አገራዊ']
         }
-        
-        extra_keywords = country_specific.get(country, [])
-        all_keywords = important_keywords + extra_keywords
-        
-        return any(keyword in title_lower for keyword in all_keywords)
-    
+
+        all_keywords = important_keywords + country_specific.get(country, [])
+        pattern = r'\b(?:' + '|'.join(all_keywords) + r')\b'
+        return bool(re.search(pattern, title_lower, re.IGNORECASE))
+
+    # ---------- የምስል ግንባታ (ሙሉ ደህንነት ታክሏል) ----------
     def _create_image_block(self, title: str, body: str, country: str,
                           country_info: Dict, topic: str, image_number: int) -> str:
-        """የምስል ቦታ HTML ፍጠር"""
-        
+        """የምስል ቦታ HTML ፍጠር – ሁሉም ውጫዊ ጽሁፍ ተሸሽጓል"""
         image_type = self._determine_image_type(title, body, country)
-        
         alt_text = self._generate_alt_text(title, topic, country, image_type, image_number)
-        
         image_url = self._generate_image_url(title, image_type, country_info['primary_color'], image_number)
-        
         design = self._get_country_design(country, country_info['primary_color'])
-        
-        html = f"""
+
+        # ደህንነት: ሁሉም ተለዋዋጭ ጽሁፎች ተሸሽገዋል
+        safe_title = html.escape(title)
+        safe_alt = html.escape(alt_text)
+        safe_topic = html.escape(topic)
+        safe_country_name = html.escape(country_info['name'])
+        safe_caption_prefix = html.escape(design['caption_prefix'])
+        safe_badge = html.escape(design['quality_badge'])
+        safe_subtitle = html.escape(design['subtitle'])
+
+        html_block = f"""
 <div style="{design['container_style']}">
     <div style="{design['header_style']}">
         <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 15px;">
             <span style="{design['badge_style']}">{image_number}</span>
-            <h3 style="{design['title_style']}">{title}</h3>
+            <h3 style="{design['title_style']}">{safe_title}</h3>
         </div>
         <p style="{design['subtitle_style']}">
-            {design['subtitle']}
+            {safe_subtitle}
         </p>
     </div>
-    
-    <img src="{image_url}" 
-         alt="{alt_text}"
-         title="{title}"
+
+    <img src="{image_url}"
+         alt="{safe_alt}"
+         title="{safe_title}"
          loading="lazy"
          decoding="async"
-         style="width: 100%; max-width: 1200px; height: auto; 
+         style="width: 100%; max-width: 1200px; height: auto;
                 border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.15);
                 display: block; margin: 20px auto;">
-    
+
     <div style="{design['footer_style']}">
         <div style="display: flex; justify-content: space-between; align-items: center;">
             <div>
                 <strong style="{design['caption_style']}">
-                    {design['caption_prefix']} {image_number}: {title}
+                    {safe_caption_prefix} {image_number}: {safe_title}
                 </strong>
                 <p style="{design['alt_style']}">
-                    {alt_text}
+                    {safe_alt}
                 </p>
             </div>
             <span style="{design['quality_badge_style']}">
-                {design['quality_badge']}
+                {safe_badge}
             </span>
         </div>
     </div>
 </div>
 """.strip()
-        
-        return html
-    
+        return html_block
+
     def _determine_image_type(self, title: str, body: str, country: str) -> str:
-        """የምስል አይነት መወሰን"""
-        
+        """የምስል አይነት መወሰን (ተመሳሳይ)"""
         title_lower = title.lower()
-        
         if 'how to' in title_lower or 'guide' in title_lower:
             return 'Step-by-Step Diagram'
         elif 'comparison' in title_lower or 'vs ' in title_lower:
@@ -1545,7 +1536,6 @@ class SmartImageEngine:
             return 'Data Visualization'
         elif 'benefits' in title_lower or 'advantages' in title_lower:
             return 'Benefits Infographic'
-        
         country_types = {
             'US': 'Data Dashboard',
             'DE': 'Technical Diagram',
@@ -1554,112 +1544,97 @@ class SmartImageEngine:
             'FR': 'Design Infographic',
             'ET': 'Community Diagram'
         }
-        
         return country_types.get(country, 'Professional Infographic')
-    
+
     def _generate_alt_text(self, title: str, topic: str, country: str,
                          image_type: str, image_number: int) -> str:
-        """የAlt Text ፍጠር"""
-        
+        """የAlt Text ፍጠር (አሁን ሁልጊዜ ≤125 ቁምፊ)"""
         country_name = self.get_country_info(country)['name']
-        
         if country == 'ET':
-            alt = f"ምስል {image_number}: {image_type} የሚያሳይ '{title}' ለ{topic} መመሪያ። "
-            alt += f"በኢትዮጵያዊ ንግድ አውድ የተመቻቸ የምስል መግለጫ።"
+            alt = f"ምስል {image_number}: {image_type} የሚያሳይ '{title}' ለ{topic} መመሪያ። በኢትዮጵያዊ ንግድ አውድ የተመቻቸ።"
         else:
-            alt = f"Image {image_number}: {image_type} illustrating '{title}' for {topic} guide. "
-            alt += f"Professional visualization optimized for {country_name} audience."
-        
+            alt = f"Image {image_number}: {image_type} illustrating '{title}' for {topic} guide. Optimized for {country_name} audience."
         return alt[:125]
-    
+
     def _generate_image_url(self, title: str, image_type: str, color: str, image_number: int) -> str:
-        """Placeholder የምስል URL ፍጠር"""
-        color_code = color.replace('#', '')
-        safe_title = title.replace(' ', '+')[:30]
-        safe_type = image_type.replace(' ', '+')
-        
+        """Placeholder የምስል URL ፍጠር – አሁን HTTPS እና ትክክለኛ ኢንኮዲንግ"""
+        color_code = color.lstrip('#')
+        safe_title = quote(title[:30])
+        safe_type = quote(image_type)
         return f"https://via.placeholder.com/1200x630/{color_code}/ffffff?text={safe_type}+{image_number}:+{safe_title}"
-    
+
     def _get_country_design(self, country: str, primary_color: str) -> Dict:
-        """በአገር የተለየ የዲዛይን ስታይል"""
-        
+        """በአገር የተለየ የዲዛይን ስታይል (ሙሉ)"""
         designs = {
-            'US': {
-                'container_style': 'margin: 40px 0; padding: 25px; background: #f8fafc; border-radius: 12px; border-left: 5px solid #1e40af;',
-                'header_style': 'margin-bottom: 20px; padding-bottom: 15px; border-bottom: 2px solid #dbeafe;',
-                'badge_style': f'background: {primary_color}; color: white; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 14px;',
-                'title_style': 'color: #1e293b; font-size: 1.3em; margin: 0;',
-                'subtitle_style': 'color: #475569; font-size: 0.95em; margin: 10px 0 0 0; font-style: italic;',
+            'US': { 'container_style': 'margin:40px 0;padding:25px;background:#f8fafc;border-radius:12px;border-left:5px solid #1e40af;',
+                'header_style': 'margin-bottom:20px;padding-bottom:15px;border-bottom:2px solid #dbeafe;',
+                'badge_style': f'background:{primary_color};color:white;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:14px;',
+                'title_style': 'color:#1e293b;font-size:1.3em;margin:0;',
+                'subtitle_style': 'color:#475569;font-size:0.95em;margin:10px 0 0 0;font-style:italic;',
                 'subtitle': 'Data-driven visualization for enterprise decision making',
-                'footer_style': 'margin-top: 20px; padding-top: 15px; border-top: 2px solid #dbeafe;',
-                'caption_style': 'color: #1e40af; font-size: 1em;',
+                'footer_style': 'margin-top:20px;padding-top:15px;border-top:2px solid #dbeafe;',
+                'caption_style': 'color:#1e40af;font-size:1em;',
                 'caption_prefix': 'Figure',
-                'alt_style': 'color: #64748b; font-size: 0.9em; margin: 5px 0 0 0;',
-                'quality_badge_style': f'background: {primary_color}; color: white; padding: 4px 12px; border-radius: 20px; font-size: 0.85em; font-weight: bold;',
-                'quality_badge': '🏢 Enterprise'
-            },
-            'DE': {
-                'container_style': 'margin: 40px 0; padding: 25px; background: #f0fdf4; border-radius: 12px; border: 2px solid #065f46;',
-                'header_style': 'margin-bottom: 20px; padding-bottom: 15px; border-bottom: 2px solid #a7f3d0;',
-                'badge_style': f'background: {primary_color}; color: white; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 14px;',
-                'title_style': 'color: #064e3b; font-size: 1.3em; margin: 0;',
-                'subtitle_style': 'color: #065f46; font-size: 0.95em; margin: 10px 0 0 0; font-style: italic;',
+                'alt_style': 'color:#64748b;font-size:0.9em;margin:5px 0 0 0;',
+                'quality_badge_style': f'background:{primary_color};color:white;padding:4px 12px;border-radius:20px;font-size:0.85em;font-weight:bold;',
+                'quality_badge': '🏢 Enterprise' },
+            'DE': { 'container_style': 'margin:40px 0;padding:25px;background:#f0fdf4;border-radius:12px;border:2px solid #065f46;',
+                'header_style': 'margin-bottom:20px;padding-bottom:15px;border-bottom:2px solid #a7f3d0;',
+                'badge_style': f'background:{primary_color};color:white;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:14px;',
+                'title_style': 'color:#064e3b;font-size:1.3em;margin:0;',
+                'subtitle_style': 'color:#065f46;font-size:0.95em;margin:10px 0 0 0;font-style:italic;',
                 'subtitle': 'Precision engineering diagram with technical accuracy',
-                'footer_style': 'margin-top: 20px; padding-top: 15px; border-top: 2px solid #a7f3d0;',
-                'caption_style': 'color: #065f46; font-size: 1em;',
+                'footer_style': 'margin-top:20px;padding-top:15px;border-top:2px solid #a7f3d0;',
+                'caption_style': 'color:#065f46;font-size:1em;',
                 'caption_prefix': 'Abbildung',
-                'alt_style': 'color: #047857; font-size: 0.9em; margin: 5px 0 0 0;',
-                'quality_badge_style': f'background: {primary_color}; color: white; padding: 4px 12px; border-radius: 20px; font-size: 0.85em; font-weight: bold;',
-                'quality_badge': '⚙️ German Precision'
-            },
-            'ET': {
-                'container_style': 'margin: 40px 0; padding: 25px; background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%); border-radius: 12px; border-left: 5px solid #dc2626;',
-                'header_style': 'margin-bottom: 20px; padding-bottom: 15px; border-bottom: 2px solid #fecaca;',
-                'badge_style': f'background: {primary_color}; color: white; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 14px;',
-                'title_style': 'color: #7f1d1d; font-size: 1.3em; margin: 0;',
-                'subtitle_style': 'color: #991b1b; font-size: 0.95em; margin: 10px 0 0 0; font-style: italic;',
+                'alt_style': 'color:#047857;font-size:0.9em;margin:5px 0 0 0;',
+                'quality_badge_style': f'background:{primary_color};color:white;padding:4px 12px;border-radius:20px;font-size:0.85em;font-weight:bold;',
+                'quality_badge': '⚙️ German Precision' },
+            'ET': { 'container_style': 'margin:40px 0;padding:25px;background:linear-gradient(135deg,#fef2f2 0%,#fee2e2 100%);border-radius:12px;border-left:5px solid #dc2626;',
+                'header_style': 'margin-bottom:20px;padding-bottom:15px;border-bottom:2px solid #fecaca;',
+                'badge_style': f'background:{primary_color};color:white;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:14px;',
+                'title_style': 'color:#7f1d1d;font-size:1.3em;margin:0;',
+                'subtitle_style': 'color:#991b1b;font-size:0.95em;margin:10px 0 0 0;font-style:italic;',
                 'subtitle': 'የሙያ ደረጃ ምስል ለኢትዮጵያዊ ንግድ አውድ',
-                'footer_style': 'margin-top: 20px; padding-top: 15px; border-top: 2px solid #fecaca;',
-                'caption_style': 'color: #dc2626; font-size: 1em;',
+                'footer_style': 'margin-top:20px;padding-top:15px;border-top:2px solid #fecaca;',
+                'caption_style': 'color:#dc2626;font-size:1em;',
                 'caption_prefix': 'ምስል',
-                'alt_style': 'color: #b91c1c; font-size: 0.9em; margin: 5px 0 0 0;',
-                'quality_badge_style': f'background: {primary_color}; color: white; padding: 4px 12px; border-radius: 20px; font-size: 0.85em; font-weight: bold;',
-                'quality_badge': '🇪🇹 ኢትዮጵያዊ'
-            },
-            'default': {
-                'container_style': f'margin: 40px 0; padding: 25px; background: #f8fafc; border-radius: 12px; border-left: 5px solid {primary_color};',
-                'header_style': 'margin-bottom: 20px; padding-bottom: 15px; border-bottom: 2px solid #e2e8f0;',
-                'badge_style': f'background: {primary_color}; color: white; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 14px;',
-                'title_style': 'color: #1e293b; font-size: 1.3em; margin: 0;',
-                'subtitle_style': 'color: #475569; font-size: 0.95em; margin: 10px 0 0 0; font-style: italic;',
+                'alt_style': 'color:#b91c1c;font-size:0.9em;margin:5px 0 0 0;',
+                'quality_badge_style': f'background:{primary_color};color:white;padding:4px 12px;border-radius:20px;font-size:0.85em;font-weight:bold;',
+                'quality_badge': '🇪🇹 ኢትዮጵያዊ' },
+            'default': { 'container_style': f'margin:40px 0;padding:25px;background:#f8fafc;border-radius:12px;border-left:5px solid {primary_color};',
+                'header_style': 'margin-bottom:20px;padding-bottom:15px;border-bottom:2px solid #e2e8f0;',
+                'badge_style': f'background:{primary_color};color:white;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:14px;',
+                'title_style': 'color:#1e293b;font-size:1.3em;margin:0;',
+                'subtitle_style': 'color:#475569;font-size:0.95em;margin:10px 0 0 0;font-style:italic;',
                 'subtitle': 'Professional visualization with SEO-optimized alt text',
-                'footer_style': 'margin-top: 20px; padding-top: 15px; border-top: 2px solid #e2e8f0;',
-                'caption_style': f'color: {primary_color}; font-size: 1em;',
+                'footer_style': 'margin-top:20px;padding-top:15px;border-top:2px solid #e2e8f0;',
+                'caption_style': f'color:{primary_color};font-size:1em;',
                 'caption_prefix': 'Figure',
-                'alt_style': 'color: #64748b; font-size: 0.9em; margin: 5px 0 0 0;',
-                'quality_badge_style': f'background: {primary_color}; color: white; padding: 4px 12px; border-radius: 20px; font-size: 0.85em; font-weight: bold;',
-                'quality_badge': '⭐ Premium'
-            }
+                'alt_style': 'color:#64748b;font-size:0.9em;margin:5px 0 0 0;',
+                'quality_badge_style': f'background:{primary_color};color:white;padding:4px 12px;border-radius:20px;font-size:0.85em;font-weight:bold;',
+                'quality_badge': '⭐ Premium' }
         }
-        
         return designs.get(country, designs['default'])
-    
+
+    # ---------- ረዳት ዘዴዎች እና ሪፖርት ----------
+    def get_country_info(self, country_code: str) -> Dict:
+        """የአገር መረጃ ማግኘት ከሌለ default"""
+        return self.country_data.get(country_code, self.country_data['default'])
+
+    @staticmethod
+    def count_injected_images(html_output: str) -> int:
+        """የተጨመሩትን ምስሎች መቁጠር"""
+        if not html_output:
+            return 0
+        return len(re.findall(r'<img\s', html_output, flags=re.IGNORECASE))
+
     def get_seo_impact(self, image_count: int, country: str = "US") -> Dict:
-        """የ SEO ተጽዕኖ ሪፖርት"""
-        
+        """የ SEO ተጽዕኖ ሪፖርት (ተመሳሳይ)"""
         base_score = min(100, 70 + (image_count * 6))
-        
-        country_boost = {
-            'US': 1.2,
-            'GB': 1.1,
-            'DE': 1.0,
-            'JP': 0.9,
-            'ET': 0.8
-        }
-        
+        country_boost = {'US': 1.2, 'GB': 1.1, 'DE': 1.0, 'JP': 0.9, 'ET': 0.8}
         multiplier = country_boost.get(country, 1.0)
         final_score = min(100, int(base_score * multiplier))
-        
         if image_count >= 4:
             quality = "🏆 Elite"
             recommendation = "✅ Excellent image coverage for SEO"
@@ -1669,7 +1644,6 @@ class SmartImageEngine:
         else:
             quality = "⚠️ Basic"
             recommendation = "⚠️ Add more images for better SEO"
-        
         return {
             'seo_score': final_score,
             'seo_level': quality,
@@ -1679,29 +1653,17 @@ class SmartImageEngine:
             'estimated_traffic_boost': f"{min(45, image_count * 7)}% potential increase",
             'accessibility_score': min(100, 75 + (image_count * 5))
         }
-    
-    @staticmethod
-    def count_injected_images(html_output: str) -> int:
-        """የተጨመሩትን ምስሎች መቁጠር"""
-        if not html_output:
-            return 0
-        import re
-        return len(re.findall(r'<img\s', html_output, flags=re.IGNORECASE))
-    
+
     def generate_detailed_report(self, content: str, country: str, topic: str) -> Dict:
         """ሙሉ የምስል ሪፖርት ፍጠር"""
-        
         enhanced = self.generate_image_placeholders(content, country, topic)
-        
         word_count = len(content.split())
         image_count = self.count_injected_images(enhanced)
         sections = len(self._extract_sections(content))
-        
         seo = self.get_seo_impact(image_count, country)
-        
         return {
             'status': 'success',
-            'engine_version': '3.1',
+            'engine_version': '3.2',
             'country': country,
             'topic': topic,
             'word_count': word_count,
@@ -1712,13 +1674,13 @@ class SmartImageEngine:
             'seo_analysis': seo,
             'engine_initialized': True,
             'error': None,
-            'content_preview': enhanced[:300] + "..." if len(enhanced) > 300 else enhanced
+            'content_preview': (enhanced[:300] + '...') if len(enhanced) > 300 else enhanced
         }
-    
+
     def enhance_with_images(self, content: str, country: str) -> str:
         """የ SmartImageEngine ለሌሎች ክፍሎች ድጋፍ"""
         return self.generate_image_placeholders(content, country, "enterprise_content")
-
+        
 # =================== DYNAMIC CTA A/B TESTING SYSTEM ===================
 
 class DynamicCTAEngine:
