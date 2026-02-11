@@ -4776,28 +4776,34 @@ class MegaContentEngine:
 
     async def _call_ai_with_round_robin(self, prompt, max_tokens=4000, phase_idx=0):
         """
-        15 ቁልፎችን በ Round-Robin ዘዴ በመጠቀም ጥሪውን ያከናውናል:
-        አንድ ቁልፍ ቢከሽፍ ወይም ሪሚት ቢመታ በራስ ሰር ወደ ቀጣዩ ይዘልላል:
+        15 ቁልፎችን በ Round-Robin ዘዴ በመጠቀም ጥሪውን ያከናውናል::
+        400 (ረጅም አውድ) እና 429 (ሪሚት) ስህተቶችን በራስ ሰር ይፈታል::
         """
         total_providers = len(self.ai_providers)
         
+        # 🛡️ መከላከያ፡ ፕሮምፕቱ (አውዱ) ከጥቅም በላይ ረጅም ከሆነ ማሳጠር (Error 400 መከላከያ)
+        # የሞዴሉ ሊሚት እንዳያልቅ የመጨረሻውን 8000 ካራክተር ብቻ እንውሰድ
+        if len(prompt) > 10000:
+            self.logger.info("✂️  Prompt too long, trimming context to prevent Error 400...")
+            prompt = prompt[:3000] + "\n... [TRUNCATED] ...\n" + prompt[-6000:]
+
         for attempt in range(total_providers):
-            # የትኛው ቁልፍ ላይ እንዳለን ለማወቅ (ዙር)
+            # የትኛው ቁልፍ ላይ እንዳለን ማስላት
             provider_idx = (phase_idx + attempt) % total_providers
             provider = self.ai_providers[provider_idx]
             
             try:
                 self.logger.info(f"🔄 Round-Robin Attempt {attempt+1}/{total_providers}: Using Key {provider_idx+1}")
                 
-                # አቅራቢው (provider) ቀጥታ ኦብጀክት ከሆነ (ለምሳሌ UnstoppableAIProvider)
+                # 1. አቅራቢው (provider) ኦብጀክት ከሆነ
                 if hasattr(provider, 'generate_content'):
                     result = await provider.generate_content(prompt, max_tokens=max_tokens)
-                    if result and not result.startswith("Error"):
+                    if result and not str(result).startswith("Error"):
                         return str(result)
                 
-                # አቅራቢው (provider) የቁልፍ ጽሁፍ (String) ብቻ ከሆነ በቀጥታ በ httpx ይጠራዋል
+                # 2. አቅራቢው (provider) የቁልፍ ጽሁፍ (String) ከሆነ
                 elif isinstance(provider, str):
-                    async with httpx.AsyncClient(timeout=160.0) as client:
+                    async with httpx.AsyncClient(timeout=180.0) as client:
                         resp = await client.post(
                             "https://api.groq.com/openai/v1/chat/completions",
                             headers={"Authorization": f"Bearer {provider}"},
@@ -4808,21 +4814,35 @@ class MegaContentEngine:
                                 "temperature": 0.7
                             }
                         )
+                        
                         if resp.status_code == 200:
-                            return str(resp.json()['choices'][0]['message']['content'])
+                            data = resp.json()
+                            content = data['choices'][0]['message']['content']
+                            if content:
+                                return str(content)
+                        
                         elif resp.status_code == 429:
-                            self.logger.warning(f"⚠️ Key {provider_idx+1} hit rate limit (429), trying next...")
+                            # ሪሚት ሲመታ ለ 10 ሰከንድ አርፎ ወደ ቀጣዩ ቁልፍ መሄድ
+                            self.logger.warning(f"⚠️ Key {provider_idx+1} hit rate limit (429). Waiting 10s...")
+                            await asyncio.sleep(10)
+                            continue
+                            
+                        elif resp.status_code == 400:
+                            # አሁንም አውዱ ረጅም ከሆነ ይበልጥ ማሳጠር
+                            self.logger.error(f"❌ Bad Request (400). Trimming prompt further and retrying...")
+                            prompt = prompt[-4000:] 
                             continue
                         else:
                             self.logger.warning(f"⚠️ Key {provider_idx+1} failed with status {resp.status_code}")
                             continue
 
             except Exception as e:
-                self.logger.warning(f"⚠️ Provider {provider_idx+1} failed: {str(e)[:100]}")
+                self.logger.warning(f"⚠️ Provider {provider_idx+1} error: {str(e)[:100]}")
+                await asyncio.sleep(2) # ለአጭር ጊዜ ማረፍ
                 continue
         
-        # ሁሉም 15ቱንም ሞክሮ ካልሰራ ብቻ ስህተት ይጥላል
-        raise Exception(f"All {total_providers} fallback keys failed for Phase {phase_idx}")
+        # ሁሉም 15ቱንም ሞክሮ ካልሰራ
+        raise Exception(f"All {total_providers} keys failed to generate content for Phase {phase_idx}")
 
     def _build_hypnotic_audio_button(self, section_name, lang, country, section_idx):
         """ሂፕኖቲክ የአውዲዮ ቁልፍ ገንባት"""
