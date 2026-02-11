@@ -3309,129 +3309,198 @@ class DashboardManager:
 # 💎 ELITE QUALITY MASTERY MODULE (E-Q-M v1.1)
 # =========================================================================
 
+# =========================================================================
+# 💎 ELITE QUALITY OPTIMIZER v1.3 (ULTIMATE MULTIMEDIA SYNC)
+# =========================================================================
+
 class EliteQualityOptimizer:
     """
     ከ Runner v8.3 እና Mega-Pen v19 ጋር ሙሉ ለሙሉ የተቀናጀ የጥራት ማሻሻያ።
-    ምንም አይነት የስም ግጭት እንዳይፈጠር ከነባር ዘዴዎች ጋር ተጣጥሞ የተሰራ።
+    - የቪዲዮ እና አውዲዮ ኮዶችን ይጠብቃል (Multimedia Safe)
+    - ምስሎች በብዛት እንዲገቡ ርዕሶችን በRegex ይለያል
+    - የአማርኛ ይዘትን ወደ 'Elite' ደረጃ ያሳድጋል
+    - አሁን እጅግ የተሻሻለ ስህተት መቋቋሚያ እና ተኳሃኝነት
     """
 
     def __init__(self, orchestrator_instance):
-        # የራነሩን 'self' (instance) ይቀበላል - ሁሉንም ሞጁሎች እንዲያገኝ
         self.runner = orchestrator_instance
         self.logger = logging.getLogger("EliteQuality")
+        # ሎገር መደበኛ አዋቂ ካልሆነ አዲስ እንፍጠር
+        if not self.logger.handlers:
+            handler = logging.StreamHandler()
+            handler.setFormatter(logging.Formatter(
+                '%(asctime)s - EliteQuality - %(levelname)s - %(message)s'
+            ))
+            self.logger.addHandler(handler)
+            self.logger.setLevel(logging.INFO)
 
     async def apply_100_percent_standard(self, raw_content: str, country: str, topic: str) -> str:
-        """ሙሉ የጥራት ማጣሪያውን በቅደም ተከተል ያስፈጽማል"""
+        """
+        ሙሉ የጥራት ማጣሪያውን በቅደም ተከተል ያስፈጽማል
+        ሁሉም ስህተቶች ተይዘው ዋናው ይዘት እንዲመለስ ተደርጓል
+        """
+        if not raw_content or not isinstance(raw_content, str):
+            return raw_content or ""
+
         try:
-            # 1. 'Fallback Mode' እና 'AI Markers' ማጽዳት (Scrubbing)
-            content = self._remove_ai_signatures(raw_content)
+            self.logger.info(f"✨ Polishing {country} content for 100% Quality Standard...")
+            content = raw_content
 
-            # 2. 🔍 Cross-Model Audit (በኦሜጋ ቁልፍ አማካኝነት)
-            content = await self._perform_omega_audit(content, country, topic)
+            # 1. የ AI ፊርማዎችን በማስወገድ (multimedia ሳይነካ)
+            content = self._remove_ai_signatures(content)
 
-            # 3. 🖼️ Real Visuals (Placeholderዎችን በሪል ምስል መተካት)
-            content = self._inject_authority_visuals(content, country, topic)
+            # 2. 🔍 Cross-Model Audit (ኦሜጋ ቁልፍ በመጠቀም)
+            try:
+                content = await self._perform_omega_audit(content, country, topic)
+            except Exception as e:
+                self.logger.warning(f"Omega audit failed for {country}: {str(e)[:100]}")
+                # ቢወድቅም ቀጥል
 
-            # 4. 🇪🇹 የኢትዮጵያ ባህል እና ቋንቋ ማስተካከያ
+            # 3. 🖼️ Smart Visuals Injection - አሁን 100% ዋስትና ያለው
+            if hasattr(self.runner, 'image_engine'):
+                self.logger.info(f"🖼️ Running Smart Image Engine for {country}...")
+                try:
+                    enhanced = self.runner.image_engine.generate_image_placeholders(content, country, topic)
+                    # ምስሎች በእርግጥ መግባታቸውን አረጋግጥ
+                    if self.runner.image_engine.count_injected_images(enhanced) > 0:
+                        content = enhanced
+                        self.logger.info(f"✅ Image injection successful for {country}")
+                    else:
+                        self.logger.warning(f"⚠️ Image engine returned 0 images for {country}, retrying with fallback...")
+                        # ለሁለተኛ ጊዜ ሙከራ (የተሻሻለውን ስልተ ቀመር ለማስነሳት)
+                        content = self.runner.image_engine.generate_image_placeholders(content, country, topic + " [FORCE]")
+                except Exception as e:
+                    self.logger.error(f"❌ Image engine failed: {str(e)[:100]}")
+            else:
+                self.logger.warning("⚠️ No image_engine found on runner – images will not be injected")
+
+            # 4. 🇪🇹 የኢትዮጵያ ባህል እና ቋንቋ ማስተካከያ (ለ ET ብቻ)
             if country == 'ET':
                 content = self._apply_amharic_excellence(content)
 
+            # 5. 🎯 የ CTA (Call to Action) ማመቻቸት
+            if hasattr(self.runner, 'cta_engine'):
+                try:
+                    content = self.runner.cta_engine.optimize_ctas(content, country)
+                except Exception as e:
+                    self.logger.warning(f"CTA optimization failed: {e}")
+
             return content
+
         except Exception as e:
-            self.logger.error(f"❌ Quality Polish Failed: {e}")
-            return raw_content # ስህተት ቢፈጠር ኦሪጅናሉን ይመልሳል (Safety First)
+            self.logger.error(f"❌ Quality Polish Failed: {traceback.format_exc()}")
+            return raw_content   # Safety First: ኦሪጅናሉን መልስ
 
     def _remove_ai_signatures(self, text: str) -> str:
-        """'Fallback Mode', 'AI-generated' የሚሉ ምልክቶችን ያስወግዳል"""
+        """
+        የቪዲዮ እና አውዲዮ ኮዶችን ሳይነካ የ AI ምልክቶችን ብቻ ያስወግዳል
+        አሁን በ word boundaries የተጠበቀ እና አላስፈላጊ ክፍተቶችን ያጸዳል
+        """
+        if not text:
+            return text
+
         patterns = [
-            r"\(Fallback Mode Enabled\)",
-            r"Comprehensive enterprise analysis", # አሰልቺ ጅማሬዎች
-            r"As an AI language model,",
-            r"This content was generated by",
-            r"Let me think about that…"
+            (r'\s*\(Fallback Mode Enabled\)\s*', ' '),
+            (r'\s*Comprehensive enterprise analysis\s*', ' '),
+            (r'\s*As an AI language model,?\s*', ' '),
+            (r'\s*This content was generated by\s*', ' '),
+            (r'\s*Let me think about that…?\s*', ' '),
+            (r'\s*I hope this helps!\s*', ' '),
+            (r'\s*Here is a guide\s*', ' '),
+            (r'\s*Here are some steps\s*', ' '),
+            (r'\s*Certainly!?\s*', ' '),
         ]
-        for pattern in patterns:
-            text = re.sub(pattern, "", text, flags=re.IGNORECASE)
+        
+        for pattern, replacement in patterns:
+            text = re.sub(pattern, replacement, text, flags=re.IGNORECASE)
+        
+        # ከመጠን በላይ ክፍተቶችን አጥራ
+        text = re.sub(r' {2,}', ' ', text)
         return text.strip()
 
     async def _perform_omega_audit(self, content: str, country: str, topic: str) -> str:
-        """የኦሜጋን 15 ቁልፎች ተጠቅሞ ይዘቱን ያስገመግማል"""
-        # የራነሩን ኦሜጋ ሲስተም ይጠራል
-        api_key, key_num = self.runner._get_next_omega_key()
-        
-        audit_prompt = f"""
-        Act as a Professional Editor for the {country} market. 
-        Polish this content about '{topic}' to 100% human quality.
-        - Remove repetitions.
-        - Add 2 'Pro-Tip' boxes with bold borders.
-        - Ensure headings are persuasive.
-        CONTENT: {content[:3000]}
         """
-        
-        # ራነሩ ውስጥ ያለውን የ generate_content ዘዴ ይጠቀማል (ከስም ግጭት ነጻ)
-        try:
-            # UnstoppableAIProvider ካለ እሱን ይጠቀማል
-            if hasattr(self.runner.failover_system, 'generate_content'):
-                polished = await self.runner.failover_system.generate_content(audit_prompt)
-                return str(polished)
-            return content
-        except:
+        የኦሜጋን 15 ቁልፎች ተጠቅሞ ይዘቱን ያስገመግማል - Visual Breakpoints ይጨምራል
+        አሁን ጊዜ ገደብ፣ የውሂብ መጠን ቁጥጥር እና ተለዋጭ መንገዶች ተጨምረዋል
+        """
+        # ከመጠን በላይ ረጅም ከሆነ ብቻ የመጀመሪያውን ክፍል እንመርምር
+        max_chars = 3000
+        trimmed_content = content[:max_chars]
+        needs_append = len(content) > max_chars
+
+        # ቁልፍ ማግኘት ካልተቻለ ወዲያውኑ ተመለስ
+        if not hasattr(self.runner, '_get_next_omega_key') or not hasattr(self.runner, 'failover_system'):
+            self.logger.debug("Omega key or failover system not available – skipping audit")
             return content
 
-    def _inject_authority_visuals(self, content: str, country: str, topic: str) -> str:
-        """Placeholderዎችን በሪል Unsplash ምስሎች ይተካል"""
-        # በኮድህ ውስጥ የነበረውን via.placeholder መፈለጊያ
-        placeholder_pattern = r"https://via\.placeholder\.com/[^\s\"']+"
-        
-        # dynamic keywords ለምስል ፍለጋ
-        img_keywords = f"{topic.replace(' ', ',')},office,business"
-        real_url = f"https://source.unsplash.com/1200x630/?{img_keywords}"
-        
-        # በሪል ምስል ዲዛይን መተካት
-        replacement = f"""
-        <div class='premium-visual' style='margin:45px 0; border-radius:15px; overflow:hidden; box-shadow:0 15px 35px rgba(0,0,0,0.2);'>
-            <img src='{real_url}' alt='{topic} visualization' style='width:100%; display:block;'>
-            <div style='background:#0b0f19; color:#c5a059; padding:12px; text-align:center; font-style:italic; font-size:14px;'>
-                Exclusive strategic visual for the {country} market.
-            </div>
-        </div>
-        """
-        return re.sub(placeholder_pattern, replacement, content)
+        try:
+            api_key, key_num = self.runner._get_next_omega_key()
+            
+            audit_prompt = f"""
+            Act as a Senior Business Editor for the {country} market.
+            Task: Final Polish for '{topic}' guide.
+            
+            STRICT INSTRUCTIONS:
+            1. Keep ALL existing HTML tags like <iframe>, <audio>, and <div> intact. Do not remove or alter them.
+            2. Add 2 'Key Takeaway' boxes with <div style="border:2px solid #c5a059; padding:20px; background:#f8fafc; border-radius:8px; margin:20px 0;">
+            3. Make sure Amharic sentences (if any) sound authoritative and professional.
+            4. Do not delete content, only improve transitions and formatting.
+            5. Do not add extra commentary or explanations.
+            6. Output only the polished content, no additional text.
+            
+            CONTENT TO POLISH:
+            {trimmed_content}
+            """
+            
+            # የጊዜ ገደብ ያለው ጥሪ (15 ሰከንድ)
+            polished = await asyncio.wait_for(
+                self.runner.failover_system.generate_content(audit_prompt),
+                timeout=15.0
+            )
+            
+            polished_str = str(polished).strip()
+            
+            # አመርቂ ውጤት ካልሆነ ኦሪጅናሉን እንደው መልስ
+            if len(polished_str) < 100:
+                self.logger.warning(f"Omega audit returned too short content ({len(polished_str)} chars), skipping")
+                return content
+            
+            # የተዋቀረውን ክፍል እና የቀረውን ኦሪጅናል በማጣመር
+            if needs_append:
+                return polished_str + content[max_chars:]
+            else:
+                return polished_str
+                
+        except asyncio.TimeoutError:
+            self.logger.warning("Omega audit timed out after 15s – using original content")
+            return content
+        except Exception as e:
+            self.logger.warning(f"Omega audit error: {type(e).__name__} – {str(e)[:100]}")
+            return content
 
     def _apply_amharic_excellence(self, text: str) -> str:
-        """የአማርኛ ጽሁፍን 'ኢትዮጵያዊ' ያደርገዋል"""
+        """
+        የአማርኛ ጽሁፍን ይበልጥ ማራኪ እና ስሜታዊ ያደርገዋል
+        አሁን ትክክለኛ ቃላትን ብቻ ለመተካት ሬጌክስ \b ተጠቅሟል
+        """
+        if not text:
+            return text
+            
         idioms = {
-            "የንግድ ስትራቴጂ": "የንግድ ስልት እና የብልህነት አካሄድ",
-            "ጥቅሞች": "የሚያስገኘው በረከትና ፋይዳ",
-            "አስፈላጊ": "ወሳኝ እና ስትራቴጂካዊ",
-            "መመሪያ": "ፋና ወጊ መመሪያ"
+            r'\bየንግድ ስትራቴጂ\b': 'ስትራቴጂካዊ የንግድ ስልት',
+            r'\bአስፈላጊ ነው\b': 'እጅግ ወሳኝ እና የማይታለፍ ነው',
+            r'\bጥቅሞች\b': 'የሚያስገኛቸው ታላላቅ በረከቶች',
+            r'\bመመሪያ\b': 'ተግባራዊ የጥበብ መመሪያ',
+            r'\bተጨማሪ መረጃ\b': 'ጥልቅ ግንዛቤ የሚሰጥ መረጃ',
+            r'\bምክር\b': 'ወርቃማ ምክር',
+            r'\bመፍትሄ\b': 'ፈጣን እና ቀልጣፋ መፍትሄ',
+            r'\bደንበኛ\b': 'ክቡር ደንበኛ',
         }
-        for old, new in idioms.items():
-            text = text.replace(old, new)
+        
+        for pattern, replacement in idioms.items():
+            text = re.sub(pattern, replacement, text, flags=re.IGNORECASE)
+            
         return text
-
-# =========================================================================
-# 🔄 ወደ Runner v8.3 ውስጥ የሚገባበት ትክክለኛ ቦታ
-# =========================================================================
-
-# በ EnterpriseProductionOrchestrator._process_country_enterprise ዘዴ ውስጥ 
-# የ Mega-Pen ስራ እንደተጠናቀቀ እንዲህ ይገባል፡
-
-"""
-# ... ነባር ኮድ ...
-mega_content = await self.content_system.mega_engine.produce_single_country_sovereign_logic(topic, country)
-
-# 💎 100% Quality Polish Integration
-quality_optimizer = EliteQualityOptimizer(self)
-perfected_content = await quality_optimizer.apply_100_percent_standard(mega_content, country, topic)
-
-# ከዚያ ውጤቱን ለ Affiliate Manager ያስረክባል
-final_content, aff_report = await self.affiliate_manager.inject_affiliate_links(
-    content=perfected_content, 
-    topic=topic,
-    # ...
-)
-"""
 # =================== ENTERPRISE PRODUCTION ORCHESTRATOR ===================
 class EnterpriseProductionOrchestrator:
     """Complete Enterprise Orchestrator with ALL Enhancements"""
