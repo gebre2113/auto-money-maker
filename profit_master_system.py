@@ -5999,8 +5999,6 @@ def _get_demo_videos(self, topic: str):
 class UltimateProfitMasterSystem:
     def __init__(self, config=None):
         self.config = config
-        # 🔗 ይህ ስም (mega_engine) ከራነሩ ድልድይ ጋር ተመሳሳይ መሆን አለበት
-        self.mega_engine = MegaContentEngine(self)
         try:
             from enterprise_runner import PremiumConfig, UnstoppableAIProvider
             self.config = config or PremiumConfig()
