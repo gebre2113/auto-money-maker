@@ -3184,306 +3184,318 @@ Due to high demand, this content was generated using the Sovereign Fallback Syst
     # 🏭 COUNTRY PROCESSING (ENRICHED + AUTO-FIX COMPLIANCE)
     # -------------------------------------------------------------------------
     async def _process_country_enterprise(self, topic: str, country: str,
-                                          content_type: str = "enterprise_guide",
-                                          country_number: int = 0,
-                                          total_countries: int = 0,
-                                          omega_key_number: int = 0) -> dict:
-        """
-        🏭 ሉዓላዊ የሀገር ማቀነባበሪያ - v9.1
-        የሜጋ-ፔን 15,000 ቃላትን ተቀብሎ፣ በ9-ደረጃ ማበልጸጊያ አልጎሪዝም አልምቶ፣
-        የጥራት፣ ገቢ፣ ተገዢነት (አውቶማቲክ ማስተካከያ) እና ማህበራዊ ሚዲያ ውህደትን በአንድ ላይ ያጠናቅቃል።
-        """
-        start_time = datetime.now()
-        self.logger.info(f"🏭 [{country_number}/{total_countries}] Processing {country} with Sovereign Pipeline...")
-        self.performance_monitor.sample_memory()
+                                      content_type: str = "enterprise_guide",
+                                      country_number: int = 0,
+                                      total_countries: int = 0,
+                                      omega_key_number: int = 0) -> Dict:
+    """
+    🏭 ሉዓላዊ የሀገር ማቀነባበሪያ - ከሜጋ-ፔን ጀምሮ እስከ ዎርድፕረስ ማተሚያ ድረስ ባሉ 11 ደረጃዎች
+    """
+    start_time = datetime.now()
+    self.logger.info(f"🏭 [{country_number}/{total_countries}] Processing {country} with Sovereign Pipeline...")
+    self.performance_monitor.sample_memory()
 
-        result = {
-            'country': country,
-            'status': 'failed',
-            'content': '',
-            'metrics': {},
-            'error': None,
-            'production_id': f"{country}_{datetime.now().strftime('%Y%m%d_%H%M%S')}_{omega_key_number}"
+    country_result = {
+        'country': country,
+        'country_number': country_number,
+        'total_countries': total_countries,
+        'status': 'processing',
+        'stages': {},
+        'content': None,
+        'metrics': {},
+        'enhancements': {},
+        'ai_enhancements': {},
+        'start_time': start_time.isoformat()
+    }
+
+    try:
+        # ------------------------------------------------------------------
+        # STAGE 1: AI TITLE OPTIMIZATION (የርዕስ ማመቻቸት)
+        # ------------------------------------------------------------------
+        self.logger.info(f"🤖 NEW: AI Title Optimization for {country}")
+        title_data = await self.ai_title_optimizer.optimize_title(topic, country)
+        country_result['ai_enhancements']['title_optimization'] = title_data
+        country_result['stages']['title_optimization'] = {
+            'status': 'completed',
+            'ai_generated': title_data.get('ai_generated', False),
+            'seo_score': title_data.get('seo_score', 70),
+            'title': title_data.get('title', f"Complete Guide to {topic} in {country}")
         }
-        enrichment_log = []
-        word_counts = {}
 
-        try:
-            # ----------------------------------------------------------------
-            # 2. ሜጋ-ፔን ይዘት ማምጣት (15,000+ ቃላት)
-            # ----------------------------------------------------------------
-            if not hasattr(self, 'content_engine') or not self.content_engine:
-                raise RuntimeError("Mega-Pen (content_engine) not available")
+        # ------------------------------------------------------------------
+        # STAGE 2: YOUTUBE RESEARCH (የቪዲዮ ጥናት)
+        # ------------------------------------------------------------------
+        self.logger.info(f"🔍 Stage 1: Enterprise YouTube Research for {country}")
+        video_research = await self._stage_1_enterprise_youtube_research(topic, country)
+        country_result['stages']['youtube_research'] = {
+            'status': 'completed',
+            'videos_analyzed': len(video_research.get('videos', [])),
+            'research_depth': video_research.get('research_depth', 'basic'),
+            'enterprise_grade': video_research.get('enterprise_grade', False)
+        }
 
-            self.logger.info(f"📡 Calling Mega-Pen for {country}...")
-            raw_content = await self._call_content_engine(self.content_engine, country, topic)
+        # ------------------------------------------------------------------
+        # STAGE 3: CULTURAL DEPTH ANALYSIS (የባህል ጥልቀት ትንተና)
+        # ------------------------------------------------------------------
+        self.logger.info(f"🌍 Stage 2: Cultural Depth Analysis for {country}")
+        cultural_depth = await self.cultural_guardian.analyze_cultural_depth(
+            topic, country, video_research
+        )
+        country_result['cultural_depth'] = cultural_depth
+        country_result['stages']['cultural_depth'] = {
+            'status': 'completed',
+            'depth_score': cultural_depth.get('depth_score', 0),
+            'quality_tier': cultural_depth.get('quality_tier', 'Basic'),
+            'requirements_met': cultural_depth.get('requirements_met', False)
+        }
 
-            if not raw_content:
-                raise ValueError(f"Empty content received from Mega-Pen for {country}")
+        # ------------------------------------------------------------------
+        # STAGE 4: PRODUCT RESEARCH (የአፊሊዬት ምርት ጥናት)
+        # ------------------------------------------------------------------
+        self.logger.info(f"🛍️  Stage 3: Enterprise Product Research for {country}")
+        affiliate_product = await self._stage_3_enterprise_product_research(topic, country)
+        country_result['stages']['affiliate_research'] = {
+            'status': 'completed',
+            'product_found': affiliate_product is not None,
+            'product_name': affiliate_product.get('name', 'None') if affiliate_product else 'None',
+            'enterprise_grade': affiliate_product.get('enterprise_grade', False) if affiliate_product else False
+        }
 
-            content = self._extract_content_string(raw_content)
-            initial_words = len(content.split())
-            word_counts['initial'] = initial_words
-            enrichment_log.append(f"✅ Mega-Pen: {initial_words} words")
-            self.logger.info(f"📥 {country} – Base content: {initial_words} words")
+        # ------------------------------------------------------------------
+        # STAGE 5: MEGA-PEN CONTENT GENERATION (የ15,000 ቃላት ማመንጨት)
+        # ------------------------------------------------------------------
+        self.logger.info(f"🏢 Stage 4: Enterprise Content Generation for {country} – Calling Mega-Pen Bridge...")
+        # 🔗 MASTER BRIDGE CALL – ወደ UltimateProfitMasterSystem._process_country_enterprise
+        raw_result = await self.content_system._process_country_enterprise(
+            topic=topic,
+            country=country,
+            omega_key_number=omega_key_number
+        )
 
-            if initial_words < self.enterprise_standards.get('min_words', 2000):
-                self.logger.warning(f"⚠️ {country} – Low word count ({initial_words}), target is {self.enterprise_standards['min_words']}+")
-                enrichment_log.append(f"⚠️ Below target ({self.enterprise_standards['min_words']} words)")
+        if raw_result.get('status') != 'success':
+            raise ValueError(f"Mega-Pen bridge failed: {raw_result.get('error', 'Unknown error')}")
 
-            # ----------------------------------------------------------------
-            # 3. ደረጃ 1 – ዘመናዊ ምስል ማስገቢያ (Smart Image Engine)
-            # ----------------------------------------------------------------
-            if hasattr(self, 'image_engine') and self.image_engine:
-                try:
-                    img_start = time.time()
-                    content = self.image_engine.generate_image_placeholders(content, country, topic)
-                    img_count = self.image_engine.count_injected_images(content)
-                    img_time = time.time() - img_start
-                    word_counts['after_images'] = len(content.split())
-                    enrichment_log.append(f"🖼️ SmartImage: +{img_count} images ({img_time:.1f}s)")
-                    self.logger.info(f"🖼️ {country} – Injected {img_count} images")
-                except Exception as e:
-                    self.logger.error(f"❌ Image injection failed: {str(e)[:100]}")
-                    enrichment_log.append(f"⚠️ Image injection failed")
+        mega_content = raw_result['content']
+        initial_words = len(mega_content.split())
+        self.logger.info(f"📥 {country} – Mega-Pen delivered: {initial_words} words")
 
-            # ----------------------------------------------------------------
-            # 4. ደረጃ 2 – ባለስልጣን ቪዲዮ ማስገቢያ (Authority Videos)
-            # ----------------------------------------------------------------
-            if hasattr(self.content_engine, '_inject_authority_videos'):
-                try:
-                    video_method = self.content_engine._inject_authority_videos
-                    if asyncio.iscoroutinefunction(video_method):
-                        video_html = await video_method(topic, country)
-                    else:
-                        video_html = video_method(topic, country)
-                    if video_html:
-                        content += f"\n\n{video_html}"
-                        word_counts['after_videos'] = len(content.split())
-                        enrichment_log.append(f"🎬 Authority Videos: +1 video block")
-                        self.logger.info(f"🎬 {country} – Injected authority videos")
-                except Exception as e:
-                    self.logger.warning(f"⚠️ Video injection failed: {str(e)[:100]}")
-                    enrichment_log.append(f"⚠️ Video injection skipped")
+        country_result['content'] = mega_content
+        country_result['metrics']['initial_word_count'] = initial_words
+        country_result['metrics']['initial_quality'] = raw_result.get('metrics', {}).get('quality_score', 0)
+        country_result['metrics']['enterprise_grade'] = raw_result.get('metrics', {}).get('enterprise_grade', False)
 
-            # ----------------------------------------------------------------
-            # 5. ደረጃ 3 – ከፍተኛ ጥራት ማሳመሪያ (EliteQualityOptimizer)
-            # ----------------------------------------------------------------
-            if hasattr(self, 'quality_optimizer') and self.quality_optimizer:
-                try:
-                    polish_start = time.time()
-                    optimizer = self.quality_optimizer
-                    if asyncio.iscoroutinefunction(optimizer.apply_100_percent_standard):
-                        content = await optimizer.apply_100_percent_standard(content, country, topic)
-                    else:
-                        content = optimizer.apply_100_percent_standard(content, country, topic)
-                    polish_time = time.time() - polish_start
-                    word_counts['after_polish'] = len(content.split())
-                    enrichment_log.append(f"💎 ElitePolish: {polish_time:.1f}s")
-                    self.logger.info(f"💎 {country} – Quality polish applied")
-                except Exception as e:
-                    self.logger.error(f"❌ Quality polish failed: {str(e)[:100]}")
-                    enrichment_log.append(f"⚠️ Quality polish failed")
+        # ------------------------------------------------------------------
+        # STAGE 6: AFFILIATE LINK INJECTION (የአፊሊዬት ማስገቢያ)
+        # ------------------------------------------------------------------
+        if hasattr(self, 'affiliate_manager') and self.affiliate_manager and affiliate_product:
+            self.logger.info(f"💰 Stage 5: Affiliate Link Injection for {country}")
+            try:
+                aff_start = time.time()
+                enriched_content, aff_report = await self.affiliate_manager.inject_affiliate_links(
+                    content=mega_content,
+                    topic=topic
+                )
+                aff_time = time.time() - aff_start
+                self.logger.info(f"💰 {country} – Affiliate injection: {aff_time:.1f}s, {aff_report.get('products_used', 0)} products")
+                country_result['content'] = enriched_content
+                country_result['enhancements']['affiliate'] = aff_report
+                country_result['stages']['affiliate_injection'] = {
+                    'status': 'completed',
+                    'products_used': aff_report.get('products_used', 0),
+                    'predicted_revenue': aff_report.get('predicted_revenue', 0)
+                }
+            except Exception as e:
+                self.logger.error(f"❌ Affiliate injection failed: {str(e)[:100]}")
+                country_result['stages']['affiliate_injection'] = {'status': 'failed', 'error': str(e)[:100]}
 
-            # ----------------------------------------------------------------
-            # 6. ደረጃ 4 – የሰው ልጅ መሰል ማበልጸጊያ (HumanLikenessEngine)
-            # ----------------------------------------------------------------
-            if hasattr(self, 'human_engine') and self.human_engine:
-                try:
-                    human_start = time.time()
-                    content = await self.human_engine.inject_human_elements(
-                        content, country, topic, content_type
-                    )
-                    human_time = time.time() - human_start
-                    human_score = self.human_engine.calculate_human_score(content)
-                    word_counts['after_human'] = len(content.split())
-                    enrichment_log.append(f"👥 HumanEngine: {human_score['human_score']}% ({human_time:.1f}s)")
-                    self.logger.info(f"👥 {country} – Human score: {human_score['human_score']}%")
-                except Exception as e:
-                    self.logger.error(f"❌ Humanization failed: {str(e)[:100]}")
-                    enrichment_log.append(f"⚠️ Humanization skipped")
+        # ------------------------------------------------------------------
+        # STAGE 7: SELF-CORRECTION / EXPANSION (ማስፋፊያ)
+        # ------------------------------------------------------------------
+        self.logger.info(f"🔄 Stage 6: Enterprise Self-Correction for {country}")
+        refined_content = await self._stage_5_enterprise_self_correction(
+            country_result['content'],
+            target_words=self.enterprise_standards['min_words'],
+            cultural_depth_score=cultural_depth.get('depth_score', 70)
+        )
+        country_result['content'] = refined_content
+        country_result['metrics']['final_word_count'] = len(refined_content.split())
 
-            # ----------------------------------------------------------------
-            # 7. ደረጃ 5 – ተለዋዋጭ ካላ-ተግባር ማስተካከያ (Dynamic CTA)
-            # ----------------------------------------------------------------
-            if hasattr(self, 'cta_engine') and self.cta_engine:
-                try:
-                    cta_start = time.time()
-                    content = self.cta_engine.optimize_ctas(content, country)
-                    cta_time = time.time() - cta_start
-                    word_counts['after_cta'] = len(content.split())
-                    enrichment_log.append(f"🎯 DynamicCTA: {cta_time:.1f}s")
-                    self.logger.info(f"🎯 {country} – CTA optimization applied")
-                except Exception as e:
-                    self.logger.warning(f"⚠️ CTA optimization failed: {str(e)[:100]}")
-                    enrichment_log.append(f"⚠️ CTA skipped")
+        # ------------------------------------------------------------------
+        # STAGE 8: HUMAN-LIKENESS ENGINE (95% AI Detection Reduction)
+        # ------------------------------------------------------------------
+        self.logger.info(f"👥 Stage 7: Human-Likeness Enhancement for {country}")
+        humanized_content = await self.human_engine.inject_human_elements(
+            refined_content, country, topic, content_type
+        )
+        country_result['content'] = humanized_content
+        human_score = self.human_engine.calculate_human_score(humanized_content)
+        country_result['enhancements']['human_score'] = human_score
+        country_result['stages']['human_likeness'] = {
+            'status': 'completed',
+            'human_score': human_score.get('human_score', 0),
+            'ai_detection_risk': human_score.get('ai_detection_risk', 'HIGH')
+        }
 
-            # ----------------------------------------------------------------
-            # 8. ደረጃ 6 – የጥራት ዘበኛ ትንተና (UltimateQualityGuardian)
-            # ----------------------------------------------------------------
-            quality_report = None
-            if hasattr(self, 'quality_guardian') and self.quality_guardian:
-                try:
-                    qa_start = time.time()
-                    quality_report = await asyncio.to_thread(
-                        self.quality_guardian.analyze_content, content
-                    )
-                    qa_time = time.time() - qa_start
+        # ------------------------------------------------------------------
+        # STAGE 9: SMART IMAGE ENGINE (40% SEO Boost)
+        # ------------------------------------------------------------------
+        self.logger.info(f"🖼️ Stage 8: Smart Image Integration for {country}")
+        content_with_images = self.image_engine.generate_image_placeholders(
+            humanized_content, country, topic
+        )
+        country_result['content'] = content_with_images
+        image_count = self.image_engine.count_injected_images(content_with_images)
+        seo_impact = self.image_engine.get_seo_impact(image_count) if hasattr(self.image_engine, 'get_seo_impact') else {'seo_score_boost': 40}
+        country_result['enhancements']['seo_impact'] = seo_impact
+        country_result['stages']['image_integration'] = {
+            'status': 'completed',
+            'images_added': image_count,
+            'seo_score_boost': seo_impact.get('seo_score_boost', 0)
+        }
 
-                    if hasattr(self, 'offline_judge') and self.offline_judge.enabled:
-                        offline_feedback = await self.offline_judge.judge_quality(
-                            content, country, topic
-                        )
-                        quality_report['offline_llm'] = offline_feedback
+        # ------------------------------------------------------------------
+        # STAGE 10: AI QUALITY AUDIT (የ AI ጥራት ማረጋገጫ)
+        # ------------------------------------------------------------------
+        self.logger.info(f"🤖 NEW: AI Quality Audit for {country}")
+        ai_audit_result = await self.ai_quality_auditor.audit_content(content_with_images, country)
+        country_result['ai_enhancements']['quality_audit'] = ai_audit_result
+        country_result['stages']['ai_quality_audit'] = {
+            'status': 'completed',
+            'ai_score': ai_audit_result.get('score', 0),
+            'ai_suggestions': ai_audit_result.get('suggestions', []),
+            'ai_audit_performed': ai_audit_result.get('ai_audit_performed', False)
+        }
 
-                    if hasattr(self, 'quality_db'):
-                        self.quality_db.insert_quality_report(
-                            production_id=result['production_id'],
-                            country=country,
-                            quality_report=quality_report
-                        )
+        # ------------------------------------------------------------------
+        # STAGE 11: ULTIMATE QUALITY GUARDIAN (የጥራት ዘበኛ)
+        # ------------------------------------------------------------------
+        self.logger.info(f"🔬 Stage 9: Ultimate Quality Guardian Analysis for {country}")
+        quality_report = await asyncio.to_thread(self.quality_guardian.analyze_content, content_with_images)
+        country_result['quality_report'] = quality_report
+        quality_score = quality_report.get('final_score', 75.0)
+        country_result['metrics']['quality_score'] = quality_score
+        country_result['metrics']['quality_status'] = 'PASS' if quality_score >= self.enterprise_standards['min_quality'] else 'FAIL'
+        country_result['stages']['quality_guardian'] = {
+            'status': 'completed',
+            'final_score': quality_score,
+            'quality_level': quality_report.get('quality_level', 'Unknown')
+        }
 
-                    final_quality = quality_report.get('final_score', 75.0)
-                    enrichment_log.append(f"🔬 QualityGuardian: {final_quality}% ({qa_time:.1f}s)")
-                    self.logger.info(f"🔬 {country} – Quality score: {final_quality}% ({quality_report['quality_level']})")
-                except Exception as e:
-                    self.logger.error(f"❌ Quality analysis failed: {str(e)[:100]}")
-                    enrichment_log.append(f"⚠️ QualityGuardian failed")
-                    if self.quality_guardian:
-                        quality_report = self.quality_guardian._get_error_report(content)
+        # ------------------------------------------------------------------
+        # STAGE 12: ETHICAL COMPLIANCE + AUTO-FIX (የሥነ ምግባር ተገዢነት)
+        # ------------------------------------------------------------------
+        self.logger.info(f"🛡️ Stage 10: Ethical Compliance Check for {country}")
+        compliance_report = await self.compliance_guardian.check_compliance(
+            content_with_images, country, affiliate_product
+        )
+        country_result['compliance'] = compliance_report
+        country_result['stages']['compliance_check'] = {
+            'status': 'completed',
+            'is_compliant': compliance_report.get('is_compliant', False),
+            'compliance_score': compliance_report.get('compliance_score', 0),
+            'severity': compliance_report.get('severity', 'UNKNOWN')
+        }
 
-            # ----------------------------------------------------------------
-            # 9. ደረጃ 7 – ገቢ ትንበያ (RevenueForecastEngine)
-            # ----------------------------------------------------------------
-            revenue_forecast = {}
-            if hasattr(self, 'revenue_engine') and self.revenue_engine:
-                try:
-                    temp_country_result = {
-                        'country': country,
-                        'metrics': {
-                            'final_word_count': len(content.split()),
-                            'quality_score': quality_report.get('final_score', 85) if quality_report else 85
-                        },
-                        'cultural_depth': {'depth_score': 85}
-                    }
-                    if hasattr(self, 'cultural_guardian') and self.cultural_guardian:
-                        temp_country_result['cultural_depth'] = {'depth_score': 85}
+        if not compliance_report.get('is_compliant', True):
+            self.logger.warning(f"⚠️ Compliance issues found for {country} - Applying enterprise auto-fixes")
+            fixed_content = await self.compliance_guardian.apply_auto_fixes(
+                content_with_images, compliance_report
+            )
+            country_result['content'] = fixed_content
+            country_result['stages']['compliance_fix'] = {
+                'status': 'applied',
+                'fixed_issues': compliance_report.get('auto_fixes_applied', 0),
+                'is_compliant_after_fix': compliance_report.get('is_compliant_after_fix', True)
+            }
 
-                    revenue_forecast = await self.revenue_engine.forecast_revenue(
-                        temp_country_result, country
-                    )
-                    enrichment_log.append(f"💰 Revenue: ${revenue_forecast.get('estimated_revenue_usd', 0):,.2f}/mo")
-                    self.logger.info(f"💰 {country} – Est. revenue: ${revenue_forecast.get('estimated_revenue_usd', 0):,.2f}/month")
-                except Exception as e:
-                    self.logger.warning(f"⚠️ Revenue forecast failed: {str(e)[:100]}")
-                    enrichment_log.append(f"⚠️ Revenue forecast skipped")
+        # ------------------------------------------------------------------
+        # STAGE 13: REVENUE FORECAST (የገቢ ትንበያ)
+        # ------------------------------------------------------------------
+        self.logger.info(f"💰 Stage 11: Revenue Forecasting for {country}")
+        revenue_forecast = await self.revenue_engine.forecast_revenue(country_result, country)
+        country_result['revenue_forecast'] = revenue_forecast
+        country_result['stages']['revenue_forecast'] = {
+            'status': 'completed',
+            'estimated_revenue': revenue_forecast.get('estimated_revenue_usd', 0),
+            'confidence_level': revenue_forecast.get('confidence_level', 'Low'),
+            'revenue_grade': revenue_forecast.get('revenue_grade', 'Below Target')
+        }
 
-            # ----------------------------------------------------------------
-            # 10. ደረጃ 8 – የሥነ-ምግባር ተገዢነት ማረጋገጫ + AUTO-FIX
-            # ----------------------------------------------------------------
-            compliance_report = {}
-            if hasattr(self, 'compliance_guardian') and self.compliance_guardian:
-                try:
-                    sample_product = {'name': 'Enterprise AI Suite', 'price': 299, 'commission_rate': 0.15}
-                    compliance_report = await self.compliance_guardian.check_compliance(
-                        content, country, affiliate_product=sample_product
-                    )
-                    compliance_score = compliance_report.get('compliance_score', 0)
-                    enrichment_log.append(f"🛡️ Compliance: {compliance_score}%")
-                    
-                    if compliance_report.get('auto_fixes'):
-                        for fix_html in compliance_report['auto_fixes']:
-                            if fix_html not in content:
-                                content = fix_html + "\n\n" + content
-                                self.logger.info(f"🛠️ Applied compliance auto-fix for {country}")
-                                enrichment_log.append(f"🛠️ Compliance auto-fix applied")
-                    
-                    if not compliance_report.get('is_compliant', True):
-                        self.logger.warning(f"⚠️ {country} – Compliance issues: {compliance_report.get('compliance_issues', [])}")
-                except Exception as e:
-                    self.logger.warning(f"⚠️ Compliance check failed: {str(e)[:100]}")
-                    enrichment_log.append(f"⚠️ Compliance skipped")
+        # ------------------------------------------------------------------
+        # STAGE 14: DYNAMIC CTA INTEGRATION (35% Revenue Increase)
+        # ------------------------------------------------------------------
+        if affiliate_product:
+            self.logger.info(f"🎯 Stage 12: Dynamic CTA Integration for {country}")
+            cta_data = self.cta_engine.select_optimal_cta(country, affiliate_product, topic)
+            cta_html = self.cta_engine.render_cta(cta_data, affiliate_product, topic)
 
-            # ----------------------------------------------------------------
-            # 11. ደረጃ 9 – ማህበራዊ ሚዲያ ማተሚያ (Social Publishing)
-            # ----------------------------------------------------------------
-            publish_results = {}
-            if hasattr(self, 'social_publisher') and self.social_publisher:
-                try:
-                    pub_start = time.time()
-                    country_data = {
-                        'country': country,
-                        'topic': topic,
-                        'content': content,
-                        'production_id': result['production_id'],
-                        'metrics': {
-                            'final_word_count': len(content.split()),
-                            'estimated_revenue': revenue_forecast.get('estimated_revenue_usd', 0)
-                        }
-                    }
-                    if asyncio.iscoroutinefunction(self.social_publisher.publish_country_content):
-                        publish_results = await self.social_publisher.publish_country_content(country_data)
-                    else:
-                        publish_results = self.social_publisher.publish_country_content(country_data)
+            if '</body>' in country_result['content']:
+                country_result['content'] = country_result['content'].replace('</body>', cta_html + '\n</body>')
+            else:
+                country_result['content'] += '\n\n' + cta_html
 
-                    successful = [p for p, r in publish_results.items() if r.get('status') == 'success']
-                    pub_time = time.time() - pub_start
-                    enrichment_log.append(f"📱 Social: {len(successful)} platforms ({pub_time:.1f}s)")
-                    self.logger.info(f"📱 {country} – Published to {len(successful)} platforms")
-                except Exception as e:
-                    self.logger.error(f"❌ Social publishing failed: {str(e)[:100]}")
-                    enrichment_log.append(f"⚠️ Social publishing failed")
-
-            # ----------------------------------------------------------------
-            # 12. የመጨረሻ መለኪያዎች ስብስብ
-            # ----------------------------------------------------------------
-            final_word_count = len(content.split())
-            processing_time = (datetime.now() - start_time).total_seconds()
-            final_quality = quality_report.get('final_score', 85.0) if quality_report else 85.0
-            final_revenue = revenue_forecast.get('estimated_revenue_usd', final_word_count * 0.05)
-
-            result.update({
+            country_result['enhancements']['cta_data'] = cta_data
+            country_result['stages']['cta_integration'] = {
                 'status': 'completed',
-                'content': content,
-                'omega_key_used': omega_key_number,
-                'metrics': {
-                    'final_word_count': final_word_count,
-                    'initial_word_count': word_counts.get('initial', 0),
-                    'quality_score': round(final_quality, 2),
-                    'quality_level': quality_report.get('quality_level', 'Unknown') if quality_report else 'Unknown',
-                    'human_score': human_score.get('human_score', 0) if 'human_score' in locals() else 0,
-                    'estimated_revenue': round(final_revenue, 2),
-                    'compliance_score': compliance_report.get('compliance_score', 100) if compliance_report else 100,
-                    'processing_time_seconds': round(processing_time, 1),
-                    'image_count': self.image_engine.count_injected_images(content) if hasattr(self, 'image_engine') else 0,
-                    'enrichment_steps': enrichment_log,
-                    'publish_results': publish_results
-                },
-                'quality_report': quality_report,
-                'revenue_forecast': revenue_forecast,
-                'compliance_report': compliance_report,
-                'error': None
-            })
+                'cta_style': cta_data['style'],
+                'a_b_test_group': cta_data['a_b_test_group'],
+                'estimated_conversion_boost': '35% (A/B Testing)'
+            }
 
-            self.logger.info(f"✅ {country} – Finished in {processing_time:.1f}s | Words: {final_word_count:,} | Quality: {final_quality:.1f}% | Revenue: ${final_revenue:,.2f}/mo")
+        # ------------------------------------------------------------------
+        # STAGE 15: CONTENT SAFETY VALIDATION & BACKUP
+        # ------------------------------------------------------------------
+        safety_check = ProductionSafetyFeatures.validate_content_safety(
+            country_result['content'], country
+        )
+        country_result['safety_check'] = safety_check
 
-        except Exception as e:
-            self.logger.error(f"❌ {country} – Critical failure: {traceback.format_exc()}")
-            result['error'] = str(e)[:500]
-            result['metrics']['processing_time_seconds'] = round((datetime.now() - start_time).total_seconds(), 1)
+        # ------------------------------------------------------------------
+        # FINAL METRICS & STATUS
+        # ------------------------------------------------------------------
+        country_result['status'] = 'completed'
+        country_result['end_time'] = datetime.now().isoformat()
+        country_result['duration'] = (datetime.fromisoformat(country_result['end_time']) -
+                                      datetime.fromisoformat(country_result['start_time'])).total_seconds()
 
-            if not result['content']:
-                result['content'] = self._generate_fallback_content(topic, country)
-                result['metrics']['final_word_count'] = len(result['content'].split())
-                result['metrics']['quality_score'] = 70.0
+        # ------------------------------------------------------------------
+        # ✅ PUBLISH TO SOCIAL MEDIA (WordPress Bridge)
+        # ------------------------------------------------------------------
+        if hasattr(self, 'social_publisher') and self.social_publisher:
+            try:
+                pub_result = await self.social_publisher.publish_country_content(country_result)
+                country_result['publishing_status'] = pub_result
+                successful_platforms = [p for p, r in pub_result.items() if r.get('status') == 'success']
+                self.logger.info(f"📱 {country} – Published to {len(successful_platforms)} platforms")
+            except Exception as pub_err:
+                self.logger.warning(f"⚠️ Real-time publishing failed for {country}: {pub_err}")
 
-        finally:
-            current_mem = self.performance_monitor.sample_memory()
-            if current_mem > 600:
-                self.logger.info(f"🧠 Memory usage at {current_mem:.1f}MB – triggering GC")
-                gc.collect()
+        # ------------------------------------------------------------------
+        # 📊 LOG SUMMARY
+        # ------------------------------------------------------------------
+        self.logger.info(f"✅ {country}: {country_result['metrics']['final_word_count']} words, "
+                         f"{quality_score:.1f}% quality, ${revenue_forecast.get('estimated_revenue_usd', 0):,.2f} forecast")
+        if country_result['metrics']['quality_status'] == 'PASS':
+            self.logger.info(f"   🎯 ENTERPRISE STANDARD MET: {country_result['metrics']['final_word_count']} words ≥ {self.enterprise_standards['min_words']}")
+        self.logger.info(f"   👥 Human Score: {human_score.get('human_score', 0)}% (AI Detection Risk: {human_score.get('ai_detection_risk', 'UNKNOWN')})")
+        self.logger.info(f"   🖼️ Images Added: {image_count} (SEO Boost: +{seo_impact.get('seo_score_boost', 0)}%)")
+        self.logger.info(f"   🤖 AI Title: {'✅' if title_data.get('ai_generated') else '⚠️'} (SEO Score: {title_data.get('seo_score', 70)})")
+        self.logger.info(f"   🤖 AI Audit: {'✅' if ai_audit_result.get('ai_audit_performed') else '⚠️'} (Score: {ai_audit_result.get('score', 0)})")
+        if affiliate_product:
+            self.logger.info(f"   🎯 CTA Style: {cta_data['style']} (A/B Group: {cta_data['a_b_test_group']})")
+        self.logger.info(f"   🔒 Safety Score: {safety_check['safety_score']}% ({'PASS' if safety_check['passed'] else 'FAIL'})")
 
-        return result
+        return country_result
+
+    except Exception as e:
+        self.logger.error(f"❌ Failed to process {country}: {e}")
+        traceback.print_exc()
+        country_result['status'] = 'failed'
+        country_result['error'] = str(e)
+        country_result['end_time'] = datetime.now().isoformat()
+        country_result['duration'] = (datetime.fromisoformat(country_result['end_time']) -
+                                      datetime.fromisoformat(country_result['start_time'])).total_seconds()
+        return country_result
 
     # -------------------------------------------------------------------------
     # 🚀 MAIN PRODUCTION ENTRY POINT
