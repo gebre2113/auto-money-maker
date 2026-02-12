@@ -3092,30 +3092,32 @@ class EnterpriseProductionOrchestrator:
     # 🌉 MEGA-BRIDGE v3.1 – ROBUST METHOD DISCOVERY
     # -------------------------------------------------------------------------
     async def _call_content_engine(self, engine, country: str, topic: str) -> str:
-        """🔗 MEGA-BRIDGE v3.1: ማንኛውንም አይነት የሞተር አወቃቀር ፈልጎ የሚያገኝ"""
-        try:
-            # 1. መጀመሪያ በውስጠኛው mega_engine ውስጥ መፈለግ
-            mega = getattr(engine, 'mega_engine', engine)  # ካልተገኘ ራሱን ይጠቀማል
-            # 2. ዘዴውን በተለያዩ ስሞች መፈለግ
-            methods = ['produce_single_country_sovereign_logic', 'produce_logic', 'generate_content']
-            target_method = None
-            for m in methods:
-                if hasattr(mega, m):
-                    target_method = getattr(mega, m)
-                    break
-            if target_method:
-                self.logger.info(f"🚀 Bridge Active: Using {target_method.__name__} for {country}")
-                if asyncio.iscoroutinefunction(target_method):
-                    content = await target_method(topic, country)
-                else:
-                    content = target_method(topic, country)
-                return self._extract_content_string(content)
-            # 3. ካልተገኘ መጠባበቂያ
-            self.logger.error(f"❌ Bridge Broken for {country} in {type(engine).__name__}")
-            return self._generate_fallback_content(topic, country)
-        except Exception as e:
-            self.logger.error(f"❌ Bridge Critical Error: {str(e)}")
-            return self._generate_fallback_content(topic, country)
+    """🔗 MEGA-BRIDGE v3.5 – ሜጋ-ፔኑን ፈልጎ በኃይል የሚያገኝ"""
+    try:
+        # 1. በ mega_engine ንብርብር ውስጥ ፈልግ
+        target_method = None
+        if hasattr(engine, 'mega_engine'):
+            mega = engine.mega_engine
+            if hasattr(mega, 'produce_single_country_sovereign_logic'):
+                target_method = mega.produce_single_country_sovereign_logic
+
+        # 2. በቀጥታ በራሱ engine ላይ ፈልግ
+        if not target_method and hasattr(engine, 'produce_single_country_sovereign_logic'):
+            target_method = engine.produce_single_country_sovereign_logic
+
+        if target_method:
+            self.logger.info(f"🚀 Bridge Connected! Pulling 15,000+ words for {country}...")
+            if asyncio.iscoroutinefunction(target_method):
+                content = await target_method(topic, country)
+            else:
+                content = target_method(topic, country)
+            return self._extract_content_string(content)
+
+        self.logger.error(f"❌ Bridge Broken – no method found for {country}")
+        return self._generate_fallback_content(topic, country)
+    except Exception as e:
+        self.logger.error(f"❌ Bridge Critical Error: {str(e)}")
+        return self._generate_fallback_content(topic, country)
 
     async def _execute_content_method(self, method, topic: str, country: str) -> Optional[Any]:
         """🧠 አስፕንክሮናስ/ሲንክሮናስ ዘዴዎችን በደህና ይጠራል፣ የጊዜ ገደብ ይጨምራል።"""
