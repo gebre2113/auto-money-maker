@@ -3504,14 +3504,14 @@ Due to high demand, this content was generated using the Sovereign Fallback Syst
 *Timestamp: {timestamp}*
 """
 # -------- Country processing with Quality Guardian integration --------
-    async def _process_country_enterprise(self, topic: str, country: str,
+async def _process_country_enterprise(self, topic: str, country: str,
                                       content_type: str = "enterprise_guide",
                                       country_number: int = 0,
                                       total_countries: int = 0,
                                       omega_key_number: int = 0) -> dict:
     """
     🏭 ሉዓላዊ የሀገር ማቀነባበሪያ - v9.0
-    የሜጋ-ፔን 15,000 ቃላትን ተቀብሎ፣ በ7-ደረጃ ማበልጸጊያ አልጎሪዝም አልምቶ፣
+    የሜጋ-ፔን 15,000 ቃላትን ተቀብሎ፣ በ9-ደረጃ ማበልጸጊያ አልጎሪዝም አልምቶ፣
     የጥራት፣ ገቢ፣ ተገዢነት እና ማህበራዊ ሚዲያ ውህደትን በአንድ ላይ ያጠናቅቃል።
     """
     # ------------------------------------------------------------
@@ -3530,7 +3530,6 @@ Due to high demand, this content was generated using the Sovereign Fallback Syst
         'production_id': f"{country}_{datetime.now().strftime('%Y%m%d_%H%M%S')}_{omega_key_number}"
     }
 
-    # የማበልጸጊያ ደረጃዎች መዝገብ (ለማጠቃለያ)
     enrichment_log = []
     word_counts = {}
 
@@ -3547,16 +3546,14 @@ Due to high demand, this content was generated using the Sovereign Fallback Syst
         if not raw_content:
             raise ValueError(f"Empty content received from Mega-Pen for {country}")
 
-        content = self._extract_content_string(raw_content)  # re-use extractor
+        content = self._extract_content_string(raw_content)
         initial_words = len(content.split())
         word_counts['initial'] = initial_words
         enrichment_log.append(f"✅ Mega-Pen: {initial_words} words")
         self.logger.info(f"📥 {country} – Base content: {initial_words} words")
 
-        # ዝቅተኛ የቃላት ብዛት ማረጋገጫ (enterprise standard)
         if initial_words < self.enterprise_standards.get('min_words', 2000):
             self.logger.warning(f"⚠️ {country} – Low word count ({initial_words}), attempting expansion...")
-            # ማስፋፊያ ዘዴ ሊጨመር ይችላል፤ አሁን ማስጠንቀቂያ ብቻ
             enrichment_log.append(f"⚠️ Below target ({self.enterprise_standards['min_words']} words)")
 
         # --------------------------------------------------------
@@ -3653,20 +3650,17 @@ Due to high demand, this content was generated using the Sovereign Fallback Syst
         if hasattr(self, 'quality_guardian') and self.quality_guardian:
             try:
                 qa_start = time.time()
-                # የረጅም ጊዜ ትንተናን ከዋናው ክር ለማላቀቅ
                 quality_report = await asyncio.to_thread(
                     self.quality_guardian.analyze_content, content
                 )
                 qa_time = time.time() - qa_start
 
-                # አማራጭ: ከአካባቢው ኤልኤልኤም ጋር ማረጋገጥ (offline judge)
                 if hasattr(self, 'offline_judge') and self.offline_judge.enabled:
                     offline_feedback = await self.offline_judge.judge_quality(
                         content, country, topic
                     )
                     quality_report['offline_llm'] = offline_feedback
 
-                # ወደ SQLite ዳታቤዝ ማስገባት
                 if hasattr(self, 'quality_db'):
                     self.quality_db.insert_quality_report(
                         production_id=result['production_id'],
@@ -3680,7 +3674,8 @@ Due to high demand, this content was generated using the Sovereign Fallback Syst
             except Exception as e:
                 self.logger.error(f"❌ Quality analysis failed: {str(e)[:100]}")
                 enrichment_log.append(f"⚠️ QualityGuardian failed")
-                quality_report = self.quality_guardian._get_error_report(content) if self.quality_guardian else None
+                if self.quality_guardian:
+                    quality_report = self.quality_guardian._get_error_report(content)
 
         # --------------------------------------------------------
         # 9. ደረጃ 7 – ገቢ ትንበያ (RevenueForecastEngine)
@@ -3688,18 +3683,15 @@ Due to high demand, this content was generated using the Sovereign Fallback Syst
         revenue_forecast = {}
         if hasattr(self, 'revenue_engine') and self.revenue_engine:
             try:
-                # ጊዜያዊ የሀገር ውጤት መዝገብ መፍጠር
                 temp_country_result = {
                     'country': country,
                     'metrics': {
                         'final_word_count': len(content.split()),
                         'quality_score': quality_report.get('final_score', 85) if quality_report else 85
                     },
-                    'cultural_depth': {'depth_score': 80}  # በእውነተኛ ሁኔታ ከCulturalDepthGuardian ይመጣል
+                    'cultural_depth': {'depth_score': 85}
                 }
-                # የባህል ጥልቀት ካለ አስገባ
                 if hasattr(self, 'cultural_guardian') and self.cultural_guardian:
-                    # ለማሳጠር ቪዲዮ ውሂብ አልተጠራም; እዚህ ግምታዊ እሴት
                     temp_country_result['cultural_depth'] = {'depth_score': 85}
 
                 revenue_forecast = await self.revenue_engine.forecast_revenue(
@@ -3718,13 +3710,12 @@ Due to high demand, this content was generated using the Sovereign Fallback Syst
         if hasattr(self, 'compliance_guardian') and self.compliance_guardian:
             try:
                 compliance_report = await self.compliance_guardian.check_compliance(
-                    content, country, affiliate_product=None  # በእውነተኛ ሁኔታ ምርት ይገባል
+                    content, country, affiliate_product=None
                 )
                 compliance_score = compliance_report.get('compliance_score', 0)
                 enrichment_log.append(f"🛡️ Compliance: {compliance_score}%")
                 if not compliance_report.get('is_compliant', True):
                     self.logger.warning(f"⚠️ {country} – Compliance issues: {compliance_report.get('compliance_issues', [])}")
-                    # አውቶማቲክ ማስተካከያ እዚህ ሊደረግ ይችላል
             except Exception as e:
                 self.logger.warning(f"⚠️ Compliance check failed: {str(e)[:100]}")
                 enrichment_log.append(f"⚠️ Compliance skipped")
@@ -3790,7 +3781,6 @@ Due to high demand, this content was generated using the Sovereign Fallback Syst
             'error': None
         })
 
-        # የማጠቃለያ መልእክት
         self.logger.info(f"✅ {country} – Finished in {processing_time:.1f}s | Words: {final_word_count:,} | Quality: {final_quality:.1f}% | Revenue: ${final_revenue:,.2f}/mo")
 
     except Exception as e:
@@ -3798,14 +3788,12 @@ Due to high demand, this content was generated using the Sovereign Fallback Syst
         result['error'] = str(e)[:500]
         result['metrics']['processing_time_seconds'] = round((datetime.now() - start_time).total_seconds(), 1)
 
-        # ቢያንስ መጠባበቂያ ይዘት ማመንጨት
         if not result['content']:
             result['content'] = self._generate_fallback_content(topic, country)
             result['metrics']['final_word_count'] = len(result['content'].split())
             result['metrics']['quality_score'] = 70.0
 
     finally:
-        # የማህደረ ትውስታ አጠቃቀም ቁጥጥር
         current_mem = self.performance_monitor.sample_memory()
         if current_mem > 600:
             self.logger.info(f"🧠 Memory usage at {current_mem:.1f}MB – triggering GC")
