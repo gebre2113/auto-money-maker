@@ -1,0 +1,6 @@
+{
+  "error": "'EnterpriseProductionOrchestrator' object has no attribute 'run_production_with_monitoring'",
+  "traceback": "Traceback (most recent call last):\n  File \"/home/runner/work/auto-money-maker/auto-money-maker/enterprise_runner.py\", line 4189, in main_execution\n    production_results = await orchestrator.run_production_with_monitoring(\n                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAttributeError: 'EnterpriseProductionOrchestrator' object has no attribute 'run_production_with_monitoring'\n",
+  "timestamp": "2026-02-12T11:24:27.721931",
+  "topic": "Unknown"
+}
