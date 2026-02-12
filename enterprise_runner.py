@@ -4193,7 +4193,7 @@ class EnterpriseProductionOrchestrator:
     # ========================================================================
     # 🔧 FIX 4: Signature now accepts **kwargs to swallow extra arguments from call
     # ========================================================================
-    async def _process_country_enterprise(self, country: str, topic: str, **kwargs) -> dict:
+async def _process_country_enterprise(self, country: str, topic: str, **kwargs) -> dict:
     """
     👑 ኢንተርፕራይዝ የሀገር ይዘት ማምረቻ ዋና ዘዴ
     ⚡ ULTIMATE ROBUST VERSION – BRIDGE FORTIFIED, ARGUMENT ORDER FIXED, RETURN TYPE HANDLED
