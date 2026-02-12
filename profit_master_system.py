@@ -5997,10 +5997,10 @@ def _get_demo_videos(self, topic: str):
 # =================== ዋና ስርዓት ክፍል ===================
 
 class UltimateProfitMasterSystem:
-    """ዋና ስርዓት አሰራር እና ቁጥጥር - v19.0 STABLE"""
-
     def __init__(self, config=None):
-        # ⚠️ እዚህ ጋር ያሉት መስመሮች በትክክል ገባ ያሉ መሆናቸውን አረጋግጥ
+        self.config = config
+        # 🔗 ይህ ስም (mega_engine) ከራነሩ ድልድይ ጋር ተመሳሳይ መሆን አለበት
+        self.mega_engine = MegaContentEngine(self)
         try:
             from enterprise_runner import PremiumConfig, UnstoppableAIProvider
             self.config = config or PremiumConfig()
