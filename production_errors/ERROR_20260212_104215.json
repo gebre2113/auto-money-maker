@@ -1,0 +1,6 @@
+{
+  "error": "cannot access local variable 'MegaContentEngine' where it is not associated with a value",
+  "traceback": "Traceback (most recent call last):\n  File \"/home/runner/work/auto-money-maker/auto-money-maker/enterprise_runner.py\", line 4186, in main_execution\n    orchestrator = EnterpriseProductionOrchestrator()\n                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/runner/work/auto-money-maker/auto-money-maker/enterprise_runner.py\", line 3153, in __init__\n    self._initialize_all_components()\n  File \"/home/runner/work/auto-money-maker/auto-money-maker/enterprise_runner.py\", line 3341, in _initialize_all_components\n    self.content_system = profit_sys() if callable(profit_sys) else profit_sys\n                          ^^^^^^^^^^^^\n  File \"/home/runner/work/auto-money-maker/auto-money-maker/profit_master_system.py\", line 6003, in __init__\n    self.mega_engine = MegaContentEngine(self)\n                       ^^^^^^^^^^^^^^^^^\nUnboundLocalError: cannot access local variable 'MegaContentEngine' where it is not associated with a value\n",
+  "timestamp": "2026-02-12T10:42:15.669151",
+  "topic": "Unknown"
+}
