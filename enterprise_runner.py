@@ -4157,7 +4157,64 @@ class EnterpriseProductionOrchestrator:
         self._print_enterprise_summary(production_results)
         
         return production_results
+    async def _process_country_enterprise(self, topic: str, country: str, **kwargs) -> Dict:
+        """የተስተካከለ ድልድይ - ስህተትን ፈልጎ የሚያገኝ"""
+        country_result = {'country': country, 'status': 'processing'}
+        
+        try:
+            self.logger.info(f"👑 ATTEMPTING MASTER BRIDGE for {country}")
+            
+            # 1. Mega Engineን ማግኘት
+            mega = getattr(self.content_system, 'mega_engine', None)
+            if mega is None:
+                raise AttributeError("❌ MegaContentEngine not found in content_system!")
+
+            # 2. ተግባሩ መኖሩን መፈተሽ
+            method_name = 'produce_single_country_sovereign_logic'
+            if not hasattr(mega, method_name):
+                # 🛑 እዚህ ጋር ነው ምርመራው የሚጀመረው!
+                existing_methods = [m for m in dir(mega) if not m.startswith('_')]
+                self.logger.error(f"❌ '{method_name}' not found! Available methods: {existing_methods}")
                 
+                # ስሙ ተቀይሮ ከሆነ ለመገመት ሙከራ (Social Media Manager ስም ከሆነ)
+                alternatives = ['produce_logic', 'start_production', 'generate_content']
+                for alt in alternatives:
+                    if hasattr(mega, alt):
+                        self.logger.warning(f"⚠️ Found alternative method: {alt}")
+                        method_name = alt
+                        break
+                else:
+                    raise AttributeError(f"❌ No valid production method found in MegaContentEngine. Available: {existing_methods}")
+
+            # 3. ጥሪውን ማከናወን
+            self.logger.info(f"✍️ Calling Mega-Pen with: {method_name}")
+            mega_content = await getattr(mega, method_name)(topic, country)
+
+            # --- ቀሪው ሎጂክ (Affiliate & Quality) ---
+            # 💰 Affiliate
+            final_content, aff_report = await self.affiliate_manager.inject_affiliate_links(
+                content=mega_content, topic=topic, user_intent="purchase", user_journey_stage="decision"
+            )
+
+            # ✨ Quality Polish
+            optimizer = EliteQualityOptimizer(self)
+            perfected_content = await optimizer.apply_100_percent_standard(final_content, country, topic)
+            
+            country_result.update({
+                'content': perfected_content,
+                'status': 'completed',
+                'metrics': {
+                    'final_word_count': len(perfected_content.split()),
+                    'estimated_revenue': aff_report.get('predicted_total_revenue', 0),
+                    'quality_score': 98
+                }
+            })
+            return country_result
+
+        except Exception as e:
+            self.logger.error(f"❌ Master Bridge Failure in {country}: {str(e)}")
+            country_result.update({'status': 'failed', 'error': str(e)})
+            return country_result        
 def produce_single_country_sovereign_logic(self, country: str, topic: str, 
                                            additional_context: dict = None) -> dict:
     """
