@@ -4157,10 +4157,6 @@ class EnterpriseProductionOrchestrator:
         self._print_enterprise_summary(production_results)
         
         return production_results
-    
-# =========================================================================
-# 📝 ወደ MegaContentEngine ክፍል ውስጥ ጨምር
-# =========================================================================
                 
 def produce_single_country_sovereign_logic(self, country: str, topic: str, 
                                            additional_context: dict = None) -> dict:
@@ -4201,9 +4197,7 @@ def produce_single_country_sovereign_logic(self, country: str, topic: str,
     }
     
     try:
-        # ----------------------------------------------------------
-        # 1. መሠረታዊ ይዘት ማመንጨት (በMega-Pen ዋና ዘዴ)
-        # ----------------------------------------------------------
+        
         if hasattr(self, 'generate_country_content'):
             # ዋናው የይዘት ማመንጫ ዘዴ (ነባር)
             content = self.generate_country_content(country, topic)
@@ -4221,10 +4215,7 @@ def produce_single_country_sovereign_logic(self, country: str, topic: str,
             content += f"Businesses in {country} are rapidly adopting AI solutions to stay competitive.\n\n"
         
         self.logger.info(f"✅ Base content generated for {country} – {len(content.split())} words")
-        
-        # ----------------------------------------------------------
-        # 2. 🖼️ SmartImageEngine በመጠቀም ምስሎችን አስገባ
-        # ----------------------------------------------------------
+    
         image_count = 0
         if hasattr(self, 'image_engine') and self.image_engine:
             try:
@@ -4241,10 +4232,6 @@ def produce_single_country_sovereign_logic(self, country: str, topic: str,
                 self.logger.info(f"🖼️ {image_count} images injected for {country}")
             except Exception as e:
                 self.logger.error(f"❌ Image injection failed for {country}: {traceback.format_exc()}")
-        
-        # ----------------------------------------------------------
-        # 3. 🎬 ቪዲዮዎችን አስገባ (Authority Videos)
-        # ----------------------------------------------------------
         video_html = ""
         video_count = 0
         if hasattr(self, '_inject_authority_videos'):
@@ -4272,10 +4259,6 @@ def produce_single_country_sovereign_logic(self, country: str, topic: str,
                     self.logger.info(f"🎬 {video_count} videos injected for {country}")
             except Exception as e:
                 self.logger.warning(f"⚠️ Video injection failed for {country}: {e}")
-        
-        # ----------------------------------------------------------
-        # 4. 💎 EliteQualityOptimizer – የመጨረሻ ማሻሻያ
-        # ----------------------------------------------------------
         if hasattr(self, 'quality_optimizer') and self.quality_optimizer:
             try:
                 if asyncio.iscoroutinefunction(self.quality_optimizer.apply_100_percent_standard):
@@ -4294,17 +4277,9 @@ def produce_single_country_sovereign_logic(self, country: str, topic: str,
                 self.logger.info(f"💎 Quality optimization completed for {country}")
             except Exception as e:
                 self.logger.warning(f"⚠️ Quality optimization failed for {country}: {e}")
-        
-        # ----------------------------------------------------------
-        # 5. መለኪያዎች ስሌት
-        # ----------------------------------------------------------
         word_count = len(content.split())
         estimated_revenue = self._estimate_revenue(country, word_count) if hasattr(self, '_estimate_revenue') else word_count * 0.05
         processing_time = (datetime.now() - start_time).total_seconds()
-        
-        # ----------------------------------------------------------
-        # 6. ውጤት ዘምን
-        # ----------------------------------------------------------
         result.update({
             'status': 'success',
             'content': content,
