@@ -4330,7 +4330,8 @@ def produce_single_country_sovereign_logic(self, country: str, topic: str,
                         content = asyncio.run(self.quality_optimizer.apply_100_percent_standard(content, country, topic))
                 else:
                     content = self.quality_optimizer.apply_100_percent_standard(content, country, topic)
-    def _calculate_enterprise_metrics(self, country_results: List[Dict]) -> Dict:
+                    
+     def_calculate_enterprise_metrics(self, country_results: List[Dict]) -> Dict:
         """የኢንተርፕራይዝ ሜትሪክስ ማስላት"""
         completed = [r for r in country_results if r.get('status') == 'completed']
         
