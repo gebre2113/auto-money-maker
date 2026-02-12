@@ -4195,127 +4195,82 @@ class EnterpriseProductionOrchestrator:
     # ========================================================================
     async def _process_country_enterprise(self, country: str, topic: str, **kwargs) -> dict:
         """
-        👑 ኢንተርፕራይዝ የሀገር ይዘት ማምረቻ ዋና ዘዴ
-        ይህ ዘዴ በቲታን ራነር ለእያንዳንዱ ሀገር ይጠራል።
-        **kwargs የማይፈለጉ ነጋሪ እሴቶችን ይውጣል (content_type, country_number, total_countries, omega_key_number)
+        👑 ኢንተርፕራይዝ የሀገር ይዘት ማምረቻ ዋና ዘዴ - FULLY ROBUST VERSION
         """
         start_time = datetime.now()
         self.logger.info(f"🏭 Processing {country} with Enterprise pipeline...")
         
         result = {
-            'country': country,
-            'status': 'failed',
-            'content': '',
-            'metrics': {},
-            'error': None,
+            'country': country, 'status': 'failed', 'content': '',
+            'metrics': {}, 'error': None,
             'production_id': f"{country}_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
         }
         
         try:
-            # 1. MegaContentEngine በመጠቀም ይዘት አመንጭ
-            if not hasattr(self, 'content_engine'):
-                self.logger.error(f"❌ No content_engine found for {country}")
-                result['error'] = "MegaContentEngine not available"
-                return result
+            # 1. 🔗 የመገናኛ ድልድዩን በኃይል ማረጋገጥ (The Bulletproof Bridge)
+            engine = self.content_engine
+            # ተግባሩ በቀጥታ ካልተገኘ በ .mega_engine ውስጥ መፈለግ
+            if not hasattr(engine, 'produce_single_country_sovereign_logic'):
+                if hasattr(engine, 'mega_engine'):
+                    engine = engine.mega_engine
+                    self.logger.info("🔗 Switched to internal mega_engine bridge")
             
-            content_result = self.content_engine.produce_single_country_sovereign_logic(
-                country=country,
-                topic=topic,
-                additional_context={'phase': kwargs.get('country_number', 0)}
-            )
+            if not hasattr(engine, 'produce_single_country_sovereign_logic'):
+                raise AttributeError("❌ produce_single_country_sovereign_logic not found in engine or mega_engine")
+
+            # 2. ✍️ ይዘቱን ማምረት (v19/v22 logic)
+            # የ await ትዕዛዝ መጨመሩን አረጋግጥ (ከላይ Async ስለሆነ)
+            content_html = await engine.produce_single_country_sovereign_logic(topic, country)
             
-            if content_result.get('status') != 'success':
-                self.logger.warning(f"⚠️ Content generation failed for {country}: {content_result.get('error')}")
-                result['error'] = content_result.get('error', 'Unknown content error')
-                return result
+            if not content_html:
+                raise ValueError(f"⚠️ Empty content received for {country}")
             
-            content = content_result.get('content', '')
-            self.logger.info(f"✅ Content generated for {country} – {len(content.split())} words")
-            
-            # 2. 🖼️ SmartImageEngine
+            self.logger.info(f"✅ Raw content received for {country}")
+
+            # 3. 🖼️ SmartImageEngine (ምስሎችን ማከል)
             if hasattr(self, 'image_engine') and self.image_engine:
-                try:
-                    content = self.image_engine.generate_image_placeholders(content, country, topic)
-                    img_count = self.image_engine.count_injected_images(content)
-                    self.logger.info(f"🖼️ {img_count} images injected for {country}")
-                except Exception as e:
-                    self.logger.error(f"❌ Image injection failed for {country}: {e}")
+                content_html = self.image_engine.generate_image_placeholders(content_html, country, topic)
             
-            # 3. 🎬 ቪዲዮዎች
-            if hasattr(self.content_engine, '_inject_authority_videos'):
-                try:
-                    video_method = self.content_engine._inject_authority_videos
-                    if asyncio.iscoroutinefunction(video_method):
-                        video_html = await video_method(topic, country)
-                    else:
-                        video_html = video_method(topic, country)
-                    
-                    if video_html:
-                        content += f"\n\n{video_html}"
-                        self.logger.info(f"🎬 Videos injected for {country}")
-                except Exception as e:
-                    self.logger.warning(f"⚠️ Video injection failed for {country}: {e}")
+            # 4. 💎 EliteQualityOptimizer (ጥራት ማረጋገጫ)
+            if self.quality_optimizer:
+                content_html = await self.quality_optimizer.apply_100_percent_standard(content_html, country, topic)
             
-            # 4. 💎 EliteQualityOptimizer
-            if hasattr(self, 'quality_optimizer') and self.quality_optimizer:
-                try:
-                    optimizer = self.quality_optimizer
-                    if asyncio.iscoroutinefunction(optimizer.apply_100_percent_standard):
-                        content = await optimizer.apply_100_percent_standard(content, country, topic)
-                    else:
-                        content = optimizer.apply_100_percent_standard(content, country, topic)
-                    self.logger.info(f"💎 Quality polish applied for {country}")
-                except Exception as e:
-                    self.logger.warning(f"⚠️ Quality optimization failed for {country}: {e}")
-            
-            # 5. 📱 SocialMediaManager
-            publish_results = {}
-            if hasattr(self, 'social_publisher') and self.social_publisher:
-                try:
-                    country_data = {
-                        'country': country,
-                        'topic': topic,
-                        'content': content,
-                        'production_id': result['production_id'],
-                        'metrics': {
-                            'final_word_count': len(content.split()),
-                            'estimated_revenue': content_result.get('metrics', {}).get('estimated_revenue', 0)
-                        }
-                    }
-                    
-                    if asyncio.iscoroutinefunction(self.social_publisher.publish_country_content):
-                        publish_results = await self.social_publisher.publish_country_content(country_data)
-                    else:
-                        publish_results = self.social_publisher.publish_country_content(country_data)
-                    
-                    successful = [p for p, r in publish_results.items() if r.get('status') == 'success']
-                    self.logger.info(f"📱 Published {country} to {len(successful)} platforms")
-                except Exception as e:
-                    self.logger.error(f"❌ Social publishing failed for {country}: {e}")
-            
-            word_count = len(content.split())
+            # 5. 💰 Affiliate & Neuro-Marketing (ካለ)
+            if hasattr(self, 'affiliate_manager'):
+                content_html, aff_report = await self.affiliate_manager.inject_affiliate_links(
+                    content=content_html, topic=topic, user_intent="purchase", user_journey_stage="decision"
+                )
+                rev = aff_report.get('predicted_total_revenue', 0.0)
+            else:
+                rev = len(content_html.split()) * 0.05
+
+            # 6. 📱 Social Publishing
+            if hasattr(self, 'social_publisher'):
+                country_data = {
+                    'country': country, 'topic': topic, 'content': content_html,
+                    'production_id': result['production_id'],
+                    'metrics': {'final_word_count': len(content_html.split()), 'estimated_revenue': rev}
+                }
+                await self.social_publisher.publish_country_content(country_data)
+
             processing_time = (datetime.now() - start_time).total_seconds()
-            
             result.update({
                 'status': 'success',
-                'content': content,
+                'content': content_html,
                 'metrics': {
-                    'final_word_count': word_count,
-                    'estimated_revenue': content_result.get('metrics', {}).get('estimated_revenue', word_count * 0.05),
-                    'processing_time_seconds': round(processing_time, 1),
-                    'image_count': self.image_engine.count_injected_images(content) if hasattr(self, 'image_engine') else 0,
-                    'publish_results': publish_results
-                },
-                'error': None
+                    'final_word_count': len(content_html.split()),
+                    'estimated_revenue': rev,
+                    'processing_time_seconds': round(processing_time, 1)
+                }
             })
             
-            self.logger.info(f"✅ Country {country} processed in {processing_time:.1f}s")
-            
+            return result
+
         except Exception as e:
-            self.logger.error(f"❌ _process_country_enterprise failed for {country}: {traceback.format_exc()}")
-            result['error'] = str(e)[:500]
-        
-        return result
+            self.logger.error(f"❌ Master Bridge Failure in {country}: {str(e)}")
+            self.logger.error(traceback.format_exc())
+            result['error'] = str(e)
+            return result
     
     # ========================================================================
     # 🔧 FIX 5: _calculate_enterprise_metrics now properly closed
