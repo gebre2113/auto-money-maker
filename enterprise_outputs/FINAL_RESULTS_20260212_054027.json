@@ -1,0 +1,131 @@
+{
+  "production_id": "enterprise_2a23ca20bd9d",
+  "topic": "Enterprise AI Implementation Strategies 2026",
+  "target_countries": [
+    "US",
+    "GB",
+    "CA",
+    "AU",
+    "DE",
+    "FR",
+    "JP",
+    "CH",
+    "NO",
+    "SE"
+  ],
+  "content_type": "enterprise_guide",
+  "enterprise_standards": {
+    "min_words": 3000,
+    "min_quality": 88,
+    "min_cultural_depth": 85,
+    "min_compliance_score": 95,
+    "sequential_processing": true,
+    "intelligent_delays": true,
+    "quality_guarantee": true,
+    "key_rotation": "15-key-omega"
+  },
+  "omega_key_system": {
+    "keys_loaded": 9,
+    "total_rotations": 10,
+    "rotation_pattern": "round_robin",
+    "key_statistics": {
+      "1": {
+        "uses": 2,
+        "successes": 0,
+        "failures": 0,
+        "last_used": "2026-02-12T05:40:22.248478",
+        "status": "active"
+      },
+      "2": {
+        "uses": 1,
+        "successes": 0,
+        "failures": 0,
+        "last_used": "2026-02-12T05:40:22.241691",
+        "status": "active"
+      },
+      "3": {
+        "uses": 1,
+        "successes": 0,
+        "failures": 0,
+        "last_used": "2026-02-12T05:40:22.242553",
+        "status": "active"
+      },
+      "4": {
+        "uses": 1,
+        "successes": 0,
+        "failures": 0,
+        "last_used": "2026-02-12T05:40:22.243405",
+        "status": "active"
+      },
+      "5": {
+        "uses": 1,
+        "successes": 0,
+        "failures": 0,
+        "last_used": "2026-02-12T05:40:22.244237",
+        "status": "active"
+      },
+      "6": {
+        "uses": 1,
+        "successes": 0,
+        "failures": 0,
+        "last_used": "2026-02-12T05:40:22.245109",
+        "status": "active"
+      },
+      "7": {
+        "uses": 1,
+        "successes": 0,
+        "failures": 0,
+        "last_used": "2026-02-12T05:40:22.245966",
+        "status": "active"
+      },
+      "8": {
+        "uses": 1,
+        "successes": 0,
+        "failures": 0,
+        "last_used": "2026-02-12T05:40:22.246799",
+        "status": "active"
+      },
+      "9": {
+        "uses": 1,
+        "successes": 0,
+        "failures": 0,
+        "last_used": "2026-02-12T05:40:22.247650",
+        "status": "active"
+      }
+    }
+  },
+  "status": "failed",
+  "start_time": "2026-02-12T05:40:22.240056",
+  "performance_monitoring": true,
+  "country_results": [],
+  "overall_metrics": {},
+  "enhancement_reports": {},
+  "error": "Production failed",
+  "performance_report": {
+    "profile_output": "         9185 function calls (9174 primitive calls) in 5.014 seconds\n\n   Ordered by: cumulative time, internal time\n   List reduced from 140 to 30 due to restriction <30>\n\n   ncalls  tottime  percall  cumtime  percall filename:lineno(function)\n        2    0.000    0.000    5.004    2.502 /opt/hostedtoolcache/Python/3.12.12/x64/lib/python3.12/asyncio/base_events.py:1922(_run_once)\n        2    0.000    0.000    5.004    2.502 /opt/hostedtoolcache/Python/3.12.12/x64/lib/python3.12/selectors.py:451(select)\n        2    5.004    2.502    5.004    2.502 {method 'poll' of 'select.epoll' objects}\n        2    0.000    0.000    0.009    0.004 /home/runner/work/auto-money-maker/auto-money-maker/enterprise_runner.py:3603(safe_execute)\n        1    0.000    0.000    0.009    0.009 /home/runner/work/auto-money-maker/auto-money-maker/enterprise_runner.py:4075(run_enterprise_production)\n       60    0.000    0.000    0.009    0.000 /opt/hostedtoolcache/Python/3.12.12/x64/lib/python3.12/logging/__init__.py:1660(_log)\n       50    0.000    0.000    0.007    0.000 /opt/hostedtoolcache/Python/3.12.12/x64/lib/python3.12/logging/__init__.py:1529(info)\n       60    0.000    0.000    0.007    0.000 /opt/hostedtoolcache/Python/3.12.12/x64/lib/python3.12/logging/__init__.py:1686(handle)\n       60    0.000    0.000    0.007    0.000 /opt/hostedtoolcache/Python/3.12.12/x64/lib/python3.12/logging/__init__.py:1746(callHandlers)\n      190    0.000    0.000    0.006    0.000 /opt/hostedtoolcache/Python/3.12.12/x64/lib/python3.12/logging/__init__.py:1011(handle)\n      190    0.000    0.000    0.006    0.000 /opt/hostedtoolcache/Python/3.12.12/x64/lib/python3.12/logging/__init__.py:1148(emit)\n      190    0.000    0.000    0.003    0.000 /opt/hostedtoolcache/Python/3.12.12/x64/lib/python3.12/logging/__init__.py:988(format)\n      190    0.000    0.000    0.002    0.000 /opt/hostedtoolcache/Python/3.12.12/x64/lib/python3.12/logging/__init__.py:690(format)\n       70    0.000    0.000    0.002    0.000 /opt/hostedtoolcache/Python/3.12.12/x64/lib/python3.12/logging/__init__.py:1266(emit)\n       10    0.000    0.000    0.002    0.000 /opt/hostedtoolcache/Python/3.12.12/x64/lib/python3.12/logging/__init__.py:1558(error)\n       10    0.000    0.000    0.002    0.000 /home/runner/work/auto-money-maker/auto-money-maker/enterprise_runner.py:3781(_get_next_omega_key)\n      190    0.000    0.000    0.001    0.000 /opt/hostedtoolcache/Python/3.12.12/x64/lib/python3.12/logging/__init__.py:1137(flush)\n       60    0.000    0.000    0.001    0.000 /home/runner/work/auto-money-maker/auto-money-maker/enterprise_runner.py:3715(format)\n       60    0.000    0.000    0.001    0.000 /opt/hostedtoolcache/Python/3.12.12/x64/lib/python3.12/logging/__init__.py:1645(makeRecord)\n       60    0.000    0.000    0.001    0.000 /opt/hostedtoolcache/Python/3.12.12/x64/lib/python3.12/logging/__init__.py:298(__init__)\n    34/23    0.000    0.000    0.001    0.000 /opt/hostedtoolcache/Python/3.12.12/x64/lib/python3.12/site-packages/psutil/_pslinux.py:1589(wrapper)\n       10    0.000    0.000    0.001    0.000 /home/runner/work/auto-money-maker/auto-money-maker/enterprise_runner.py:89(sample_memory)\n       23    0.000    0.000    0.001    0.000 /opt/hostedtoolcache/Python/3.12.12/x64/lib/python3.12/site-packages/psutil/_common.py:367(wrapper)\n      190    0.001    0.000    0.001    0.000 {method 'write' of '_io.TextIOWrapper' objects}\n      190    0.000    0.000    0.001    0.000 /opt/hostedtoolcache/Python/3.12.12/x64/lib/python3.12/logging/__init__.py:622(formatTime)\n       11    0.000    0.000    0.001    0.000 /opt/hostedtoolcache/Python/3.12.12/x64/lib/python3.12/site-packages/psutil/__init__.py:313(__init__)\n       11    0.000    0.000    0.001    0.000 /opt/hostedtoolcache/Python/3.12.12/x64/lib/python3.12/site-packages/psutil/__init__.py:316(_init)\n       11    0.000    0.000    0.001    0.000 /opt/hostedtoolcache/Python/3.12.12/x64/lib/python3.12/site-packages/psutil/__init__.py:363(_get_ident)\n       60    0.000    0.000    0.001    0.000 /opt/hostedtoolcache/Python/3.12.12/x64/lib/python3.12/logging/__init__.py:1611(findCaller)\n       11    0.000    0.000    0.001    0.000 /opt/hostedtoolcache/Python/3.12.12/x64/lib/python3.12/site-packages/psutil/_pslinux.py:1848(create_time)\n\n\n",
+    "elapsed_time_seconds": 5.116306781768799,
+    "memory_report": {
+      "rss_mb": 136.46875,
+      "vms_mb": 401.15234375,
+      "percent": 0.853201937239251,
+      "available_system_mb": 15028.578125,
+      "cpu_percent": 0.0
+    },
+    "peak_memory_mb": 136.46875
+  },
+  "system_status": {
+    "memory": {
+      "total_mb": 15994.89453125,
+      "available_mb": 15028.734375,
+      "percent_used": 6.0,
+      "swap_mb": 0.0
+    },
+    "cpu": {
+      "percent": 0.0,
+      "count": 4
+    },
+    "disk": {
+      "free_gb": 20.678813934326172
+    }
+  }
+}
