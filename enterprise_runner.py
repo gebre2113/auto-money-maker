@@ -3091,7 +3091,7 @@ class EnterpriseProductionOrchestrator:
     # -------------------------------------------------------------------------
     # 🌉 MEGA-BRIDGE v3.1 – ROBUST METHOD DISCOVERY
     # -------------------------------------------------------------------------
-    async def _call_content_engine(self, engine, country: str, topic: str) -> str:
+async def _call_content_engine(self, engine, country: str, topic: str) -> str:
     """🔗 MEGA-BRIDGE v3.5 – ሜጋ-ፔኑን ፈልጎ በኃይል የሚያገኝ"""
     try:
         # 1. በ mega_engine ንብርብር ውስጥ ፈልግ
