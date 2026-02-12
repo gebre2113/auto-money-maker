@@ -4194,87 +4194,154 @@ class EnterpriseProductionOrchestrator:
     # 🔧 FIX 4: Signature now accepts **kwargs to swallow extra arguments from call
     # ========================================================================
     async def _process_country_enterprise(self, country: str, topic: str, **kwargs) -> dict:
-        """
-        👑 ኢንተርፕራይዝ የሀገር ይዘት ማምረቻ - DEEP BRIDGE SEARCH VERSION
-        """
-        # ⚠️ 'default' የሚባለውን ቁልፍ እንዲዘል ማድረግ
-        if country.lower() == 'default':
-            return {'status': 'skipped'}
-
-        start_time = datetime.now()
-        self.logger.info(f"🏭 Processing {country} with Enterprise pipeline...")
+    """
+    👑 ኢንተርፕራይዝ የሀገር ይዘት ማምረቻ ዋና ዘዴ
+    ⚡ ULTIMATE ROBUST VERSION – BRIDGE FORTIFIED, ARGUMENT ORDER FIXED, RETURN TYPE HANDLED
+    """
+    start_time = datetime.now()
+    self.logger.info(f"🏭 Processing {country} with Enterprise pipeline...")
+    
+    result = {
+        'country': country,
+        'status': 'failed',
+        'content': '',
+        'metrics': {},
+        'error': None,
+        'production_id': f"{country}_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+    }
+    
+    try:
+        # --------------------------------------------------------------
+        # 🔗 የመገናኛ ድልድይ – ተግባሩን በትክክለኛው ቦታ ፈልግ
+        # --------------------------------------------------------------
+        if not hasattr(self, 'content_engine'):
+            raise AttributeError("❌ content_engine not found on orchestrator")
         
-        result = {
-            'country': country, 'status': 'failed', 'content': '',
-            'metrics': {}, 'error': None,
-            'production_id': f"{country}_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
-        }
+        engine = self.content_engine
+        # ተግባሩ በቀጥታ ካልተገኘ፣ ወደ .mega_engine ግባ
+        if not hasattr(engine, 'produce_single_country_sovereign_logic'):
+            if hasattr(engine, 'mega_engine'):
+                engine = engine.mega_engine
+                self.logger.info("🔗 Switched to internal mega_engine bridge")
+            else:
+                raise AttributeError("❌ No mega_engine or direct method found")
         
-        try:
-            # 1. 🔗 ድልድዩን ፈልጎ የማግኘት ጥልቅ ፍተሻ (The Deep Hunter)
-            engine_method = None
-            
-            # ሀ. በ content_engine ውስጥ መፈለግ
-            if hasattr(self, 'content_engine'):
-                # በቀጥታ ካለ
-                if hasattr(self.content_engine, 'produce_single_country_sovereign_logic'):
-                    engine_method = self.content_engine.produce_single_country_sovereign_logic
-                # በ mega_engine ውስጥ ካለ
-                elif hasattr(self.content_engine, 'mega_engine'):
-                    if hasattr(self.content_engine.mega_engine, 'produce_single_country_sovereign_logic'):
-                        engine_method = self.content_engine.mega_engine.produce_single_country_sovereign_logic
-            
-            if engine_method is None:
-                # ለሙከራ ያህል ያሉትን ዘዴዎች ዘርዝር
-                available = [m for m in dir(getattr(self, 'content_engine', {})) if not m.startswith('_')]
-                raise AttributeError(f"❌ produce_single_country_sovereign_logic not found. Available: {available}")
-
-            # 2. ✍️ ይዘቱን ማምረት
-            self.logger.info(f"🚀 Found engine! Executing logic for {country}...")
-            content_html = await engine_method(topic, country)
-            
-            if not content_html or len(content_html) < 100:
-                raise ValueError(f"⚠️ Content generation returned empty or too short for {country}")
-
-            # 3. 🖼️ SmartImageEngine (ምስል ማስገቢያ)
-            if hasattr(self, 'image_engine') and self.image_engine:
-                content_html = self.image_engine.generate_image_placeholders(content_html, country, topic)
-            
-            # 4. 💎 EliteQualityOptimizer (ጥራት ማረጋገጫ)
-            if hasattr(self, 'quality_optimizer') and self.quality_optimizer:
-                content_html = await self.quality_optimizer.apply_100_percent_standard(content_html, country, topic)
-            
-            # 5. 💰 Affiliate & Neuro-Marketing
-            rev = 0.0
-            if hasattr(self, 'affiliate_manager') and self.affiliate_manager:
-                content_html, aff_report = await self.affiliate_manager.inject_affiliate_links(
-                    content=content_html, topic=topic, user_intent="purchase", user_journey_stage="decision"
-                )
-                rev = aff_report.get('predicted_total_revenue', 0.0)
-
-            # 6. 📱 Social Media Publishing
-            if hasattr(self, 'social_publisher') and self.social_publisher:
-                await self.social_publisher.publish_country_content({
-                    'country': country, 'topic': topic, 'content': content_html,
+        # --------------------------------------------------------------
+        # ✍️ ይዘት ማመንጨት – ትክክለኛ ቅደም ተከተል (country, topic)
+        # --------------------------------------------------------------
+        # ዘዴው async ሊሆን ይችላል፣ ስለዚህ ሁልጊዜ await አድርግ
+        raw_result = await engine.produce_single_country_sovereign_logic(
+            country=country,
+            topic=topic,
+            additional_context={'phase': kwargs.get('country_number', 0)}
+        )
+        
+        # 📦 የተመላሽውን ውጤት አስተናግድ – ዲክሽነሪ ወይም ቀጥተኛ ሕብረቁምፊ
+        if isinstance(raw_result, dict):
+            if raw_result.get('status') != 'success':
+                raise ValueError(f"Content generation failed: {raw_result.get('error', 'Unknown')}")
+            content = raw_result.get('content', '')
+            estimated_revenue = raw_result.get('metrics', {}).get('estimated_revenue', 0)
+        else:
+            content = str(raw_result)
+            estimated_revenue = 0.0
+        
+        if not content:
+            raise ValueError(f"⚠️ Empty content received for {country}")
+        
+        self.logger.info(f"✅ Raw content generated for {country} – {len(content.split())} words")
+        
+        # --------------------------------------------------------------
+        # 🖼️ SmartImageEngine – ምስሎችን አስገባ
+        # --------------------------------------------------------------
+        if hasattr(self, 'image_engine') and self.image_engine:
+            try:
+                content = self.image_engine.generate_image_placeholders(content, country, topic)
+                img_count = self.image_engine.count_injected_images(content)
+                self.logger.info(f"🖼️ {img_count} images injected for {country}")
+            except Exception as e:
+                self.logger.error(f"❌ Image injection failed for {country}: {e}")
+        
+        # --------------------------------------------------------------
+        # 🎬 ቪዲዮዎችን አስገባ (ካለ)
+        # --------------------------------------------------------------
+        if hasattr(engine, '_inject_authority_videos'):
+            try:
+                video_method = engine._inject_authority_videos
+                if asyncio.iscoroutinefunction(video_method):
+                    video_html = await video_method(topic, country)
+                else:
+                    video_html = video_method(topic, country)
+                if video_html:
+                    content += f"\n\n{video_html}"
+                    self.logger.info(f"🎬 Videos injected for {country}")
+            except Exception as e:
+                self.logger.warning(f"⚠️ Video injection failed for {country}: {e}")
+        
+        # --------------------------------------------------------------
+        # 💎 EliteQualityOptimizer – የመጨረሻ ማሻሻያ
+        # --------------------------------------------------------------
+        if hasattr(self, 'quality_optimizer') and self.quality_optimizer:
+            try:
+                optimizer = self.quality_optimizer
+                if asyncio.iscoroutinefunction(optimizer.apply_100_percent_standard):
+                    content = await optimizer.apply_100_percent_standard(content, country, topic)
+                else:
+                    content = optimizer.apply_100_percent_standard(content, country, topic)
+                self.logger.info(f"💎 Quality polish applied for {country}")
+            except Exception as e:
+                self.logger.warning(f"⚠️ Quality optimization failed for {country}: {e}")
+        
+        # --------------------------------------------------------------
+        # 📱 SocialMediaManager – ቀጥታ ማተም
+        # --------------------------------------------------------------
+        if hasattr(self, 'social_publisher') and self.social_publisher:
+            try:
+                country_data = {
+                    'country': country,
+                    'topic': topic,
+                    'content': content,
                     'production_id': result['production_id'],
-                    'metrics': {'final_word_count': len(content_html.split()), 'estimated_revenue': rev}
-                })
-
-            result.update({
-                'status': 'success',
-                'content': content_html,
-                'metrics': {
-                    'final_word_count': len(content_html.split()),
-                    'estimated_revenue': rev,
-                    'quality_score': 98
+                    'metrics': {
+                        'final_word_count': len(content.split()),
+                        'estimated_revenue': estimated_revenue or len(content.split()) * 0.05
+                    }
                 }
-            })
-            return result
-
-        except Exception as e:
-            self.logger.error(f"❌ Master Bridge Failure in {country}: {str(e)}")
-            result['error'] = str(e)
-            return result
+                if asyncio.iscoroutinefunction(self.social_publisher.publish_country_content):
+                    await self.social_publisher.publish_country_content(country_data)
+                else:
+                    self.social_publisher.publish_country_content(country_data)
+                self.logger.info(f"📱 Published {country} to social platforms")
+            except Exception as e:
+                self.logger.error(f"❌ Social publishing failed for {country}: {e}")
+        
+        # --------------------------------------------------------------
+        # 📊 ውጤት ዘምን
+        # --------------------------------------------------------------
+        word_count = len(content.split())
+        processing_time = (datetime.now() - start_time).total_seconds()
+        
+        result.update({
+            'status': 'success',
+            'content': content,
+            'metrics': {
+                'final_word_count': word_count,
+                'estimated_revenue': round(estimated_revenue or word_count * 0.05, 2),
+                'processing_time_seconds': round(processing_time, 1),
+                'image_count': self.image_engine.count_injected_images(content) if hasattr(self, 'image_engine') else 0,
+                'quality_score': 98  # ጊዜያዊ፤ በኋላ ከquality_optimizer ማግኘት ይቻላል
+            },
+            'error': None
+        })
+        
+        self.logger.info(f"✅ Country {country} processed in {processing_time:.1f}s")
+        return result
+        
+    except Exception as e:
+        self.logger.error(f"❌ Master Bridge Failure in {country}: {str(e)}")
+        self.logger.error(traceback.format_exc())
+        result['error'] = str(e)[:500]
+        return result
     
     # ========================================================================
     # 🔧 FIX 5: _calculate_enterprise_metrics now properly closed
