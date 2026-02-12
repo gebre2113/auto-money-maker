@@ -3145,13 +3145,22 @@ class EnterpriseImportSystem:
         return self.enterprise_components.get(component_name)
 
 # =================== ENTERPRISE PRODUCTION ORCHESTRATOR (ENHANCED) ===================
+# =============================================================================
+# 🏢 ENTERPRISE PRODUCTION ORCHESTRATOR v9.0 - STABLE BRIDGE
+# =============================================================================
+
 class EnterpriseProductionOrchestrator:
+    """
+    🏭 ዋና የምርት ማስኬጃ ሲስተም - ሁሉንም ክፍሎች ያስተባብራል፣
+    ወደ Mega‑Pen ድልድይ ይገነባል፣ እና የመጨረሻውን 15,000+ ቃላት ያመነጫል።
+    """
+
     def __init__(self):
         self.logger = self._setup_enterprise_logging()
         self.importer = EnterpriseImportSystem()
         import_results = self.importer.import_enterprise_system()
         self._initialize_all_components()
-        
+
         # NEW: Ultimate Quality Guardian
         self.quality_guardian = UltimateQualityGuardian()
         # NEW: Offline LLM Judge (optional)
@@ -3160,7 +3169,7 @@ class EnterpriseProductionOrchestrator:
         self.quality_db = QualityDatabase()
         # NEW: Schema Validator
         self.schema_validator = ProductionSchemaValidator()
-        
+
         self.enterprise_standards = {
             'min_words': 3000,
             'min_quality': 88,
@@ -3172,12 +3181,14 @@ class EnterpriseProductionOrchestrator:
             'key_rotation': '15-key-omega',
             'quality_guardian_version': '3.1'
         }
+
         self.performance_monitor = PerformanceMonitor()
         self.memory_manager = MemoryManager()
         self.key_rotation_system = self._initialize_omega_key_system()
         self.failover_system = UnstoppableAIProvider()
         self.quality_optimizer = EliteQualityOptimizer(self)
-        self.logger.info("="*80)
+
+        self.logger.info("=" * 80)
         self.logger.info("🏢 ENTERPRISE PRODUCTION ORCHESTRATOR v9.0 INITIALIZED")
         self.logger.info("💎 ALL ENHANCEMENTS INTEGRATED - ZERO COMPROMISE")
         self.logger.info("🔑 OMEGA 15-KEY ROTATION SYSTEM ACTIVE (Round-Robin Relay)")
@@ -3191,39 +3202,53 @@ class EnterpriseProductionOrchestrator:
         self.logger.info("⚙️ Offline LLM Judge Available" if self.offline_judge.enabled else "⚙️ Offline LLM Judge Not Available")
         self.logger.info("🌍 10+ HIGH-VALUE MARKETS WITH ENTERPRISE DEPTH")
         self.logger.info("🛡️ FULL ETHICAL COMPLIANCE & LEGAL PROTECTION")
-        self.logger.info("="*80)
+        self.logger.info("=" * 80)
+
         self._verify_module_integrity()
-    
+
+    # -------------------------------------------------------------------------
+    # 🪵 LOGGING SETUP
+    # -------------------------------------------------------------------------
     def _setup_enterprise_logging(self):
         log_dir = Path('enterprise_logs')
         log_dir.mkdir(exist_ok=True)
         logger = logging.getLogger('enterprise_orchestrator')
         logger.setLevel(logging.DEBUG)
         logger.handlers.clear()
+
         class EnterpriseFormatter(logging.Formatter):
-            level_colors = {'DEBUG': '\033[36m', 'INFO': '\033[32m', 'WARNING': '\033[33m', 'ERROR': '\033[31m', 'CRITICAL': '\033[41m'}
+            level_colors = {'DEBUG': '\033[36m', 'INFO': '\033[32m', 'WARNING': '\033[33m',
+                            'ERROR': '\033[31m', 'CRITICAL': '\033[41m'}
             level_emojis = {'DEBUG': '🔍', 'INFO': '✅', 'WARNING': '⚠️', 'ERROR': '❌', 'CRITICAL': '🚨'}
             def format(self, record):
                 lc = self.level_colors.get(record.levelname, '\033[0m')
                 le = self.level_emojis.get(record.levelname, '📝')
                 fmt = f"{lc}{le} %(asctime)s | %(levelname)-8s | %(message)s\033[0m"
                 return logging.Formatter(fmt, datefmt='%H:%M:%S').format(record)
+
         console = logging.StreamHandler()
         console.setLevel(logging.INFO)
         console.setFormatter(EnterpriseFormatter())
         logger.addHandler(console)
+
         log_file = log_dir / f"enterprise_{datetime.now().strftime('%Y%m%d_%H%M%S')}.log"
         fh = logging.FileHandler(log_file, encoding='utf-8')
         fh.setLevel(logging.DEBUG)
-        fh.setFormatter(logging.Formatter('%(asctime)s | %(levelname)-8s | %(name)s | %(message)s', datefmt='%Y-%m-%d %H:%M:%S'))
+        fh.setFormatter(logging.Formatter('%(asctime)s | %(levelname)-8s | %(name)s | %(message)s',
+                                          datefmt='%Y-%m-%d %H:%M:%S'))
         logger.addHandler(fh)
+
         error_file = log_dir / f"enterprise_errors_{datetime.now().strftime('%Y%m%d')}.log"
         eh = logging.FileHandler(error_file, encoding='utf-8')
         eh.setLevel(logging.ERROR)
-        eh.setFormatter(logging.Formatter('%(asctime)s | %(levelname)-8s | %(name)s | %(message)s', datefmt='%Y-%m-%d %H:%M:%S'))
+        eh.setFormatter(logging.Formatter('%(asctime)s | %(levelname)-8s | %(name)s | %(message)s',
+                                          datefmt='%Y-%m-%d %H:%M:%S'))
         logger.addHandler(eh)
         return logger
-    
+
+    # -------------------------------------------------------------------------
+    # 🔑 OMEGA 15-KEY SYSTEM
+    # -------------------------------------------------------------------------
     def _initialize_omega_key_system(self):
         omega_system = {
             'keys_loaded': 0,
@@ -3240,7 +3265,8 @@ class EnterpriseProductionOrchestrator:
                 key_value = os.getenv(key_name)
                 if key_value:
                     omega_system['keys'].append(key_value)
-                    omega_system['key_statistics'][i] = {'uses': 0, 'successes': 0, 'failures': 0, 'last_used': None, 'status': 'active'}
+                    omega_system['key_statistics'][i] = {'uses': 0, 'successes': 0, 'failures': 0,
+                                                          'last_used': None, 'status': 'active'}
             omega_system['keys_loaded'] = len(omega_system['keys'])
             self.logger.info(f"🔑 OMEGA KEY SYSTEM: {omega_system['keys_loaded']}/15 keys loaded")
             if omega_system['keys_loaded'] == 0:
@@ -3248,7 +3274,7 @@ class EnterpriseProductionOrchestrator:
         except Exception as e:
             self.logger.error(f"❌ Error initializing Omega key system: {e}")
         return omega_system
-    
+
     def _get_next_omega_key(self, phase_idx=None):
         if not self.key_rotation_system['keys']:
             raise Exception("No Omega keys available")
@@ -3274,26 +3300,33 @@ class EnterpriseProductionOrchestrator:
                 self.logger.info(f"✅ Omega Key {key_number} blacklist expired, reactivating")
         self.logger.info(f"🔄 OMEGA ROTATION: Using Key {key_number}/{total_keys} (Phase: {phase_idx})")
         return selected_key, key_number
-    
+
     def _blacklist_omega_key(self, key_number, duration_seconds=120):
         unblock_time = time.time() + duration_seconds
         self.key_rotation_system['blacklisted_keys'][key_number] = unblock_time
         self.key_rotation_system['key_statistics'][key_number]['status'] = 'blacklisted'
         self.logger.warning(f"⚫ Omega Key {key_number} blacklisted for {duration_seconds}s")
-    
+
     def _update_key_statistics(self, key_number, success=True):
         if key_number in self.key_rotation_system['key_statistics']:
             if success:
                 self.key_rotation_system['key_statistics'][key_number]['successes'] += 1
             else:
                 self.key_rotation_system['key_statistics'][key_number]['failures'] += 1
-            total = self.key_rotation_system['key_statistics'][key_number]['successes'] + self.key_rotation_system['key_statistics'][key_number]['failures']
+            total = (self.key_rotation_system['key_statistics'][key_number]['successes'] +
+                     self.key_rotation_system['key_statistics'][key_number]['failures'])
             if total > 0:
                 sr = (self.key_rotation_system['key_statistics'][key_number]['successes'] / total) * 100
                 self.key_rotation_system['key_statistics'][key_number]['status'] = 'unreliable' if sr < 50 else 'active'
-    
+
+    # -------------------------------------------------------------------------
+    # 🧩 MODULE INTEGRITY & FALLBACKS
+    # -------------------------------------------------------------------------
     def _verify_module_integrity(self):
-        required = ['youtube_hunter', 'affiliate_manager', 'content_system', 'human_engine', 'image_engine', 'cta_engine', 'cultural_guardian', 'revenue_engine', 'compliance_guardian', 'ai_cultural_enricher', 'ai_quality_auditor', 'ai_title_optimizer']
+        required = ['youtube_hunter', 'affiliate_manager', 'content_system', 'human_engine',
+                    'image_engine', 'cta_engine', 'cultural_guardian', 'revenue_engine',
+                    'compliance_guardian', 'ai_cultural_enricher', 'ai_quality_auditor',
+                    'ai_title_optimizer']
         missing = []
         for mod in required:
             if not hasattr(self, mod):
@@ -3304,12 +3337,13 @@ class EnterpriseProductionOrchestrator:
             self._create_fallback_modules(missing)
         else:
             self.logger.info("✅ All required modules verified")
-    
+
     def _create_fallback_modules(self, missing_modules):
         for module in missing_modules:
             if module == 'content_system':
                 async def mock_generate(*args, **kwargs):
-                    return {'content': f"# Content Generation Fallback\n\nThis is a safety-first generated content.", 'word_count': 1000, 'quality_score': 75}
+                    return {'content': "# Content Generation Fallback\n\nThis is a safety-first generated content.",
+                            'word_count': 1000, 'quality_score': 75}
                 async def mock_sovereign_logic(country, topic, additional_context=None):
                     return f"# {topic} for {country}\n\nComprehensive enterprise analysis (Fallback Mode Enabled)."
                 fallback_obj = type('FallbackContentSystem', (), {
@@ -3324,7 +3358,7 @@ class EnterpriseProductionOrchestrator:
                 self.logger.warning("✅ Bulletproof Fallback Content System activated.")
             else:
                 setattr(self, module, None)
-    
+
     def _initialize_all_components(self):
         self.logger.info("🏢 Initializing Enterprise Components...")
         try:
@@ -3336,11 +3370,15 @@ class EnterpriseProductionOrchestrator:
             if aff_mgr:
                 self.affiliate_manager = aff_mgr(user_geo="US", user_segment="enterprise") if callable(aff_mgr) else aff_mgr
                 self.logger.info("✅ Enterprise Affiliate Manager initialized")
+
             profit_sys = self.importer.get_module('UltimateProfitMasterSystem')
             if profit_sys:
                 self.content_system = profit_sys() if callable(profit_sys) else profit_sys
                 self.content_engine = self.content_system
                 self.logger.info("✅ Enterprise Content System (Mega-Pen) initialized")
+            else:
+                self.logger.warning("⚠️ UltimateProfitMasterSystem not found, fallback will be used")
+
             self.ai_cultural_enricher = self.importer.get_enterprise_component('AICulturalEnricher')
             if self.ai_cultural_enricher:
                 status = "✅ (API Key Active)" if self.ai_cultural_enricher.enabled else "⚠️ (Fallback Mode)"
@@ -3353,138 +3391,124 @@ class EnterpriseProductionOrchestrator:
             if self.ai_title_optimizer:
                 status = "✅ (API Key Active)" if self.ai_title_optimizer.enabled else "⚠️ (Fallback Mode)"
                 self.logger.info(f"{status} AI Title Optimizer initialized")
+
             self.human_engine = HumanLikenessEngine(cultural_enricher=self.ai_cultural_enricher)
             self.logger.info("✅ Human Likeness Engine initialized (95% AI Detection Reduction)")
             self.cultural_guardian = self.importer.get_enterprise_component('CulturalDepthGuardian')
-            if self.cultural_guardian: self.logger.info("✅ Cultural Depth Guardian initialized")
+            if self.cultural_guardian:
+                self.logger.info("✅ Cultural Depth Guardian initialized")
             self.revenue_engine = self.importer.get_enterprise_component('RevenueForecastEngine')
-            if self.revenue_engine: self.logger.info("✅ Revenue Forecast Engine initialized")
+            if self.revenue_engine:
+                self.logger.info("✅ Revenue Forecast Engine initialized")
             self.compliance_guardian = self.importer.get_enterprise_component('EthicalComplianceGuardian')
-            if self.compliance_guardian: self.logger.info("✅ Ethical Compliance Guardian initialized")
+            if self.compliance_guardian:
+                self.logger.info("✅ Ethical Compliance Guardian initialized")
             self.image_engine = self.importer.get_enterprise_component('SmartImageEngine')
-            if self.image_engine: self.logger.info("✅ Smart Image Engine initialized (40% SEO Boost)")
+            if self.image_engine:
+                self.logger.info("✅ Smart Image Engine initialized (40% SEO Boost)")
             self.cta_engine = self.importer.get_enterprise_component('DynamicCTAEngine')
-            if self.cta_engine: self.logger.info("✅ Dynamic CTA Engine initialized (35% Revenue Increase)")
+            if self.cta_engine:
+                self.logger.info("✅ Dynamic CTA Engine initialized (35% Revenue Increase)")
             self.social_manager = self.importer.get_enterprise_component('SocialMediaManager')
             self.social_publisher = self.social_manager
-            if self.social_manager: self.logger.info("✅ Social Media Manager initialized")
+            if self.social_manager:
+                self.logger.info("✅ Social Media Manager initialized")
             self.dashboard_manager = self.importer.get_enterprise_component('DashboardManager')
-            if self.dashboard_manager: self.logger.info("✅ Dashboard Manager initialized")
+            if self.dashboard_manager:
+                self.logger.info("✅ Dashboard Manager initialized")
         except Exception as e:
             self.logger.error(f"❌ Error during component initialization: {str(e)}")
             raise
-    
-    # -------- Content Engine Method Resolver (fix for AttributeError) --------
-async def _call_content_engine(self, engine, country: str, topic: str) -> str:
-    """
-    🔗 MEGA-BRIDGE v3.0 – ከሜጋ-ፔን (v19) የተመረተውን 15,000+ ቃላት በአስተማማኝ ሁኔታ ይቀበላል።
-    ✅ Asynchronous/synchronous ሁለቱንም ይደግፋል፣ መጠባበቂያ ዘዴዎች አሉት፣ የውጤት ቅርጸትን በራስ-ሰር ይለያል።
-    """
-    try:
-        # 1. መጀመሪያ በ UltimateProfitMasterSystem ውስጥ mega_engine መኖሩን ይፈትሻል
-        mega = getattr(engine, 'mega_engine', None)
-        content = None
 
-        # 2. ተመራጭ ዘዴ: Mega-Pen v19 (15,000 ቃላት)
-        if mega and hasattr(mega, 'produce_single_country_sovereign_logic'):
-            method = mega.produce_single_country_sovereign_logic
-            self.logger.info(f"🚀 Mega-Bridge Active: Receiving 15,000+ words from Mega-Pen for {country}")
-            content = await self._execute_content_method(method, topic, country)
+    # -------------------------------------------------------------------------
+    # 🌉 MEGA-BRIDGE – Content Engine Method Resolver (FIXED)
+    # -------------------------------------------------------------------------
+    async def _call_content_engine(self, engine, country: str, topic: str) -> str:
+        """
+        🔗 MEGA-BRIDGE v3.0 – ከሜጋ-ፔን (v19) የተመረተውን 15,000+ ቃላት በአስተማማኝ ሁኔታ ይቀበላል።
+        """
+        try:
+            # 1. መጀመሪያ በ UltimateProfitMasterSystem ውስጥ mega_engine መኖሩን ይፈትሻል
+            mega = getattr(engine, 'mega_engine', None)
+            content = None
 
-        # 3. በቀጥታ በ engine ላይ ካለ (ለተኳሃኝነት)
-        if content is None and hasattr(engine, 'produce_single_country_sovereign_logic'):
-            method = engine.produce_single_country_sovereign_logic
-            self.logger.info(f"⚙️ Using direct engine method for {country}")
-            content = await self._execute_content_method(method, topic, country)
+            if mega and hasattr(mega, 'produce_single_country_sovereign_logic'):
+                method = mega.produce_single_country_sovereign_logic
+                self.logger.info(f"🚀 Mega-Bridge Active: Receiving 15,000+ words from Mega-Pen for {country}")
+                content = await self._execute_content_method(method, topic, country)
 
-        # 4. ሌሎች የተለመዱ የይዘት ማመንጫ ዘዴዎች (fallback)
-        if content is None:
-            for method_name in ['generate_content', 'generate', 'create_content']:
-                if hasattr(engine, method_name):
-                    method = getattr(engine, method_name)
-                    self.logger.info(f"🔄 Fallback: Using {method_name} for {country}")
-                    content = await self._execute_content_method(method, topic, country)
-                    if content:
-                        break
+            # 2. በቀጥታ በ engine ላይ ካለ (ለተኳሃኝነት)
+            if content is None and hasattr(engine, 'produce_single_country_sovereign_logic'):
+                method = engine.produce_single_country_sovereign_logic
+                self.logger.info(f"⚙️ Using direct engine method for {country}")
+                content = await self._execute_content_method(method, topic, country)
 
-        # 5. አሁንም ይዘት ካልተገኘ → የመጨረሻ መጠባበቂያ
-        if not content:
-            self.logger.error(f"❌ No content generation method found in {type(engine).__name__} for {country}")
-            content = self._generate_fallback_content(topic, country)
+            # 3. ሌሎች የተለመዱ የይዘት ማመንጫ ዘዴዎች (fallback)
+            if content is None:
+                for method_name in ['generate_content', 'generate', 'create_content']:
+                    if hasattr(engine, method_name):
+                        method = getattr(engine, method_name)
+                        self.logger.info(f"🔄 Fallback: Using {method_name} for {country}")
+                        content = await self._execute_content_method(method, topic, country)
+                        if content:
+                            break
 
-        # 6. የውጤት ቅርጸት ማጽዳት (string ብቻ እንዲሆን)
-        final_content = self._extract_content_string(content)
-        word_count = len(final_content.split())
-        self.logger.info(f"✅ Mega-Bridge Delivered: {word_count} words for {country}")
-        return final_content
+            # 4. አሁንም ይዘት ካልተገኘ → የመጨረሻ መጠባበቂያ
+            if not content:
+                self.logger.error(f"❌ No content generation method found in {type(engine).__name__} for {country}")
+                content = self._generate_fallback_content(topic, country)
 
-    except Exception as e:
-        self.logger.error(f"❌ Mega-Bridge Critical Error for {country}: {str(e)}")
-        return self._generate_fallback_content(topic, country)
+            final_content = self._extract_content_string(content)
+            word_count = len(final_content.split())
+            self.logger.info(f"✅ Mega-Bridge Delivered: {word_count} words for {country}")
+            return final_content
 
+        except Exception as e:
+            self.logger.error(f"❌ Mega-Bridge Critical Error for {country}: {str(e)}")
+            return self._generate_fallback_content(topic, country)
 
-async def _execute_content_method(self, method, topic: str, country: str) -> Optional[Any]:
-    """
-    🧠 አስፕንክሮናስ/ሲንክሮናስ ዘዴዎችን በደህና ይጠራል፣ የጊዜ ገደብ ይጨምራል።
-    """
-    try:
-        # ዘዴው async ወይም sync መሆኑን ይለያል
-        if asyncio.iscoroutinefunction(method):
-            # ሁለቱንም የመለኪያ አይነቶች ይሞክራል (keyword / positional)
-            try:
-                return await asyncio.wait_for(
-                    method(topic=topic, country=country),
-                    timeout=60.0
-                )
-            except TypeError:
-                return await asyncio.wait_for(
-                    method(topic, country),
-                    timeout=60.0
-                )
-        else:
-            try:
-                return method(topic=topic, country=country)
-            except TypeError:
-                return method(topic, country)
-    except asyncio.TimeoutError:
-        self.logger.warning(f"⏰ Content generation timeout for {country}")
-        return None
-    except Exception as e:
-        self.logger.warning(f"⚠️ Content method execution failed: {str(e)[:100]}")
-        return None
+    async def _execute_content_method(self, method, topic: str, country: str) -> Optional[Any]:
+        """🧠 አስፕንክሮናስ/ሲንክሮናስ ዘዴዎችን በደህና ይጠራል፣ የጊዜ ገደብ ይጨምራል።"""
+        try:
+            if asyncio.iscoroutinefunction(method):
+                try:
+                    return await asyncio.wait_for(method(topic=topic, country=country), timeout=60.0)
+                except TypeError:
+                    return await asyncio.wait_for(method(topic, country), timeout=60.0)
+            else:
+                try:
+                    return method(topic=topic, country=country)
+                except TypeError:
+                    return method(topic, country)
+        except asyncio.TimeoutError:
+            self.logger.warning(f"⏰ Content generation timeout for {country}")
+            return None
+        except Exception as e:
+            self.logger.warning(f"⚠️ Content method execution failed: {str(e)[:100]}")
+            return None
 
+    def _extract_content_string(self, raw_content: Any) -> str:
+        """📄 ከተለያዩ የውጤት ቅርጸቶች (string, dict, object) ይዘትን በstring መልክ ያወጣል።"""
+        if isinstance(raw_content, str):
+            return raw_content.strip()
+        elif isinstance(raw_content, dict):
+            for key in ['content', 'text', 'response', 'output']:
+                if key in raw_content and isinstance(raw_content[key], str):
+                    return raw_content[key].strip()
+            for val in raw_content.values():
+                if isinstance(val, str):
+                    return val.strip()
+        elif hasattr(raw_content, 'content') and isinstance(raw_content.content, str):
+            return raw_content.content.strip()
+        elif hasattr(raw_content, 'text') and isinstance(raw_content.text, str):
+            return raw_content.text.strip()
+        return ""
 
-def _extract_content_string(self, raw_content: Any) -> str:
-    """
-    📄 ከተለያዩ የውጤት ቅርጸቶች (string, dict, object) ይዘትን በstring መልክ ያወጣል።
-    """
-    if isinstance(raw_content, str):
-        return raw_content.strip()
-    elif isinstance(raw_content, dict):
-        # በተለምዶ የሚመጡ ቁልፎች: 'content', 'text', 'response', 'output'
-        for key in ['content', 'text', 'response', 'output']:
-            if key in raw_content and isinstance(raw_content[key], str):
-                return raw_content[key].strip()
-        # ሌላ ማንኛውም የዲክሽነሪ እሴት string ቢሆን ይውሰድ
-        for val in raw_content.values():
-            if isinstance(val, str):
-                return val.strip()
-    elif hasattr(raw_content, 'content') and isinstance(raw_content.content, str):
-        return raw_content.content.strip()
-    elif hasattr(raw_content, 'text') and isinstance(raw_content.text, str):
-        return raw_content.text.strip()
-
-    # ምንም ባይገኝ ባዶ string
-    return ""
-
-
-def _generate_fallback_content(self, topic: str, country: str) -> str:
-    """
-    🛡️ የመጨረሻ መጠባበቂያ – ሁሉም ዘዴዎች ሲሳኩ ይሠራል።
-    """
-    self.logger.warning(f"⚠️ Generating fallback content for {country}")
-    timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-    return f"""# {topic} – Strategic Guide for {country}
+    def _generate_fallback_content(self, topic: str, country: str) -> str:
+        """🛡️ የመጨረሻ መጠባበቂያ – ሁሉም ዘዴዎች ሲሳኩ ይሠራል።"""
+        self.logger.warning(f"⚠️ Generating fallback content for {country}")
+        timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        return f"""# {topic} – Strategic Guide for {country}
 
 ## Executive Overview
 This document provides a comprehensive enterprise analysis of {topic} tailored specifically for the {country} market. 
@@ -3503,319 +3527,328 @@ Due to high demand, this content was generated using the Sovereign Fallback Syst
 *Generated by Enterprise Production Runner v9.0 – Mega-Bridge Fallback*
 *Timestamp: {timestamp}*
 """
-# -------- Country processing with Quality Guardian integration --------
-async def _process_country_enterprise(self, topic: str, country: str,
-                                      content_type: str = "enterprise_guide",
-                                      country_number: int = 0,
-                                      total_countries: int = 0,
-                                      omega_key_number: int = 0) -> dict:
-    """
-    🏭 ሉዓላዊ የሀገር ማቀነባበሪያ - v9.0
-    የሜጋ-ፔን 15,000 ቃላትን ተቀብሎ፣ በ9-ደረጃ ማበልጸጊያ አልጎሪዝም አልምቶ፣
-    የጥራት፣ ገቢ፣ ተገዢነት እና ማህበራዊ ሚዲያ ውህደትን በአንድ ላይ ያጠናቅቃል።
-    """
-    # ------------------------------------------------------------
-    # 1. የመነሻ ቅንብሮች እና የአፈጻጸም መለኪያ
-    # ------------------------------------------------------------
-    start_time = datetime.now()
-    self.logger.info(f"🏭 [{country_number}/{total_countries}] Processing {country} with Sovereign Pipeline...")
-    self.performance_monitor.sample_memory()
 
-    result = {
-        'country': country,
-        'status': 'failed',
-        'content': '',
-        'metrics': {},
-        'error': None,
-        'production_id': f"{country}_{datetime.now().strftime('%Y%m%d_%H%M%S')}_{omega_key_number}"
-    }
+    # -------------------------------------------------------------------------
+    # 🏭 COUNTRY PROCESSING (ENRICHED)
+    # -------------------------------------------------------------------------
+    async def _process_country_enterprise(self, topic: str, country: str,
+                                          content_type: str = "enterprise_guide",
+                                          country_number: int = 0,
+                                          total_countries: int = 0,
+                                          omega_key_number: int = 0) -> dict:
+        """
+        🏭 ሉዓላዊ የሀገር ማቀነባበሪያ - v9.0
+        የሜጋ-ፔን 15,000 ቃላትን ተቀብሎ፣ በ9-ደረጃ ማበልጸጊያ አልጎሪዝም አልምቶ፣
+        የጥራት፣ ገቢ፣ ተገዢነት እና ማህበራዊ ሚዲያ ውህደትን በአንድ ላይ ያጠናቅቃል።
+        """
+        start_time = datetime.now()
+        self.logger.info(f"🏭 [{country_number}/{total_countries}] Processing {country} with Sovereign Pipeline...")
+        self.performance_monitor.sample_memory()
 
-    enrichment_log = []
-    word_counts = {}
+        result = {
+            'country': country,
+            'status': 'failed',
+            'content': '',
+            'metrics': {},
+            'error': None,
+            'production_id': f"{country}_{datetime.now().strftime('%Y%m%d_%H%M%S')}_{omega_key_number}"
+        }
+        enrichment_log = []
+        word_counts = {}
 
-    try:
-        # --------------------------------------------------------
-        # 2. ሜጋ-ፔን ይዘት ማምጣት (15,000+ ቃላት)
-        # --------------------------------------------------------
-        if not hasattr(self, 'content_engine') or not self.content_engine:
-            raise RuntimeError("Mega-Pen (content_engine) not available")
+        try:
+            # ----------------------------------------------------------------
+            # 2. ሜጋ-ፔን ይዘት ማምጣት (15,000+ ቃላት)
+            # ----------------------------------------------------------------
+            if not hasattr(self, 'content_engine') or not self.content_engine:
+                raise RuntimeError("Mega-Pen (content_engine) not available")
 
-        self.logger.info(f"📡 Calling Mega-Pen for {country}...")
-        raw_content = await self._call_content_engine(self.content_engine, country, topic)
+            self.logger.info(f"📡 Calling Mega-Pen for {country}...")
+            raw_content = await self._call_content_engine(self.content_engine, country, topic)
 
-        if not raw_content:
-            raise ValueError(f"Empty content received from Mega-Pen for {country}")
+            if not raw_content:
+                raise ValueError(f"Empty content received from Mega-Pen for {country}")
 
-        content = self._extract_content_string(raw_content)
-        initial_words = len(content.split())
-        word_counts['initial'] = initial_words
-        enrichment_log.append(f"✅ Mega-Pen: {initial_words} words")
-        self.logger.info(f"📥 {country} – Base content: {initial_words} words")
+            content = self._extract_content_string(raw_content)
+            initial_words = len(content.split())
+            word_counts['initial'] = initial_words
+            enrichment_log.append(f"✅ Mega-Pen: {initial_words} words")
+            self.logger.info(f"📥 {country} – Base content: {initial_words} words")
 
-        if initial_words < self.enterprise_standards.get('min_words', 2000):
-            self.logger.warning(f"⚠️ {country} – Low word count ({initial_words}), attempting expansion...")
-            enrichment_log.append(f"⚠️ Below target ({self.enterprise_standards['min_words']} words)")
+            if initial_words < self.enterprise_standards.get('min_words', 2000):
+                self.logger.warning(f"⚠️ {country} – Low word count ({initial_words}), attempting expansion...")
+                enrichment_log.append(f"⚠️ Below target ({self.enterprise_standards['min_words']} words)")
 
-        # --------------------------------------------------------
-        # 3. ደረጃ 1 – ዘመናዊ ምስል ማስገቢያ (Smart Image Engine)
-        # --------------------------------------------------------
-        if hasattr(self, 'image_engine') and self.image_engine:
-            try:
-                img_start = time.time()
-                content = self.image_engine.generate_image_placeholders(content, country, topic)
-                img_count = self.image_engine.count_injected_images(content)
-                img_time = time.time() - img_start
-                word_counts['after_images'] = len(content.split())
-                enrichment_log.append(f"🖼️ SmartImage: +{img_count} images ({img_time:.1f}s)")
-                self.logger.info(f"🖼️ {country} – Injected {img_count} images")
-            except Exception as e:
-                self.logger.error(f"❌ Image injection failed: {str(e)[:100]}")
-                enrichment_log.append(f"⚠️ Image injection failed")
+            # ----------------------------------------------------------------
+            # 3. ደረጃ 1 – ዘመናዊ ምስል ማስገቢያ (Smart Image Engine)
+            # ----------------------------------------------------------------
+            if hasattr(self, 'image_engine') and self.image_engine:
+                try:
+                    img_start = time.time()
+                    content = self.image_engine.generate_image_placeholders(content, country, topic)
+                    img_count = self.image_engine.count_injected_images(content)
+                    img_time = time.time() - img_start
+                    word_counts['after_images'] = len(content.split())
+                    enrichment_log.append(f"🖼️ SmartImage: +{img_count} images ({img_time:.1f}s)")
+                    self.logger.info(f"🖼️ {country} – Injected {img_count} images")
+                except Exception as e:
+                    self.logger.error(f"❌ Image injection failed: {str(e)[:100]}")
+                    enrichment_log.append(f"⚠️ Image injection failed")
 
-        # --------------------------------------------------------
-        # 4. ደረጃ 2 – ባለስልጣን ቪዲዮ ማስገቢያ (Authority Videos)
-        # --------------------------------------------------------
-        if hasattr(self.content_engine, '_inject_authority_videos'):
-            try:
-                video_method = self.content_engine._inject_authority_videos
-                if asyncio.iscoroutinefunction(video_method):
-                    video_html = await video_method(topic, country)
-                else:
-                    video_html = video_method(topic, country)
-                if video_html:
-                    content += f"\n\n{video_html}"
-                    word_counts['after_videos'] = len(content.split())
-                    enrichment_log.append(f"🎬 Authority Videos: +1 video block")
-                    self.logger.info(f"🎬 {country} – Injected authority videos")
-            except Exception as e:
-                self.logger.warning(f"⚠️ Video injection failed: {str(e)[:100]}")
-                enrichment_log.append(f"⚠️ Video injection skipped")
+            # ----------------------------------------------------------------
+            # 4. ደረጃ 2 – ባለስልጣን ቪዲዮ ማስገቢያ (Authority Videos)
+            # ----------------------------------------------------------------
+            if hasattr(self.content_engine, '_inject_authority_videos'):
+                try:
+                    video_method = self.content_engine._inject_authority_videos
+                    if asyncio.iscoroutinefunction(video_method):
+                        video_html = await video_method(topic, country)
+                    else:
+                        video_html = video_method(topic, country)
+                    if video_html:
+                        content += f"\n\n{video_html}"
+                        word_counts['after_videos'] = len(content.split())
+                        enrichment_log.append(f"🎬 Authority Videos: +1 video block")
+                        self.logger.info(f"🎬 {country} – Injected authority videos")
+                except Exception as e:
+                    self.logger.warning(f"⚠️ Video injection failed: {str(e)[:100]}")
+                    enrichment_log.append(f"⚠️ Video injection skipped")
 
-        # --------------------------------------------------------
-        # 5. ደረጃ 3 – ከፍተኛ ጥራት ማሳመሪያ (EliteQualityOptimizer)
-        # --------------------------------------------------------
-        if hasattr(self, 'quality_optimizer') and self.quality_optimizer:
-            try:
-                polish_start = time.time()
-                optimizer = self.quality_optimizer
-                if asyncio.iscoroutinefunction(optimizer.apply_100_percent_standard):
-                    content = await optimizer.apply_100_percent_standard(content, country, topic)
-                else:
-                    content = optimizer.apply_100_percent_standard(content, country, topic)
-                polish_time = time.time() - polish_start
-                word_counts['after_polish'] = len(content.split())
-                enrichment_log.append(f"💎 ElitePolish: {polish_time:.1f}s")
-                self.logger.info(f"💎 {country} – Quality polish applied")
-            except Exception as e:
-                self.logger.error(f"❌ Quality polish failed: {str(e)[:100]}")
-                enrichment_log.append(f"⚠️ Quality polish failed")
+            # ----------------------------------------------------------------
+            # 5. ደረጃ 3 – ከፍተኛ ጥራት ማሳመሪያ (EliteQualityOptimizer)
+            # ----------------------------------------------------------------
+            if hasattr(self, 'quality_optimizer') and self.quality_optimizer:
+                try:
+                    polish_start = time.time()
+                    optimizer = self.quality_optimizer
+                    if asyncio.iscoroutinefunction(optimizer.apply_100_percent_standard):
+                        content = await optimizer.apply_100_percent_standard(content, country, topic)
+                    else:
+                        content = optimizer.apply_100_percent_standard(content, country, topic)
+                    polish_time = time.time() - polish_start
+                    word_counts['after_polish'] = len(content.split())
+                    enrichment_log.append(f"💎 ElitePolish: {polish_time:.1f}s")
+                    self.logger.info(f"💎 {country} – Quality polish applied")
+                except Exception as e:
+                    self.logger.error(f"❌ Quality polish failed: {str(e)[:100]}")
+                    enrichment_log.append(f"⚠️ Quality polish failed")
 
-        # --------------------------------------------------------
-        # 6. ደረጃ 4 – የሰው ልጅ መሰል ማበልጸጊያ (HumanLikenessEngine)
-        # --------------------------------------------------------
-        if hasattr(self, 'human_engine') and self.human_engine:
-            try:
-                human_start = time.time()
-                content = await self.human_engine.inject_human_elements(
-                    content, country, topic, content_type
-                )
-                human_time = time.time() - human_start
-                human_score = self.human_engine.calculate_human_score(content)
-                word_counts['after_human'] = len(content.split())
-                enrichment_log.append(f"👥 HumanEngine: {human_score['human_score']}% ({human_time:.1f}s)")
-                self.logger.info(f"👥 {country} – Human score: {human_score['human_score']}%")
-            except Exception as e:
-                self.logger.error(f"❌ Humanization failed: {str(e)[:100]}")
-                enrichment_log.append(f"⚠️ Humanization skipped")
-
-        # --------------------------------------------------------
-        # 7. ደረጃ 5 – ተለዋዋጭ ካላ-ተግባር ማስተካከያ (Dynamic CTA)
-        # --------------------------------------------------------
-        if hasattr(self, 'cta_engine') and self.cta_engine:
-            try:
-                cta_start = time.time()
-                content = self.cta_engine.optimize_ctas(content, country)
-                cta_time = time.time() - cta_start
-                word_counts['after_cta'] = len(content.split())
-                enrichment_log.append(f"🎯 DynamicCTA: {cta_time:.1f}s")
-                self.logger.info(f"🎯 {country} – CTA optimization applied")
-            except Exception as e:
-                self.logger.warning(f"⚠️ CTA optimization failed: {str(e)[:100]}")
-                enrichment_log.append(f"⚠️ CTA skipped")
-
-        # --------------------------------------------------------
-        # 8. ደረጃ 6 – የጥራት ዘበኛ ትንተና (UltimateQualityGuardian)
-        # --------------------------------------------------------
-        quality_report = None
-        if hasattr(self, 'quality_guardian') and self.quality_guardian:
-            try:
-                qa_start = time.time()
-                quality_report = await asyncio.to_thread(
-                    self.quality_guardian.analyze_content, content
-                )
-                qa_time = time.time() - qa_start
-
-                if hasattr(self, 'offline_judge') and self.offline_judge.enabled:
-                    offline_feedback = await self.offline_judge.judge_quality(
-                        content, country, topic
+            # ----------------------------------------------------------------
+            # 6. ደረጃ 4 – የሰው ልጅ መሰል ማበልጸጊያ (HumanLikenessEngine)
+            # ----------------------------------------------------------------
+            if hasattr(self, 'human_engine') and self.human_engine:
+                try:
+                    human_start = time.time()
+                    content = await self.human_engine.inject_human_elements(
+                        content, country, topic, content_type
                     )
-                    quality_report['offline_llm'] = offline_feedback
+                    human_time = time.time() - human_start
+                    human_score = self.human_engine.calculate_human_score(content)
+                    word_counts['after_human'] = len(content.split())
+                    enrichment_log.append(f"👥 HumanEngine: {human_score['human_score']}% ({human_time:.1f}s)")
+                    self.logger.info(f"👥 {country} – Human score: {human_score['human_score']}%")
+                except Exception as e:
+                    self.logger.error(f"❌ Humanization failed: {str(e)[:100]}")
+                    enrichment_log.append(f"⚠️ Humanization skipped")
 
-                if hasattr(self, 'quality_db'):
-                    self.quality_db.insert_quality_report(
-                        production_id=result['production_id'],
-                        country=country,
-                        quality_report=quality_report
+            # ----------------------------------------------------------------
+            # 7. ደረጃ 5 – ተለዋዋጭ ካላ-ተግባር ማስተካከያ (Dynamic CTA)
+            # ----------------------------------------------------------------
+            if hasattr(self, 'cta_engine') and self.cta_engine:
+                try:
+                    cta_start = time.time()
+                    content = self.cta_engine.optimize_ctas(content, country)
+                    cta_time = time.time() - cta_start
+                    word_counts['after_cta'] = len(content.split())
+                    enrichment_log.append(f"🎯 DynamicCTA: {cta_time:.1f}s")
+                    self.logger.info(f"🎯 {country} – CTA optimization applied")
+                except Exception as e:
+                    self.logger.warning(f"⚠️ CTA optimization failed: {str(e)[:100]}")
+                    enrichment_log.append(f"⚠️ CTA skipped")
+
+            # ----------------------------------------------------------------
+            # 8. ደረጃ 6 – የጥራት ዘበኛ ትንተና (UltimateQualityGuardian)
+            # ----------------------------------------------------------------
+            quality_report = None
+            if hasattr(self, 'quality_guardian') and self.quality_guardian:
+                try:
+                    qa_start = time.time()
+                    quality_report = await asyncio.to_thread(
+                        self.quality_guardian.analyze_content, content
                     )
+                    qa_time = time.time() - qa_start
 
-                final_quality = quality_report.get('final_score', 75.0)
-                enrichment_log.append(f"🔬 QualityGuardian: {final_quality}% ({qa_time:.1f}s)")
-                self.logger.info(f"🔬 {country} – Quality score: {final_quality}% ({quality_report['quality_level']})")
-            except Exception as e:
-                self.logger.error(f"❌ Quality analysis failed: {str(e)[:100]}")
-                enrichment_log.append(f"⚠️ QualityGuardian failed")
-                if self.quality_guardian:
-                    quality_report = self.quality_guardian._get_error_report(content)
+                    if hasattr(self, 'offline_judge') and self.offline_judge.enabled:
+                        offline_feedback = await self.offline_judge.judge_quality(
+                            content, country, topic
+                        )
+                        quality_report['offline_llm'] = offline_feedback
 
-        # --------------------------------------------------------
-        # 9. ደረጃ 7 – ገቢ ትንበያ (RevenueForecastEngine)
-        # --------------------------------------------------------
-        revenue_forecast = {}
-        if hasattr(self, 'revenue_engine') and self.revenue_engine:
-            try:
-                temp_country_result = {
-                    'country': country,
-                    'metrics': {
-                        'final_word_count': len(content.split()),
-                        'quality_score': quality_report.get('final_score', 85) if quality_report else 85
-                    },
-                    'cultural_depth': {'depth_score': 85}
-                }
-                if hasattr(self, 'cultural_guardian') and self.cultural_guardian:
-                    temp_country_result['cultural_depth'] = {'depth_score': 85}
+                    if hasattr(self, 'quality_db'):
+                        self.quality_db.insert_quality_report(
+                            production_id=result['production_id'],
+                            country=country,
+                            quality_report=quality_report
+                        )
 
-                revenue_forecast = await self.revenue_engine.forecast_revenue(
-                    temp_country_result, country
-                )
-                enrichment_log.append(f"💰 Revenue: ${revenue_forecast.get('estimated_revenue_usd', 0):,.2f}/mo")
-                self.logger.info(f"💰 {country} – Est. revenue: ${revenue_forecast.get('estimated_revenue_usd', 0):,.2f}/month")
-            except Exception as e:
-                self.logger.warning(f"⚠️ Revenue forecast failed: {str(e)[:100]}")
-                enrichment_log.append(f"⚠️ Revenue forecast skipped")
+                    final_quality = quality_report.get('final_score', 75.0)
+                    enrichment_log.append(f"🔬 QualityGuardian: {final_quality}% ({qa_time:.1f}s)")
+                    self.logger.info(f"🔬 {country} – Quality score: {final_quality}% ({quality_report['quality_level']})")
+                except Exception as e:
+                    self.logger.error(f"❌ Quality analysis failed: {str(e)[:100]}")
+                    enrichment_log.append(f"⚠️ QualityGuardian failed")
+                    if self.quality_guardian:
+                        quality_report = self.quality_guardian._get_error_report(content)
 
-        # --------------------------------------------------------
-        # 10. ደረጃ 8 – የሥነ-ምግባር ተገዢነት ማረጋገጫ (EthicalCompliance)
-        # --------------------------------------------------------
-        compliance_report = {}
-        if hasattr(self, 'compliance_guardian') and self.compliance_guardian:
-            try:
-                compliance_report = await self.compliance_guardian.check_compliance(
-                    content, country, affiliate_product=None
-                )
-                compliance_score = compliance_report.get('compliance_score', 0)
-                enrichment_log.append(f"🛡️ Compliance: {compliance_score}%")
-                if not compliance_report.get('is_compliant', True):
-                    self.logger.warning(f"⚠️ {country} – Compliance issues: {compliance_report.get('compliance_issues', [])}")
-            except Exception as e:
-                self.logger.warning(f"⚠️ Compliance check failed: {str(e)[:100]}")
-                enrichment_log.append(f"⚠️ Compliance skipped")
-
-        # --------------------------------------------------------
-        # 11. ደረጃ 9 – ማህበራዊ ሚዲያ ማተሚያ (Social Publishing)
-        # --------------------------------------------------------
-        publish_results = {}
-        if hasattr(self, 'social_publisher') and self.social_publisher:
-            try:
-                pub_start = time.time()
-                country_data = {
-                    'country': country,
-                    'topic': topic,
-                    'content': content,
-                    'production_id': result['production_id'],
-                    'metrics': {
-                        'final_word_count': len(content.split()),
-                        'estimated_revenue': revenue_forecast.get('estimated_revenue_usd', 0)
+            # ----------------------------------------------------------------
+            # 9. ደረጃ 7 – ገቢ ትንበያ (RevenueForecastEngine)
+            # ----------------------------------------------------------------
+            revenue_forecast = {}
+            if hasattr(self, 'revenue_engine') and self.revenue_engine:
+                try:
+                    temp_country_result = {
+                        'country': country,
+                        'metrics': {
+                            'final_word_count': len(content.split()),
+                            'quality_score': quality_report.get('final_score', 85) if quality_report else 85
+                        },
+                        'cultural_depth': {'depth_score': 85}
                     }
-                }
-                if asyncio.iscoroutinefunction(self.social_publisher.publish_country_content):
-                    publish_results = await self.social_publisher.publish_country_content(country_data)
-                else:
-                    publish_results = self.social_publisher.publish_country_content(country_data)
+                    if hasattr(self, 'cultural_guardian') and self.cultural_guardian:
+                        temp_country_result['cultural_depth'] = {'depth_score': 85}
 
-                successful = [p for p, r in publish_results.items() if r.get('status') == 'success']
-                pub_time = time.time() - pub_start
-                enrichment_log.append(f"📱 Social: {len(successful)} platforms ({pub_time:.1f}s)")
-                self.logger.info(f"📱 {country} – Published to {len(successful)} platforms")
-            except Exception as e:
-                self.logger.error(f"❌ Social publishing failed: {str(e)[:100]}")
-                enrichment_log.append(f"⚠️ Social publishing failed")
+                    revenue_forecast = await self.revenue_engine.forecast_revenue(
+                        temp_country_result, country
+                    )
+                    enrichment_log.append(f"💰 Revenue: ${revenue_forecast.get('estimated_revenue_usd', 0):,.2f}/mo")
+                    self.logger.info(f"💰 {country} – Est. revenue: ${revenue_forecast.get('estimated_revenue_usd', 0):,.2f}/month")
+                except Exception as e:
+                    self.logger.warning(f"⚠️ Revenue forecast failed: {str(e)[:100]}")
+                    enrichment_log.append(f"⚠️ Revenue forecast skipped")
 
-        # --------------------------------------------------------
-        # 12. የመጨረሻ መለኪያዎች ስብስብ
-        # --------------------------------------------------------
-        final_word_count = len(content.split())
-        processing_time = (datetime.now() - start_time).total_seconds()
-        final_quality = quality_report.get('final_score', 85.0) if quality_report else 85.0
-        final_revenue = revenue_forecast.get('estimated_revenue_usd', final_word_count * 0.05)
+            # ----------------------------------------------------------------
+            # 10. ደረጃ 8 – የሥነ-ምግባር ተገዢነት ማረጋገጫ (EthicalCompliance)
+            # ----------------------------------------------------------------
+            compliance_report = {}
+            if hasattr(self, 'compliance_guardian') and self.compliance_guardian:
+                try:
+                    compliance_report = await self.compliance_guardian.check_compliance(
+                        content, country, affiliate_product=None
+                    )
+                    compliance_score = compliance_report.get('compliance_score', 0)
+                    enrichment_log.append(f"🛡️ Compliance: {compliance_score}%")
+                    if not compliance_report.get('is_compliant', True):
+                        self.logger.warning(f"⚠️ {country} – Compliance issues: {compliance_report.get('compliance_issues', [])}")
+                except Exception as e:
+                    self.logger.warning(f"⚠️ Compliance check failed: {str(e)[:100]}")
+                    enrichment_log.append(f"⚠️ Compliance skipped")
 
-        result.update({
-            'status': 'completed',
-            'content': content,
-            'omega_key_used': omega_key_number,
-            'metrics': {
-                'final_word_count': final_word_count,
-                'initial_word_count': word_counts.get('initial', 0),
-                'quality_score': round(final_quality, 2),
-                'quality_level': quality_report.get('quality_level', 'Unknown') if quality_report else 'Unknown',
-                'human_score': human_score.get('human_score', 0) if 'human_score' in locals() else 0,
-                'estimated_revenue': round(final_revenue, 2),
-                'compliance_score': compliance_report.get('compliance_score', 100) if compliance_report else 100,
-                'processing_time_seconds': round(processing_time, 1),
-                'image_count': self.image_engine.count_injected_images(content) if hasattr(self, 'image_engine') else 0,
-                'enrichment_steps': enrichment_log,
-                'publish_results': publish_results
-            },
-            'quality_report': quality_report,
-            'revenue_forecast': revenue_forecast,
-            'compliance_report': compliance_report,
-            'error': None
-        })
+            # ----------------------------------------------------------------
+            # 11. ደረጃ 9 – ማህበራዊ ሚዲያ ማተሚያ (Social Publishing)
+            # ----------------------------------------------------------------
+            publish_results = {}
+            if hasattr(self, 'social_publisher') and self.social_publisher:
+                try:
+                    pub_start = time.time()
+                    country_data = {
+                        'country': country,
+                        'topic': topic,
+                        'content': content,
+                        'production_id': result['production_id'],
+                        'metrics': {
+                            'final_word_count': len(content.split()),
+                            'estimated_revenue': revenue_forecast.get('estimated_revenue_usd', 0)
+                        }
+                    }
+                    if asyncio.iscoroutinefunction(self.social_publisher.publish_country_content):
+                        publish_results = await self.social_publisher.publish_country_content(country_data)
+                    else:
+                        publish_results = self.social_publisher.publish_country_content(country_data)
 
-        self.logger.info(f"✅ {country} – Finished in {processing_time:.1f}s | Words: {final_word_count:,} | Quality: {final_quality:.1f}% | Revenue: ${final_revenue:,.2f}/mo")
+                    successful = [p for p, r in publish_results.items() if r.get('status') == 'success']
+                    pub_time = time.time() - pub_start
+                    enrichment_log.append(f"📱 Social: {len(successful)} platforms ({pub_time:.1f}s)")
+                    self.logger.info(f"📱 {country} – Published to {len(successful)} platforms")
+                except Exception as e:
+                    self.logger.error(f"❌ Social publishing failed: {str(e)[:100]}")
+                    enrichment_log.append(f"⚠️ Social publishing failed")
 
-    except Exception as e:
-        self.logger.error(f"❌ {country} – Critical failure: {traceback.format_exc()}")
-        result['error'] = str(e)[:500]
-        result['metrics']['processing_time_seconds'] = round((datetime.now() - start_time).total_seconds(), 1)
+            # ----------------------------------------------------------------
+            # 12. የመጨረሻ መለኪያዎች ስብስብ
+            # ----------------------------------------------------------------
+            final_word_count = len(content.split())
+            processing_time = (datetime.now() - start_time).total_seconds()
+            final_quality = quality_report.get('final_score', 85.0) if quality_report else 85.0
+            final_revenue = revenue_forecast.get('estimated_revenue_usd', final_word_count * 0.05)
 
-        if not result['content']:
-            result['content'] = self._generate_fallback_content(topic, country)
-            result['metrics']['final_word_count'] = len(result['content'].split())
-            result['metrics']['quality_score'] = 70.0
+            result.update({
+                'status': 'completed',
+                'content': content,
+                'omega_key_used': omega_key_number,
+                'metrics': {
+                    'final_word_count': final_word_count,
+                    'initial_word_count': word_counts.get('initial', 0),
+                    'quality_score': round(final_quality, 2),
+                    'quality_level': quality_report.get('quality_level', 'Unknown') if quality_report else 'Unknown',
+                    'human_score': human_score.get('human_score', 0) if 'human_score' in locals() else 0,
+                    'estimated_revenue': round(final_revenue, 2),
+                    'compliance_score': compliance_report.get('compliance_score', 100) if compliance_report else 100,
+                    'processing_time_seconds': round(processing_time, 1),
+                    'image_count': self.image_engine.count_injected_images(content) if hasattr(self, 'image_engine') else 0,
+                    'enrichment_steps': enrichment_log,
+                    'publish_results': publish_results
+                },
+                'quality_report': quality_report,
+                'revenue_forecast': revenue_forecast,
+                'compliance_report': compliance_report,
+                'error': None
+            })
 
-    finally:
-        current_mem = self.performance_monitor.sample_memory()
-        if current_mem > 600:
-            self.logger.info(f"🧠 Memory usage at {current_mem:.1f}MB – triggering GC")
-            gc.collect()
+            self.logger.info(f"✅ {country} – Finished in {processing_time:.1f}s | Words: {final_word_count:,} | Quality: {final_quality:.1f}% | Revenue: ${final_revenue:,.2f}/mo")
 
-    return result
-    
-    async def run_production_with_monitoring(self, topic: str, markets: List[str] = None, content_type: str = "enterprise_guide") -> Dict:
+        except Exception as e:
+            self.logger.error(f"❌ {country} – Critical failure: {traceback.format_exc()}")
+            result['error'] = str(e)[:500]
+            result['metrics']['processing_time_seconds'] = round((datetime.now() - start_time).total_seconds(), 1)
+
+            if not result['content']:
+                result['content'] = self._generate_fallback_content(topic, country)
+                result['metrics']['final_word_count'] = len(result['content'].split())
+                result['metrics']['quality_score'] = 70.0
+
+        finally:
+            current_mem = self.performance_monitor.sample_memory()
+            if current_mem > 600:
+                self.logger.info(f"🧠 Memory usage at {current_mem:.1f}MB – triggering GC")
+                gc.collect()
+
+        return result
+
+    # -------------------------------------------------------------------------
+    # 🚀 MAIN PRODUCTION ENTRY POINT
+    # -------------------------------------------------------------------------
+    async def run_production_with_monitoring(self, topic: str, markets: List[str] = None,
+                                             content_type: str = "enterprise_guide") -> Dict:
+        """
+        🚀 ዋናው የማስኬጃ ዘዴ – ክትትል፣ ማህደረ ትውስታ፣ እና የመጨረሻ ሪፖርት ያካትታል።
+        """
         if markets is None:
             markets = DEFAULT_TARGET_COUNTRIES
+
         self.performance_monitor.start()
         mem_result = self.memory_manager.optimize_memory(300)
         self.logger.info(f"🧠 Memory optimization: {mem_result['current_memory_mb']:.1f}MB -> {mem_result['memory_after_mb']:.1f}MB")
+
         production_id = f"enterprise_{hashlib.md5(f'{topic}{datetime.now()}'.encode()).hexdigest()[:12]}"
-        self.logger.info("\n" + "="*80)
+        self.logger.info("\n" + "=" * 80)
         self.logger.info(f"🏢 STARTING ENTERPRISE PRODUCTION: {production_id}")
         self.logger.info(f"📝 Topic: {topic}")
         self.logger.info(f"🌍 Markets: {', '.join(markets)}")
         self.logger.info(f"🔑 Omega Key System: {self.key_rotation_system['keys_loaded']}/15 keys")
         self.logger.info(f"📊 Performance monitoring: ACTIVE")
         self.logger.info(f"🧠 Memory management: ACTIVE")
-        self.logger.info("="*80)
+        self.logger.info("=" * 80)
+
         production_results = {
             'production_id': production_id,
             'topic': topic,
@@ -3834,6 +3867,7 @@ async def _process_country_enterprise(self, topic: str, country: str,
             'overall_metrics': {},
             'enhancement_reports': {}
         }
+
         try:
             result = await EnhancedErrorHandler.safe_execute(
                 self.run_enterprise_production(topic, markets, content_type),
@@ -3842,16 +3876,18 @@ async def _process_country_enterprise(self, topic: str, country: str,
                 retry_delay=5.0,
                 context="Enterprise Production"
             )
+
             if not isinstance(result, dict):
                 self.logger.warning(f"⚠️ Expected dict but got {type(result)}. Converting...")
                 result = {'country_results': result if isinstance(result, list) else [], 'status': 'success'}
+
             performance_report = self.performance_monitor.stop()
             production_results.update(result)
             production_results['performance_report'] = performance_report
             production_results['system_status'] = self.memory_manager.get_system_status()
             production_results['omega_key_system']['total_rotations'] = self.key_rotation_system['total_rotations']
             production_results['omega_key_system']['key_statistics'] = self.key_rotation_system['key_statistics']
-            
+
             # ---- Validate against JSON Schema ----
             is_valid, errors = self.schema_validator.validate(production_results)
             if not is_valid:
@@ -3860,10 +3896,10 @@ async def _process_country_enterprise(self, topic: str, country: str,
             else:
                 production_results['schema_validation'] = {'valid': True}
                 self.logger.info("✅ Production results schema validated successfully")
-            
+
             # ---- Insert production summary into database ----
             self.quality_db.insert_production_summary(production_results)
-            
+
             for country_result in result.get('country_results', []):
                 if country_result.get('content'):
                     safety_check = ProductionSafetyFeatures.validate_content_safety(
@@ -3879,7 +3915,9 @@ async def _process_country_enterprise(self, topic: str, country: str,
                         }
                     )
                     self.logger.info(f"💾 Safety backup created: {backup_file} ({safety_check['safety_score']}% safety score)")
+
             return production_results
+
         except Exception as e:
             self.logger.error(f"❌ Production failed: {e}")
             traceback.print_exc()
@@ -3892,12 +3930,16 @@ async def _process_country_enterprise(self, topic: str, country: str,
                 'performance_report': self.performance_monitor.stop() if hasattr(self.performance_monitor, 'stop') else {},
                 'omega_key_system': self.key_rotation_system
             }
-    
-    async def run_enterprise_production(self, topic: str, markets: List[str] = None, content_type: str = "enterprise_guide") -> Dict:
+
+    async def run_enterprise_production(self, topic: str, markets: List[str] = None,
+                                        content_type: str = "enterprise_guide") -> Dict:
+        """🏭 የሀገራት ማቀነባበሪያን በቅደም ተከተል ያስኬዳል።"""
         if markets is None:
             markets = DEFAULT_TARGET_COUNTRIES
+
         production_id = f"enterprise_{hashlib.md5(f'{topic}{datetime.now()}'.encode()).hexdigest()[:12]}"
         self.logger.info(f"🏢 Processing {len(markets)} countries sequentially with Real-time Publishing...")
+
         production_results = {
             'production_id': production_id,
             'topic': topic,
@@ -3914,24 +3956,29 @@ async def _process_country_enterprise(self, topic: str, country: str,
             'overall_metrics': {},
             'enhancement_reports': {}
         }
+
         country_results = []
         for idx, country in enumerate(markets):
-            self.logger.info(f"\n{'━'*60}")
-            self.logger.info(f"🏢 Processing {country} ({idx+1}/{len(markets)})")
-            self.logger.info(f"{'━'*60}")
+            self.logger.info(f"\n{'━' * 60}")
+            self.logger.info(f"🏢 Processing {country} ({idx + 1}/{len(markets)})")
+            self.logger.info(f"{'━' * 60}")
+
             current_memory = self.performance_monitor.sample_memory()
             if current_memory > 500:
                 self.logger.info(f"🧠 High memory usage: {current_memory:.1f}MB - optimizing...")
                 self.memory_manager.optimize_memory()
+
             try:
                 phase_key, key_number = self._get_next_omega_key(phase_idx=idx)
                 country_result = await EnhancedErrorHandler.safe_execute(
-                    self._process_country_enterprise(topic, country, content_type, idx+1, len(markets), key_number),
-                    fallback_value={'country': country, 'status': 'failed', 'error': 'Processing failed after retries', 'word_count': 0, 'quality_score': 0},
+                    self._process_country_enterprise(topic, country, content_type, idx + 1, len(markets), key_number),
+                    fallback_value={'country': country, 'status': 'failed', 'error': 'Processing failed after retries',
+                                    'word_count': 0, 'quality_score': 0},
                     max_retries=2,
                     context=f"Country {country} processing"
                 )
                 country_result['omega_key_used'] = key_number
+
                 if country_result.get('status') == 'completed':
                     self.logger.info(f"📡 Sending {country} content to all platforms immediately...")
                     country_result['topic'] = topic
@@ -3942,31 +3989,45 @@ async def _process_country_enterprise(self, topic: str, country: str,
                             country_result['publishing_status'] = publish_res
                     except Exception as pub_err:
                         self.logger.warning(f"⚠️ Real-time publishing failed for {country}: {pub_err}")
+
                 country_results.append(country_result)
+
                 if country_result.get('status') == 'completed':
                     self._update_key_statistics(key_number, success=True)
                 else:
                     self._update_key_statistics(key_number, success=False)
                     if 'rate limit' in str(country_result.get('error', '')).lower():
                         self._blacklist_omega_key(key_number, 180)
+
                 if idx < len(markets) - 1:
                     delay_range = HIGH_VALUE_COUNTRIES.get(country, {}).get('delay_seconds', (45, 65))
                     delay = random.randint(*delay_range)
                     self.logger.info(f"⏳ Enterprise delay for quality: {delay} seconds...")
                     await asyncio.sleep(delay)
+
             except Exception as e:
                 self.logger.error(f"❌ Failed to process {country}: {e}")
-                country_results.append({'country': country, 'status': 'failed', 'error': str(e), 'word_count': 0, 'quality_score': 0})
+                country_results.append({'country': country, 'status': 'failed', 'error': str(e),
+                                        'word_count': 0, 'quality_score': 0})
+
         production_results['country_results'] = country_results
         production_results['overall_metrics'] = self._calculate_enterprise_metrics(country_results)
         production_results['status'] = 'completed'
         production_results['end_time'] = datetime.now().isoformat()
-        production_results['total_duration'] = (datetime.fromisoformat(production_results['end_time']) - datetime.fromisoformat(production_results['start_time'])).total_seconds()
+        production_results['total_duration'] = (
+            datetime.fromisoformat(production_results['end_time']) -
+            datetime.fromisoformat(production_results['start_time'])
+        ).total_seconds()
+
         await self._generate_enterprise_reports(production_results)
         await self._send_enterprise_notifications(production_results)
         self._print_enterprise_summary(production_results)
+
         return production_results
-    
+
+    # -------------------------------------------------------------------------
+    # 📊 METRICS & REPORTS
+    # -------------------------------------------------------------------------
     def _calculate_enterprise_metrics(self, country_results: List[Dict]) -> Dict:
         completed = [r for r in country_results if r.get('status') == 'completed']
         if not completed:
@@ -3987,9 +4048,10 @@ async def _process_country_enterprise(self, topic: str, country: str,
                     'total_rotations': getattr(self, 'key_rotation_system', {}).get('total_rotations', 0)
                 }
             }
+
         total_words = sum(r.get('metrics', {}).get('final_word_count', 0) for r in completed)
         avg_words = total_words / len(completed)
-        total_quality = sum(r.get('metrics', {}).get('quality_score', r.get('metrics', {}).get('enterprise_grade_score', 98)) for r in completed)
+        total_quality = sum(r.get('metrics', {}).get('quality_score', 98) for r in completed)
         avg_quality = total_quality / len(completed)
         total_revenue = sum(r.get('metrics', {}).get('estimated_revenue', 0) for r in completed)
         standards_met = 0
@@ -3997,13 +4059,17 @@ async def _process_country_enterprise(self, topic: str, country: str,
             m = r.get('metrics', {})
             if m.get('final_word_count', 0) >= 3000 and m.get('quality_score', 0) >= 88:
                 standards_met += 1
+
         success_rate = (len(completed) / len(country_results)) * 100
+
         omega_stats = {}
         if hasattr(self, 'key_rotation_system'):
             for key_num, stats in self.key_rotation_system.get('key_statistics', {}).items():
                 if stats.get('uses', 0) > 0:
                     sr = (stats.get('successes', 0) / stats['uses']) * 100
-                    omega_stats[key_num] = {'uses': stats['uses'], 'success_rate': round(sr, 1), 'status': stats.get('status', 'active')}
+                    omega_stats[key_num] = {'uses': stats['uses'], 'success_rate': round(sr, 1),
+                                            'status': stats.get('status', 'active')}
+
         return {
             'total_countries': len(country_results),
             'completed_countries': len(completed),
@@ -4021,26 +4087,26 @@ async def _process_country_enterprise(self, topic: str, country: str,
                 'total_rotations': self.key_rotation_system.get('total_rotations', 0) if hasattr(self, 'key_rotation_system') else 0
             }
         }
-    
+
     def _print_enterprise_summary(self, production_results: Dict):
         metrics = production_results.get('overall_metrics', {})
         omega_stats = metrics.get('omega_key_statistics', {})
         summary = f"""
-{'='*100}
+{'=' * 100}
 🏢 ENTERPRISE PRODUCTION COMPLETE - {production_results['production_id']} - v9.0
-{'='*100}
+{'=' * 100}
 
 📊 EXECUTIVE SUMMARY
-{'─'*40}
+{'─' * 40}
 Topic: {production_results['topic']}
 Total Countries: {metrics.get('total_countries', 0)}
 Completed Countries: {metrics.get('completed_countries', 0)} ({metrics.get('success_rate', 0)}%)
-Total Production Time: {production_results.get('total_duration', 0)/60:.1f} minutes
+Total Production Time: {production_results.get('total_duration', 0) / 60:.1f} minutes
 Total Words Produced: {metrics.get('total_words', 0):,}
 Total Revenue Forecast: ${metrics.get('estimated_revenue', 0):,.2f}/month
 
 🔑 OMEGA 15-KEY SYSTEM PERFORMANCE
-{'─'*40}
+{'─' * 40}
 Keys Loaded: {self.key_rotation_system['keys_loaded']}/15
 Total Rotations: {self.key_rotation_system['total_rotations']}
 Blacklisted Keys: {len(self.key_rotation_system['blacklisted_keys'])}
@@ -4050,16 +4116,17 @@ Key Performance Details:
 """
         for key_num, stats in omega_stats.items():
             summary += f"  Key {key_num}: {stats['uses']} uses, {stats['success_rate']:.1f}% success, {stats['status']}\n"
+
         summary += f"""
 🎯 ENTERPRISE PERFORMANCE METRICS
-{'─'*40}
+{'─' * 40}
 Average Word Count: {metrics.get('avg_word_count', 0):,} (Target: 3,000+)
 Average Quality: {metrics.get('avg_quality', 0)}% (Target: 88%+)
 Enterprise Standards Met: {metrics.get('enterprise_standards_met', 0)}/{metrics.get('completed_countries', 1)}
 Standards Achievement Rate: {metrics.get('enterprise_standards_rate', 0)}%
 
 🌍 COUNTRY PERFORMANCE DETAILS
-{'─'*40}
+{'─' * 40}
 """
         for result in production_results.get('country_results', []):
             if result.get('status') == 'completed':
@@ -4068,8 +4135,9 @@ Standards Achievement Rate: {metrics.get('enterprise_standards_rate', 0)}%
                 summary += f"✅ {result['country']}: Words: {m.get('final_word_count', 0):,} | Quality: {m.get('quality_score', 0)}% | Omega Key: {key} | Revenue: ${m.get('estimated_revenue', 0):,.2f}\n"
             else:
                 summary += f"❌ {result.get('country', 'Unknown')}: Failed - {result.get('error', 'Unknown error')}\n"
+
         summary += f"""
-{'='*100}
+{'=' * 100}
 🚀 GENERATED BY ENTERPRISE PRODUCTION ORCHESTRATOR v9.0
 🔑 OMEGA 15-KEY ROTATION SYSTEM (Round-Robin Relay Race)
 💎 ALL ENHANCEMENTS INTEGRATED - ZERO COMPROMISE
@@ -4080,11 +4148,11 @@ Standards Achievement Rate: {metrics.get('enterprise_standards_rate', 0)}%
 🔬 ULTIMATE QUALITY GUARDIAN PRO v3.1 - 4-Layer Linguistic Analysis (95%+ Accuracy)
 💾 SQLite Quality Persistence & JSON Schema Validation
 📅 {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
-{'='*100}
+{'=' * 100}
 """
         self.logger.info(summary)
         return summary
-    
+
     async def _generate_enterprise_reports(self, production_results: Dict):
         output_dir = Path('enterprise_outputs')
         output_dir.mkdir(exist_ok=True)
@@ -4093,6 +4161,7 @@ Standards Achievement Rate: {metrics.get('enterprise_standards_rate', 0)}%
         complete_file = output_dir / f"{prod_id}_{timestamp}_complete.json"
         with open(complete_file, 'w', encoding='utf-8') as f:
             json.dump(production_results, f, indent=2, ensure_ascii=False)
+
         content_dir = output_dir / f"{prod_id}_content"
         content_dir.mkdir(exist_ok=True)
         for cr in production_results.get('country_results', []):
@@ -4102,12 +4171,14 @@ Standards Achievement Rate: {metrics.get('enterprise_standards_rate', 0)}%
                 md_file = content_dir / f"{prod_id}_{country}.md"
                 with open(md_file, 'w', encoding='utf-8') as f:
                     f.write(cnt)
+
         summary = self._print_enterprise_summary(production_results)
         summary_file = output_dir / f"{prod_id}_{timestamp}_summary.txt"
         with open(summary_file, 'w', encoding='utf-8') as f:
             f.write(summary)
+
         self.logger.info(f"💾 Enterprise outputs saved to: {output_dir}/")
-    
+
     async def _send_enterprise_notifications(self, production_results: Dict):
         try:
             if hasattr(self, 'dashboard_manager') and self.dashboard_manager:
@@ -4116,7 +4187,10 @@ Standards Achievement Rate: {metrics.get('enterprise_standards_rate', 0)}%
                 await self.social_manager.announce_production_completion(production_results)
         except Exception as e:
             self.logger.warning(f"⚠️ Notifications failed: {e}")
-    
+
+    # -------------------------------------------------------------------------
+    # 🔧 UTILITY METHODS
+    # -------------------------------------------------------------------------
     def get_omega_key_report(self) -> Dict:
         report = {
             'total_keys': self.key_rotation_system['keys_loaded'],
@@ -4130,7 +4204,7 @@ Standards Achievement Rate: {metrics.get('enterprise_standards_rate', 0)}%
         total_successes = sum(stats['successes'] for stats in self.key_rotation_system['key_statistics'].values())
         report['overall_success_rate'] = (total_successes / total_uses * 100) if total_uses > 0 else 0
         return report
-    
+
     def reset_omega_system(self):
         self.key_rotation_system['current_rotation'] = 0
         self.key_rotation_system['blacklisted_keys'].clear()
