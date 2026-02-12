@@ -4330,35 +4330,6 @@ def produce_single_country_sovereign_logic(self, country: str, topic: str,
                         content = asyncio.run(self.quality_optimizer.apply_100_percent_standard(content, country, topic))
                 else:
                     content = self.quality_optimizer.apply_100_percent_standard(content, country, topic)
-                
-                self.logger.info(f"💎 Quality optimization completed for {country}")
-            except Exception as e:
-                self.logger.warning(f"⚠️ Quality optimization failed for {country}: {e}")
-        word_count = len(content.split())
-        estimated_revenue = self._estimate_revenue(country, word_count) if hasattr(self, '_estimate_revenue') else word_count * 0.05
-        processing_time = (datetime.now() - start_time).total_seconds()
-        result.update({
-            'status': 'success',
-            'content': content,
-            'metrics': {
-                'final_word_count': word_count,
-                'estimated_revenue': round(estimated_revenue, 2),
-                'processing_time_seconds': round(processing_time, 1),
-                'image_count': image_count,
-                'video_count': video_count
-            },
-            'error': None
-        })
-        
-        self.logger.info(f"✅ Sovereign generation SUCCESS for {country} – {word_count} words, "
-                        f"${result['metrics']['estimated_revenue']:.2f} revenue, "
-                        f"{processing_time:.1f}s")
-        
-    except Exception as e:
-        self.logger.error(f"❌ Sovereign generation FAILED for {country}: {traceback.format_exc()}")
-        result['error'] = str(e)[:500]
-    
-    return tracebackult
     
     def _calculate_enterprise_metrics(self, country_results: List[Dict]) -> Dict:
         """የኢንተርፕራይዝ ሜትሪክስ ማስላት"""
