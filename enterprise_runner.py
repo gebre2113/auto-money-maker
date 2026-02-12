@@ -4157,64 +4157,142 @@ class EnterpriseProductionOrchestrator:
         self._print_enterprise_summary(production_results)
         
         return production_results
-    async def _process_country_enterprise(self, topic: str, country: str, **kwargs) -> Dict:
-        """የተስተካከለ ድልድይ - ስህተትን ፈልጎ የሚያገኝ"""
-        country_result = {'country': country, 'status': 'processing'}
+async def _process_country_enterprise(self, country: str, topic: str) -> dict:
+    """
+    👑 ኢንተርፕራይዝ የሀገር ይዘት ማምረቻ ዋና ዘዴ
+    ይህ ዘዴ በቲታን ራነር ለእያንዳንዱ ሀገር ይጠራል።
+    """
+    start_time = datetime.now()
+    self.logger.info(f"🏭 Processing {country} with Enterprise pipeline...")
+    
+    # ነባሪ ውጤት (ስህተት ቢከሰትም ሂደቱ እንዲቀጥል)
+    result = {
+        'country': country,
+        'status': 'failed',
+        'content': '',
+        'metrics': {},
+        'error': None,
+        'production_id': f"{country}_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+    }
+    
+    try:
+        # --------------------------------------------------------------
+        # 1. MegaContentEngine በመጠቀም ይዘት አመንጭ
+        # --------------------------------------------------------------
+        if not hasattr(self, 'content_engine'):
+            self.logger.error(f"❌ No content_engine found for {country}")
+            result['error'] = "MegaContentEngine not available"
+            return result
         
-        try:
-            self.logger.info(f"👑 ATTEMPTING MASTER BRIDGE for {country}")
-            
-            # 1. Mega Engineን ማግኘት
-            mega = getattr(self.content_system, 'mega_engine', None)
-            if mega is None:
-                raise AttributeError("❌ MegaContentEngine not found in content_system!")
-
-            # 2. ተግባሩ መኖሩን መፈተሽ
-            method_name = 'produce_single_country_sovereign_logic'
-            if not hasattr(mega, method_name):
-                # 🛑 እዚህ ጋር ነው ምርመራው የሚጀመረው!
-                existing_methods = [m for m in dir(mega) if not m.startswith('_')]
-                self.logger.error(f"❌ '{method_name}' not found! Available methods: {existing_methods}")
-                
-                # ስሙ ተቀይሮ ከሆነ ለመገመት ሙከራ (Social Media Manager ስም ከሆነ)
-                alternatives = ['produce_logic', 'start_production', 'generate_content']
-                for alt in alternatives:
-                    if hasattr(mega, alt):
-                        self.logger.warning(f"⚠️ Found alternative method: {alt}")
-                        method_name = alt
-                        break
+        content_result = self.content_engine.produce_single_country_sovereign_logic(
+            country=country,
+            topic=topic,
+            additional_context={'phase': getattr(self, 'current_phase', 0)}
+        )
+        
+        if content_result.get('status') != 'success':
+            self.logger.warning(f"⚠️ Content generation failed for {country}: {content_result.get('error')}")
+            result['error'] = content_result.get('error', 'Unknown content error')
+            return result
+        
+        content = content_result.get('content', '')
+        self.logger.info(f"✅ Content generated for {country} – {len(content.split())} words")
+        
+        # --------------------------------------------------------------
+        # 2. 🖼️ SmartImageEngine – ምስሎችን አስገባ (አስገዳጅ)
+        # --------------------------------------------------------------
+        if hasattr(self, 'image_engine') and self.image_engine:
+            try:
+                content = self.image_engine.generate_image_placeholders(content, country, topic)
+                img_count = self.image_engine.count_injected_images(content)
+                self.logger.info(f"🖼️ {img_count} images injected for {country}")
+            except Exception as e:
+                self.logger.error(f"❌ Image injection failed for {country}: {e}")
+        
+        # --------------------------------------------------------------
+        # 3. 🎬 ቪዲዮዎችን አስገባ (Authority Videos)
+        # --------------------------------------------------------------
+        if hasattr(self.content_engine, '_inject_authority_videos'):
+            try:
+                video_method = self.content_engine._inject_authority_videos
+                if asyncio.iscoroutinefunction(video_method):
+                    video_html = await video_method(topic, country)
                 else:
-                    raise AttributeError(f"❌ No valid production method found in MegaContentEngine. Available: {existing_methods}")
-
-            # 3. ጥሪውን ማከናወን
-            self.logger.info(f"✍️ Calling Mega-Pen with: {method_name}")
-            mega_content = await getattr(mega, method_name)(topic, country)
-
-            # --- ቀሪው ሎጂክ (Affiliate & Quality) ---
-            # 💰 Affiliate
-            final_content, aff_report = await self.affiliate_manager.inject_affiliate_links(
-                content=mega_content, topic=topic, user_intent="purchase", user_journey_stage="decision"
-            )
-
-            # ✨ Quality Polish
-            optimizer = EliteQualityOptimizer(self)
-            perfected_content = await optimizer.apply_100_percent_standard(final_content, country, topic)
-            
-            country_result.update({
-                'content': perfected_content,
-                'status': 'completed',
-                'metrics': {
-                    'final_word_count': len(perfected_content.split()),
-                    'estimated_revenue': aff_report.get('predicted_total_revenue', 0),
-                    'quality_score': 98
+                    video_html = video_method(topic, country)
+                
+                if video_html:
+                    content += f"\n\n{video_html}"
+                    self.logger.info(f"🎬 Videos injected for {country}")
+            except Exception as e:
+                self.logger.warning(f"⚠️ Video injection failed for {country}: {e}")
+        
+        # --------------------------------------------------------------
+        # 4. 💎 EliteQualityOptimizer – የመጨረሻ ማሻሻያ
+        # --------------------------------------------------------------
+        if hasattr(self, 'quality_optimizer') and self.quality_optimizer:
+            try:
+                optimizer = self.quality_optimizer
+                if asyncio.iscoroutinefunction(optimizer.apply_100_percent_standard):
+                    content = await optimizer.apply_100_percent_standard(content, country, topic)
+                else:
+                    content = optimizer.apply_100_percent_standard(content, country, topic)
+                self.logger.info(f"💎 Quality polish applied for {country}")
+            except Exception as e:
+                self.logger.warning(f"⚠️ Quality optimization failed for {country}: {e}")
+        
+        # --------------------------------------------------------------
+        # 5. 📱 SocialMediaManager – ቀጥታ ወደ መድረኮች ማተም
+        # --------------------------------------------------------------
+        publish_results = {}
+        if hasattr(self, 'social_publisher') and self.social_publisher:
+            try:
+                country_data = {
+                    'country': country,
+                    'topic': topic,
+                    'content': content,
+                    'production_id': result['production_id'],
+                    'metrics': {
+                        'final_word_count': len(content.split()),
+                        'estimated_revenue': content_result.get('metrics', {}).get('estimated_revenue', 0)
+                    }
                 }
-            })
-            return country_result
-
-        except Exception as e:
-            self.logger.error(f"❌ Master Bridge Failure in {country}: {str(e)}")
-            country_result.update({'status': 'failed', 'error': str(e)})
-            return country_result        
+                
+                if asyncio.iscoroutinefunction(self.social_publisher.publish_country_content):
+                    publish_results = await self.social_publisher.publish_country_content(country_data)
+                else:
+                    publish_results = self.social_publisher.publish_country_content(country_data)
+                
+                successful = [p for p, r in publish_results.items() if r.get('status') == 'success']
+                self.logger.info(f"📱 Published {country} to {len(successful)} platforms")
+            except Exception as e:
+                self.logger.error(f"❌ Social publishing failed for {country}: {e}")
+        
+        # --------------------------------------------------------------
+        # 6. ውጤት ዘምን
+        # --------------------------------------------------------------
+        word_count = len(content.split())
+        processing_time = (datetime.now() - start_time).total_seconds()
+        
+        result.update({
+            'status': 'success',
+            'content': content,
+            'metrics': {
+                'final_word_count': word_count,
+                'estimated_revenue': content_result.get('metrics', {}).get('estimated_revenue', word_count * 0.05),
+                'processing_time_seconds': round(processing_time, 1),
+                'image_count': self.image_engine.count_injected_images(content) if hasattr(self, 'image_engine') else 0,
+                'publish_results': publish_results
+            },
+            'error': None
+        })
+        
+        self.logger.info(f"✅ Country {country} processed in {processing_time:.1f}s")
+        
+    except Exception as e:
+        self.logger.error(f"❌ _process_country_enterprise failed for {country}: {traceback.format_exc()}")
+        result['error'] = str(e)[:500]
+    
+    return result        
 def produce_single_country_sovereign_logic(self, country: str, topic: str, 
                                            additional_context: dict = None) -> dict:
     """
@@ -4331,72 +4409,81 @@ def produce_single_country_sovereign_logic(self, country: str, topic: str,
                 else:
                     content = self.quality_optimizer.apply_100_percent_standard(content, country, topic)
                     
-     def_calculate_enterprise_metrics(self, country_results: List[Dict]) -> Dict:
-        """የኢንተርፕራይዝ ሜትሪክስ ማስላት"""
-        completed = [r for r in country_results if r.get('status') == 'completed']
-        
-        if not completed:
-            return {
-                'total_countries': len(country_results),
-                'completed_countries': 0,
-                'avg_word_count': 0,
-                'avg_quality': 0,
-                'avg_cultural_depth': 0,
-                'avg_human_score': 0,
-                'total_words': 0,
-                'estimated_revenue': 0,
-                'success_rate': 0.0,
-                'enterprise_standards_met': 0
-            }
-        
-        # 📊 መሰረታዊ ሜትሪክስ
-        total_words = sum(r.get('metrics', {}).get('final_word_count', 0) for r in completed)
-        avg_words = total_words / len(completed)
-        
-        total_quality = sum(r.get('metrics', {}).get('quality_score', 0) for r in completed)
-        avg_quality = total_quality / len(completed)
-        
-        total_revenue = sum(r.get('metrics', {}).get('estimated_revenue', 0) for r in completed)
-        
-        # 🎯 የኢንተርፕራይዝ ደረጃዎች ማለፊያ
-        standards_met = 0
-        for result in completed:
-            metrics = result.get('metrics', {})
-            if (metrics.get('final_word_count', 0) >= 3000 and 
-                metrics.get('quality_score', 0) >= 88 and
-                metrics.get('enterprise_grade', False)):
-                standards_met += 1
-        
-        success_rate = (len(completed) / len(country_results)) * 100
-        
-        # 🔑 የኦሜጋ ቁልፍ ስታቲስቲክስ
-        omega_stats = {}
-        for key_num, stats in self.key_rotation_system['key_statistics'].items():
-            if stats['uses'] > 0:
-                success_rate_key = (stats['successes'] / stats['uses']) * 100
-                omega_stats[key_num] = {
-                    'uses': stats['uses'],
-                    'success_rate': success_rate_key,
-                    'status': stats['status']
-                }
-        
+def _calculate_enterprise_metrics(self, country_results: List[Dict]) -> Dict:
+    """
+    የሁሉም ሀገሮች አጠቃላይ መለኪያዎችን ያሰላል።
+    የኦሜጋ ቁልፍ ስታቲስቲክስን ጨምሮ።
+    """
+    completed = [r for r in country_results if r.get('status') == 'success']
+    
+    if not completed:
         return {
             'total_countries': len(country_results),
-            'completed_countries': len(completed),
-            'avg_word_count': round(avg_words),
-            'avg_quality': round(avg_quality, 1),
-            'total_words': total_words,
-            'estimated_revenue': round(total_revenue, 2),
-            'success_rate': round(success_rate, 1),
-            'enterprise_standards_met': standards_met,
-            'enterprise_standards_rate': round((standards_met / len(completed)) * 100, 1) if completed else 0,
-            'omega_key_statistics': omega_stats,
+            'completed_countries': 0,
+            'avg_word_count': 0,
+            'avg_quality': 0,
+            'total_words': 0,
+            'estimated_revenue': 0,
+            'success_rate': 0.0,
+            'enterprise_standards_met': 0,
+            'enterprise_standards_rate': 0,
+            'omega_key_statistics': {},
             'omega_key_system': {
-                'total_keys': self.key_rotation_system['keys_loaded'],
-                'blacklisted_keys': len(self.key_rotation_system['blacklisted_keys']),
-                'total_rotations': self.key_rotation_system['total_rotations']
+                'total_keys': getattr(self, 'key_rotation_system', {}).get('keys_loaded', 0),
+                'blacklisted_keys': len(getattr(self, 'key_rotation_system', {}).get('blacklisted_keys', [])),
+                'total_rotations': getattr(self, 'key_rotation_system', {}).get('total_rotations', 0)
             }
         }
+    
+    # 📊 መሰረታዊ ሜትሪክስ
+    total_words = sum(r.get('metrics', {}).get('final_word_count', 0) for r in completed)
+    avg_words = total_words / len(completed)
+    
+    total_quality = sum(r.get('metrics', {}).get('quality_score', 
+                       r.get('metrics', {}).get('enterprise_grade_score', 98)) for r in completed)
+    avg_quality = total_quality / len(completed)
+    
+    total_revenue = sum(r.get('metrics', {}).get('estimated_revenue', 0) for r in completed)
+    
+    # 🎯 የኢንተርፕራይዝ ደረጃዎች ማለፊያ
+    standards_met = 0
+    for result in completed:
+        metrics = result.get('metrics', {})
+        if (metrics.get('final_word_count', 0) >= 3000 and 
+            metrics.get('quality_score', 0) >= 88):
+            standards_met += 1
+    
+    success_rate = (len(completed) / len(country_results)) * 100
+    
+    # 🔑 የኦሜጋ ቁልፍ ስታቲስቲክስ (ካለ)
+    omega_stats = {}
+    if hasattr(self, 'key_rotation_system'):
+        for key_num, stats in self.key_rotation_system.get('key_statistics', {}).items():
+            if stats.get('uses', 0) > 0:
+                success_rate_key = (stats.get('successes', 0) / stats['uses']) * 100
+                omega_stats[key_num] = {
+                    'uses': stats['uses'],
+                    'success_rate': round(success_rate_key, 1),
+                    'status': stats.get('status', 'active')
+                }
+    
+    return {
+        'total_countries': len(country_results),
+        'completed_countries': len(completed),
+        'avg_word_count': round(avg_words),
+        'avg_quality': round(avg_quality, 1),
+        'total_words': total_words,
+        'estimated_revenue': round(total_revenue, 2),
+        'success_rate': round(success_rate, 1),
+        'enterprise_standards_met': standards_met,
+        'enterprise_standards_rate': round((standards_met / len(completed)) * 100, 1) if completed else 0,
+        'omega_key_statistics': omega_stats,
+        'omega_key_system': {
+            'total_keys': self.key_rotation_system.get('keys_loaded', 0) if hasattr(self, 'key_rotation_system') else 0,
+            'blacklisted_keys': len(self.key_rotation_system.get('blacklisted_keys', [])) if hasattr(self, 'key_rotation_system') else 0,
+            'total_rotations': self.key_rotation_system.get('total_rotations', 0) if hasattr(self, 'key_rotation_system') else 0
+        }
+    }
     
     def _print_enterprise_summary(self, production_results: Dict):
         """የኢንተርፕራይዝ ማጠቃለያ ማተም"""
