@@ -3255,7 +3255,7 @@ Due to high demand, this content was generated using the Sovereign Fallback Syst
     # -------------------------------------------------------------------------
     # 🏭 COUNTRY PROCESSING (ENRICHED + AUTO-FIX COMPLIANCE)
     # -------------------------------------------------------------------------
-     async def _process_country_enterprise(self, topic: str, country: str,
+async def _process_country_enterprise(self, topic: str, country: str,
                                           content_type: str = "enterprise_guide",
                                           country_number: int = 0,
                                           total_countries: int = 0,
