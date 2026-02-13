@@ -669,51 +669,50 @@ CONTENT SAMPLE:
             return {'score': 90, 'suggestions': ['Fallback audit'],
                     'passed': True, 'ai_audit_performed': False}
 
+# --- 🛠 Title Optimizer ማስተካከያ (OpenAIን ያስወግዳል) ---
 class AITitleOptimizer:
-    def __init__(self, api_key: Optional[str] = None):
-        self.api_key = api_key or os.getenv('AI_TITLE_API_KEY')
-        self.enabled = bool(self.api_key and openai)
-        if self.enabled and OPENAI_V1:
-            self.client = openai.OpenAI(api_key=self.api_key)
-        else:
-            self.client = None
-    async def optimize_title(self, topic: str, country: str) -> Dict:
-        if not self.enabled:
-            country_name = HIGH_VALUE_COUNTRIES.get(country, {}).get('name', country)
-            return {'title': f"{topic} in {country_name}: The Ultimate Guide", 'ai_generated': True, 'options': [f"{topic} in {country_name}: The Ultimate Guide"], 'seo_score': 85}
-        try:
-            if OPENAI_V1 and self.client:
-                response = await asyncio.to_thread(
-                    self.client.chat.completions.create,
-                    model="gpt-4",
-                    messages=[
-                        {"role": "system", "content": "You are an SEO expert specializing in title optimization."},
-                        {"role": "user", "content": f"Generate 5 SEO-optimized titles for an article about {topic} targeted at {country} audience. Titles should be under 60 characters, include keywords naturally, and be culturally appropriate for {country}."}
-                    ],
-                    temperature=0.7,
-                    max_tokens=300
-                )
-                titles_text = response.choices[0].message.content.strip()
-            else:
-                openai.api_key = self.api_key
-                response = await openai.ChatCompletion.acreate(
-                    model="gpt-4",
-                    messages=[
-                        {"role": "system", "content": "You are an SEO expert specializing in title optimization."},
-                        {"role": "user", "content": f"Generate 5 SEO-optimized titles for an article about {topic} targeted at {country} audience. Titles should be under 60 characters, include keywords naturally, and be culturally appropriate for {country}."}
-                    ],
-                    temperature=0.7,
-                    max_tokens=300
-                )
-                titles_text = response.choices[0].message.content.strip()
-            titles = [t.strip() for t in titles_text.split('\n') if t.strip()][:5]
-            selected_title = titles[0] if titles else f"Complete Guide to {topic} in {country}"
-            return {'title': selected_title, 'ai_generated': True, 'options': titles, 'seo_score': 92}
-        except Exception as e:
-            logging.error(f"AI Title Optimizer failed: {e}")
-            country_name = HIGH_VALUE_COUNTRIES.get(country, {}).get('name', country)
-            return {'title': f"{topic} in {country_name}: The Ultimate Guide", 'ai_generated': True, 'options': [f"{topic} in {country_name}: The Ultimate Guide"], 'seo_score': 85}
+    def __init__(self, runner):
+        self.runner = runner # የGroq Poolን ለመጠቀም ራነሩን ይቀበላል
+        self.enabled = True
 
+    async def optimize_title(self, topic: str, country: str) -> Dict:
+        try:
+            # 🚀 OpenAIን ዘሎ የ Groq 15-Key Poolን ይጠራል
+            prompt = f"As an SEO expert for {country}, generate 5 high-CTR titles for a business guide about '{topic}'. Return ONLY the list of titles."
+            response = await self.runner.failover_system.generate_content(prompt)
+            titles = [t.strip() for t in response.split('\n') if t.strip()]
+            selected = titles[0] if titles else f"Complete Guide to {topic} in {country}"
+            return {'title': selected, 'ai_generated': True, 'seo_score': 95}
+        except Exception as e:
+            logging.error(f"Groq Title Optimization failed: {e}")
+            return {'title': f"Enterprise Guide to {topic} in {country}", 'ai_generated': False}
+
+# --- 🛠 የድልድይ (Bridge) ሎጂክ ማጠናከሪያ ---
+# በ EnterpriseProductionOrchestrator._process_country_enterprise ውስጥ ያለውን ጥሪ በዚህ ተካ፡
+    async def _process_country_enterprise(self, topic: str, country: str, **kwargs) -> dict:
+        # ... (የመጀመሪያዎቹ ሎጂኮች እንዳሉ ሆነው)
+        try:
+            # 🔗 የድልድይ መገጣጠሚያ (Robust Dynamic Bridge)
+            engine = self.content_system
+            mega_method = None
+            
+            # 1. መጀመሪያ በ mega_engine ውስጥ መፈለግ
+            if hasattr(engine, 'mega_engine'):
+                mega_method = getattr(engine.mega_engine, 'produce_single_country_sovereign_logic', None)
+            
+            # 2. ካልተገኘ በቀጥታ በ engine ላይ መፈለግ
+            if not mega_method:
+                mega_method = getattr(engine, 'produce_single_country_sovereign_logic', None)
+
+            if not mega_method:
+                # 🛑 ምን አይነት ስሞች እንዳሉ ለምርመራ በሎግ ያወጣል
+                available = [m for m in dir(engine) if not m.startswith('_')]
+                raise AttributeError(f"❌ Master Bridge Broken: Methods available are {available}")
+
+            self.logger.info(f"🚀 Bridge Active: Calling Mega-Pen for {country}...")
+            content = await mega_method(topic, country)
+            
+            # ... (ቀሪው የ Quality Polish እና Publishing ኮድ ይቀጥላል)
 # =================== HUMAN-LIKENESS ENGINE ===================
 class HumanLikenessEngine:
     def __init__(self, cultural_enricher: Optional[AICulturalEnricher] = None):
