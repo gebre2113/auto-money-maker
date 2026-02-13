@@ -671,48 +671,30 @@ CONTENT SAMPLE:
 
 # --- 🛠 Title Optimizer ማስተካከያ (OpenAIን ያስወግዳል) ---
 class AITitleOptimizer:
+    """የርዕስ ማሳመሪያ - OpenAIን ዘሎ በGroq 15-Key Pool ይሰራል"""
     def __init__(self, runner):
         self.runner = runner # የGroq Poolን ለመጠቀም ራነሩን ይቀበላል
         self.enabled = True
 
     async def optimize_title(self, topic: str, country: str) -> Dict:
         try:
-            # 🚀 OpenAIን ዘሎ የ Groq 15-Key Poolን ይጠራል
-            prompt = f"As an SEO expert for {country}, generate 5 high-CTR titles for a business guide about '{topic}'. Return ONLY the list of titles."
+            self.runner.logger.info(f"🤖 SEO Title Optimization for {country} (Groq-powered)...")
+            # 🚀 የ Groq 15-Key Poolን ይጠራል
+            prompt = f"As an SEO expert for the {country} market, generate 5 high-CTR titles for a business article about '{topic}'. Return ONLY the list of titles."
             response = await self.runner.failover_system.generate_content(prompt)
-            titles = [t.strip() for t in response.split('\n') if t.strip()]
-            selected = titles[0] if titles else f"Complete Guide to {topic} in {country}"
-            return {'title': selected, 'ai_generated': True, 'seo_score': 95}
+            
+            titles = [t.strip() for t in response.split('\n') if t.strip() and len(t) > 10]
+            selected = titles[0] if titles else f"Ultimate Strategy for {topic} in {country}"
+            
+            return {
+                'title': selected.replace('"', '').replace("'", ""),
+                'ai_generated': True,
+                'options': titles,
+                'seo_score': 95
+            }
         except Exception as e:
             logging.error(f"Groq Title Optimization failed: {e}")
-            return {'title': f"Enterprise Guide to {topic} in {country}", 'ai_generated': False}
-
-# --- 🛠 የድልድይ (Bridge) ሎጂክ ማጠናከሪያ ---
-# በ EnterpriseProductionOrchestrator._process_country_enterprise ውስጥ ያለውን ጥሪ በዚህ ተካ፡
-    async def _process_country_enterprise(self, topic: str, country: str, **kwargs) -> dict:
-        # ... (የመጀመሪያዎቹ ሎጂኮች እንዳሉ ሆነው)
-        try:
-            # 🔗 የድልድይ መገጣጠሚያ (Robust Dynamic Bridge)
-            engine = self.content_system
-            mega_method = None
-            
-            # 1. መጀመሪያ በ mega_engine ውስጥ መፈለግ
-            if hasattr(engine, 'mega_engine'):
-                mega_method = getattr(engine.mega_engine, 'produce_single_country_sovereign_logic', None)
-            
-            # 2. ካልተገኘ በቀጥታ በ engine ላይ መፈለግ
-            if not mega_method:
-                mega_method = getattr(engine, 'produce_single_country_sovereign_logic', None)
-
-            if not mega_method:
-                # 🛑 ምን አይነት ስሞች እንዳሉ ለምርመራ በሎግ ያወጣል
-                available = [m for m in dir(engine) if not m.startswith('_')]
-                raise AttributeError(f"❌ Master Bridge Broken: Methods available are {available}")
-
-            self.logger.info(f"🚀 Bridge Active: Calling Mega-Pen for {country}...")
-            content = await mega_method(topic, country)
-            
-            # ... (ቀሪው የ Quality Polish እና Publishing ኮድ ይቀጥላል)
+            return {'title': f"Strategy Guide: {topic} in {country}", 'ai_generated': False, 'seo_score': 70}
 # =================== HUMAN-LIKENESS ENGINE ===================
 class HumanLikenessEngine:
     def __init__(self, cultural_enricher: Optional[AICulturalEnricher] = None):
