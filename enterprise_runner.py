@@ -3113,54 +3113,53 @@ class EnterpriseProductionOrchestrator:
 
     def _initialize_all_components(self):
         """
-        🚀 DIRECT BRIDGE v4.0: ክፍሎችን ልክ እንደ ድሮው ራነር በቀጥታ የማስነሳት ዘዴ
-        ይህ ዘዴ በሎግ ላይ የታየውን 'unexpected keyword' ስህተት በቋሚነት ይፈታል።
+        🚀 SUPER-BRIDGE v5.0: ሁሉንም የጥራት እና የገቢ ሞተሮች በቀጥታ የማስነሳት ዘዴ
+        ይህ ዘዴ የ 'NoneType' ስህተቶችን በሙሉ ይፈታል።
         """
-        self.logger.info("🏢 Initializing Enterprise Components (Direct Link Mode)...")
+        self.logger.info("🏢 Finalizing Enterprise Component Linkage (High-Authority Mode)...")
         
         try:
-            # 1. 🤖 AI Title Optimizer (Direct Call)
+            # 1. 🤖 AI Title, Phrases & Quality (Direct Linking)
             self.ai_title_optimizer = AITitleOptimizer(runner=self)
-            
-            # 2. 🌍 AI Cultural Enricher (Direct Call)
             self.ai_cultural_enricher = AICulturalEnricher(runner=self)
-            
-            # 3. ⚖️ AI Quality Auditor (Direct Call)
             self.ai_quality_auditor = AIQualityAuditor(runner=self)
-
-            # 4. 👥 Human Likeness Engine (Linked with Cultural Enricher)
-            self.human_engine = HumanLikenessEngine(cultural_enricher=self.ai_cultural_enricher)
             
-            # 5. 🖼️ Smart Image Engine & 🎯 CTA Engine (Direct)
+            # 2. 🛡️ የጥራት እና የህግ ጠባቂዎች (ይህ ነው ስህተት የነበረው - አሁን ተስተካክሏል)
+            # እነዚህ ክላሶች በፋይሉ ውስጥ ስላሉ በቀጥታ እናስነሳቸዋለን
+            self.quality_guardian = UltimateQualityGuardian()
+            self.cultural_guardian = CulturalDepthGuardian()
+            self.revenue_engine = RevenueForecastEngine()
+            self.compliance_guardian = EthicalComplianceGuardian()
+            
+            # 3. ✨ ማሳመሪያ ሞተሮች
+            self.human_engine = HumanLikenessEngine(cultural_enricher=self.ai_cultural_enricher)
             self.image_engine = SmartImageEngine()
             self.cta_engine = DynamicCTAEngine()
 
-            # 6. 🛍️ Affiliate Manager (ከ Importer በደህና መሳብ)
+            # 4. 🛍️ አፊሊየት እና ✍️ ይዘት ማምረቻ (ከ Importer)
             aff_mgr_class = self.importer.get_module('UltraAffiliateManager')
             if aff_mgr_class:
                 self.affiliate_manager = aff_mgr_class(user_geo="US", user_segment="enterprise") if callable(aff_mgr_class) else aff_mgr_class
-
-            # 7. ✍️ Mega-Pen Content System (ከ Importer በደህና መሳብ)
+            
             profit_sys_class = self.importer.get_module('UltimateProfitMasterSystem')
             if profit_sys_class:
                 self.content_system = profit_sys_class() if callable(profit_sys_class) else profit_sys_class
                 self.content_engine = self.content_system
-                # ድልድዩን ለሜጋ-ፔን ማስተላለፍ
                 if hasattr(self.content_engine, 'mega_engine'):
                     self.content_engine.mega_engine.system = self
-            
-            # 8. 📱 Social & Dashboard (Direct)
+
+            # 5. 📱 ማተሚያ እና 📊 ዳሽቦርድ
             self.social_manager = SocialMediaManager()
             self.social_publisher = self.social_manager
             self.dashboard_manager = DashboardManager()
 
-            self.logger.info("✅ All components successfully linked using Direct Bridge.")
+            self.logger.info("✅ ALL SYSTEMS GO: Guardians, Revenue, and Compliance linked successfully.")
 
         except Exception as e:
-            self.logger.error(f"❌ Component Linkage Failed: {str(e)}")
-            # ስህተት ቢፈጠር እንኳ ስራው እንዳይቆም Fallback መፍጠር
-            self._create_fallback_modules(['all'])
-
+            self.logger.error(f"❌ Critical Linkage Error: {str(e)}")
+            # ስራው እንዳይቋረጥ መሠረታዊ መጠባበቂያዎችን ማዘጋጀት
+            if not hasattr(self, 'cultural_guardian'): self.cultural_guardian = CulturalDepthGuardian()
+            if not hasattr(self, 'revenue_engine'): self.revenue_engine = RevenueForecastEngine()
     # -------------------------------------------------------------------------
     # 🌉 MEGA-BRIDGE v3.1 – ROBUST METHOD DISCOVERY
     # -------------------------------------------------------------------------
