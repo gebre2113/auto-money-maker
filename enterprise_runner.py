@@ -3261,12 +3261,11 @@ Due to high demand, this content was generated using the Sovereign Fallback Syst
                                           total_countries: int = 0,
                                           omega_key_number: int = 0) -> Dict:
         """
-        🏭 ሉዓላዊ የሀገር ማቀነባበሪያ v9.9 - 11ቱንም ደረጃዎች የያዘ ፍጹም ድልድይ
-        ይህ ኮድ በሌላኛው ፋይል ውስጥ ያለውን የ 'AttributeError' በራሱ ይጠግናል
+        🏭 ሉዓላዊ የሀገር ማቀነባበሪያ v10.0 - 'The Infinite Bridge'
+        ይህ ኮድ በሌላኛው ፋይል ውስጥ ያለውን ማንኛውንም ተግባር ፈልጎ የማግኘት አቅም አለው።
         """
         start_time = datetime.now()
-        self.logger.info(f"🏭 [{country_number}/{total_countries}] Starting Sovereign Pipeline for {country}...")
-        self.performance_monitor.sample_memory()
+        self.logger.info(f"🏭 [{country_number}/{total_countries}] Initiating Sovereign Pipeline for {country}...")
 
         country_result = {
             'country': country, 'status': 'processing', 'stages': {},
@@ -3275,71 +3274,61 @@ Due to high demand, this content was generated using the Sovereign Fallback Syst
 
         try:
             # ------------------------------------------------------------------
-            # STAGE 1: AI TITLE OPTIMIZATION (የርዕስ ማመቻቸት)
+            # STAGE 1-4: RESEARCH (ርዕስ፣ ዩቲዩብ፣ ባህል፣ ምርት)
             # ------------------------------------------------------------------
-            self.logger.info(f"🤖 STAGE 1: AI Title Optimization for {country}")
-            if hasattr(self, 'ai_title_optimizer') and self.ai_title_optimizer:
-                title_data = await self.ai_title_optimizer.optimize_title(topic, country)
-            else:
-                title_data = {'title': f"Enterprise Guide to {topic} in {country}", 'ai_generated': False}
+            title_data = await self.ai_title_optimizer.optimize_title(topic, country)
             country_result['ai_enhancements']['title_optimization'] = title_data
-
-            # ------------------------------------------------------------------
-            # STAGE 2: YOUTUBE RESEARCH (የቪዲዮ ጥናት)
-            # ------------------------------------------------------------------
-            self.logger.info(f"🔍 STAGE 2: Enterprise YouTube Research for {country}")
             video_research = await self._stage_1_enterprise_youtube_research(topic, country)
-
-            # ------------------------------------------------------------------
-            # STAGE 3: CULTURAL DEPTH ANALYSIS (የባህል ጥልቀት ትንተና)
-            # ------------------------------------------------------------------
-            self.logger.info(f"🌍 STAGE 3: Cultural Depth Analysis for {country}")
             cultural_depth = await self.cultural_guardian.analyze_cultural_depth(topic, country, video_research)
-
-            # ------------------------------------------------------------------
-            # STAGE 4: PRODUCT RESEARCH (የአፊሊዬት ምርት ጥናት)
-            # ------------------------------------------------------------------
-            self.logger.info(f"🛍️  STAGE 4: Enterprise Product Research for {country}")
             affiliate_product = await self._stage_3_enterprise_product_research(topic, country)
 
             # ------------------------------------------------------------------
-            # ⚓ STAGE 5: THE GHOST BRIDGE (የሜጋ-ፔን ድልድይ ጥገና)
+            # ⚓ STAGE 5: THE INFINITE BRIDGE (የሜጋ-ፔን ማፈላለጊያ)
             # ------------------------------------------------------------------
-            self.logger.info(f"🏢 STAGE 5: Attempting Master Bridge to Mega-Pen...")
+            self.logger.info(f"🏢 STAGE 5: Attempting Multi-Level Bridge Connection...")
             
             engine = self.content_system
             mega = getattr(engine, 'mega_engine', engine)
             target_method = None
 
-            # 1. መጀመሪያ በክላሱ ውስጥ መፈለግ
-            possible_names = ['produce_single_country_sovereign_logic', '_process_country_enterprise', 'produce_logic']
+            # 🔍 ዘዴ 1: በክላሱ ውስጥ ፈልጎ ማግኘት (Instance Check)
+            possible_names = ['produce_single_country_sovereign_logic', '_process_country_enterprise', 'produce_logic', 'generate_deep_content']
             for name in possible_names:
                 if hasattr(mega, name):
                     target_method = getattr(mega, name)
+                    self.logger.info(f"🔗 Bridge found in class: {name}")
                     break
             
-            # 2. 🛑 ካልተገኘ (ክፍተት ስህተት ካለ) በፋይሉ ውስጥ በግሎባል መፈለግ
+            # 🔍 ዘዴ 2: በፋይሉ (Module) ውስጥ ፈልጎ ማግኘት (Ghost Hook)
             if not target_method:
-                self.logger.warning("🔍 Method missing from class. Attemping Global Module Hook...")
+                self.logger.warning("🔍 Method missing from class. Scoping Global Module...")
                 import types
                 try:
                     import profit_master_system as pms
-                    for name in possible_names:
-                        if hasattr(pms, name):
-                            self.logger.info(f"⚡ Ghost Hook found global function: {name}")
-                            target_method = types.MethodType(getattr(pms, name), mega)
-                            break
+                    # በፋይሉ ውስጥ ያሉትን ሁሉንም ስሞች መመርመር (The Ultimate Search)
+                    for attr_name in dir(pms):
+                        if any(term in attr_name.lower() for term in ['produce', 'sovereign', 'logic', 'mega']):
+                            attr = getattr(pms, attr_name)
+                            if callable(attr):
+                                self.logger.info(f"⚡ Ghost Hook discovered Global Method: {attr_name}")
+                                # ተግባሩን ለጊዜው ከክላሱ ጋር ማጣበቅ
+                                target_method = types.MethodType(attr, mega)
+                                break
                 except ImportError:
-                    self.logger.error("❌ profit_master_system.py could not be imported!")
+                    self.logger.error("❌ profit_master_system.py could not be found or imported!")
             
             if not target_method:
-                raise AttributeError("❌ Critical: No production method found in Mega-Pen or Global Scope!")
+                # 🛑 የመጨረሻ ሙከራ፡ በፋይሉ ውስጥ ያለውን ማንኛውንም 'async' ተግባር መጥራት
+                import profit_master_system as pms
+                all_funcs = [f for f in dir(pms) if callable(getattr(pms, f)) and not f.startswith('__')]
+                self.logger.error(f"❌ No specific production method found. Available functions: {all_funcs}")
+                raise AttributeError("❌ Critical: No valid production method found in Mega-Pen or Global Scope!")
 
-            # ✍️ 15,000 ቃላትን መሳብ
+            # ✍️ 15,000 ቃላትን ከሜጋ-ፔን መሳብ
             self.logger.info(f"🚀 Bridge Active: Calling Mega-Pen via {target_method.__name__}...")
             raw_result = await target_method(topic, country)
             
-            # ውጤቱን ማጽዳት
+            # ውጤቱ ዲክሽነሪ ከሆነ ይዘቱን መለየት
             mega_content = raw_result.get('content', '') if isinstance(raw_result, dict) else str(raw_result)
 
             if not mega_content or len(mega_content) < 500:
@@ -3347,7 +3336,7 @@ Due to high demand, this content was generated using the Sovereign Fallback Syst
                 mega_content = self._generate_fallback_content(topic, country)
 
             # ------------------------------------------------------------------
-            # STAGE 6: HUMAN-LIKENESS ( AI ማስተዋልን መቀነስ)
+            # STAGE 6: HUMAN-LIKENESS (AI ማስተዋልን መቀነስ)
             # ------------------------------------------------------------------
             self.logger.info(f"👥 STAGE 6: Human-Likeness Engine for {country}")
             content = await self.human_engine.inject_human_elements(mega_content, country, topic)
@@ -3400,11 +3389,11 @@ Due to high demand, this content was generated using the Sovereign Fallback Syst
                     'estimated_revenue': rev_forecast.get('estimated_revenue_usd', 0)
                 }
             })
-            self.logger.info(f"✅ [{country}] Processed successfully with {len(content.split())} words.")
+            self.logger.info(f"✅ [{country}] Sovereign Pipeline Complete.")
             return country_result
 
         except Exception as e:
-            self.logger.error(f"❌ Sovereign Pipeline Critical Failure in {country}: {str(e)}")
+            self.logger.error(f"❌ Sovereign Pipeline Failure in {country}: {str(e)}")
             self.logger.error(traceback.format_exc())
             country_result.update({'status': 'failed', 'error': str(e)})
             return country_result
