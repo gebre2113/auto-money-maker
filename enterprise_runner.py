@@ -3140,7 +3140,7 @@ class EnterpriseProductionOrchestrator:
             if self.ai_quality_auditor:
                 self.logger.info("✅ AI Quality Auditor initialized (Groq‑powered)")
 
-            self.ai_title_optimizer = self.importer.get_enterprise_component('AITitleOptimizer')
+            self.ai_title_optimizer = AITitleOptimizer(runner=self)
             if self.ai_title_optimizer:
                 status = "✅ (API Key Active)" if self.ai_title_optimizer.enabled else "⚠️ (Fallback Mode)"
                 self.logger.info(f"{status} AI Title Optimizer initialized (OpenAI fallback)")
