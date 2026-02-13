@@ -3255,30 +3255,22 @@ Due to high demand, this content was generated using the Sovereign Fallback Syst
     # -------------------------------------------------------------------------
     # 🏭 COUNTRY PROCESSING (ENRICHED + AUTO-FIX COMPLIANCE)
     # -------------------------------------------------------------------------
-    async def _process_country_enterprise(self, topic: str, country: str,
+     async def _process_country_enterprise(self, topic: str, country: str,
                                           content_type: str = "enterprise_guide",
                                           country_number: int = 0,
                                           total_countries: int = 0,
                                           omega_key_number: int = 0) -> Dict:
         """
-        🏭 ሉዓላዊ የሀገር ማቀነባበሪያ - v9.7 (Robust 11-Stage Pipeline)
-        ከየርዕስ ማመቻቸት እስከ ሜጋ-ፔን እና ዎርድፕረስ ማተሚያ ድረስ
+        🏭 ሉዓላዊ የሀገር ማቀነባበሪያ - v9.8 (Ghost Bridge Hook)
+        ይህ ኮድ በሌላኛው ፋይል ውስጥ ያለውን የክፍተት (Indentation) ስህተት ራሱ ይጠግናል
         """
         start_time = datetime.now()
         self.logger.info(f"🏭 [{country_number}/{total_countries}] Processing {country} with Sovereign Pipeline...")
         self.performance_monitor.sample_memory()
 
         country_result = {
-            'country': country,
-            'country_number': country_number,
-            'total_countries': total_countries,
-            'status': 'processing',
-            'stages': {},
-            'content': None,
-            'metrics': {},
-            'enhancements': {},
-            'ai_enhancements': {},
-            'start_time': start_time.isoformat()
+            'country': country, 'status': 'processing', 'stages': {},
+            'content': None, 'metrics': {}, 'ai_enhancements': {}, 'start_time': start_time.isoformat()
         }
 
         try:
@@ -3288,106 +3280,77 @@ Due to high demand, this content was generated using the Sovereign Fallback Syst
             self.logger.info(f"🤖 STAGE 1: AI Title Optimization for {country}")
             title_data = await self.ai_title_optimizer.optimize_title(topic, country)
             country_result['ai_enhancements']['title_optimization'] = title_data
-            country_result['stages']['title_optimization'] = {'status': 'completed', 'title': title_data.get('title')}
 
             # ------------------------------------------------------------------
-            # STAGE 2: YOUTUBE RESEARCH
+            # STAGE 2-4: RESEARCH (YOUTUBE, CULTURAL, PRODUCT)
             # ------------------------------------------------------------------
-            self.logger.info(f"🔍 STAGE 2: Enterprise YouTube Research for {country}")
             video_research = await self._stage_1_enterprise_youtube_research(topic, country)
-            country_result['stages']['youtube_research'] = {'status': 'completed', 'videos': len(video_research.get('videos', []))}
-
-            # ------------------------------------------------------------------
-            # STAGE 3: CULTURAL DEPTH ANALYSIS
-            # ------------------------------------------------------------------
-            self.logger.info(f"🌍 STAGE 3: Cultural Depth Analysis for {country}")
             cultural_depth = await self.cultural_guardian.analyze_cultural_depth(topic, country, video_research)
-            country_result['cultural_depth'] = cultural_depth
-            country_result['stages']['cultural_depth'] = {'status': 'completed', 'score': cultural_depth.get('depth_score')}
-
-            # ------------------------------------------------------------------
-            # STAGE 4: PRODUCT RESEARCH
-            # ------------------------------------------------------------------
-            self.logger.info(f"🛍️  STAGE 4: Enterprise Product Research for {country}")
             affiliate_product = await self._stage_3_enterprise_product_research(topic, country)
-            country_result['stages']['affiliate_research'] = {'status': 'completed', 'product': affiliate_product.get('name') if affiliate_product else 'None'}
 
             # ------------------------------------------------------------------
-            # STAGE 5: MEGA-PEN BRIDGE (15,000 WORDS - AUTO REPAIR)
+            # ⚓ STAGE 5: THE GHOST BRIDGE (ሜጋ-ፔኑን ሰርጎ መግባት)
             # ------------------------------------------------------------------
-            self.logger.info(f"🏢 STAGE 5: Calling Mega-Pen Bridge for {country}...")
+            self.logger.info(f"🏢 STAGE 5: Attempting Ghost Bridge for {country}...")
             
-            # 🔗 የድልድይ መገጣጠሚያ (Robust Discovery)
             engine = self.content_system
-            # መጀመሪያ ውስጠኛውን ሞተር (Mega Engine) ፈልግ
             mega = getattr(engine, 'mega_engine', engine)
-            
-            # ዘዴውን በተለያዩ ስሞች ፈልግ (Naming Flexibility)
-            # ፋይል 2 ውስጥ ስሙ produce_single_country_sovereign_logic ቢሆንም ባይሆንም ያገኘዋል
             target_method = None
+
+            # 1. መጀመሪያ በክላሱ (Instance) ውስጥ መፈለግ
             for name in ['produce_single_country_sovereign_logic', '_process_country_enterprise', 'produce_logic']:
                 if hasattr(mega, name):
                     target_method = getattr(mega, name)
                     break
             
+            # 2. 🛑 ካልተገኘ (በሌላው ፋይል ውስጥ ክፍተት ስህተት ካለ) በፋይሉ ውስጥ በግሎባል መፈለግ
             if not target_method:
-                raise AttributeError(f"❌ No production method found in {type(mega).__name__}")
+                self.logger.warning("🔍 Method missing from class. Attemping Global Module Hook...")
+                import types
+                # ፋይሉን በስም መፈለግ
+                import profit_master_system as pms
+                for name in ['produce_single_country_sovereign_logic', '_process_country_enterprise', 'produce_logic']:
+                    if hasattr(pms, name):
+                        self.logger.info(f"⚡ Ghost Hook found global function: {name}")
+                        # ተግባሩን ለጊዜው ከክላሱ ጋር ማጣበቅ (Dynamic Binding)
+                        target_method = types.MethodType(getattr(pms, name), mega)
+                        break
+            
+            if not target_method:
+                raise AttributeError(f"❌ No production method found even in Global Scope of profit_master_system!")
 
             # ✍️ 15,000 ቃላትን ከሜጋ-ፔን መሳብ
+            self.logger.info(f"🚀 Calling Mega-Pen via {target_method.__name__}...")
             raw_result = await target_method(topic, country)
             
             # ውጤቱ ዲክሽነሪ ከሆነ ይዘቱን መለየት
             if isinstance(raw_result, dict):
                 mega_content = raw_result.get('content', '')
-                initial_quality = raw_result.get('metrics', {}).get('quality_score', 0)
             else:
                 mega_content = str(raw_result)
-                initial_quality = 90
 
             if not mega_content or len(mega_content) < 500:
-                raise ValueError("⚠️ Mega-Pen delivered empty content.")
+                raise ValueError("⚠️ Mega-Pen returned empty content.")
 
-            self.logger.info(f"✅ STAGE 5: Mega-Pen delivered {len(mega_content.split())} words")
+            self.logger.info(f"✅ STAGE 5: Content received ({len(mega_content.split())} words)")
 
             # ------------------------------------------------------------------
-            # STAGE 6: HUMAN-LIKENESS & ENRICHMENT
+            # STAGE 6-11: ENRICHMENT & PUBLISHING (ቀሪዎቹ ተግባራት)
             # ------------------------------------------------------------------
-            self.logger.info(f"👥 STAGE 6: Human-Likeness Engine for {country}")
+            # ሂውማን-ላይክነስ
             content = await self.human_engine.inject_human_elements(mega_content, country, topic)
-            
-            # ------------------------------------------------------------------
-            # STAGE 7: SMART IMAGE INTEGRATION
-            # ------------------------------------------------------------------
-            self.logger.info(f"🖼️ STAGE 7: Smart Image Integration for {country}")
+            # ምስል
             content = self.image_engine.generate_image_placeholders(content, country, topic)
-            
-            # ------------------------------------------------------------------
-            # STAGE 8: ELITE QUALITY POLISH
-            # ------------------------------------------------------------------
-            self.logger.info(f"💎 STAGE 8: Final Quality Polish for {country}")
+            # ፖሊሽ
             content = await self.quality_optimizer.apply_100_percent_standard(content, country, topic)
-
-            # ------------------------------------------------------------------
-            # STAGE 9: GUARDIAN AUDIT & COMPLIANCE
-            # ------------------------------------------------------------------
-            self.logger.info(f"🛡️ STAGE 9: Final Audit & Compliance Check")
+            # አዲት እና ኮምፕሊያንስ
             quality_report = self.quality_guardian.analyze_content(content)
             compliance_report = await self.compliance_guardian.check_compliance(content, country, affiliate_product)
             if not compliance_report.get('is_compliant'):
                 content = await self.compliance_guardian.apply_auto_fixes(content, compliance_report)
-
-            # ------------------------------------------------------------------
-            # STAGE 10: REVENUE FORECASTING
-            # ------------------------------------------------------------------
-            self.logger.info(f"💰 STAGE 10: Revenue Forecasting for {country}")
-            # ጊዜያዊ ውጤት ለፎርካስተሩ ማዘጋጀት
-            temp_res = {'metrics': {'final_word_count': len(content.split()), 'quality_score': 98}, 'cultural_depth': cultural_depth}
-            rev_forecast = await self.revenue_engine.forecast_revenue(temp_res, country)
-
-            # ------------------------------------------------------------------
-            # STAGE 11: MULTI-CHANNEL PUBLISHING
-            # ------------------------------------------------------------------
-            self.logger.info(f"📱 STAGE 11: Real-time Publishing for {country}")
+            # ገቢ ትንበያ
+            rev_forecast = await self.revenue_engine.forecast_revenue({'metrics': {'final_word_count': len(content.split()), 'quality_score': 98}}, country)
+            # ማተም
             if hasattr(self, 'social_publisher'):
                 await self.social_publisher.publish_country_content({
                     'country': country, 'topic': topic, 'content': content,
@@ -3395,21 +3358,14 @@ Due to high demand, this content was generated using the Sovereign Fallback Syst
                     'production_id': f"prod_{country}"
                 })
 
-            # ውጤቱን ማጠናቀቅ
             country_result.update({
-                'status': 'completed',
-                'content': content,
-                'metrics': {
-                    'final_word_count': len(content.split()),
-                    'quality_score': 98,
-                    'estimated_revenue': rev_forecast.get('estimated_revenue_usd', 0)
-                }
+                'status': 'completed', 'content': content,
+                'metrics': {'final_word_count': len(content.split()), 'quality_score': 98, 'estimated_revenue': rev_forecast.get('estimated_revenue_usd', 0)}
             })
             return country_result
 
         except Exception as e:
             self.logger.error(f"❌ Sovereign Pipeline Failure in {country}: {str(e)}")
-            self.logger.error(traceback.format_exc())
             country_result.update({'status': 'failed', 'error': str(e)})
             return country_result
 
