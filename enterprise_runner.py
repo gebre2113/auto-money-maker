@@ -3351,12 +3351,15 @@ Due to high demand, this content was generated using the Sovereign Fallback Syst
             # ------------------------------------------------------------------
             self.logger.info(f"🏢 Stage 4: Enterprise Content Generation for {country} – Calling Mega-Pen Bridge...")
             # 🔗 MASTER BRIDGE CALL – ወደ UltimateProfitMasterSystem._process_country_enterprise
+            # 🔗 MASTER BRIDGE CALL – ማስተር ሲስተሙን በትክክለኛው ስሙ መጥራት
             raw_result = await self.content_system._process_country_enterprise(
                 topic=topic,
                 country=country,
                 omega_key_number=omega_key_number
             )
-
+            
+            # ✍️ ከማስተር ሲስተሙ የመጣውን ጽሁፍ ለቀጣዩ ማሳመሪያ ክፍል ማቀበል
+            content = raw_result.get('content', '')
             if raw_result.get('status') != 'success':
                 raise ValueError(f"Mega-Pen bridge failed: {raw_result.get('error', 'Unknown error')}")
 
