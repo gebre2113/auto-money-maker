@@ -132,7 +132,6 @@ try:
         # ... (የቀረው የ importer ኮድ ይቀጥላል)
 except Exception as e:
     print(f"   ⚠️ Profit system Bridge optimization error: {e}")
-```
 # ========== SUPPRESS WARNINGS ==========
 warnings.filterwarnings('ignore')
 
