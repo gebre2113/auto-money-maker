@@ -3,7 +3,7 @@ name: 👑 TITAN v22.0 ULTIMATE MULTI-CHANNEL ORACLE
 on:
   schedule:
     # በየ 30 ደቂቃው እንዲነሳ ተስተካክሏል (ደቂቃ 0 እና 30 ላይ)
-    - cron: '*/90 * * * *'
+    - cron: '*/30 * * * *'
   workflow_dispatch:
     inputs:
       topic:
