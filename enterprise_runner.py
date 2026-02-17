@@ -117,7 +117,22 @@ except ImportError:
     JSONSCHEMA_AVAILABLE = False
     def validate(instance, schema):
         pass
-
+# --- ድልድዩን ማጠናከሪያ (BRIDGE STRENGTHENING) ---
+try:
+    if Path("profit_master_system.py").exists():
+        import profit_master_system as pm
+        import logging
+        # ስህተቱን ሳይነካ ለመጠገን (Monkey Patching the Logger bug)
+        # 'MegaContentEngine' ገና ሳይነሳ ሎገሩን በክፍል ደረጃ (Class Level) እንሰጠዋለን
+        pm.MegaContentEngine.logger = logging.getLogger("MegaJournalist")
+        
+        # አሁን ራነሩ ፈልጎ እንዲያገኘው ለ importer እናስተዋውቃለን
+        self.modules['UltimateProfitMasterSystem'] = getattr(pm, 'UltimateProfitMasterSystem', None)
+        self.modules['AdvancedAIContentGenerator'] = getattr(pm, 'AdvancedAIContentGenerator', None)
+        # ... (የቀረው የ importer ኮድ ይቀጥላል)
+except Exception as e:
+    print(f"   ⚠️ Profit system Bridge optimization error: {e}")
+```
 # ========== SUPPRESS WARNINGS ==========
 warnings.filterwarnings('ignore')
 
