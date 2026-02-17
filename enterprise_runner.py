@@ -3429,39 +3429,55 @@ Due to high demand, this content was generated using the Sovereign Fallback Syst
             'enterprise_grade': True
         }
 
-    async def _stage_5_enterprise_self_correction(self, content: str, target_words: int = 3000,
-                                                  cultural_depth_score: float = 70) -> str:
-        """
-        🔄 Self-correction and expansion to meet word count and quality.
-        """
-        current_words = len(content.split())
-        if current_words >= target_words:
-            return content  # already sufficient
+    # ⚓ STAGE 5: SMART SURGICAL BRIDGE (SNIFFER MODE)
+self.logger.info(f"🏢 STAGE 5: Sniffing out Production Logic for {country}...")
 
-        # Simple expansion: add more paragraphs based on existing structure
-        expansion_needed = target_words - current_words
-        paragraphs_to_add = max(1, expansion_needed // 150)  # ~150 words per paragraph
+# ማስተካከያ፡- ምንም እንኳን ስሙ ቢቀየርም ተግባሩን ፈልጎ ማግኘት
+engine = self.content_system
+mega = getattr(engine, 'mega_engine', engine)  # mega_engine ካለ እሱን ይጠቀማል
+target_method = None
 
-        expanded = content
-        for i in range(paragraphs_to_add):
-            # Add a new section with AI‑generated text if possible, else generic
-            try:
-                if hasattr(self, 'failover_system') and self.failover_system:
-                    prompt = f"""Expand the following content by adding one well-researched paragraph about implementation best practices.
-    Keep the style professional and data-driven. Do not repeat existing ideas.
-    Content snippet:
-    {content[:500]}..."""
-                    new_para = await self.failover_system.generate_content(prompt)
-                    if new_para and len(new_para) > 100:
-                        expanded += f"\n\n{new_para.strip()}"
-                        continue
-            except:
-                pass
-            # Fallback generic expansion
-            expanded += f"\n\n## Additional Insight\n\nFurther analysis reveals that enterprises in this sector benefit from continuous optimization and agile methodologies. By leveraging real-time analytics and cross-functional teams, organizations can achieve up to 40% faster time-to-market while maintaining high quality standards."
+# 🔍 ዘዴ 1፡ በስማቸው ሊሆኑ የሚችሉትን በቅደም ተከተል መፈለግ
+possible_names = [
+    'produce_single_country_sovereign_logic',
+    '_process_country_enterprise',
+    'produce_logic',
+    'generate_premium_content'
+]
 
-        return expanded
+for name in possible_names:
+    if hasattr(mega, name):
+        target_method = getattr(mega, name)
+        if callable(target_method):
+            self.logger.info(f"🔗 Bridge Connected via Name: {name}")
+            break
 
+# 🔍 ዘዴ 2፡ (ስማቸው ከተቀየረ) ማንኛውንም 'produce' የሚል ቃል ያለበትን ተግባር መፈለግ
+if not target_method:
+    self.logger.warning("⚠️ Standard names failed. Scanning for dynamic methods...")
+    for attr_name in dir(mega):
+        if "produce" in attr_name.lower() or "sovereign" in attr_name.lower():
+            attr = getattr(mega, attr_name)
+            if callable(attr) and not isinstance(attr, type):
+                target_method = attr
+                self.logger.info(f"⚡ Dynamic Bridge Found: {attr_name}")
+                break
+
+if not target_method:
+    raise AttributeError(f"❌ Critical: No valid production function found on {type(mega).__name__}")
+
+# ✍️ የ15,000 ቃላት ምርት ጥሪ (Handshake ተካቷል)
+try:
+    mega_content = await target_method(topic, country)
+except TypeError:
+    # selfን የማይፈልግ ከሆነ (እንደ static method) ያለ እሱ መሞከር
+    mega_content = await target_method(topic=topic, country=country)
+
+# ውጤቱ ዲክሽነሪ ከሆነ ጽሁፉን ብቻ ማውጣት
+if isinstance(mega_content, dict):
+    mega_content = mega_content.get('content', str(mega_content))
+
+self.logger.info(f"✅ STAGE 5 Complete: Mega Content Retrieved ({len(str(mega_content))} chars)")
     # -------------------------------------------------------------------------
     # 🚀 MAIN PRODUCTION ENTRY POINT
     # -------------------------------------------------------------------------
