@@ -1,0 +1,6 @@
+{
+  "error": "'EnterpriseProductionOrchestrator' object has no attribute '_setup_enterprise_logging'",
+  "traceback": "Traceback (most recent call last):\n  File \"/home/runner/work/auto-money-maker/auto-money-maker/enterprise_runner.py\", line 4168, in main_execution\n    orchestrator = EnterpriseProductionOrchestrator()\n                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/runner/work/auto-money-maker/auto-money-maker/enterprise_runner.py\", line 3153, in __init__\n    self.logger = self._setup_enterprise_logging()\n                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAttributeError: 'EnterpriseProductionOrchestrator' object has no attribute '_setup_enterprise_logging'\n",
+  "timestamp": "2026-02-17T18:06:59.105860",
+  "topic": "Unknown"
+}
