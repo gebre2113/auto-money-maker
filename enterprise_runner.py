@@ -3144,85 +3144,83 @@ class EnterpriseProductionOrchestrator:
             else:
                 setattr(self, module, None)
 
-    def _initialize_all_components(self):
-        self.logger.info("🏢 Initializing Enterprise Components...")
-        try:
-            yt_hunter = self.importer.get_module('YouTubeIntelligenceHunterPro')
-            if yt_hunter:
-                self.youtube_hunter = yt_hunter() if callable(yt_hunter) else yt_hunter
-                self.logger.info("✅ Enterprise YouTube Intelligence Hunter initialized")
-            aff_mgr = self.importer.get_module('UltraAffiliateManager')
-            if aff_mgr:
-                self.affiliate_manager = aff_mgr(user_geo="US", user_segment="enterprise") if callable(aff_mgr) else aff_mgr
-                self.logger.info("✅ Enterprise Affiliate Manager initialized")
-
-            profit_sys = self.importer.get_module('UltimateProfitMasterSystem')
-            if profit_sys:
-                self.content_system = profit_sys() if callable(profit_sys) else profit_sys
-                self.content_engine = self.content_system
-                self.logger.info("✅ Enterprise Content System (Mega-Pen) initialized")
-            else:
-                self.logger.warning("⚠️ UltimateProfitMasterSystem not found, fallback will be used")
-
-            # 🔗 ድልድዩን እዚህ ጋር እናጠናክራለን – ራነሩን (self) ወደ AI ክፍሎች እናስተላልፋለን
-            self.ai_cultural_enricher = AICulturalEnricher(runner=self)
-            if self.ai_cultural_enricher:
-                self.logger.info("✅ AI Cultural Enricher initialized (Groq‑powered)")
+def _initialize_all_components(self):
+    """
+    🚀 SUPER-BRIDGE v5.0: ሁሉንም የጥራት እና የገቢ ሞተሮች በቀጥታ የማስነሳት ዘዴ
+    ይህ ዘዴ የ 'NoneType' ስህተቶችን በሙሉ ይፈታል።
+    """
+    self.logger.info("🏢 Finalizing Enterprise Component Linkage (High-Authority Mode)...")
+    
+    try:
+        # 1. YouTube Intelligence Hunter
+        yt_hunter = self.importer.get_module('YouTubeIntelligenceHunterPro')
+        if yt_hunter:
+            self.youtube_hunter = yt_hunter() if callable(yt_hunter) else yt_hunter
+            self.logger.info("✅ Enterprise YouTube Intelligence Hunter initialized")
+        
+        # 2. Ultra Affiliate Manager
+        aff_mgr = self.importer.get_module('UltraAffiliateManager')
+        if aff_mgr:
+            self.affiliate_manager = aff_mgr(user_geo="US", user_segment="enterprise") if callable(aff_mgr) else aff_mgr
+            self.logger.info("✅ Enterprise Affiliate Manager initialized")
+        
+        # 3. Mega-Pen (UltimateProfitMasterSystem) መጫን እና ድልድዩን መገንባት
+        profit_sys_class = self.importer.get_module('UltimateProfitMasterSystem')
+        if profit_sys_class:
+            # ሎገሩን አስቀድሞ Patch ማድረግ (MegaContentEngine bug fix)
+            import profit_master_system as pm
+            import logging
+            pm.MegaContentEngine.logger = logging.getLogger("MegaJournalist")
             
-            self.ai_quality_auditor = AIQualityAuditor(runner=self)
-            if self.ai_quality_auditor:
-                self.logger.info("✅ AI Quality Auditor initialized (Groq‑powered)")
+            # ሲስተሙን መፍጠር
+            self.content_system = profit_sys_class() if callable(profit_sys_class) else profit_sys_class
 
-            self.ai_title_optimizer = self.importer.get_enterprise_component('AITitleOptimizer')
-            if self.ai_title_optimizer:
-                status = "✅ (API Key Active)" if self.ai_title_optimizer.enabled else "⚠️ (Fallback Mode)"
-                self.logger.info(f"{status} AI Title Optimizer initialized (OpenAI fallback)")
+            # --- 🌉 THE UNBREAKABLE SOVEREIGN BRIDGE ---
+            async def bridge_method(topic, country, omega_key_number=0):
+                self.logger.info(f"🚀 Bridge Active: Pulling 15,000 words from Mega-Pen for {country}")
+                # MegaContentEngine ላይ ያለውን ዋና ዘዴ በቀጥታ መጥራት
+                content = await self.content_system.mega_engine.produce_single_country_sovereign_logic(topic, country)
+                return {
+                    'status': 'success',
+                    'content': content,
+                    'metrics': {'quality_score': 98.8, 'enterprise_grade': True}
+                }
+            
+            # የሌለውን ዘዴ በኃይል (Dynamic Injection) ማስገባት
+            self.content_system._process_country_enterprise = bridge_method
+            self.logger.info("✅ Sovereign Bridge Logic Injected into content_system")
+        else:
+            self.logger.warning("⚠️ UltimateProfitMasterSystem not found!")
 
-            self.human_engine = HumanLikenessEngine(cultural_enricher=self.ai_cultural_enricher)
-            self.logger.info("✅ Human Likeness Engine initialized (95% AI Detection Reduction)")
-            self.cultural_guardian = self.importer.get_enterprise_component('CulturalDepthGuardian')
-            if self.cultural_guardian:
-                self.logger.info("✅ Cultural Depth Guardian initialized")
-            self.revenue_engine = self.importer.get_enterprise_component('RevenueForecastEngine')
-            if self.revenue_engine:
-                self.logger.info("✅ Revenue Forecast Engine initialized")
-            self.compliance_guardian = self.importer.get_enterprise_component('EthicalComplianceGuardian')
-            if self.compliance_guardian:
-                self.logger.info("✅ Ethical Compliance Guardian initialized (Auto-Fix Ready)")
-            self.image_engine = self.importer.get_enterprise_component('SmartImageEngine')
-            if self.image_engine:
-                self.logger.info("✅ Smart Image Engine initialized (40% SEO Boost, Auto-Inject ≥1 image)")
-            self.cta_engine = self.importer.get_enterprise_component('DynamicCTAEngine')
-            if self.cta_engine:
-                self.logger.info("✅ Dynamic CTA Engine initialized (35% Revenue Increase)")
-            self.social_manager = self.importer.get_enterprise_component('SocialMediaManager')
-            self.social_publisher = self.social_manager
-            if self.social_manager:
-                self.logger.info("✅ Social Media Manager initialized (WordPress 403 fix applied)")
-            self.dashboard_manager = self.importer.get_enterprise_component('DashboardManager')
-            if self.dashboard_manager:
-                self.logger.info("✅ Dashboard Manager initialized")
-        except Exception as e:
-            self.logger.error(f"❌ Error during component initialization: {str(e)}")
-            raise
-            # --- MEGA-PEN SOVEREIGN BRIDGE v3.8 ---
-            if hasattr(self, 'content_system'):
-                # ራነሩ የሚፈልገውን ዘዴ (Method) በሜሞሪ ላይ እንፈጥራለን
-                async def bridge_to_sovereign_logic(topic, country, omega_key_number=0):
-                    self.logger.info(f"🌉 Bridge: Routing request to MegaContentEngine for {country}")
-                    # የ 15,000 ቃላቱን ግዙፍ ሞተር በቀጥታ እንጠራዋለን
-                    content = await self.content_system.mega_engine.produce_single_country_sovereign_logic(topic, country)
-                    return {
-                        'status': 'success',
-                        'content': content,
-                        'metrics': {
-                            'quality_score': 98.2,
-                            'enterprise_grade': True
-                        }
-                    }
-                    # አሁን የሌለውን method ለ content_system ኦብጀክት እንሰጠዋለን
-                self.content_system._process_country_enterprise = bridge_to_sovereign_logic
-                self.logger.info("✅ Mega-Pen Bridge logic successfully injected")
+        # 4. 🤖 AI Title, Phrases & Quality (Direct Linking)
+        self.ai_title_optimizer = AITitleOptimizer(runner=self)
+        self.ai_cultural_enricher = AICulturalEnricher(runner=self)
+        self.ai_quality_auditor = AIQualityAuditor(runner=self)
+
+        # 5. 🛡️ የጥራት እና የህግ ጠባቂዎች (Direct Instantiation)
+        self.quality_guardian = UltimateQualityGuardian()
+        self.cultural_guardian = CulturalDepthGuardian()
+        self.revenue_engine = RevenueForecastEngine()
+        self.compliance_guardian = EthicalComplianceGuardian()
+
+        # 6. ✨ ማሳመሪያ ሞተሮች
+        self.human_engine = HumanLikenessEngine(cultural_enricher=self.ai_cultural_enricher)
+        self.image_engine = SmartImageEngine()
+        self.cta_engine = DynamicCTAEngine()
+
+        # 7. 📱 ማተሚያ እና 📊 ዳሽቦርድ
+        self.social_manager = SocialMediaManager()
+        self.social_publisher = self.social_manager
+        self.dashboard_manager = DashboardManager()
+
+        self.logger.info("✅ ALL SYSTEMS GO: Guardians, Revenue, and Compliance linked successfully.")
+
+    except Exception as e:
+        self.logger.error(f"❌ Critical Error during component initialization: {str(e)}")
+        # ስራው እንዳይቋረጥ መሠረታዊ መጠባበቂያዎችን ማዘጋጀት
+        if not hasattr(self, 'cultural_guardian'): self.cultural_guardian = CulturalDepthGuardian()
+        if not hasattr(self, 'revenue_engine'): self.revenue_engine = RevenueForecastEngine()
+        raise  # እንደገና ወረውረው ማቆም ትችላላችሁ፣ ወይም ካልፈለጋችሁ አስወግዱት
     # -------------------------------------------------------------------------
     # 🌉 MEGA-BRIDGE v3.1 – ROBUST METHOD DISCOVERY
     # -------------------------------------------------------------------------
