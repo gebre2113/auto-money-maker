@@ -1,0 +1,1013 @@
+{
+  "production_id": "enterprise_f85a078b4f2b",
+  "topic": "Enterprise AI Implementation Strategies 2026",
+  "target_countries": [
+    "US",
+    "GB",
+    "CA",
+    "AU",
+    "DE",
+    "FR",
+    "JP",
+    "CH",
+    "NO",
+    "SE",
+    "ET"
+  ],
+  "content_type": "enterprise_guide",
+  "enterprise_standards": {
+    "min_words": 3000,
+    "min_quality": 88,
+    "min_cultural_depth": 85,
+    "min_compliance_score": 95,
+    "sequential_processing": true,
+    "intelligent_delays": true,
+    "quality_guarantee": true,
+    "key_rotation": "15-key-omega",
+    "quality_guardian_version": "3.1"
+  },
+  "omega_key_system": {
+    "keys_loaded": 9,
+    "start_rotations": 0,
+    "total_rotations": 11,
+    "key_statistics": {
+      "1": {
+        "uses": 2,
+        "successes": 0,
+        "failures": 2,
+        "last_used": "2026-02-17T15:54:36.349840",
+        "status": "unreliable"
+      },
+      "2": {
+        "uses": 2,
+        "successes": 0,
+        "failures": 2,
+        "last_used": "2026-02-17T15:56:36.461514",
+        "status": "unreliable"
+      },
+      "3": {
+        "uses": 1,
+        "successes": 0,
+        "failures": 1,
+        "last_used": "2026-02-17T15:35:30.256570",
+        "status": "unreliable"
+      },
+      "4": {
+        "uses": 1,
+        "successes": 0,
+        "failures": 1,
+        "last_used": "2026-02-17T15:38:19.452386",
+        "status": "unreliable"
+      },
+      "5": {
+        "uses": 1,
+        "successes": 0,
+        "failures": 1,
+        "last_used": "2026-02-17T15:40:22.582810",
+        "status": "unreliable"
+      },
+      "6": {
+        "uses": 1,
+        "successes": 0,
+        "failures": 1,
+        "last_used": "2026-02-17T15:43:38.677638",
+        "status": "unreliable"
+      },
+      "7": {
+        "uses": 1,
+        "successes": 0,
+        "failures": 1,
+        "last_used": "2026-02-17T15:45:47.862349",
+        "status": "unreliable"
+      },
+      "8": {
+        "uses": 1,
+        "successes": 0,
+        "failures": 1,
+        "last_used": "2026-02-17T15:48:59.014742",
+        "status": "unreliable"
+      },
+      "9": {
+        "uses": 1,
+        "successes": 0,
+        "failures": 1,
+        "last_used": "2026-02-17T15:52:28.219980",
+        "status": "unreliable"
+      }
+    }
+  },
+  "status": "completed",
+  "start_time": "2026-02-17T15:29:10.536639",
+  "performance_monitoring": true,
+  "country_results": [
+    {
+      "country": "US",
+      "country_number": 1,
+      "total_countries": 11,
+      "status": "failed",
+      "stages": {
+        "title_optimization": {
+          "status": "completed",
+          "ai_generated": true,
+          "seo_score": 85,
+          "title": "Enterprise AI Implementation Strategies 2026 in United States: The Ultimate Guide"
+        },
+        "youtube_research": {
+          "status": "completed",
+          "videos_analyzed": 3,
+          "research_depth": "medium",
+          "enterprise_grade": true
+        },
+        "cultural_depth": {
+          "status": "completed",
+          "depth_score": 80.5,
+          "quality_tier": "⭐ Premium",
+          "requirements_met": true
+        },
+        "affiliate_research": {
+          "status": "completed",
+          "product_found": true,
+          "product_name": "Premium Enterprise AI Implementation Strategies 2026 Solution",
+          "enterprise_grade": true
+        }
+      },
+      "content": null,
+      "metrics": {},
+      "enhancements": {},
+      "ai_enhancements": {
+        "title_optimization": {
+          "title": "Enterprise AI Implementation Strategies 2026 in United States: The Ultimate Guide",
+          "ai_generated": true,
+          "options": [
+            "Enterprise AI Implementation Strategies 2026 in United States: The Ultimate Guide"
+          ],
+          "seo_score": 85
+        }
+      },
+      "start_time": "2026-02-17T15:29:10.537385",
+      "cultural_depth": {
+        "depth_score": 80.5,
+        "research_depth": "deep",
+        "requirements_met": true,
+        "actual_metrics": {
+          "videos": 3,
+          "views": 550000,
+          "engagement": 0.06,
+          "quality": 80.0
+        },
+        "required_metrics": {
+          "min_videos": 5,
+          "min_views": 500000,
+          "min_engagement": 0.08,
+          "score_weight": 1.0
+        },
+        "recommendations": [
+          "🎯 **Engagement Issue**: Focus on videos with higher engagement rates (comments, likes, shares).",
+          "🇺🇸 Include data from US government sources (Census, BLS) and major corporations",
+          "✅ **Depth Achieved**: Maintain current research depth and focus on implementation examples."
+        ],
+        "cultural_insights": [
+          "**Market Context**: United States has a $100,000 market potential for Enterprise AI Implementation Strategies 2026",
+          "**Communication Style**: Direct, data-driven, ROI-focused communication",
+          "**Business Culture**: Fast-paced, entrepreneurial, results-driven",
+          "**Key Regulations**: FTC affiliate disclosure, GDPR notice for EU visitors"
+        ],
+        "quality_tier": "⭐ Premium",
+        "improvement_priority": "LOW - Minor improvements possible"
+      },
+      "error": "Mega-Pen bridge failed: Mega-Pen Error in US: 'MegaContentEngine' object has no attribute 'produce_single_country_sovereign_logic'",
+      "end_time": "2026-02-17T15:29:11.009352",
+      "duration": 0.471967,
+      "omega_key_used": 1
+    },
+    {
+      "country": "GB",
+      "country_number": 2,
+      "total_countries": 11,
+      "status": "failed",
+      "stages": {
+        "title_optimization": {
+          "status": "completed",
+          "ai_generated": true,
+          "seo_score": 85,
+          "title": "Enterprise AI Implementation Strategies 2026 in United Kingdom: The Ultimate Guide"
+        },
+        "youtube_research": {
+          "status": "completed",
+          "videos_analyzed": 3,
+          "research_depth": "medium",
+          "enterprise_grade": true
+        },
+        "cultural_depth": {
+          "status": "completed",
+          "depth_score": 80.5,
+          "quality_tier": "⭐ Premium",
+          "requirements_met": true
+        },
+        "affiliate_research": {
+          "status": "completed",
+          "product_found": true,
+          "product_name": "Premium Enterprise AI Implementation Strategies 2026 Solution",
+          "enterprise_grade": true
+        }
+      },
+      "content": null,
+      "metrics": {},
+      "enhancements": {},
+      "ai_enhancements": {
+        "title_optimization": {
+          "title": "Enterprise AI Implementation Strategies 2026 in United Kingdom: The Ultimate Guide",
+          "ai_generated": true,
+          "options": [
+            "Enterprise AI Implementation Strategies 2026 in United Kingdom: The Ultimate Guide"
+          ],
+          "seo_score": 85
+        }
+      },
+      "start_time": "2026-02-17T15:32:22.077619",
+      "cultural_depth": {
+        "depth_score": 80.5,
+        "research_depth": "deep",
+        "requirements_met": true,
+        "actual_metrics": {
+          "videos": 3,
+          "views": 550000,
+          "engagement": 0.06,
+          "quality": 80.0
+        },
+        "required_metrics": {
+          "min_videos": 5,
+          "min_views": 500000,
+          "min_engagement": 0.08,
+          "score_weight": 1.0
+        },
+        "recommendations": [
+          "🎯 **Engagement Issue**: Focus on videos with higher engagement rates (comments, likes, shares).",
+          "🇬🇧 Reference UK government data (ONS) and British business associations",
+          "✅ **Depth Achieved**: Maintain current research depth and focus on implementation examples."
+        ],
+        "cultural_insights": [
+          "**Market Context**: United Kingdom has a $90,000 market potential for Enterprise AI Implementation Strategies 2026",
+          "**Key Regulations**: UK GDPR compliance, FCA financial regulations (if applicable)"
+        ],
+        "quality_tier": "⭐ Premium",
+        "improvement_priority": "LOW - Minor improvements possible"
+      },
+      "error": "Mega-Pen bridge failed: Mega-Pen Error in GB: 'MegaContentEngine' object has no attribute 'produce_single_country_sovereign_logic'",
+      "end_time": "2026-02-17T15:32:22.155164",
+      "duration": 0.077545,
+      "omega_key_used": 2
+    },
+    {
+      "country": "CA",
+      "country_number": 3,
+      "total_countries": 11,
+      "status": "failed",
+      "stages": {
+        "title_optimization": {
+          "status": "completed",
+          "ai_generated": true,
+          "seo_score": 85,
+          "title": "Enterprise AI Implementation Strategies 2026 in Canada: The Ultimate Guide"
+        },
+        "youtube_research": {
+          "status": "completed",
+          "videos_analyzed": 3,
+          "research_depth": "medium",
+          "enterprise_grade": true
+        },
+        "cultural_depth": {
+          "status": "completed",
+          "depth_score": 80.5,
+          "quality_tier": "⭐ Premium",
+          "requirements_met": true
+        },
+        "affiliate_research": {
+          "status": "completed",
+          "product_found": true,
+          "product_name": "Premium Enterprise AI Implementation Strategies 2026 Solution",
+          "enterprise_grade": true
+        }
+      },
+      "content": null,
+      "metrics": {},
+      "enhancements": {},
+      "ai_enhancements": {
+        "title_optimization": {
+          "title": "Enterprise AI Implementation Strategies 2026 in Canada: The Ultimate Guide",
+          "ai_generated": true,
+          "options": [
+            "Enterprise AI Implementation Strategies 2026 in Canada: The Ultimate Guide"
+          ],
+          "seo_score": 85
+        }
+      },
+      "start_time": "2026-02-17T15:35:30.256792",
+      "cultural_depth": {
+        "depth_score": 80.5,
+        "research_depth": "deep",
+        "requirements_met": true,
+        "actual_metrics": {
+          "videos": 3,
+          "views": 550000,
+          "engagement": 0.06,
+          "quality": 80.0
+        },
+        "required_metrics": {
+          "min_videos": 5,
+          "min_views": 500000,
+          "min_engagement": 0.08,
+          "score_weight": 1.0
+        },
+        "recommendations": [
+          "🎯 **Engagement Issue**: Focus on videos with higher engagement rates (comments, likes, shares).",
+          "✅ **Depth Achieved**: Maintain current research depth and focus on implementation examples."
+        ],
+        "cultural_insights": [
+          "**Market Context**: Canada has a $84,000 market potential for Enterprise AI Implementation Strategies 2026",
+          "**Key Regulations**: CASL anti-spam compliance, PIPEDA privacy regulations"
+        ],
+        "quality_tier": "⭐ Premium",
+        "improvement_priority": "LOW - Minor improvements possible"
+      },
+      "error": "Mega-Pen bridge failed: Mega-Pen Error in CA: 'MegaContentEngine' object has no attribute 'produce_single_country_sovereign_logic'",
+      "end_time": "2026-02-17T15:35:30.352695",
+      "duration": 0.095903,
+      "omega_key_used": 3
+    },
+    {
+      "country": "AU",
+      "country_number": 4,
+      "total_countries": 11,
+      "status": "failed",
+      "stages": {
+        "title_optimization": {
+          "status": "completed",
+          "ai_generated": true,
+          "seo_score": 85,
+          "title": "Enterprise AI Implementation Strategies 2026 in Australia: The Ultimate Guide"
+        },
+        "youtube_research": {
+          "status": "completed",
+          "videos_analyzed": 3,
+          "research_depth": "medium",
+          "enterprise_grade": true
+        },
+        "cultural_depth": {
+          "status": "completed",
+          "depth_score": 80.0,
+          "quality_tier": "⭐ Premium",
+          "requirements_met": true
+        },
+        "affiliate_research": {
+          "status": "completed",
+          "product_found": true,
+          "product_name": "Premium Enterprise AI Implementation Strategies 2026 Solution",
+          "enterprise_grade": true
+        }
+      },
+      "content": null,
+      "metrics": {},
+      "enhancements": {},
+      "ai_enhancements": {
+        "title_optimization": {
+          "title": "Enterprise AI Implementation Strategies 2026 in Australia: The Ultimate Guide",
+          "ai_generated": true,
+          "options": [
+            "Enterprise AI Implementation Strategies 2026 in Australia: The Ultimate Guide"
+          ],
+          "seo_score": 85
+        }
+      },
+      "start_time": "2026-02-17T15:38:19.452639",
+      "cultural_depth": {
+        "depth_score": 80.0,
+        "research_depth": "medium",
+        "requirements_met": true,
+        "actual_metrics": {
+          "videos": 3,
+          "views": 550000,
+          "engagement": 0.06,
+          "quality": 80.0
+        },
+        "required_metrics": {
+          "min_videos": 3,
+          "min_views": 200000,
+          "min_engagement": 0.05,
+          "score_weight": 0.8
+        },
+        "recommendations": [
+          "✅ **Depth Achieved**: Maintain current research depth and focus on implementation examples."
+        ],
+        "cultural_insights": [
+          "**Market Context**: Australia has a $96,000 market potential for Enterprise AI Implementation Strategies 2026",
+          "**Key Regulations**: Australian Consumer Law, Spam Act compliance"
+        ],
+        "quality_tier": "⭐ Premium",
+        "improvement_priority": "LOW - Minor improvements possible"
+      },
+      "error": "Mega-Pen bridge failed: Mega-Pen Error in AU: 'MegaContentEngine' object has no attribute 'produce_single_country_sovereign_logic'",
+      "end_time": "2026-02-17T15:38:19.554006",
+      "duration": 0.101367,
+      "omega_key_used": 4
+    },
+    {
+      "country": "DE",
+      "country_number": 5,
+      "total_countries": 11,
+      "status": "failed",
+      "stages": {
+        "title_optimization": {
+          "status": "completed",
+          "ai_generated": true,
+          "seo_score": 85,
+          "title": "Enterprise AI Implementation Strategies 2026 in Germany: The Ultimate Guide"
+        },
+        "youtube_research": {
+          "status": "completed",
+          "videos_analyzed": 3,
+          "research_depth": "medium",
+          "enterprise_grade": true
+        },
+        "cultural_depth": {
+          "status": "completed",
+          "depth_score": 80.5,
+          "quality_tier": "⭐ Premium",
+          "requirements_met": true
+        },
+        "affiliate_research": {
+          "status": "completed",
+          "product_found": true,
+          "product_name": "Premium Enterprise AI Implementation Strategies 2026 Solution",
+          "enterprise_grade": true
+        }
+      },
+      "content": null,
+      "metrics": {},
+      "enhancements": {},
+      "ai_enhancements": {
+        "title_optimization": {
+          "title": "Enterprise AI Implementation Strategies 2026 in Germany: The Ultimate Guide",
+          "ai_generated": true,
+          "options": [
+            "Enterprise AI Implementation Strategies 2026 in Germany: The Ultimate Guide"
+          ],
+          "seo_score": 85
+        }
+      },
+      "start_time": "2026-02-17T15:40:22.583021",
+      "cultural_depth": {
+        "depth_score": 80.5,
+        "research_depth": "deep",
+        "requirements_met": true,
+        "actual_metrics": {
+          "videos": 3,
+          "views": 550000,
+          "engagement": 0.06,
+          "quality": 80.0
+        },
+        "required_metrics": {
+          "min_videos": 5,
+          "min_views": 500000,
+          "min_engagement": 0.08,
+          "score_weight": 1.0
+        },
+        "recommendations": [
+          "🎯 **Engagement Issue**: Focus on videos with higher engagement rates (comments, likes, shares).",
+          "🇩🇪 Include German engineering standards and industry associations",
+          "✅ **Depth Achieved**: Maintain current research depth and focus on implementation examples."
+        ],
+        "cultural_insights": [
+          "**Market Context**: Germany has a $80,000 market potential for Enterprise AI Implementation Strategies 2026",
+          "**Communication Style**: Precise, technical, detail-oriented presentation",
+          "**Key Regulations**: Strict GDPR implementation, German consumer protection laws"
+        ],
+        "quality_tier": "⭐ Premium",
+        "improvement_priority": "LOW - Minor improvements possible"
+      },
+      "error": "Mega-Pen bridge failed: Mega-Pen Error in DE: 'MegaContentEngine' object has no attribute 'produce_single_country_sovereign_logic'",
+      "end_time": "2026-02-17T15:40:22.668973",
+      "duration": 0.085952,
+      "omega_key_used": 5
+    },
+    {
+      "country": "FR",
+      "country_number": 6,
+      "total_countries": 11,
+      "status": "failed",
+      "stages": {
+        "title_optimization": {
+          "status": "completed",
+          "ai_generated": true,
+          "seo_score": 85,
+          "title": "Enterprise AI Implementation Strategies 2026 in France: The Ultimate Guide"
+        },
+        "youtube_research": {
+          "status": "completed",
+          "videos_analyzed": 3,
+          "research_depth": "medium",
+          "enterprise_grade": true
+        },
+        "cultural_depth": {
+          "status": "completed",
+          "depth_score": 80.0,
+          "quality_tier": "⭐ Premium",
+          "requirements_met": true
+        },
+        "affiliate_research": {
+          "status": "completed",
+          "product_found": true,
+          "product_name": "Premium Enterprise AI Implementation Strategies 2026 Solution",
+          "enterprise_grade": true
+        }
+      },
+      "content": null,
+      "metrics": {},
+      "enhancements": {},
+      "ai_enhancements": {
+        "title_optimization": {
+          "title": "Enterprise AI Implementation Strategies 2026 in France: The Ultimate Guide",
+          "ai_generated": true,
+          "options": [
+            "Enterprise AI Implementation Strategies 2026 in France: The Ultimate Guide"
+          ],
+          "seo_score": 85
+        }
+      },
+      "start_time": "2026-02-17T15:43:38.677866",
+      "cultural_depth": {
+        "depth_score": 80.0,
+        "research_depth": "medium",
+        "requirements_met": true,
+        "actual_metrics": {
+          "videos": 3,
+          "views": 550000,
+          "engagement": 0.06,
+          "quality": 80.0
+        },
+        "required_metrics": {
+          "min_videos": 3,
+          "min_views": 200000,
+          "min_engagement": 0.05,
+          "score_weight": 0.8
+        },
+        "recommendations": [
+          "✅ **Depth Achieved**: Maintain current research depth and focus on implementation examples."
+        ],
+        "cultural_insights": [
+          "**Market Context**: France has a $76,000 market potential for Enterprise AI Implementation Strategies 2026",
+          "**Communication Style**: Elegant, conceptual, quality-focused messaging",
+          "**Key Regulations**: CNIL GDPR enforcement, French consumer code"
+        ],
+        "quality_tier": "⭐ Premium",
+        "improvement_priority": "LOW - Minor improvements possible"
+      },
+      "error": "Mega-Pen bridge failed: Mega-Pen Error in FR: 'MegaContentEngine' object has no attribute 'produce_single_country_sovereign_logic'",
+      "end_time": "2026-02-17T15:43:38.761025",
+      "duration": 0.083159,
+      "omega_key_used": 6
+    },
+    {
+      "country": "JP",
+      "country_number": 7,
+      "total_countries": 11,
+      "status": "failed",
+      "stages": {
+        "title_optimization": {
+          "status": "completed",
+          "ai_generated": true,
+          "seo_score": 85,
+          "title": "Enterprise AI Implementation Strategies 2026 in Japan: The Ultimate Guide"
+        },
+        "youtube_research": {
+          "status": "completed",
+          "videos_analyzed": 3,
+          "research_depth": "medium",
+          "enterprise_grade": true
+        },
+        "cultural_depth": {
+          "status": "completed",
+          "depth_score": 80.5,
+          "quality_tier": "⭐ Premium",
+          "requirements_met": true
+        },
+        "affiliate_research": {
+          "status": "completed",
+          "product_found": true,
+          "product_name": "Premium Enterprise AI Implementation Strategies 2026 Solution",
+          "enterprise_grade": true
+        }
+      },
+      "content": null,
+      "metrics": {},
+      "enhancements": {},
+      "ai_enhancements": {
+        "title_optimization": {
+          "title": "Enterprise AI Implementation Strategies 2026 in Japan: The Ultimate Guide",
+          "ai_generated": true,
+          "options": [
+            "Enterprise AI Implementation Strategies 2026 in Japan: The Ultimate Guide"
+          ],
+          "seo_score": 85
+        }
+      },
+      "start_time": "2026-02-17T15:45:47.862593",
+      "cultural_depth": {
+        "depth_score": 80.5,
+        "research_depth": "deep",
+        "requirements_met": true,
+        "actual_metrics": {
+          "videos": 3,
+          "views": 550000,
+          "engagement": 0.06,
+          "quality": 80.0
+        },
+        "required_metrics": {
+          "min_videos": 5,
+          "min_views": 500000,
+          "min_engagement": 0.08,
+          "score_weight": 1.0
+        },
+        "recommendations": [
+          "🎯 **Engagement Issue**: Focus on videos with higher engagement rates (comments, likes, shares).",
+          "🇯🇵 Reference Japanese government statistics and keiretsu case studies",
+          "✅ **Depth Achieved**: Maintain current research depth and focus on implementation examples."
+        ],
+        "cultural_insights": [
+          "**Market Context**: Japan has a $86,000 market potential for Enterprise AI Implementation Strategies 2026",
+          "**Communication Style**: Indirect, consensus-building, relationship-focused approach",
+          "**Business Culture**: Hierarchical, consensus-based, long-term relationships",
+          "**Key Regulations**: Japanese privacy laws, Consumer Contract Act"
+        ],
+        "quality_tier": "⭐ Premium",
+        "improvement_priority": "LOW - Minor improvements possible"
+      },
+      "error": "Mega-Pen bridge failed: Mega-Pen Error in JP: 'MegaContentEngine' object has no attribute 'produce_single_country_sovereign_logic'",
+      "end_time": "2026-02-17T15:45:47.941826",
+      "duration": 0.079233,
+      "omega_key_used": 7
+    },
+    {
+      "country": "CH",
+      "country_number": 8,
+      "total_countries": 11,
+      "status": "failed",
+      "stages": {
+        "title_optimization": {
+          "status": "completed",
+          "ai_generated": true,
+          "seo_score": 85,
+          "title": "Enterprise AI Implementation Strategies 2026 in Switzerland: The Ultimate Guide"
+        },
+        "youtube_research": {
+          "status": "completed",
+          "videos_analyzed": 3,
+          "research_depth": "medium",
+          "enterprise_grade": true
+        },
+        "cultural_depth": {
+          "status": "completed",
+          "depth_score": 80.5,
+          "quality_tier": "⭐ Premium",
+          "requirements_met": true
+        },
+        "affiliate_research": {
+          "status": "completed",
+          "product_found": true,
+          "product_name": "Premium Enterprise AI Implementation Strategies 2026 Solution",
+          "enterprise_grade": true
+        }
+      },
+      "content": null,
+      "metrics": {},
+      "enhancements": {},
+      "ai_enhancements": {
+        "title_optimization": {
+          "title": "Enterprise AI Implementation Strategies 2026 in Switzerland: The Ultimate Guide",
+          "ai_generated": true,
+          "options": [
+            "Enterprise AI Implementation Strategies 2026 in Switzerland: The Ultimate Guide"
+          ],
+          "seo_score": 85
+        }
+      },
+      "start_time": "2026-02-17T15:48:59.014994",
+      "cultural_depth": {
+        "depth_score": 80.5,
+        "research_depth": "deep",
+        "requirements_met": true,
+        "actual_metrics": {
+          "videos": 3,
+          "views": 550000,
+          "engagement": 0.06,
+          "quality": 80.0
+        },
+        "required_metrics": {
+          "min_videos": 5,
+          "min_views": 500000,
+          "min_engagement": 0.08,
+          "score_weight": 1.0
+        },
+        "recommendations": [
+          "🎯 **Engagement Issue**: Focus on videos with higher engagement rates (comments, likes, shares).",
+          "✅ **Depth Achieved**: Maintain current research depth and focus on implementation examples."
+        ],
+        "cultural_insights": [
+          "**Market Context**: Switzerland has a $110,000 market potential for Enterprise AI Implementation Strategies 2026",
+          "**Key Regulations**: Swiss data protection, Consumer protection laws"
+        ],
+        "quality_tier": "⭐ Premium",
+        "improvement_priority": "LOW - Minor improvements possible"
+      },
+      "error": "Mega-Pen bridge failed: Mega-Pen Error in CH: 'MegaContentEngine' object has no attribute 'produce_single_country_sovereign_logic'",
+      "end_time": "2026-02-17T15:48:59.136665",
+      "duration": 0.121671,
+      "omega_key_used": 8
+    },
+    {
+      "country": "NO",
+      "country_number": 9,
+      "total_countries": 11,
+      "status": "failed",
+      "stages": {
+        "title_optimization": {
+          "status": "completed",
+          "ai_generated": true,
+          "seo_score": 85,
+          "title": "Enterprise AI Implementation Strategies 2026 in Norway: The Ultimate Guide"
+        },
+        "youtube_research": {
+          "status": "completed",
+          "videos_analyzed": 3,
+          "research_depth": "medium",
+          "enterprise_grade": true
+        },
+        "cultural_depth": {
+          "status": "completed",
+          "depth_score": 80.0,
+          "quality_tier": "⭐ Premium",
+          "requirements_met": true
+        },
+        "affiliate_research": {
+          "status": "completed",
+          "product_found": true,
+          "product_name": "Premium Enterprise AI Implementation Strategies 2026 Solution",
+          "enterprise_grade": true
+        }
+      },
+      "content": null,
+      "metrics": {},
+      "enhancements": {},
+      "ai_enhancements": {
+        "title_optimization": {
+          "title": "Enterprise AI Implementation Strategies 2026 in Norway: The Ultimate Guide",
+          "ai_generated": true,
+          "options": [
+            "Enterprise AI Implementation Strategies 2026 in Norway: The Ultimate Guide"
+          ],
+          "seo_score": 85
+        }
+      },
+      "start_time": "2026-02-17T15:52:28.220196",
+      "cultural_depth": {
+        "depth_score": 80.0,
+        "research_depth": "medium",
+        "requirements_met": true,
+        "actual_metrics": {
+          "videos": 3,
+          "views": 550000,
+          "engagement": 0.06,
+          "quality": 80.0
+        },
+        "required_metrics": {
+          "min_videos": 3,
+          "min_views": 200000,
+          "min_engagement": 0.05,
+          "score_weight": 0.8
+        },
+        "recommendations": [
+          "✅ **Depth Achieved**: Maintain current research depth and focus on implementation examples."
+        ],
+        "cultural_insights": [
+          "**Market Context**: Norway has a $94,000 market potential for Enterprise AI Implementation Strategies 2026",
+          "**Key Regulations**: Norwegian GDPR implementation, Consumer Purchases Act"
+        ],
+        "quality_tier": "⭐ Premium",
+        "improvement_priority": "LOW - Minor improvements possible"
+      },
+      "error": "Mega-Pen bridge failed: Mega-Pen Error in NO: 'MegaContentEngine' object has no attribute 'produce_single_country_sovereign_logic'",
+      "end_time": "2026-02-17T15:52:28.300409",
+      "duration": 0.080213,
+      "omega_key_used": 9
+    },
+    {
+      "country": "SE",
+      "country_number": 10,
+      "total_countries": 11,
+      "status": "failed",
+      "stages": {
+        "title_optimization": {
+          "status": "completed",
+          "ai_generated": true,
+          "seo_score": 85,
+          "title": "Enterprise AI Implementation Strategies 2026 in Sweden: The Ultimate Guide"
+        },
+        "youtube_research": {
+          "status": "completed",
+          "videos_analyzed": 3,
+          "research_depth": "medium",
+          "enterprise_grade": true
+        },
+        "cultural_depth": {
+          "status": "completed",
+          "depth_score": 80.0,
+          "quality_tier": "⭐ Premium",
+          "requirements_met": true
+        },
+        "affiliate_research": {
+          "status": "completed",
+          "product_found": true,
+          "product_name": "Premium Enterprise AI Implementation Strategies 2026 Solution",
+          "enterprise_grade": true
+        }
+      },
+      "content": null,
+      "metrics": {},
+      "enhancements": {},
+      "ai_enhancements": {
+        "title_optimization": {
+          "title": "Enterprise AI Implementation Strategies 2026 in Sweden: The Ultimate Guide",
+          "ai_generated": true,
+          "options": [
+            "Enterprise AI Implementation Strategies 2026 in Sweden: The Ultimate Guide"
+          ],
+          "seo_score": 85
+        }
+      },
+      "start_time": "2026-02-17T15:54:36.350007",
+      "cultural_depth": {
+        "depth_score": 80.0,
+        "research_depth": "medium",
+        "requirements_met": true,
+        "actual_metrics": {
+          "videos": 3,
+          "views": 550000,
+          "engagement": 0.06,
+          "quality": 80.0
+        },
+        "required_metrics": {
+          "min_videos": 3,
+          "min_views": 200000,
+          "min_engagement": 0.05,
+          "score_weight": 0.8
+        },
+        "recommendations": [
+          "✅ **Depth Achieved**: Maintain current research depth and focus on implementation examples."
+        ],
+        "cultural_insights": [
+          "**Market Context**: Sweden has a $82,000 market potential for Enterprise AI Implementation Strategies 2026",
+          "**Key Regulations**: Swedish data protection, Distance and Doorstep Sales Act"
+        ],
+        "quality_tier": "⭐ Premium",
+        "improvement_priority": "LOW - Minor improvements possible"
+      },
+      "error": "Mega-Pen bridge failed: Mega-Pen Error in SE: 'MegaContentEngine' object has no attribute 'produce_single_country_sovereign_logic'",
+      "end_time": "2026-02-17T15:54:36.439788",
+      "duration": 0.089781,
+      "omega_key_used": 1
+    },
+    {
+      "country": "ET",
+      "country_number": 11,
+      "total_countries": 11,
+      "status": "failed",
+      "stages": {
+        "title_optimization": {
+          "status": "completed",
+          "ai_generated": true,
+          "seo_score": 85,
+          "title": "Enterprise AI Implementation Strategies 2026 in Ethiopia: The Ultimate Guide"
+        },
+        "youtube_research": {
+          "status": "completed",
+          "videos_analyzed": 3,
+          "research_depth": "medium",
+          "enterprise_grade": true
+        },
+        "cultural_depth": {
+          "status": "completed",
+          "depth_score": 80.5,
+          "quality_tier": "⭐ Premium",
+          "requirements_met": true
+        },
+        "affiliate_research": {
+          "status": "completed",
+          "product_found": true,
+          "product_name": "Premium Enterprise AI Implementation Strategies 2026 Solution",
+          "enterprise_grade": true
+        }
+      },
+      "content": null,
+      "metrics": {},
+      "enhancements": {},
+      "ai_enhancements": {
+        "title_optimization": {
+          "title": "Enterprise AI Implementation Strategies 2026 in Ethiopia: The Ultimate Guide",
+          "ai_generated": true,
+          "options": [
+            "Enterprise AI Implementation Strategies 2026 in Ethiopia: The Ultimate Guide"
+          ],
+          "seo_score": 85
+        }
+      },
+      "start_time": "2026-02-17T15:56:36.461713",
+      "cultural_depth": {
+        "depth_score": 80.5,
+        "research_depth": "deep",
+        "requirements_met": true,
+        "actual_metrics": {
+          "videos": 3,
+          "views": 550000,
+          "engagement": 0.06,
+          "quality": 80.0
+        },
+        "required_metrics": {
+          "min_videos": 5,
+          "min_views": 500000,
+          "min_engagement": 0.08,
+          "score_weight": 1.0
+        },
+        "recommendations": [
+          "🎯 **Engagement Issue**: Focus on videos with higher engagement rates (comments, likes, shares).",
+          "🇪🇹 Include Ethiopian government data, local business associations, and cultural references",
+          "✅ **Depth Achieved**: Maintain current research depth and focus on implementation examples."
+        ],
+        "cultural_insights": [
+          "**Market Context**: Ethiopia has a $50,000 market potential for Enterprise AI Implementation Strategies 2026",
+          "**Communication Style**: Relationship-based, community-focused, respectful tone",
+          "**Business Culture**: Relationship-focused, hierarchical, community-oriented",
+          "**Key Regulations**: Ethiopian consumer protection, Advertising standards"
+        ],
+        "quality_tier": "⭐ Premium",
+        "improvement_priority": "LOW - Minor improvements possible"
+      },
+      "error": "Mega-Pen bridge failed: Mega-Pen Error in ET: 'MegaContentEngine' object has no attribute 'produce_single_country_sovereign_logic'",
+      "end_time": "2026-02-17T15:56:36.566176",
+      "duration": 0.104463,
+      "omega_key_used": 2
+    }
+  ],
+  "overall_metrics": {
+    "total_countries": 11,
+    "completed_countries": 0,
+    "avg_word_count": 0,
+    "avg_quality": 0,
+    "total_words": 0,
+    "estimated_revenue": 0,
+    "success_rate": 0.0,
+    "enterprise_standards_met": 0,
+    "enterprise_standards_rate": 0,
+    "omega_key_statistics": {},
+    "omega_key_system": {
+      "total_keys": 9,
+      "blacklisted_keys": 0,
+      "total_rotations": 11
+    }
+  },
+  "enhancement_reports": {},
+  "end_time": "2026-02-17T15:56:36.566232",
+  "total_duration": 1646.029593,
+  "performance_report": {
+    "profile_output": "         551231 function calls (531300 primitive calls) in 1646.042 seconds\n\n   Ordered by: cumulative time, internal time\n   List reduced from 2550 to 30 due to restriction <30>\n\n   ncalls  tottime  percall  cumtime  percall filename:lineno(function)\n       42    0.001    0.000 1646.037   39.191 /opt/hostedtoolcache/Python/3.12.12/x64/lib/python3.12/asyncio/base_events.py:1922(_run_once)\n       42    0.000    0.000 1645.985   39.190 /opt/hostedtoolcache/Python/3.12.12/x64/lib/python3.12/selectors.py:451(select)\n       42 1644.622   39.158 1644.622   39.158 {method 'poll' of 'select.epoll' objects}\n       11    0.000    0.000    1.362    0.124 /opt/hostedtoolcache/Python/3.12.12/x64/lib/python3.12/concurrent/futures/thread.py:54(run)\n       11    0.000    0.000    1.361    0.124 /opt/hostedtoolcache/Python/3.12.12/x64/lib/python3.12/site-packages/openai/_utils/_utils.py:252(wrapper)\n       11    0.000    0.000    0.975    0.089 /opt/hostedtoolcache/Python/3.12.12/x64/lib/python3.12/site-packages/openai/resources/chat/completions/completions.py:1145(create)\n       11    0.000    0.000    0.953    0.087 /opt/hostedtoolcache/Python/3.12.12/x64/lib/python3.12/site-packages/openai/_base_client.py:1271(post)\n       11    0.000    0.000    0.952    0.087 /opt/hostedtoolcache/Python/3.12.12/x64/lib/python3.12/site-packages/openai/_base_client.py:964(request)\n       11    0.000    0.000    0.934    0.085 /opt/hostedtoolcache/Python/3.12.12/x64/lib/python3.12/site-packages/httpx/_client.py:879(send)\n       11    0.000    0.000    0.931    0.085 /opt/hostedtoolcache/Python/3.12.12/x64/lib/python3.12/site-packages/httpx/_client.py:930(_send_handling_auth)\n       11    0.000    0.000    0.931    0.085 /opt/hostedtoolcache/Python/3.12.12/x64/lib/python3.12/site-packages/httpx/_client.py:964(_send_handling_redirects)\n       11    0.000    0.000    0.931    0.085 /opt/hostedtoolcache/Python/3.12.12/x64/lib/python3.12/site-packages/httpx/_client.py:1001(_send_single_request)\n       11    0.000    0.000    0.925    0.084 /opt/hostedtoolcache/Python/3.12.12/x64/lib/python3.12/site-packages/httpx/_transports/default.py:230(handle_request)\n       11    0.000    0.000    0.923    0.084 /opt/hostedtoolcache/Python/3.12.12/x64/lib/python3.12/site-packages/httpcore/_sync/connection_pool.py:199(handle_request)\n       11    0.000    0.000    0.921    0.084 /opt/hostedtoolcache/Python/3.12.12/x64/lib/python3.12/site-packages/httpcore/_sync/connection.py:69(handle_request)\n       11    0.000    0.000    0.527    0.048 /opt/hostedtoolcache/Python/3.12.12/x64/lib/python3.12/site-packages/httpcore/_sync/http11.py:65(handle_request)\n       33    0.000    0.000    0.522    0.016 /opt/hostedtoolcache/Python/3.12.12/x64/lib/python3.12/site-packages/httpcore/_sync/http11.py:209(_receive_event)\n       11    0.000    0.000    0.522    0.047 /opt/hostedtoolcache/Python/3.12.12/x64/lib/python3.12/site-packages/httpcore/_sync/http11.py:170(_receive_response_headers)\n       12    0.000    0.000    0.518    0.043 /opt/hostedtoolcache/Python/3.12.12/x64/lib/python3.12/site-packages/httpcore/_backends/sync.py:124(read)\n       12    0.000    0.000    0.518    0.043 /opt/hostedtoolcache/Python/3.12.12/x64/lib/python3.12/ssl.py:1225(recv)\n       12    0.000    0.000    0.518    0.043 /opt/hostedtoolcache/Python/3.12.12/x64/lib/python3.12/ssl.py:1094(read)\n       12    0.518    0.043    0.518    0.043 {method 'read' of '_ssl._SSLSocket' objects}\n       11    0.000    0.000    0.394    0.036 /opt/hostedtoolcache/Python/3.12.12/x64/lib/python3.12/site-packages/httpcore/_sync/connection.py:105(_connect)\n    959/4    0.001    0.000    0.388    0.097 /opt/hostedtoolcache/Python/3.12.12/x64/lib/python3.12/functools.py:982(__get__)\n        1    0.000    0.000    0.386    0.386 /opt/hostedtoolcache/Python/3.12.12/x64/lib/python3.12/site-packages/openai/_client.py:187(chat)\n    284/1    0.001    0.000    0.386    0.386 <frozen importlib._bootstrap>:1349(_find_and_load)\n    284/1    0.001    0.000    0.385    0.385 <frozen importlib._bootstrap>:1304(_find_and_load_unlocked)\n      9/2    0.000    0.000    0.385    0.193 {built-in method builtins.__import__}\n    566/1    0.000    0.000    0.385    0.385 <frozen importlib._bootstrap>:480(_call_with_frames_removed)\n    278/1    0.001    0.000    0.385    0.385 <frozen importlib._bootstrap>:911(_load_unlocked)\n\n\n",
+    "elapsed_time_seconds": 1646.1632707118988,
+    "memory_report": {
+      "rss_mb": 168.0546875,
+      "vms_mb": 511.5078125,
+      "percent": 1.0506957910624184,
+      "available_system_mb": 14963.57421875,
+      "cpu_percent": 0.0
+    },
+    "peak_memory_mb": 164.6875
+  },
+  "system_status": {
+    "memory": {
+      "total_mb": 15994.609375,
+      "available_mb": 14963.57421875,
+      "percent_used": 6.4,
+      "swap_mb": 0.0
+    },
+    "cpu": {
+      "percent": 0.0,
+      "count": 4
+    },
+    "disk": {
+      "free_gb": 90.00452423095703
+    }
+  },
+  "schema_validation": {
+    "valid": false,
+    "errors": [
+      "None is not of type 'string'\n\nFailed validating 'type' in schema['properties']['country_results']['items']['properties']['content']:\n    {'type': 'string'}\n\nOn instance['country_results'][10]['content']:\n    None"
+    ]
+  }
+}
