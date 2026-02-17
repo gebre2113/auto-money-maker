@@ -1774,6 +1774,16 @@ class SocialMediaManager:
 
             timeout = ClientTimeout(total=120.0)
             async with ClientSession(timeout=timeout) as session:
+                # ተጨማሪ የUser-Agent ማስመሰል እና ኩኪ አለመቀበል
+headers = {
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36',
+    'Accept': 'application/json',
+    'Content-Type': 'application/json',
+    'Origin': wp['url'],
+    'Referer': wp['url']
+}
+# እንዲሁም ከዚህ በታች ያለውን መስመር ቀይር
+async with session.post(..., headers=headers, allow_redirects=True) as resp:
                 async with session.post(
                     f"{wp['url'].rstrip('/')}/wp-json/wp/v2/posts",
                     auth=auth,
