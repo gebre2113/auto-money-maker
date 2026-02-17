@@ -1,9 +1,9 @@
 {
   "status": "success",
-  "timestamp": "2026-02-17T15:56:36.812049",
+  "timestamp": "2026-02-17T19:59:05.608177",
   "topic": "Enterprise AI Implementation Strategies 2026",
-  "countries_processed": 0,
-  "total_words": 0,
-  "avg_quality": 0,
+  "countries_processed": 11,
+  "total_words": 228279,
+  "avg_quality": 79.9,
   "revenue_forecast": 0
 }
