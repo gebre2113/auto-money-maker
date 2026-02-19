@@ -4015,27 +4015,6 @@ def _initialize_all_components(self):
         self.content_system._process_country_enterprise = sovereign_bridge_v43
         self.logger.info("✅ Imperial Zenith v43.0 Established. Mission Complete.")
 
-        # ========== የተቀሩት አካላት ==========
-        self.image_engine = self.importer.get_enterprise_component('SmartImageEngine')
-        self.cta_engine = self.importer.get_enterprise_component('DynamicCTAEngine')
-        self.social_manager = self.importer.get_enterprise_component('SocialMediaManager')
-        self.dashboard_manager = self.importer.get_enterprise_component('DashboardManager')
-        self.ai_cultural_enricher = AICulturalEnricher(runner=self)
-        self.ai_quality_auditor = AIQualityAuditor(runner=self)
-        self.human_engine = HumanLikenessEngine(cultural_enricher=self.ai_cultural_enricher)
-        self.cultural_guardian = self.importer.get_enterprise_component('CulturalDepthGuardian')
-        self.revenue_engine = self.importer.get_enterprise_component('RevenueForecastEngine')
-        self.compliance_guardian = self.importer.get_enterprise_component('EthicalComplianceGuardian')
-        self.ai_title_optimizer = self.importer.get_enterprise_component('AITitleOptimizer')
-
-        self.content_engine = self.content_system
-        self.social_publisher = self.social_manager
-
-    except Exception as e:
-        self.logger.error(f"❌ Infinite Oracle v43.0 initialization failed: {str(e)}")
-        import traceback
-        traceback.print_exc()
-        raise
     # -------------------------------------------------------------------------
     # 🌉 MEGA-BRIDGE v3.1 – ROBUST METHOD DISCOVERY (keep for backward compatibility)
     # -------------------------------------------------------------------------
