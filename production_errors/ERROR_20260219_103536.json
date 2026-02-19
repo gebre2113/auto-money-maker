@@ -1,0 +1,6 @@
+{
+  "error": "'EnterpriseProductionOrchestrator' object has no attribute '_initialize_all_components'",
+  "traceback": "Traceback (most recent call last):\n  File \"/home/runner/work/auto-money-maker/auto-money-maker/enterprise_runner.py\", line 4807, in main_execution\n    orchestrator = EnterpriseProductionOrchestrator()\n                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/runner/work/auto-money-maker/auto-money-maker/enterprise_runner.py\", line 3066, in __init__\n    self._initialize_all_components()\n    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAttributeError: 'EnterpriseProductionOrchestrator' object has no attribute '_initialize_all_components'\n",
+  "timestamp": "2026-02-19T10:35:36.962426",
+  "topic": "Unknown"
+}
