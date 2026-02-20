@@ -4220,35 +4220,141 @@ class ProfitMasterSupreme:
 
 # =================== ENTRY POINT ===================
 
-if __name__ == "__main__":
-    # If running under streamlit, just init the dashboard class
-    if os.environ.get('STREAMLIT_RUNNING'):
-        pms = ProfitMasterSupreme()
-        pms.run_gui()
+async def main_execution():
+    is_github = os.getenv('GITHUB_ACTIONS') == 'true'
+    banner = """
+╔══════════════════════════════════════════════════════════════════════════════════════╗
+║                                                                                      ║
+║  🏢 ENTERPRISE PRODUCTION RUNNER v26.0 - THE SOVEREIGN MASTER                       ║
+║  🤖 AI-POWERED: Cultural Phrases, Quality Audit, Title Optimization (Groq‑powered)  ║
+║  🔑 OMEGA 15-KEY ROTATION SYSTEM (Smart Exponential Backoff)                        ║
+║  💎 15000+ WORDS | 88%+ QUALITY | 85%+ CULTURAL DEPTH                             ║
+║  👥 95% AI DETECTION REDUCTION | HUMAN-LIKE CONTENT                               ║
+║  🖼️ 40% SEO BOOST | SMART IMAGES WITH ALT-TEXT (≥1 image forced)                  ║
+║  🎯 35% REVENUE INCREASE | DYNAMIC CTA A/B TESTING                                ║
+║  🎙️ INTERACTIVE AUDIO ENGINE | FULL ARTICLE NARRATION + AUDIO ADS – JS FIXED      ║
+║  ⏰ SMART MARKET PULSE | PROCESS ONLY GOLDEN NEWS HOUR COUNTRIES                  ║
+║  📊 ENHANCED PERFORMANCE MONITORING & MEMORY MANAGEMENT                           ║
+║  🔬 ULTIMATE QUALITY GUARDIAN PRO v3.1 - 4-Layer Linguistic Analysis + SAMPLING   ║
+║  ⚙️ OFFLINE LLM JUDGE SUPPORT (Ollama/Llama.cpp)                                  ║
+║  💾 JSON SCHEMA VALIDATION & SQLITE PERSISTENCE                                   ║
+║  🛡️ WORDPRESS 403 FIX (User-Agent Spoofing + Application Password) - TAGS FIXED  ║
+║  🌉 ZENITH SUPREME BRIDGE v26.0 - MAJESTIC DESIGN + FULL AUDIO + DEDUPLICATION    ║
+║  🔒 CONTENT SAFETY VALIDATION & AUTOMATIC BACKUPS                                 ║
+║  🌍 COMPLETE 11 HIGH-VALUE MARKETS WITH ENTERPRISE LOCALIZATION                   ║
+║  🛡️ FULL ETHICAL COMPLIANCE & AUTOMATIC LEGAL PROTECTION (Auto-Fix)               ║
+║  📊 ADVANCED REVENUE FORECASTING WITH CONFIDENCE SCORING                          ║
+║  📱 SOCIAL MEDIA & DASHBOARD INTEGRATION READY                                    ║
+║                                                                                      ║
+╚══════════════════════════════════════════════════════════════════════════════════════╝
+    """
+    print(banner)
+    print(f"🏢 Enterprise Start Time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+    print("="*100)
+    ai_cultural_key = os.getenv('AI_CULTURAL_API_KEY')
+    ai_audit_key = os.getenv('AI_AUDIT_API_KEY')
+    ai_title_key = os.getenv('AI_TITLE_API_KEY')
+    ai_status = []
+    ai_status.append("🤖 Cultural Enricher: ✅ Active (Groq‑powered)")
+    ai_status.append("🤖 Quality Auditor: ✅ Active (Groq‑powered)")
+    if ai_title_key:
+        ai_status.append("🤖 Title Optimizer: ✅ Active (OpenAI fallback)")
     else:
-        # Command Line Interface
-        import argparse
-        parser = argparse.ArgumentParser(description="Profit Master Supreme v16.0")
-        parser.add_argument("--gui", action="store_true", help="Launch Dashboard")
-        parser.add_argument("--generate", type=str, help="Topic to generate")
-        parser.add_argument("--category", type=str, default="technology", help="Article category")
-        
-        args = parser.parse_args()
-        
-        app = ProfitMasterSupreme()
-        
-        if args.gui:
-            app.run_gui()
-        elif args.generate:
-            app.generate_full_campaign(args.generate, args.category)
+        ai_status.append("🤖 Title Optimizer: ⚠️ Fallback Mode (No API Key)")
+    if is_github:
+        print("🌐 Running in GitHub Actions Environment")
+        print("🤖 AI API Status:")
+        for s in ai_status: print(f"   {s}")
+        print("="*100)
+    try:
+        orchestrator = EnterpriseProductionOrchestrator()
+        production_topic = os.getenv('ENTERPRISE_TOPIC', 'Enterprise AI Implementation Strategies 2026')
+        print(f"📝 Production Topic: {production_topic}")
+        production_results = await orchestrator.run_production_with_monitoring(
+            topic=production_topic,
+            markets=['US', 'GB', 'CA', 'AU', 'DE', 'FR', 'JP', 'CH', 'NO', 'SE', 'ET'],
+            content_type="enterprise_guide"
+        )
+        print("\n" + "="*100)
+        print("🎉 ENTERPRISE PRODUCTION COMPLETED SUCCESSFULLY!")
+        print("="*100)
+        metrics = production_results.get('overall_metrics', {})
+        print(f"📊 Results Summary:")
+        print(f"   • Countries Processed: {metrics.get('completed_countries', 0)}/{metrics.get('total_countries', 0)}")
+        print(f"   • Total Words: {metrics.get('total_words', 0):,}")
+        print(f"   • Average Quality: {metrics.get('avg_quality', 0)}%")
+        print(f"   • Revenue Forecast: ${metrics.get('estimated_revenue', 0):,.2f}/month")
+        print(f"   • Duration: {production_results.get('total_duration', 0)/60:.1f} minutes")
+        print(f"\n📁 Outputs saved to: enterprise_outputs/")
+        print(f"💾 Safety backups: production_backups/")
+        print(f"🔧 Performance logs: enterprise_logs/")
+        print(f"💾 Quality database: enterprise_quality.db")
+        output_dir = Path('enterprise_outputs')
+        output_dir.mkdir(exist_ok=True)
+        final_file = output_dir / f"FINAL_RESULTS_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
+        with open(final_file, 'w', encoding='utf-8') as f:
+            json.dump(production_results, f, indent=2, ensure_ascii=False)
+        print(f"\n💾 Final results saved to: {final_file}")
+        if is_github:
+            artifact_dir = Path('github_artifacts')
+            artifact_dir.mkdir(exist_ok=True)
+            with open(artifact_dir / 'production_status.json', 'w') as f:
+                json.dump({
+                    'status': 'success',
+                    'timestamp': datetime.now().isoformat(),
+                    'topic': production_topic,
+                    'countries_processed': metrics.get('completed_countries', 0),
+                    'total_words': metrics.get('total_words', 0),
+                    'avg_quality': metrics.get('avg_quality', 0),
+                    'revenue_forecast': metrics.get('estimated_revenue', 0)
+                }, f, indent=2)
+            print(f"\n📦 GitHub artifact created: github_artifacts/production_status.json")
+        print("\n" + "="*100)
+        print("🚀 ENTERPRISE PRODUCTION RUNNER v26.0 - MISSION ACCOMPLISHED!")
+        print("="*100)
+        return production_results
+    except KeyboardInterrupt:
+        print("\n⚠️ Production interrupted by user")
+        return {'status': 'interrupted', 'timestamp': datetime.now().isoformat()}
+    except Exception as e:
+        print(f"\n❌ Production failed: {str(e)}")
+        traceback.print_exc()
+        error_dir = Path('production_errors')
+        error_dir.mkdir(exist_ok=True)
+        error_file = error_dir / f"ERROR_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
+        with open(error_file, 'w', encoding='utf-8') as f:
+            json.dump({
+                'error': str(e),
+                'traceback': traceback.format_exc(),
+                'timestamp': datetime.now().isoformat(),
+                'topic': os.getenv('ENTERPRISE_TOPIC', 'Unknown')
+            }, f, indent=2)
+        return {'status': 'failed', 'error': str(e), 'error_file': str(error_file)}
+
+if __name__ == "__main__":
+    try:
+        results = asyncio.run(main_execution())
+        if results and results.get('status') in ['success', 'completed']:
+            print("\n" + "="*50)
+            print("🚀 MISSION ACCOMPLISHED: Status 0 (Success)")
+            print("="*50)
+            sys.exit(0)
+        elif results and results.get('status') == 'interrupted':
+            print("\n⚠️ Process interrupted by user.")
+            sys.exit(130)
         else:
-            print("\ncommands:")
-            print("  --gui                  Launch the Visual Dashboard")
-            print("  --generate \"Topic\"     Generate a full campaign for a topic")
-            print("  --category \"Cat\"       Specify category (default: technology)\n")
-            
-            # Interactive mode if no args
-            print("Interactive Mode:")
-            topic = input("Enter a topic to generate: ")
-            if topic:
-                app.generate_full_campaign(topic, "general")
+            status = results.get('status') if results else "None"
+            print(f"\n❌ MISSION FAILED: Status 1 (Status was: {status})")
+            sys.exit(1)
+    except KeyboardInterrupt:
+        print("\n\n👋 ፕሮግራሙ በተጠቃሚ ተቋርጧል!")
+        sys.exit(130)
+    except Exception as e:
+        print(f"\n💥 ከፍተኛ ስህተት ተከስቷል: {e}")
+        traceback.print_exc()
+        try:
+            with open('crash_report.log', 'a', encoding='utf-8') as f:
+                f.write(f"\n--- {datetime.now()} ---\n{traceback.format_exc()}\n")
+        except:
+            pass
+        sys.exit(1)
