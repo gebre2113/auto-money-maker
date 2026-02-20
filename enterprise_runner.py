@@ -4107,11 +4107,6 @@ class EnterpriseProductionOrchestrator:
     
                 hero_image = get_majestic_visual(topic, country)
                 live_badge = get_live_badge
-                በጽሑፍ ርዝመት (Character limit) ምክንያት ነው የተቋረጠው፤ በጣም ይቅርታ! 
-
-በትክክል ከተቋረጠበት `live_badge = get_live_badge(live_context)` መስመር ጀምሮ እስከ ስክሪፕቱ መጨረሻ ድረስ ያለውን ቀሪ ኮድ ከዚህ በታች አቅርቤዋለሁ። ይህንን ኮድ ወስደው ከተቋረጠበት ጋር ያያይዙት፦
-
-```python
                 live_badge = get_live_badge(live_context)
                 schema_html = generate_advanced_schema(topic, country, persona)
                 city_stamp = get_city_stamp(country)
