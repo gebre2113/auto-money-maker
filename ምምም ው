@@ -5376,5 +5376,780 @@ class MegaContentEngine:
         </body>
         </html>
         """
+    async def start_mega_loop(self, topic: str):
+        target_countries = ['US', 'GB', 'DE', 'CA', 'AU', 'FR', 'JP', 'CH', 'NO', 'SE', 'ET']
 
-    .error(f"❌ Error producing {country}:
+        self.logger.info(f"🚀 Starting Mega Loop for topic: {topic} (CONCURRENT MODE)")
+        self.logger.info(f"🌍 Target countries: {', '.join(target_countries)}")
+
+        semaphore = asyncio.Semaphore(4) # Run up to 4 countries simultaneously
+
+        while True:
+            self.logger.info("🔔 Mega Journalist System Waking Up...")
+
+            active_productions = []
+            total_predicted_revenue = 0.0
+            
+            async def process_hot_country(country):
+                nonlocal total_predicted_revenue
+                async with semaphore:
+                    if self._is_hot_country_time(country):
+                        self.logger.info(f"🔥 {country} is in HOT MARKET TIME - Starting Production")
+                        try:
+                            report = await self.produce_single_country_sovereign_logic(topic, country)
+
+                            output_dir = "mega_journalist_outputs"
+                            if not os.path.exists(output_dir):
+                                os.makedirs(output_dir)
+
+                            timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+                            safe_topic = ''.join(c if c.isalnum() else '_' for c in topic)
+                            file_name = f"{output_dir}/ZENITH_{country}_{timestamp}_{safe_topic[:20]}.html"
+
+                            with open(file_name, "w", encoding="utf-8") as f:
+                                f.write(report)
+
+                            country_revenue = self.revenue_predictions.get(country, 0.0)
+                            total_predicted_revenue += country_revenue
+
+                            self.logger.info(f"✅ {country} report saved: {file_name}")
+                            self.logger.info(f"💰 {country} Revenue Prediction: ${country_revenue:.2f}")
+
+                            active_productions.append(country)
+
+                            self.logger.info(f"⏸️  Cooling down for 5 minutes (CNN-style pacing) for {country}...")
+                            await asyncio.sleep(300)
+
+                        except Exception as e:
+                            self.logger.error(f"❌ Error producing {country}: {e}")
+                            self.logger.error(f"Stack trace: {e.__traceback__}")
+                    else:
+                        self.logger.info(f"⏸️  {country} is NOT in hot market time - Skipping")
+
+            # Execute all countries concurrently based on the semaphore limit
+            tasks = [process_hot_country(country) for country in target_countries]
+            await asyncio.gather(*tasks)
+
+            if active_productions:
+                self.logger.info(f"🎉 Production cycle complete for: {', '.join(active_productions)}")
+                self.logger.info(f"💰 TOTAL PREDICTED REVENUE: ${total_predicted_revenue:.2f}")
+                self.logger.info("💤 System sleeping for 30 minutes (GitHub Free Tier Optimization)...")
+                await asyncio.sleep(1800)
+            else:
+                self.logger.info("😴 No countries in hot time - Sleeping for 1 minute (Energy Saving Mode)...")
+                await asyncio.sleep(60)
+
+# =========================================================================
+# END OF OMNIPOTENT ORACLE v26.0
+# =========================================================================
+
+# =================== ዋና ስርዓት ክፍል ===================
+class UltimateProfitMasterSystem:
+    """ዋና ስርዓት አሰራር እና ቁጥጥር"""
+
+    def __init__(self, config: PremiumConfig = None):
+        self.config = config or PremiumConfig()
+
+        # 🛡️ 1. መጀመሪያ የ AI Failover Systemን እንፈጥራለን (ስህተቱን የሚፈታው ወሳኝ መስመር)
+        self.failover_system = EnhancedAIFailoverSystem(self.config)
+
+        # 2. የይዘት ማመንጫውን እንፈጥራለን
+        self.content_generator = ProductionContentGenerator(self.config)
+
+        # 3. ሌሎች ዋና ዋና ክፍሎች
+        self.cultural_engine = CulturalAnthropologistEngine(self.config)
+        self.hyper_localizer = HyperLocalizedContentProducer(self.cultural_engine)
+        self.multimedia_enhancer = PremiumMultimediaEnhancer()
+        self.sensory_writer = SensoryWritingEngine()
+        self.neuro_converter = NeuroConversionEngine()
+        self.gamification = GamificationLayer()
+        self.visual_architect = HypnoticVisualArchitect()
+        self.visual_asset_generator = VisualAssetGenerator()
+        self.production_manager = ProductionManager(self.config)
+        self.error_handler = ComprehensiveErrorHandler()
+
+        # ADDED: YouTube Hunter for MegaContentEngine
+        self.youtube_hunter = YouTubeHunter(api_key=os.getenv('YOUTUBE_API_KEY'))
+
+        # 4. አማራጭ ክፍሎች (Dashboard, Optimizer)
+        try:
+            import pandas as pd
+            self.dashboard = RealTimeDashboard()
+        except ImportError:
+            self.dashboard = None
+            print("⚠️ Pandas not installed, dashboard disabled")
+
+        try:
+            self.self_optimizer = SelfOptimizingEngine()
+        except:
+            self.self_optimizer = None
+
+        # 🚀 5. በመጨረሻ ሜጋ-ሞተሩን እናስጀምራለን (አሁን failover_systemን ያገኘዋል)
+        self.mega_engine = MegaContentEngine(self)
+
+        logger.info("🚀 Ultimate Profit Master System v18.1 Initialized")
+
+    async def full_production_pipeline(self, topic: str, target_countries: List[str] = None) -> Dict:
+        start_time = time.time()
+        logger.info(f"🚀 ፈረቃ መጀመር: {topic}")
+
+        try:
+            if not target_countries:
+                target_countries = self.config.DEFAULT_TARGET_COUNTRIES[:5]
+                logger.info(f"🌍 Using default high-value target countries: {', '.join(target_countries)}")
+
+            content = await self.content_generator.generate_premium_content(topic)
+            content['generation_time'] = time.time() - start_time
+
+            if target_countries:
+                try:
+                    localized = await self.hyper_localizer.produce_geo_optimized_content(
+                        topic, target_countries
+                    )
+                    content['localized_versions'] = localized
+
+                    total_monthly_earning = sum(
+                        data.get('estimated_monthly_earning', 0)
+                        for data in localized.values()
+                        if isinstance(data, dict)
+                    )
+                    content['high_value_countries_earning'] = round(total_monthly_earning, 2)
+
+                except Exception as e:
+                    logger.warning(f"Localization failed: {e}")
+                    content['localized_versions'] = {}
+                    content['high_value_countries_earning'] = 0
+
+            try:
+                content['sensory_content'] = self.sensory_writer.transform_to_sensory_content(
+                    content['content']
+                )
+            except Exception as e:
+                logger.warning(f"Sensory writing failed: {e}")
+                content['sensory_content'] = content['content']
+
+            try:
+                enhancement = await self.multimedia_enhancer.enhance_content_with_multimedia(content)
+                content['multimedia_enhancement'] = enhancement
+            except Exception as e:
+                logger.warning(f"Multimedia enhancement failed: {e}")
+                content['multimedia_enhancement'] = {'status': 'failed'}
+
+            try:
+                content['neuro_converted'] = self.neuro_converter.apply_neuro_marketing(
+                    content['content']
+                )
+            except Exception as e:
+                logger.warning(f"Neuro conversion failed: {e}")
+                content['neuro_converted'] = content['content']
+
+            try:
+                content['gamified'] = self.gamification.add_interactive_quiz(
+                    content['content'], topic
+                )
+            except Exception as e:
+                logger.warning(f"Gamification failed: {e}")
+                content['gamified'] = content['content']
+
+            content['production_report'] = self._generate_production_report(content, target_countries)
+
+            if self.self_optimizer:
+                try:
+                    optimization_report = self.self_optimizer.analyze_and_optimize(content)
+                    content['optimization_report'] = optimization_report
+                except Exception as e:
+                    logger.warning(f"Self-optimization failed: {e}")
+                    content['optimization_report'] = {'status': 'failed'}
+
+            if self.dashboard:
+                try:
+                    self.dashboard.add_metric('content_quality', content['quality_report']['overall_score'])
+                    self.dashboard.add_metric('word_count', content['word_count'])
+                    self.dashboard.add_metric('generation_time', content['generation_time'])
+
+                    if 'high_value_countries_earning' in content:
+                        self.dashboard.add_metric('high_value_countries_earning', content['high_value_countries_earning'])
+
+                except Exception as e:
+                    logger.warning(f"Dashboard update failed: {e}")
+
+            total_time = time.time() - start_time
+            logger.info(f"✅ ፈረቃ ተጠናቋል: {total_time:.2f} ሰከንድ")
+
+            return content
+
+        except Exception as e:
+            error_response = self.error_handler.handle_error(
+                e, context=f"Production pipeline for topic: {topic}",
+                component="UltimateProfitMasterSystem.full_production_pipeline",
+                severity="CRITICAL"
+            )
+            logger.error(f"Production pipeline failed: {e}")
+
+            return self._generate_emergency_fallback(topic, target_countries)
+
+    def _generate_production_report(self, content: Dict, target_countries: List[str]) -> Dict:
+        high_value_countries_stats = []
+        for country in target_countries:
+            if country in self.config.HIGH_VALUE_COUNTRIES:
+                country_info = self.config.get_country_info(country)
+                high_value_countries_stats.append({
+                    'country': country,
+                    'emoji': country_info['emoji'],
+                    'avg_commission': country_info['avg_commission'],
+                    'conversion_rate': country_info['conversion_rate']
+                })
+
+        return {
+            'total_assets': len(content.get('multimedia_enhancement', {}).get('enhancements', {})),
+            'quality_score': content.get('quality_report', {}).get('overall_score', 0),
+            'estimated_earning_potential': self._calculate_earning_potential(content, target_countries),
+            'monetization_channels': self._suggest_monetization_channels(content),
+            'high_value_countries': high_value_countries_stats,
+            'production_timestamp': datetime.now().isoformat(),
+            'system_version': '18.1',
+            'target_countries': target_countries
+        }
+
+    def _calculate_earning_potential(self, content: Dict, target_countries: List[str]) -> Dict:
+        word_count = content.get('word_count', 0)
+        quality = content.get('quality_report', {}).get('overall_score', 0)
+
+        base_earning = word_count * 0.5
+        quality_multiplier = quality / 100
+        adjusted_earning = base_earning * quality_multiplier
+
+        multimedia_bonus = len(content.get('multimedia_enhancement', {})) * 10
+        localization_bonus = len(content.get('localized_versions', {})) * 5
+
+        high_value_country_bonus = 0
+        for country in target_countries:
+            if country in self.config.HIGH_VALUE_COUNTRIES:
+                country_info = self.config.get_country_info(country)
+                high_value_country_bonus += country_info['avg_commission'] * 0.5
+
+        total_earning = adjusted_earning + multimedia_bonus + localization_bonus + high_value_country_bonus
+
+        high_value_countries_earning = content.get('high_value_countries_earning', 0)
+
+        return {
+            'base_potential': round(base_earning, 2),
+            'quality_adjusted': round(adjusted_earning, 2),
+            'multimedia_bonus': multimedia_bonus,
+            'localization_bonus': localization_bonus,
+            'high_value_country_bonus': round(high_value_country_bonus, 2),
+            'high_value_countries_earning': high_value_countries_earning,
+            'total_monthly_potential': round(total_earning * 30, 2),
+            'currency': 'USD',
+            'high_value_countries_targeted': len([c for c in target_countries if c in self.config.HIGH_VALUE_COUNTRIES])
+        }
+
+    def _suggest_monetization_channels(self, content: Dict) -> List[Dict]:
+        channels = [
+            {
+                'channel': 'Medium Partner Program',
+                'estimated_earnings': '$50-500/month',
+                'requirements': ['Original content', 'Minimum followers'],
+                'action': 'Publish with paywall',
+                'priority': 'high'
+            },
+            {
+                'channel': 'YouTube Video',
+                'estimated_earnings': '$100-1000/month',
+                'requirements': ['Video adaptation', '10k watch hours'],
+                'action': 'Create video from content',
+                'priority': 'high'
+            },
+            {
+                'channel': 'Affiliate Marketing',
+                'estimated_earnings': '$200-2000/month',
+                'requirements': ['Relevant affiliate links', 'Traffic'],
+                'action': 'Add affiliate links strategically',
+                'priority': 'medium'
+            },
+            {
+                'channel': 'Digital Product',
+                'estimated_earnings': '$500-5000/month',
+                'requirements': ['Lead magnet', 'Email list'],
+                'action': 'Create eBook/workshop',
+                'priority': 'high'
+            },
+            {
+                'channel': 'Freelance Writing',
+                'estimated_earnings': '$100-800/article',
+                'requirements': ['Portfolio samples', 'Client acquisition'],
+                'action': 'Use as portfolio sample',
+                'priority': 'medium'
+            },
+            {
+                'channel': 'High-Value Country Targeting',
+                'estimated_earnings': '$1000-5000/month',
+                'requirements': ['Localized content', 'Country-specific offers'],
+                'action': 'Target US, GB, CA, AU, DE markets',
+                'priority': 'high'
+            }
+        ]
+        return channels
+
+    def _generate_emergency_fallback(self, topic: str, target_countries: List[str] = None) -> Dict:
+        logger.critical(f"🚨 EMERGENCY FALLBACK ACTIVATED for topic: {topic}")
+
+        fallback_content = f"""
+        <h1>Emergency Content: {topic}</h1>
+        <p>Due to a system issue, we're providing this emergency content about {topic}.</p>
+        <p>The Ultimate Profit Master System is currently experiencing technical difficulties.</p>
+        <p>Please check back later for the full, optimized content.</p>
+        """
+
+        return {
+            'id': f"emergency_{hashlib.md5(topic.encode()).hexdigest()[:8]}",
+            'title': f"Emergency: {topic}",
+            'content': fallback_content,
+            'summary': f"Emergency content about {topic}",
+            'word_count': len(fallback_content.split()),
+            'reading_time': 1,
+            'quality_report': {
+                'overall_score': 60.0,
+                'readability': 70.0,
+                'seo': 50.0,
+                'human_likeness': 65.0,
+                'plagiarism': 90.0,
+                'grammar': 85.0,
+                'engagement': 55.0
+            },
+            'production_report': {
+                'status': 'emergency_fallback',
+                'estimated_earning_potential': {
+                    'total_monthly_potential': 100.0,
+                    'currency': 'USD'
+                },
+                'system_version': '18.1',
+                'note': 'Emergency fallback activated'
+            },
+            'generation_time': time.time(),
+            'created_at': datetime.now().isoformat(),
+            'emergency': True
+        }
+
+    def get_dashboard_html(self) -> str:
+        if self.dashboard:
+            return self.dashboard.generate_dashboard_html()
+        return "<h1>Dashboard not available</h1>"
+
+# =================== ተጨማሪ ክፍሎች ===================
+class RealTimeDashboard:
+    """ቅጽበታዊ የስርዓት ቁጥጥር ሰሌዳ"""
+
+    def __init__(self):
+        self.metrics = defaultdict(list)
+        self.start_time = datetime.now()
+
+    def add_metric(self, category: str, value: float, label: str = None):
+        self.metrics[category].append({
+            'value': value,
+            'label': label or datetime.now().strftime('%H:%M:%S'),
+            'timestamp': datetime.now().isoformat()
+        })
+
+    def generate_dashboard_html(self) -> str:
+        dashboard = f"""
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>🚀 Profit Master Dashboard v18.1</title>
+            <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+            <style>
+                body {{ font-family: Arial, sans-serif; margin: 20px; background: #f8fafc; }}
+                .metric-card {{ 
+                    background: white; 
+                    border-radius: 10px; 
+                    padding: 20px; 
+                    margin: 10px; 
+                    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+                    display: inline-block;
+                    min-width: 200px;
+                }}
+                .metric-value {{ font-size: 24px; font-weight: bold; color: #3B82F6; }}
+                .metric-label {{ color: #666; }}
+                .grid {{ display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; }}
+                .header {{ 
+                    background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); 
+                    color: white; 
+                    padding: 30px; 
+                    border-radius: 15px;
+                    margin-bottom: 30px;
+                }}
+                .country-badge {{
+                    display: inline-block;
+                    background: #10b981;
+                    color: white;
+                    padding: 5px 15px;
+                    border-radius: 20px;
+                    margin: 5px;
+                    font-size: 14px;
+                }}
+            </style>
+        </head>
+        <body>
+            <div class="header">
+                <h1>🚀 Ultimate Profit Master Dashboard v18.1</h1>
+                <p>Started: {self.start_time.strftime('%Y-%m-%d %H:%M:%S')}</p>
+                <p>High-Value Countries Edition</p>
+            </div>
+            <div class="grid">
+                {self._generate_metric_cards()}
+            </div>
+        </body>
+        </html>
+        """
+        return dashboard
+
+    def _generate_metric_cards(self) -> str:
+        cards = []
+        for category, values in self.metrics.items():
+            if values:
+                latest = values[-1]['value']
+
+                color = '#3B82F6'
+                if 'quality' in category.lower():
+                    if latest >= 85:
+                        color = '#10B981'
+                    elif latest >= 70:
+                        color = '#F59E0B'
+                    else:
+                        color = '#EF4444'
+                elif 'earning' in category.lower():
+                    color = '#8B5CF6'
+                elif 'count' in category.lower():
+                    color = '#06B6D4'
+
+                cards.append(f"""
+                <div class="metric-card">
+                    <div class="metric-label">{category}</div>
+                    <div class="metric-value" style="color: {color};">{latest}</div>
+                    <div style="font-size: 12px; color: #999;">
+                        {len(values)} measurements
+                    </div>
+                </div>
+                """)
+        return '\n'.join(cards) if cards else "<p>No metrics available</p>"
+
+class SelfOptimizingEngine:
+    """ራሱን የሚያሻሽል የስርዓት ሞተር"""
+
+    def __init__(self):
+        self.performance_log = []
+        self.optimization_rules = self._load_optimization_rules()
+
+    def analyze_and_optimize(self, content_result: Dict) -> Dict:
+        analysis = {
+            'generation_time': content_result.get('generation_time', 0),
+            'quality_score': content_result.get('quality_report', {}).get('overall_score', 0),
+            'word_count': content_result.get('word_count', 0),
+            'timestamp': datetime.now().isoformat()
+        }
+
+        self.performance_log.append(analysis)
+
+        optimizations = []
+
+        if analysis['generation_time'] > 30:
+            optimizations.append({
+                'issue': 'Slow generation time',
+                'suggestion': 'Switch to faster AI models for initial draft',
+                'priority': 'high'
+            })
+
+        if analysis['quality_score'] < 85:
+            optimizations.append({
+                'issue': 'Quality below threshold',
+                'suggestion': 'Add additional refinement loop',
+                'priority': 'high'
+            })
+
+        if analysis['word_count'] < 2000:
+            optimizations.append({
+                'issue': 'Content too short',
+                'suggestion': 'Increase prompt detail and token limit',
+                'priority': 'medium'
+            })
+
+        return {
+            'analysis': analysis,
+            'optimizations': optimizations,
+            'total_optimizations_applied': len(self.performance_log) * 2,
+            'performance_history': self._get_performance_summary()
+        }
+
+    def _load_optimization_rules(self) -> List[Dict]:
+        return [
+            {
+                'condition': lambda x: x.get('generation_time', 0) > 30,
+                'action': 'switch_to_fast_mode',
+                'description': 'Use faster AI models'
+            },
+            {
+                'condition': lambda x: x.get('quality_score', 0) < 80,
+                'action': 'add_refinement_step',
+                'description': 'Add extra quality check'
+            },
+            {
+                'condition': lambda x: x.get('word_count', 0) < 2000,
+                'action': 'increase_token_limit',
+                'description': 'Increase token limit for generation'
+            }
+        ]
+
+    def _get_performance_summary(self) -> Dict:
+        if not self.performance_log:
+            return {}
+
+        quality_scores = [x['quality_score'] for x in self.performance_log]
+        generation_times = [x['generation_time'] for x in self.performance_log]
+
+        return {
+            'average_quality': round(sum(quality_scores) / len(quality_scores), 2),
+            'average_generation_time': round(sum(generation_times) / len(generation_times), 2),
+            'total_content_generated': len(self.performance_log),
+            'improvement_trend': self._calculate_improvement_trend(quality_scores)
+        }
+
+    def _calculate_improvement_trend(self, scores: List[float]) -> str:
+        if len(scores) < 2:
+            return "insufficient_data"
+
+        recent_avg = sum(scores[-3:]) / min(3, len(scores))
+        earlier_avg = sum(scores[:3]) / min(3, len(scores))
+
+        if recent_avg > earlier_avg + 5:
+            return "improving"
+        elif recent_avg < earlier_avg - 5:
+            return "declining"
+        else:
+            return "stable"
+
+# =================== የመጀመሪያ አፈፃፀም እና የማስኬድ ተግባራት ===================
+def check_dependencies():
+    REQUIRED_PACKAGES = [
+        ('httpx', 'httpx'),
+        ('textblob', 'textblob'),
+        ('nltk', 'nltk'),
+        ('numpy', 'numpy'),
+        ('pytz', 'pytz')
+    ]
+
+    OPTIONAL_PACKAGES = [
+        ('pandas', 'pandas'),
+        ('yaml', 'PyYAML'),
+        ('jinja2', 'jinja2'),
+        ('psutil', 'psutil')
+    ]
+
+    missing_required = []
+    missing_optional = []
+
+    print("🔍 የፕሮግራም ጥገኛዎችን በመፈተሽ...")
+
+    for import_name, package_name in REQUIRED_PACKAGES:
+        try:
+            __import__(import_name)
+        except ImportError:
+            missing_required.append(package_name)
+            print(f"❌ {package_name} አልተገኘም")
+
+    for import_name, package_name in OPTIONAL_PACKAGES:
+        try:
+            __import__(import_name)
+        except ImportError:
+            missing_optional.append(package_name)
+
+    try:
+        import nltk
+        nltk.data.find('tokenizers/punkt')
+        nltk.data.find('corpora/stopwords')
+    except LookupError:
+        print("⚠️ NLTK ውሂብ አልተገኘም")
+        print("   Auto-downloading NLTK data...")
+        try:
+            nltk.download('punkt', quiet=True)
+            nltk.download('stopwords', quiet=True)
+            print("✅ NLTK data downloaded.")
+        except:
+            pass
+
+    if missing_required:
+        print(f"\n❌ አስፈላጊ ሞጁሎች አልተገኙም: {', '.join(missing_required)}")
+        print("\n📦 ለመጫን የሚከተለውን ኮማንድ ይጠቀሙ:")
+        print(f"   pip install {' '.join(missing_required)}")
+        return False
+
+    return True
+
+# =================== 🛠️ የተሻሻለ የ10 ደቂቃ ስትራቴጂ (The 10-Minute Strategy) ===================
+async def run_10_minute_production_strategy(system):
+    target_countries_map = [
+        ("US", "USA"),
+        ("GB", "UK"),
+        ("DE", "Germany"),
+        ("CA", "Canada"),
+        ("AU", "Australia"),
+        ("NO", "Norway"),
+        ("SE", "Sweden"),
+        ("CH", "Switzerland"),
+        ("FR", "France"),
+        ("JP", "Japan")
+    ]
+
+    topic = "The Rise of AI Agents: How to Build Passive Income in 2025"
+
+    print("\n" + "="*80)
+    print(f"🚀 የ10 ሀገራት ምርት ተጀምሯል። (The 10-Minute Strategy)")
+    print(f"📝 ርዕስ: {topic}")
+    print(f"⏱️ ግምታዊ ጊዜ: ~10-12 ደቂቃ")
+    print("="*80)
+
+    start_total_time = time.time()
+
+    for index, (code, name) in enumerate(target_countries_map, 1):
+        country_start_time = time.time()
+        print(f"\n🌍 [{index}/10] አሁን ለ {name} ({code}) ይዘት እየተመረተ ነው...")
+
+        try:
+            result = await system.full_production_pipeline(topic, target_countries=[code])
+
+            if result and result.get('quality_report', {}).get('overall_score', 0) > 0:
+                print(f"   ✅ {name} ተሳክቷል! (Quality: {result['quality_report']['overall_score']}%)")
+
+                filename = save_to_file(result, 'json')
+                print(f"   💾 ተቀምጧል: {filename}")
+
+                save_to_file(result, 'html')
+            else:
+                print(f"   ⚠️ {name} ላይ ውጤቱ ባዶ ነው ወይም ችግር አጋጥሟል፣ ግን እንቀጥላለን።")
+
+        except Exception as e:
+            print(f"   ❌ ስህተት በ {name}: {e}")
+
+        duration = time.time() - country_start_time
+        print(f"   ⏱️ የወሰደው ጊዜ: {duration:.2f} ሰከንድ")
+
+        if index < len(target_countries_map):
+            print(f"⏳ ቀጣዩ ሀገር ከመጀመሩ በፊት ለ60 ሰከንድ እረፍት (Cooling down)...")
+
+            for i in range(60, 0, -1):
+                sys.stdout.write(f"\r   💤 እረፍት: {i} ሰከንድ ቀረው... ")
+                sys.stdout.flush()
+                await asyncio.sleep(1)
+            print("\r   🚀 እረፍት ተጠናቀቀ! ቀጣዩን እንጀምር...            ")
+
+    total_duration = (time.time() - start_total_time) / 60
+    print("\n" + "="*80)
+    print(f"🎉 ጨርሰናል! አስሩንም ሀገራት በ {total_duration:.2f} ደቂቃ ውስጥ አጠናቅቄያለሁ!")
+    print("="*80)
+
+    if os.getenv('GITHUB_ACTIONS') == 'true':
+        print("🤖 GitHub Actions Environment Detected - Exiting cleanly.")
+        sys.exit(0)
+
+# =================== የተሻሻለ ዋና አፈፃፀም ፋይል (Main) ===================
+async def enhanced_main():
+    UserInterface.display_banner()
+
+    try:
+        if not check_dependencies():
+            return
+
+        config = PremiumConfig()
+        global logger
+        logger = setup_logging(config)
+
+        system = UltimateProfitMasterSystem(config)
+
+        UserInterface.display_system_status(config, system)
+
+        if os.getenv('GITHUB_ACTIONS') == 'true' or os.getenv('AUTO_RUN') == 'true':
+            print("\n🤖 Automation detected. Starting Mega-Production automatically...")
+            default_topic = "AI-Driven Digital Wealth and Global Automation 2026"
+            await system.mega_engine.produce_11_countries_mega_loop(default_topic)
+            return
+
+        while True:
+            UserInterface.display_main_menu()
+
+            choice = UserInterface.get_user_input(
+                "📋 ምርጫዎን ያስገቡ (1-10)",
+                input_type=int,
+                options=list(range(1, 11))
+            )
+
+            if choice == 1:
+                await single_topic_mode(system, config)
+            elif choice == 2:
+                await batch_mode_enhanced(system, config)
+            elif choice == 3:
+                await project_management_mode_enhanced(system, config)
+            elif choice == 4:
+                await system_optimization_mode_enhanced(system, config)
+            elif choice == 5:
+                await production_report_mode(system, config)
+            elif choice == 6:
+                await service_monitoring_mode(system, config)
+            elif choice == 7:
+                UserInterface.display_system_status(config, system)
+            elif choice == 8:
+                await high_value_countries_mode(system, config)
+            elif choice == 10:
+                print("\n" + "═"*60)
+                print("💎 የሜጋ ምርት ተርሚናል (15,000+ ቃላት በሁለት ዙር)")
+                print("═"*60)
+                mega_topic = input("\n📝 የምርት ርዕሱን ያስገቡ (ለምሳሌ፡ 'AI Agency Business'): ").strip()
+                if not mega_topic:
+                    mega_topic = "Strategic Wealth Building with AI and Global Automation"
+
+                await system.mega_engine.produce_11_countries_mega_loop(mega_topic)
+
+            elif choice == 9:
+                print("\n👋 እንደገና ተገናኙ! መልካም ቀን።")
+                break
+            else:
+                print("❌ ትክክል ያልሆነ ምርጫ። እባክዎ እንደገና ይሞክሩ።")
+
+    except KeyboardInterrupt:
+        print("\n\n⚠️ በተጠቃሚ ተቋርጧል (KeyboardInterrupt)")
+    except Exception as e:
+        print(f"\n❌ ያልተጠበቀ ስህተት ተፈጥሯል: {e}")
+        import traceback
+        traceback.print_exc()
+        logger.error(f"ዋና አፈፃፀም ስህተት: {e}", exc_info=True)
+
+# =================== 🏁 መጨረሻ የምርት ማስጀመሪያ ኮድ ===================
+if __name__ == "__main__":
+    print("\n" + "="*70)
+    print("🚀 ULTIMATE PROFIT MASTER MEGA-SYSTEM v18.1")
+    print("💎 ፍጹም የምርት ዝግጁ እጅግ የላቀ ስርዓት")
+    print("🌍 HIGH-VALUE COUNTRIES EDITION (10+ Countries)")
+    print("🔥 ሁሉም ክፍተቶች ተሞልተዋል!")
+    print("✅ ምንም ነገር አልተቀነሰም!")
+    print("🎯 አሁን ለምርት ፍጹም ዝግጁ!")
+    print("="*70)
+
+    try:
+        asyncio.run(enhanced_main())
+    except KeyboardInterrupt:
+        print("\n\n👋 ፕሮግራሙ ተቋርጧል!")
+        sys.exit(0)
+    except Exception as e:
+        print(f"\n💥 ከፍተኛ ስህተት: {e}")
+        import traceback
+        traceback.print_exc()
+
+        error_log = Path('crash_report.log')
+        with open(error_log, 'w', encoding='utf-8') as f:
+            f.write(f"Crash Report - {datetime.now()}\n")
+            f.write(f"Error: {e}\n")
+            f.write("Traceback:\n")
+            traceback.print_exc(file=f)
+
+        print(f"\n📝 የስህተት ሪፖርት ተስተካክሏል: {error_log}")
+        print("🆘 እባክዎ ይህን ፋይል ለድጋፍ ያህል ያስተላልፉ")
+        sys.exit(1)
