@@ -1,0 +1,164 @@
+{
+  "production_id": "enterprise_7cf00d667424",
+  "topic": "Enterprise AI Implementation Strategies 2026",
+  "target_countries": [
+    "US"
+  ],
+  "content_type": "enterprise_guide",
+  "enterprise_standards": {
+    "min_words": 15000,
+    "min_quality": 88,
+    "min_cultural_depth": 85,
+    "min_compliance_score": 95,
+    "sequential_processing": true,
+    "intelligent_delays": true,
+    "quality_guarantee": true,
+    "key_rotation": "15-key-omega",
+    "quality_guardian_version": "3.1"
+  },
+  "omega_key_system": {
+    "keys_loaded": 9,
+    "start_rotations": 0,
+    "total_rotations": 1,
+    "key_statistics": {
+      "1": {
+        "uses": 1,
+        "successes": 0,
+        "failures": 1,
+        "last_used": "2026-02-21T21:16:12.218198",
+        "status": "unreliable"
+      },
+      "2": {
+        "uses": 0,
+        "successes": 0,
+        "failures": 0,
+        "last_used": null,
+        "status": "active"
+      },
+      "3": {
+        "uses": 0,
+        "successes": 0,
+        "failures": 0,
+        "last_used": null,
+        "status": "active"
+      },
+      "4": {
+        "uses": 0,
+        "successes": 0,
+        "failures": 0,
+        "last_used": null,
+        "status": "active"
+      },
+      "5": {
+        "uses": 0,
+        "successes": 0,
+        "failures": 0,
+        "last_used": null,
+        "status": "active"
+      },
+      "6": {
+        "uses": 0,
+        "successes": 0,
+        "failures": 0,
+        "last_used": null,
+        "status": "active"
+      },
+      "7": {
+        "uses": 0,
+        "successes": 0,
+        "failures": 0,
+        "last_used": null,
+        "status": "active"
+      },
+      "8": {
+        "uses": 0,
+        "successes": 0,
+        "failures": 0,
+        "last_used": null,
+        "status": "active"
+      },
+      "9": {
+        "uses": 0,
+        "successes": 0,
+        "failures": 0,
+        "last_used": null,
+        "status": "active"
+      }
+    }
+  },
+  "status": "completed",
+  "start_time": "2026-02-21T21:16:12.217552",
+  "performance_monitoring": true,
+  "country_results": [
+    {
+      "country": "US",
+      "country_number": 1,
+      "total_countries": 1,
+      "status": "failed",
+      "stages": {},
+      "content": null,
+      "metrics": {},
+      "enhancements": {},
+      "ai_enhancements": {},
+      "start_time": "2026-02-21T21:16:12.218408",
+      "production_id": "enterprise_7cf00d667424",
+      "error": "'NoneType' object has no attribute 'optimize_title'",
+      "end_time": "2026-02-21T21:16:12.222631",
+      "duration": 0.004223,
+      "omega_key_used": 1
+    }
+  ],
+  "overall_metrics": {
+    "total_countries": 1,
+    "completed_countries": 0,
+    "avg_word_count": 0,
+    "avg_quality": 0,
+    "total_words": 0,
+    "estimated_revenue": 0,
+    "success_rate": 0.0,
+    "enterprise_standards_met": 0,
+    "enterprise_standards_rate": 0,
+    "omega_key_statistics": {},
+    "omega_key_system": {
+      "total_keys": 9,
+      "blacklisted_keys": 0,
+      "total_rotations": 1
+    }
+  },
+  "enhancement_reports": {},
+  "end_time": "2026-02-21T21:16:12.222856",
+  "total_duration": 0.005304,
+  "performance_report": {
+    "profile_output": "         10412 function calls (10188 primitive calls) in 0.013 seconds\n\n   Ordered by: cumulative time, internal time\n   List reduced from 246 to 30 due to restriction <30>\n\n   ncalls  tottime  percall  cumtime  percall filename:lineno(function)\n      2/1    0.000    0.000    0.011    0.011 /home/runner/work/auto-money-maker/auto-money-maker/enterprise_runner.py:395(safe_execute)\n        1    0.000    0.000    0.011    0.011 /home/runner/work/auto-money-maker/auto-money-maker/enterprise_runner.py:4906(run_enterprise_production)\n       33    0.000    0.000    0.005    0.000 /opt/hostedtoolcache/Python/3.12.12/x64/lib/python3.12/logging/__init__.py:1660(_log)\n       30    0.000    0.000    0.005    0.000 /opt/hostedtoolcache/Python/3.12.12/x64/lib/python3.12/logging/__init__.py:1529(info)\n       33    0.000    0.000    0.004    0.000 /opt/hostedtoolcache/Python/3.12.12/x64/lib/python3.12/logging/__init__.py:1686(handle)\n       33    0.000    0.000    0.004    0.000 /opt/hostedtoolcache/Python/3.12.12/x64/lib/python3.12/logging/__init__.py:1746(callHandlers)\n        1    0.000    0.000    0.004    0.004 /home/runner/work/auto-money-maker/auto-money-maker/enterprise_runner.py:4248(_process_country_enterprise)\n      100    0.000    0.000    0.004    0.000 /opt/hostedtoolcache/Python/3.12.12/x64/lib/python3.12/logging/__init__.py:1011(handle)\n      100    0.000    0.000    0.004    0.000 /opt/hostedtoolcache/Python/3.12.12/x64/lib/python3.12/logging/__init__.py:1148(emit)\n        1    0.000    0.000    0.004    0.004 /opt/hostedtoolcache/Python/3.12.12/x64/lib/python3.12/traceback.py:178(print_exc)\n        1    0.000    0.000    0.004    0.004 /opt/hostedtoolcache/Python/3.12.12/x64/lib/python3.12/traceback.py:111(print_exception)\n        1    0.000    0.000    0.003    0.003 /opt/hostedtoolcache/Python/3.12.12/x64/lib/python3.12/traceback.py:718(__init__)\n       11    0.000    0.000    0.002    0.000 /home/runner/work/auto-money-maker/auto-money-maker/enterprise_runner.py:305(is_country_processed)\n        1    0.000    0.000    0.002    0.002 /opt/hostedtoolcache/Python/3.12.12/x64/lib/python3.12/traceback.py:399(_extract_from_extended_frame_gen)\n      100    0.000    0.000    0.002    0.000 /opt/hostedtoolcache/Python/3.12.12/x64/lib/python3.12/logging/__init__.py:988(format)\n        6    0.000    0.000    0.002    0.000 /opt/hostedtoolcache/Python/3.12.12/x64/lib/python3.12/traceback.py:318(line)\n        1    0.000    0.000    0.002    0.002 /opt/hostedtoolcache/Python/3.12.12/x64/lib/python3.12/linecache.py:26(getline)\n        1    0.000    0.000    0.002    0.002 /opt/hostedtoolcache/Python/3.12.12/x64/lib/python3.12/linecache.py:36(getlines)\n        1    0.000    0.000    0.002    0.002 /opt/hostedtoolcache/Python/3.12.12/x64/lib/python3.12/linecache.py:83(updatecache)\n        1    0.001    0.001    0.002    0.002 {method 'readlines' of '_io._IOBase' objects}\n      100    0.000    0.000    0.001    0.000 /opt/hostedtoolcache/Python/3.12.12/x64/lib/python3.12/logging/__init__.py:690(format)\n        1    0.000    0.000    0.001    0.001 /opt/hostedtoolcache/Python/3.12.12/x64/lib/python3.12/traceback.py:1067(_compute_suggestion_error)\n        1    0.000    0.000    0.001    0.001 /home/runner/work/auto-money-maker/auto-money-maker/enterprise_runner.py:5172(_generate_enterprise_reports)\n       25    0.000    0.000    0.001    0.000 /opt/hostedtoolcache/Python/3.12.12/x64/lib/python3.12/traceback.py:1129(_levenshtein_distance)\n       34    0.000    0.000    0.001    0.000 /opt/hostedtoolcache/Python/3.12.12/x64/lib/python3.12/logging/__init__.py:1266(emit)\n       11    0.001    0.000    0.001    0.000 {method 'execute' of 'sqlite3.Cursor' objects}\n      331    0.001    0.000    0.001    0.000 {method 'write' of '_io.TextIOWrapper' objects}\n      100    0.000    0.000    0.001    0.000 /opt/hostedtoolcache/Python/3.12.12/x64/lib/python3.12/logging/__init__.py:1137(flush)\n       11    0.001    0.000    0.001    0.000 {built-in method _sqlite3.connect}\n       33    0.000    0.000    0.001    0.000 /home/runner/work/auto-money-maker/auto-money-maker/enterprise_runner.py:3086(format)\n\n\n",
+    "elapsed_time_seconds": 0.11605477333068848,
+    "memory_report": {
+      "rss_mb": 116.79296875,
+      "vms_mb": 370.546875,
+      "percent": 0.7303775909729151,
+      "available_system_mb": 14956.1015625,
+      "cpu_percent": 0.0
+    },
+    "peak_memory_mb": 115.78125
+  },
+  "system_status": {
+    "memory": {
+      "total_mb": 15990.765625,
+      "available_mb": 14956.2890625,
+      "percent_used": 6.5,
+      "swap_mb": 0.0
+    },
+    "cpu": {
+      "percent": 0.0,
+      "count": 4
+    },
+    "disk": {
+      "free_gb": 90.23638916015625
+    }
+  },
+  "schema_validation": {
+    "valid": false,
+    "errors": [
+      "None is not of type 'string'\n\nFailed validating 'type' in schema['properties']['country_results']['items']['properties']['content']:\n    {'type': 'string'}\n\nOn instance['country_results'][0]['content']:\n    None"
+    ]
+  }
+}
