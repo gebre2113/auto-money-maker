@@ -1,6 +1,6 @@
 name: 🚀 Profit Master Elite - PRODUCTION RUN v2.0
 
-on:
+on:🔋
   workflow_dispatch:
     inputs:
       topic:
