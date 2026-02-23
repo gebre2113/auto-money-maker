@@ -1,6 +1,6 @@
 name: 🧪 Profit Master Engine - INDIVIDUAL TEST RUN
 
-on:
+on:🩸
   workflow_dispatch: # በእጅህ Run ስትለው ብቻ እንዲሰራ
   push:
     paths:
