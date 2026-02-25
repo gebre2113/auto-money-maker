@@ -1,6 +1,6 @@
 name: 👑 TITAN v22.0 ULTIMATE MULTI-CHANNEL ORACLE
 
-on:
+on:💫
   schedule:
     # በየ 30 ደቂቃው እንዲነሳ ተስተካክሏል (ደቂቃ 0 እና 30 ላይ)
     - cron: '*/30 * * * *'
